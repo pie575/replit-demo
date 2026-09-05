@@ -1,9 +1,11 @@
 ---
-title: "Shopify 연결하기"
-description: "Shopify를 연결하면 Agent가 Replit 안에서 Shopify 스토어를 프로비저닝하고, 커스텀 스토어프런트를 구축하며, 제품과 인벤토리를 관리할 수 있습니다."
+title: "Shopify 연결"
+description: "Shopify를 연결하면 Agent가 Shopify store를 프로비저닝하고, 맞춤형 storefront를 구축하며, Replit 안에서 제품과 inventory를 관리할 수 있습니다."
+sidebarTitle: "Shopify"
+icon: "bag-shopping"
 ---
 
-export const WistiaEmbed = ({videoId, title = "Wistia video", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+export const WistiaEmbed = ({videoId, title = "Wistia 동영상", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
   if (!videoId) {
     return null;
   }
@@ -13,148 +15,166 @@ export const WistiaEmbed = ({videoId, title = "Wistia video", playerColor = "FF0
     </Frame>;
 };
 
-<WistiaEmbed videoId="d3o9gwwtiw" title="Shopify를 연결하고 Agent로 스토어프런트 구축하기" />
+<WistiaEmbed videoId="d3o9gwwtiw" title="Shopify를 연결하고 Agent로 storefront 만들기" />
 
-Shopify 커넥터를 사용하면 Agent가 Shopify 스토어를 프로비저닝하고, 커스텀 스토어프런트를 구축하며, 하나의 대화에서 API 키 없이 제품과 인벤토리를 관리합니다. 물리적 제품 판매를 설명하면 Agent가 Shopify를 추천하고, 라이브로 전환할 때만 Shopify를 방문하면 됩니다. 첫 번째 프롬프트부터 실제 주문까지 약 10분이면 됩니다.
+Shopify connector를 사용하면 Agent가 Shopify store를 프로비저닝하고, 그에 맞는 맞춤형 storefront를 만들고, products와 inventory까지 관리합니다. 이 모든 작업이 하나의 conversation 안에서 API key 없이 이루어집니다. 실물 상품을 판매한다고 설명하면 Agent가 Shopify를 추천하며, Shopify에 직접 접속할 일은 go live할 때뿐입니다. 첫 prompt부터 실제 주문까지 약 10분이면 됩니다.
 
 <Note>
-  단계별 안내는 [Shopify 스토어프런트 구축하기](/ko/build/ecommerce-store)를 참조하세요.
+  단계별 안내는 [Shopify storefront 만들기](/ko/build/ecommerce-store)를 참고하세요.
 </Note>
 
-## 만들 수 있는 것
+<div id="what-you-can-build">
+  ## 만들 수 있는 것
+</div>
 
-* 물리적 제품을 위한 커스텀 디자인 스토어프런트
-* 브랜드 굿즈 및 의류 스토어
-* 장바구니와 결제가 있는 D2C 쇼핑몰
-* Shopify 스토어 기반의 카탈로그 및 인벤토리 도구
-* 단일 히어로 아이템을 판매하는 제품 랜딩 페이지
+* 실물 상품을 위한 맞춤 디자인 storefront
+* 브랜드 굿즈 및 의류 store
+* 장바구니와 checkout을 갖춘 소비자 직접 판매(D2C) shop
+* Shopify store와 연동되는 카탈로그 및 inventory 도구
+* 단일 hero 상품을 판매하는 제품 landing page
 
-## 예시
+<div id="examples">
+  ## 예시
+</div>
 
-<Frame caption="Ember & Oak: 튜토리얼에서 구축된 수제 소이 캔들 스토어">
-  <img src="/assets/mirror/ember-and-oak-candles-a7ab5795c737.png" alt="Ember & Oak 캔들 스토어프런트: 크림색과 앰버 톤 디자인, 켜진 캔들 히어로 이미지와 'Light that feels like home' 헤드라인" width="3452" height="1978" data-path="images/build-examples/ember-and-oak-candles.png" />
+<Frame caption="Ember & Oak: 튜토리얼에서 만든 핸드푸어 소이 캔들 스토어">
+  <img src="/assets/mirror/ember-and-oak-candles-a7ab5795c737.png" alt="Ember & Oak 캔들 storefront: 따뜻한 크림·앰버 톤 디자인에 불 켜진 캔들 hero 이미지와 'Light that feels like home' 헤드라인이 배치된 화면" width="3452" height="1978" data-path="images/build-examples/ember-and-oak-candles.png" />
 </Frame>
 
-<Frame caption="Petals & Purl: 수제 뜨개질 실꽃 스토어">
-  <img src="/assets/mirror/petals-and-purl-cd1153838907.png" alt="Petals & Purl 스토어프런트: 아늑한 수제 뜨개질 실꽃 쇼핑몰, 'Blooms that last a lifetime' 헤드라인" width="1291" height="740" data-path="images/build-examples/petals-and-purl.png" />
+<Frame caption="Petals & Purl: 손뜨개 실꽃 스토어">
+  <img src="/assets/mirror/petals-and-purl-cd1153838907.png" alt="Petals & Purl storefront: 'Blooms that last a lifetime' 헤드라인이 있는 아늑한 분위기의 손뜨개 실꽃 상점" width="1291" height="740" data-path="images/build-examples/petals-and-purl.png" />
 </Frame>
 
-## 작동 방식
+<div id="how-it-works">
+  ## 작동 방식
+</div>
 
 <Steps>
-  <Step title="스토어 설명하기">
-    Agent에게 판매하고 싶은 것을 말하세요. 이름을 지정하지 않아도 물리적 제품에는 Shopify를 추천합니다.
+  <Step title="스토어를 설명하세요">
+    무엇을 판매하고 싶은지 Agent에게 알려주세요. 직접 언급하지 않아도 실물 상품이라면 Shopify를 추천합니다.
 
     <Frame>
-      <img src="/assets/mirror/describe-your-store-b5d724daee99.png" alt="Replit 프롬프트 박스에 캔들 스토어 프롬프트가 입력된 상태" width="1440" height="900" data-path="images/replitai/shopify/describe-your-store.png" />
+      <img src="/assets/mirror/describe-your-store-b5d724daee99.png" alt="양초 스토어 프롬프트가 입력된 Replit prompt box" width="1440" height="900" data-path="images/replitai/shopify/describe-your-store.png" />
     </Frame>
   </Step>
 
-  <Step title="Agent가 스토어 프로비저닝">
-    Replit의 Shopify Partner 계정 아래에 개발 스토어가 생성되고(약 10초), Replit Sales Channel 앱이 설치되어 스토어가 연결됩니다. API 키 불필요. 앱당 스토어 하나. 클레임할 때까지 비밀번호로 보호됩니다.
+  <Step title="Agent가 스토어를 준비합니다">
+    Replit의 Shopify 파트너 계정 아래에 development store가 생성되고(약 10초 소요), Replit Sales Channel 앱이 설치되며, 스토어가 연결됩니다. API key는 필요 없고, 앱당 스토어는 하나이며, claim하기 전까지는 비밀번호로 보호됩니다.
 
     <Frame>
-      <img src="/assets/mirror/connect-shopify-store-7f36389f976f.png" alt="Replit Agent가 Shopify 스킬로 핸드오프하며 Connect Shopify 버튼이 있는 'Connect to Shopify' 카드 표시" width="3452" height="1984" data-path="images/replitai/shopify/connect-shopify-store.png" />
+      <img src="/assets/mirror/connect-shopify-store-7f36389f976f.png" alt="Replit Agent가 Shopify skill로 작업을 넘기며 Connect Shopify 버튼이 있는 'Connect to Shopify' 카드를 표시하는 화면" width="3452" height="1984" data-path="images/replitai/shopify/connect-shopify-store.png" />
     </Frame>
   </Step>
 
-  <Step title="Agent가 구축 및 관리">
-    Agent가 헤드리스 스토어프런트를 디자인하고 제품, 옵션, 인벤토리, 컬렉션, 할인을 관리합니다.
+  <Step title="Agent가 만들고 관리합니다">
+    Agent가 헤드리스 storefront를 디자인하고 products, 변형, inventory, 컬렉션, 할인을 관리합니다.
 
     <Frame>
-      <img src="/assets/mirror/add-product-8b098e606340.png" alt="이름과 가격이 있는 캔들 제품이 표시된 스토어프런트 제품 그리드" width="3452" height="1978" data-path="images/replitai/shopify/add-product.png" />
+      <img src="/assets/mirror/add-product-8b098e606340.png" alt="이름과 가격이 표시된 양초 상품들이 나열된 storefront 상품 그리드" width="3452" height="1978" data-path="images/replitai/shopify/add-product.png" />
     </Frame>
   </Step>
 
-  <Step title="Shopify에서 라이브 전환">
-    판매 준비가 되면 스토어를 클레임하고, 플랜을 선택하고, 결제를 설정하고, 런칭합니다.
+  <Step title="Shopify에서 Go live">
+    스토어를 claim하고, plan을 선택하고, payments를 설정한 다음, 판매할 준비가 되면 launch하세요.
 
     <Frame>
-      <img src="/assets/mirror/claim-store-4facb7c8b10c.png" alt="'Claim store' 버튼이 있는 Replit 'Claim your store' 화면" width="3452" height="1978" data-path="images/replitai/shopify/claim-store.png" />
+      <img src="/assets/mirror/claim-store-4facb7c8b10c.png" alt="'Claim store' 버튼이 있는 Replit의 'Claim your store' 화면" width="3452" height="1978" data-path="images/replitai/shopify/claim-store.png" />
     </Frame>
   </Step>
 </Steps>
 
-## Agent가 관리하는 것
+<div id="what-agent-manages">
+  ## Agent가 관리하는 항목
+</div>
 
-스토어프런트와 카탈로그의 모든 것을 채팅으로 편집할 수 있습니다.
+storefront와 카탈로그의 모든 요소는 Chat으로 편집할 수 있습니다.
 
-| 영역       | Agent가 하는 것                                                                                                                                                                                  |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 디자인      | 지침에 따라 헤드리스 프런트엔드를 생성합니다(Liquid 테마나 템플릿 라이브러리 없음). 카피, 레이아웃, 내비게이션, 모션, 제품 페이지를 채팅으로 편집하고 [Canvas](/ko/design/canvas) 변형으로 방향을 탐색할 수 있습니다. 실제 Replit 프로젝트이므로 블로그, 위시리스트, 랜딩 페이지로 확장할 수 있습니다. |
-| 제품       | 제품 및 옵션 생성, 수정, 삭제. 필드: 제목, 설명, 유형, 공급업체, 태그, SKU, 가격, 무게, 옵션(사이즈, 색상), 이미지, 가용성.                                                                                                            |
-| 인벤토리     | 옵션별 재고 설정 및 조정.                                                                                                                                                                              |
-| 컬렉션      | 제품을 컬렉션으로 그룹화.                                                                                                                                                                               |
-| 할인       | 가격 규칙과 사용 가능한 코드 생성.                                                                                                                                                                         |
-| 게시 및 동기화 | 새 제품은 스토어프런트에 자동으로 게시됩니다. 양방향 동기화: Shopify 관리자에서의 수정이 Replit 미리보기에 반영되고, Agent의 변경 사항은 Shopify 관리자에 반영됩니다.                                                                                   |
+| 영역               | Agent가 하는 일                                                                                                                                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Design           | 사용자의 지시에 따라 헤드리스 프런트엔드를 생성합니다(Liquid 테마 불필요, template 라이브러리 불필요). 문구, layout, 내비게이션, 모션, 제품 페이지를 Chat으로 편집할 수 있고, [Canvas](/ko/design/canvas) 변형으로 여러 direction을 탐색할 수 있습니다. 실제 Replit project이므로 블로그, 위시리스트, landing page 등을 추가해 확장할 수 있습니다. |
+| Products         | products와 변형을 생성, 수정, 삭제합니다. 필드: 제목, 설명, type, vendor, 태그, SKU, 가격, 무게, 옵션(사이즈, color), 이미지, 판매 가능 여부.                                                                                                                                     |
+| Inventory        | 변형별 재고를 설정하고 조정합니다.                                                                                                                                                                                                                        |
+| Collections      | products를 컬렉션으로 묶습니다.                                                                                                                                                                                                                      |
+| Discounts        | 가격 규칙과 사용 가능한 할인 코드를 생성합니다.                                                                                                                                                                                                                |
+| Publishing 및 동기화 | 새 products는 storefront에 자동으로 게시됩니다. 동기화는 양방향으로 이루어집니다. Shopify admin에서 편집한 내용은 Replit Preview에 반영되고, Agent가 적용한 changes는 Shopify admin에 나타납니다.                                                                                             |
 
-## Replit과 Shopify: 역할 분담
+<div id="replit-and-shopify-who-does-what">
+  ## Replit과 Shopify: 각자의 역할
+</div>
 
-| Replit 담당                    | Shopify 담당                 |
-| ---------------------------- | -------------------------- |
-| 스토어프런트 디자인 및 구축              | 호스팅된 결제                    |
-| 채팅을 통한 카탈로그 관리(제품, 인벤토리, 할인) | 제품, 인벤토리, 장바구니, 주문의 기록 시스템 |
-| 스토어프런트 호스팅 및 배포              | 결제, 신원 확인(KYC), 지급         |
-| Canvas 디자인 변형                | 세금, 배송, 이행                 |
-| 앱 확장(블로그, 랜딩 페이지 등)          | 멀티채널 판매                    |
+| Replit 담당                                 | Shopify 담당                                  |
+| ----------------------------------------- | ------------------------------------------- |
+| storefront 디자인 및 빌드                       | 호스팅형 checkout                               |
+| Chat을 통한 카탈로그 관리(products, inventory, 할인) | products, inventory, 장바구니, 주문의 기록 시스템       |
+| storefront 호스팅 및 deployment               | payments, identity verification(KYC), 대금 지급 |
+| Canvas 디자인 변형                             | 세금, 배송, 주문 이행                               |
+| 앱 확장(블로그, landing page 등)                 | 멀티채널 판매                                     |
 
-주문, 환불, 지급, 이행은 Agent가 아닌 Shopify 관리자에서 처리됩니다.
+주문, 환불, 대금 지급, 주문 이행은 Agent가 아닌 Shopify admin에서 처리합니다.
 
-## 연결 범위
+<div id="connection-scope">
+  ## 연결 범위
+</div>
 
-* API 키나 Connectors 패널 설정 없이 모든 앱의 모든 빌더가 대화에서 연결 가능.
-* 앱당 하나의 스코프: 각 앱은 고유한 Shopify 스토어를 갖습니다.
-* 스토어는 클레임할 때까지 Replit 소유의 개발 스토어입니다. 이메일이 Shopify와 공유되어 나중에 클레임할 수 있습니다.
-* 언제든지 Shopify 관리자에서 Replit 앱을 제거할 수 있습니다.
+* 모든 builder가 모든 앱에서 사용할 수 있으며, conversation 안에서 바로 연결되므로 Connectors 패널 설정이나 자격 증명이 필요 없습니다.
+* 범위는 앱 하나로 한정됩니다. 즉, 앱마다 별도의 Shopify store가 생성됩니다.
+* 해당 store는 사용자가 claim하기 전까지 Replit 소유의 development store입니다. 나중에 claim할 수 있도록 사용자의 이메일이 Shopify에 공유됩니다.
+* Shopify admin에서 언제든지 Replit 앱을 제거할 수 있습니다.
 
-## Shopify에서 라이브 전환
+<div id="go-live-on-shopify">
+  ## Shopify에서 Go live 하기
+</div>
 
-라이브 전환은 Replit이 아닌 Shopify에서 이루어집니다. Agent에게 Go Live 플로우를 시작하도록 요청한 후 Shopify 관리자에서 다음 판매자 소유 단계를 완료합니다:
+Go live는 Replit이 아닌 Shopify에서 진행됩니다. Agent에게 Go Live flow를 시작해 달라고 요청한 다음, Shopify admin에서 판매자가 직접 처리해야 하는 아래 단계를 완료하세요.
 
-* **스토어 클레임**: 채팅의 링크나 Shopify가 보내는 이메일을 통해 스토어를 클레임합니다. 링크는 7일 후 만료됩니다. 클레임하면 무료 체험이 시작됩니다.
-* **플랜 선택**: 실제 주문을 처리하려면 [유료 플랜](https://www.shopify.com/pricing)이 필요합니다.
-* **결제 설정**: [Shopify Payments](https://help.shopify.com/en/manual/payments/shopify-payments) 또는 다른 공급업체를 활성화하고 신원 확인(KYC)을 완료합니다. 클레임 계정의 KYC 완료 후 실제 결제가 가능합니다.
-* **[배송](https://help.shopify.com/en/manual/shipping)과 [세금](https://help.shopify.com/en/manual/taxes) 설정.**
-* **[커스텀 도메인 연결](/ko/build/add-custom-domain)**(선택사항) 후 스토어 비밀번호를 제거하여 구매자에게 스토어를 오픈합니다.
+* Chat에 표시된 링크 또는 Shopify가 보낸 이메일을 통해 **store를 claim**하세요. 링크는 7일 후 만료됩니다. claim하면 무료 trial이 시작됩니다.
+* **plan 선택**: 실제 주문을 처리하려면 [paid plan](https://www.shopify.com/pricing)이 필요합니다.
+* **payments 설정**: [Shopify Payments](https://help.shopify.com/en/manual/payments/shopify-payments) 또는 다른 provider를 활성화하고 identity verification(KYC)을 완료하세요. claim한 Account가 KYC를 마쳐야 실제 결제 승인이 이루어집니다.
+* **[배송](https://help.shopify.com/en/manual/shipping) 및 [세금](https://help.shopify.com/en/manual/taxes) 설정하기.**
+* **[custom domain](/ko/build/add-custom-domain) 연결**(선택 사항) 후 storefront 비밀번호를 해제해 구매자에게 store를 공개하세요.
 
-결제는 항상 Shopify 호스팅 결제로 리다이렉트되므로 구매자는 Shopify에서 결제합니다.
+Checkout은 항상 Shopify가 호스팅하는 checkout으로 리디렉션되므로 구매자는 Shopify에서 결제합니다.
 
 <Note>
-  결제, 신원 확인, 세금, 배송, 사기 검사는 Shopify에서 처리됩니다. Replit은 판매자 은행 정보, 세금 ID, 기타 민감한 정보를 수집하지 않습니다.
+  payments, identity verification, 세금, 배송, 사기 검사는 모두 Shopify에서 처리됩니다. Replit은 판매자의 은행 정보, 세금 식별번호를 비롯한 민감한 정보를 일절 수집하지 않습니다.
 </Note>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
 <AccordionGroup>
-  <Accordion title="Shopify 스토어 설정에 시간이 걸립니다">
-    프로비저닝 과정에서 여러 Shopify API를 호출하므로 시간이 걸릴 수 있습니다. Agent가 설정을 완료한 후 스토어프런트 구축을 요청하세요.
+  <Accordion title="Shopify store 설정에 시간이 오래 걸립니다">
+    provisioning 과정에서 여러 Shopify API를 호출하기 때문에 다소 시간이 걸릴 수 있습니다. storefront 구축을 요청하기 전에 Agent가 설정을 마칠 때까지 기다려 주세요.
   </Accordion>
 
-  <Accordion title="개발 중 결제 시 비밀번호 페이지가 표시됩니다">
-    개발 스토어는 라이브 전환 전까지 비밀번호로 보호되므로 결제 미리보기가 비밀번호 페이지로 이동할 수 있습니다. 예상된 동작이지만 장바구니는 여전히 작동합니다. 런칭할 때만 Shopify에서 비밀번호를 제거하세요.
+  <Accordion title="개발 중 checkout에서 비밀번호 페이지가 표시됩니다">
+    development store는 go live 전까지 password-protected 상태이므로 checkout previews에서 비밀번호 페이지가 나타날 수 있습니다. 정상적인 동작이며 장바구니는 그대로 작동합니다. Shopify의 비밀번호는 launch 시점에만 제거하세요.
   </Accordion>
 
-  <Accordion title="결제에서 실제 결제가 완료되지 않습니다">
-    실제 결제는 클레임한 Shopify 계정의 결제 설정 및 KYC 완료가 필요합니다. 완료 전까지 결제는 Shopify로 리다이렉트되지만 결제를 캡처할 수 없습니다. KYC를 완료하거나 이미 결제가 설정된 계정을 사용하세요.
+  <Accordion title="checkout에서 실제 결제가 완료되지 않습니다">
+    실제 결제를 받으려면 store를 claim한 Shopify Account에서 payments 설정과 KYC를 완료해야 합니다. 그전까지는 checkout이 Shopify로 리디렉션되더라도 결제를 처리할 수 없습니다. KYC를 완료하거나, payments 설정이 이미 완료된 Account를 사용하세요.
   </Accordion>
 
-  <Accordion title="Agent가 이 앱에 Shopify가 연결되지 않았다고 합니다">
-    각 스토어는 하나의 앱에 스코프됩니다. 다른 앱에서 Shopify를 연결했다면 Agent에게 현재 앱에 Shopify 스토어를 설정하도록 요청하세요.
+  <Accordion title="이 App에 Shopify가 연결되지 않았다고 Agent가 말합니다">
+    각 store는 하나의 App에만 연결됩니다. 다른 App에서 Shopify를 연결했다면, 현재 App에 Shopify store를 설정해 달라고 Agent에게 요청하세요.
   </Accordion>
 
-  <Accordion title="스토어프런트에 제품이 표시되지 않습니다">
-    제품은 활성화되고 게시된 경우에만 표시됩니다. Agent가 생성한 제품은 자동으로 게시됩니다. 없는 제품이 있다면 Agent에게 게시를 요청한 후 미리보기를 새로고침하세요.
+  <Accordion title="storefront에 products가 표시되지 않습니다">
+    product는 Active 상태이면서 게시되어야만 표시됩니다. Agent는 자신이 생성한 products를 자동으로 게시합니다. 누락된 항목이 있다면 Agent에게 게시를 요청한 뒤 Preview를 새로 고치세요.
   </Accordion>
 
-  <Accordion title="이전 후 연결을 다시 해야 합니다">
-    스토어를 클레임하거나 이전한 후 Shopify가 연결 재인증을 요청할 수 있습니다. Agent에게 Shopify 재연결을 요청하면 스토어 데이터 손실 없이 접근 권한을 복원합니다.
+  <Accordion title="이전 후 연결을 다시 설정해야 합니다">
+    store를 claim하거나 이전한 뒤에는 Shopify가 연결 재승인을 요청할 수 있습니다. Agent에게 Shopify 재연결을 요청하면 store를 잃지 않고 접근 권한이 복구됩니다.
   </Accordion>
 </AccordionGroup>
 
-## 관련 문서
+<div id="related-documentation">
+  ## 관련 문서
+</div>
 
-* [Shopify 스토어프런트 구축하기](/ko/build/ecommerce-store): 프롬프트부터 게시된 스토어프런트까지 단계별 가이드
-* [커스텀 도메인 추가하기](/ko/build/add-custom-domain): 스토어프런트에 브랜드 URL 부여
-* [Agent 통합](/ko/features/integrations/overview): Replit 관리 통합 및 Agent 서비스
-* [커넥터 관리](/ko/replitai/managing-connectors): 커넥터 설정 및 관리
-* [Shopify 도움말 센터](https://help.shopify.com/): 스토어 설정, 결제, 계정 관리
+* [Shopify storefront 구축하기](/ko/build/ecommerce-store): prompt 작성부터 storefront 게시까지 단계별 가이드
+* [custom domain 추가하기](/ko/build/add-custom-domain): storefront에 브랜드 URL 연결하기
+* [Agent integrations](/ko/features/integrations/overview): Replit이 관리하는 integration 및 Agent 서비스
+* [connector 관리하기](/ko/replitai/managing-connectors): connector 구성 및 관리 방법
+* [Shopify 헬프 센터](https://help.shopify.com/): store 설정, payments, 계정 관리

@@ -1,6 +1,8 @@
 ---
 title: "유료 이벤트 웹사이트 출시하기"
-description: "Notion을 바탕으로 프로그램, 연사, 장소, 유료 티켓을 출시하세요."
+description: "Notion의 프로그램, 연사, 장소, 유료 티켓 정보를 그대로 웹사이트로 만들어 보세요."
+sidebarTitle: "유료 이벤트 웹사이트 출시하기"
+icon: "calendar-days"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                기본 제공 커넥터가 아닙니다. Agent가 API 키를 요청합니다.
               </div> : null}
           </div>
         </div>)}
@@ -67,78 +69,86 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-프로그램, 연사, 장소, 오시는 길, 티켓 체크아웃을 갖춘 완전한 유료 이벤트 웹사이트를
-만드세요. 참석자는 Replit Database에 저장하고, 결제는 Stripe로 받고, 확인 메일은
-Resend로 보내고, 명단은 내보내세요. 링크를 공유하기 전에 테스트 주문을 넣어보세요.
+프로그램, 연사, 장소, 오시는 길, 티켓 결제까지 갖춘 완전한 유료 이벤트 웹사이트를 만들어 보세요. 참가자 정보를 Replit Database에 저장하고, Stripe로 결제를 받고, Resend로 확인 메일을 보내고, 명단을 내보낼 수 있습니다. 링크를 공유하기 전에 테스트 주문을 먼저 진행해 보세요.
 
-## 적합한 대상
+<div id="best-for">
+  ## 이런 경우에 적합합니다
+</div>
 
-* 콘퍼런스, 밋업, 출시 행사를 위한 공개 페이지와 유료 티켓이 필요한 이벤트 마케터
-* 별도의 콘텐츠 시스템 없이 앱 안에서 어젠다를 편집해야 하는 커뮤니티 리드
+* 콘퍼런스, 밋업, 출시 행사를 위해 공개 페이지와 유료 티켓이 필요한 이벤트 마케터
+* 별도의 콘텐츠 시스템 없이 앱에서 바로 일정을 수정하고 싶은 커뮤니티 담당자
 
-## 커넥터
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 {
-  id: "notion",
-  name: "Notion",
-  why: "연사, 프로그램, 세션 시간",
+id: "notion",
+name: "Notion",
+why: "발표자, 프로그램, 세션 시간",
 },
 { id: "resend", name: "Resend", why: "구매 후 확인 이메일" },
-{ id: "stripe", name: "Stripe", why: "유료 티켓과 체크아웃" },
+{ id: "stripe", name: "Stripe", why: "유료 티켓 및 결제" },
 ]}
 />
 
-## 시작하기 전에
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
-이벤트 이름, 날짜, 장소, 티켓 가격과 연사용 Notion 데이터베이스(이름, 사진, 세션)를
-준비하세요. Notion, Resend, Stripe를 연결하세요. Agent가 앱 안에 체크아웃을
-구축합니다.
+행사 이름, 날짜, 장소, 티켓 가격과 연사 정보(이름, 사진, 세션)를 담은 Notion 데이터베이스를 준비하세요. Notion, Resend, Stripe를 연결합니다. Agent가 앱에 결제(checkout) 기능을 구축합니다.
 
-## Agent에게 요청하기
-
-<AiPrompt>
-  이 Notion 페이지\[링크]를 바탕으로 완전한 유료 이벤트 웹사이트를 만들어
-  주세요: 프로그램, 연사, 장소, 오시는 길, 티켓 체크아웃입니다. Notion에서 연사
-  이름, 사진, 직함, 소개, 세션 시간을 사용해 주세요. Stripe로 티켓당 \[가격]을
-  청구해 주세요. 참석자는 Replit Database에 저장하고, Resend로 확인 메일을
-  보내고, 명단을 내보내 주세요.
-</AiPrompt>
-
-## 예상되는 결과
-
-Agent는 공개 사이트를 빌드하고 체크아웃, 결제, 확인 메일, 참석자 명단을
-연결합니다. 링크를 공유하기 전에 테스트 주문을 넣어보세요. Stripe 테스트 모드와
-테스트 카드를 사용한 다음, 실제 결제로 전환하기 전에 확인 메일이 도착하는지,
-참석자가 명단에 있는지, 내보내기에 포함되는지 확인하세요.
-
-## 나에게 맞게 조정하기
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
 
 <AiPrompt>
-  이 Notion 데이터베이스\[링크]를 바탕으로 연사 페이지를 추가해 주세요. 이름,
-  사진, 직함, 소개, 세션 시간을 사용해 주세요. Notion이 변경되면 페이지도
-  동기화되게 해주세요.
+  이 Notion 페이지 [link]를 바탕으로 유료 이벤트 웹사이트를 완성해 줘: 프로그램,
+  연사, 장소, 오시는 길, 티켓 결제까지 포함해서. Notion에 있는 연사 이름, 사진,
+  직함, 약력, 세션 시간을 사용해 줘. 티켓 한 장당 [price]를 Stripe로 결제받고,
+  참가자는 Replit Database에 저장하고, Resend로 확인 메일을 보내고, 명단을
+  내보낼 수 있게 해 줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상되는 결과
+</div>
+
+Agent가 공개 사이트를 만들고 결제, 결제, 확인, 참가자 목록을 연결합니다. 링크를 공유하기 전에 테스트 주문을 한 번 진행해 보세요. Stripe 테스트 모드와 테스트 카드를 사용한 뒤, 확인 메일이 도착하는지, 참가자가 목록에 표시되는지, 내보내기 파일에도 포함되는지 확인한 다음 실제 결제로 전환하세요.
+
+<div id="make-it-work-for-you">
+  ## 나에게 맞게 활용하기
+</div>
+
+<AiPrompt>
+  이 Notion 데이터베이스 [link]를 바탕으로 연사 페이지를 추가해 줘. 이름, 사진, 직함,
+  약력, 세션 시간을 사용해. Notion 내용이 바뀌면 페이지도 계속 동기화해 줘.
 </AiPrompt>
 
 <AiPrompt>
-  참석자가 \[n]명이 되면 티켓 판매를 마감하고 대신 대기자 명단 폼을 보여주세요.
+  참가자가 [n]명에 도달하면 티켓 판매를 종료하고 대신 대기자 명단 양식을 보여줘.
 </AiPrompt>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
-* **확인 이메일이 오지 않음:** Resend가 연결되어 있고 발신 도메인이 인증되었는지 확인하세요. 테스트 주문을 넣고 Resend 대시보드에서 이메일이 발송되었는지 확인하세요.
-* **연사나 시간이 잘못됨:** Agent에게 Notion 데이터베이스(이름, 사진, 직함, 소개, 세션 시간)를 알려주고, Notion이 변경되면 페이지도 동기화하도록 요청하세요.
-* **체크아웃에서 결제가 되지 않음:** Stripe가 연결되어 있고 먼저 테스트 모드인지 확인하세요. 링크를 공유하기 전에 테스트 주문을 넣어보세요.
+* **확인 이메일이 오지 않는 경우:** Resend가 연결되어 있고 발신 도메인이 인증되었는지 확인하세요. 테스트 주문을 넣어 본 뒤 Resend 대시보드에서 이메일이 발송되었는지 확인하세요.
+* **연사나 시간이 잘못된 경우:** Agent에게 Notion 데이터베이스(이름, 사진, 직함, 약력, 세션 시간)를 알려 주고, Notion이 변경되면 페이지도 동기화되도록 요청하세요.
+* **결제가 이루어지지 않는 경우:** 먼저 Stripe가 연결되어 있고 테스트 모드인지 확인하세요. 링크를 공유하기 전에 테스트 주문을 넣어 보세요.
 
-## 관련 문서
+<div id="related">
+  ## 관련 문서
+</div>
 
 <CardGroup cols={2}>
   <Card title="랜딩 페이지 디자인하기" href="/ko/use-cases/design-landing-page">
-    대기자 명단이나 출시 페이지에도 동일한 Notion 브리프를 사용합니다.
+    대기 명단 또는 출시 페이지에도 동일한 Notion 브리프를 사용합니다.
   </Card>
 
-  <Card title="소셜 아이콘과 배너 만들기" href="/ko/use-cases/create-social-kit">
-    프로필 및 커버 자산도 필요한 이벤트 마케터를 위한 문서입니다.
+  <Card title="소셜 아이콘 및 배너 만들기" href="/ko/use-cases/create-social-kit">
+    프로필과 커버 에셋까지 필요한 이벤트 마케터를 위한 가이드입니다.
   </Card>
 </CardGroup>

@@ -1,90 +1,105 @@
 ---
 title: "Agent 보안 스캔"
-description: "소스 코드 보안 검토를 실행하고, 발견 사항을 평가하고, Agent로 취약점을 수정한 후 수정 사항을 확인하세요."
+description: "소스 코드 보안 검토를 실행하고, finding을 평가하며, Agent로 취약점을 수정하고 수정 사항을 확인하세요."
+sidebarTitle: "Agent 보안 스캔"
+icon: "shield-check"
 ---
 
-Agent 보안 스캔은 전체 코드베이스에서 보안 및 개인정보 관련 취약점을 검토합니다. Security Agent는 모델 기반 분석과 [Semgrep](https://semgrep.dev/), [HoundDog.ai](https://hounddog.ai)와 같은 정적 분석 도구를 결합한 뒤, 그 결과를 Project Security Center에서 보여줍니다.
+Agent 보안 스캔은 코드베이스 전체를 검토하여 보안 및 개인정보 취약점을 찾아냅니다. Security Agent는 모델 기반 분석과 [Semgrep](https://semgrep.dev/), [HoundDog.ai](https://hounddog.ai) 같은 정적 분석 도구를 결합해 분석한 뒤, 그 결과를 Project Security Center에 표시합니다.
 
-Agent 보안 스캔은 모든 유료 Replit 빌더가 사용할 수 있습니다. 대규모 프로젝트에서는 심층 감사에 최대 15분이 걸릴 수 있습니다.
+Agent 보안 스캔은 유료 요금제를 사용하는 모든 Replit 빌더가 이용할 수 있습니다. 규모가 큰 프로젝트에서는 심층 감사에 최대 15분이 걸릴 수 있습니다.
 
-## Security Agent가 검토하는 항목
+<div id="what-security-agent-reviews">
+  ## Security Agent가 검토하는 항목
+</div>
 
-스캔을 시작하면 Security Agent는 다음을 수행합니다.
+스캔을 시작하면 Security Agent는 다음 작업을 수행합니다.
 
-1. 경로, API, 데이터 흐름, 진입점을 매핑합니다.
-2. 애플리케이션에 대한 위협 모델을 구축합니다.
-3. 코드베이스 전체에 걸쳐 정적 분석을 실행합니다.
-4. 애플리케이션 맥락에서 발견 사항을 평가합니다.
-5. 검토를 위한 발견 사항 보고서를 생성합니다.
+1. 라우트, API, 데이터 흐름, 진입점을 매핑합니다.
+2. 애플리케이션의 위협 모델을 구성합니다.
+3. 코드베이스 전반에 대해 정적 분석을 실행합니다.
+4. 애플리케이션 context를 고려해 findings를 평가합니다.
+5. 검토용 findings report를 생성합니다.
 
-이 검토는 SQL 인젝션, 크로스 사이트 스크립팅, 크로스 사이트 요청 위조와 같은 안전하지 않은 코드 패턴, 로그나 서드파티 API로 흘러가는 민감한 데이터와 같은 개인정보 문제, 경로·API·데이터 흐름의 아키텍처 취약점을 식별할 수 있습니다.
+이 검토를 통해 SQL 인젝션, 크로스 사이트 스크립팅, 크로스 사이트 요청 위조 등 안전하지 않은 코드 패턴, 민감한 데이터가 logs나 제3자 API로 유출되는 등의 개인정보 문제, 라우트, API, 데이터 흐름의 아키텍처상 취약점을 찾아낼 수 있습니다.
 
-## Agent 보안 스캔 시작하기
+<div id="start-an-agent-security-scan">
+  ## Agent security scan 시작하기
+</div>
 
 <Steps>
   <Step title="Security Center 열기">
-    프로젝트의 **Tools** 패널에서 **Security Center**를 선택하세요. Publish 흐름에서 **Review security**를 선택할 수도 있습니다.
+    project의 **Tools** pane에서 **Security Center**를 선택합니다. Publish flow에서
+    **Review security**를 선택해도 됩니다.
 
     <Frame>
-      <img src="/assets/mirror/review-security-button-9331149c28f7.png" alt="Publish 흐름에 있는 Review security 작업" width="1440" height="900" data-path="images/project-security-center/review-security-button.png" />
+      <img src="/assets/mirror/review-security-button-9331149c28f7.png" alt="Publish flow의 Review security 작업" width="1440" height="900" data-path="images/project-security-center/review-security-button.png" />
     </Frame>
   </Step>
 
   <Step title="스캔 시작하기">
-    **Run scan with Agent**를 선택하세요.
+    **Run scan with Agent**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/run-scan-with-agent-f54820ac154a.png" alt="Project Security Center에 있는 Run scan with Agent 작업" width="1440" height="900" data-path="images/project-security-center/run-scan-with-agent.png" />
+      <img src="/assets/mirror/run-scan-with-agent-f54820ac154a.png" alt="Project Security Center의 Run scan with Agent 작업" width="1440" height="900" data-path="images/project-security-center/run-scan-with-agent.png" />
     </Frame>
   </Step>
 
-  <Step title="필요하면 컨텍스트 추가하기">
-    필요하다면 컨텍스트를 추가해 위협 모델이 애플리케이션의 특정 영역에 집중하도록 한 다음, 보안 스캔을 시작하세요.
+  <Step title="필요하면 context 추가하기">
+    필요에 따라 context를 추가해 애플리케이션의 특정 영역에 위협 모델을 집중시킨 다음, security scan을 시작합니다.
 
     <Frame>
-      <img src="/assets/mirror/scan-options-c2cd398fa78b.png" alt="Add context 필드와 Start security scan 작업이 있는 보안 스캔 옵션" width="1440" height="900" data-path="images/project-security-center/scan-options.png" />
+      <img src="/assets/mirror/scan-options-c2cd398fa78b.png" alt="Add context 필드와 Start security scan 작업이 있는 security scan 옵션" width="1440" height="900" data-path="images/project-security-center/scan-options.png" />
     </Frame>
   </Step>
 
-  <Step title="검토 기다리기">
-    Security Agent가 검토를 완료할 때까지 기다리세요. 일반적으로 몇 분 정도 걸리며, 대규모 프로젝트에서는 최대 15분까지 걸릴 수 있습니다.
+  <Step title="검토 완료 대기하기">
+    Security Agent가 검토를 마칠 때까지 기다립니다. 보통 몇 분 정도 걸리며, 규모가 큰 project는 최대 15분까지 소요될 수 있습니다.
   </Step>
 </Steps>
 
-## 발견 사항 검토 및 수정
+<div id="review-and-fix-findings">
+  ## findings 검토 및 수정
+</div>
 
 <Steps>
-  <Step title="보고서 검토하기">
-    **Security Center**에서 각 발견 사항과 심각도를 확인하세요. 이해했고
-    받아들일 수 있는 발견 사항은 무시하거나, 수정 요청으로 보내기 전에 발견
-    사항을 수정할 수 있습니다.
+  <Step title="report 검토">
+    **Security Center**에서 각 finding과 severity를 확인하세요. 내용을 파악하고
+    수용하기로 한 findings는 무시하고, 그렇지 않은 경우 remediation으로 보내기
+    전에 finding을 수정하세요.
   </Step>
 
-  <Step title="Agent로 승인된 발견 사항 수정하기">
-    승인된 문제를 Agent에게 보내세요. Security Agent는 취약점을 별도의
-    작업으로 정리하므로 Agent가 여러 수정 작업을 동시에 진행할 수 있습니다.
+  <Step title="Agent로 수용한 findings 수정">
+    수용한 issues를 Agent에 보내세요. Security Agent가 취약점을 개별 tasks로
+    정리해 주므로 Agent가 여러 수정 작업을 동시에 진행할 수 있습니다.
   </Step>
 
-  <Step title="스캔 다시 실행하기">
-    Agent가 수정 사항을 적용한 후, 스캔을 다시 실행해 문제가 해결되었는지
-    확인하세요. 대규모 프로젝트에서는 심각도가 높은 발견 사항이 해결된 후
-    추가적인 문제가 드러날 수 있습니다.
+  <Step title="스캔 다시 실행">
+    Agent가 수정을 적용한 뒤 스캔을 한 번 더 실행해 issues가 해결되었는지
+    확인하세요. 규모가 큰 projects에서는 severity가 높은 findings를 수정하고 나면
+    추가 issues가 드러나기도 합니다.
   </Step>
 </Steps>
 
-## Level 3를 사용해야 할 때
+<div id="when-to-use-level-3">
+  ## Level 3를 사용해야 하는 경우
+</div>
 
-Agent 보안 스캔은 소스 코드를 검토합니다. 브라우저 및 네트워크 상호작용을 통해 실행 중인 앱까지 점검해야 한다면 [Level 3 블랙박스 침투 테스트](/ko/features/security/black-box-pen-tests)를 사용하세요. Level 3는 블랙박스 테스트와 소스 코드 검토를 동시에 실행합니다.
+Agent security scan은 소스 코드를 검토합니다. 브라우저와 네트워크 상호작용을 통해 실행 중인 앱까지 점검해야 한다면 [Level 3 black-box pen test](/ko/features/security/black-box-pen-tests)를 사용하세요. Level 3는 black-box test와 소스 코드 검토를 동시에 실행합니다.
 
-## 제한 사항 및 모범 사례
+<div id="limitations-and-best-practices">
+  ## 제한 사항 및 모범 사례
+</div>
 
-* 스캔은 Replit 인프라에서 실행됩니다. Replit은 여러분의 코드나 데이터를 Semgrep, HoundDog.ai, 또는 다른 서드파티로 전송하지 않습니다.
-* 스캔 구성과 결과는 여러분의 Replit App에 계속 연결되어 있습니다.
-* 스캔은 완전한 보안 검토가 아닙니다. 코드 리뷰, 테스트, 종속성 검토, 실행 중인 앱 점검과 함께 사용하세요.
-* 주요 코드 변경 후, 종속성을 추가하거나 업데이트한 후, 새 버전을 게시하기 전에 스캔을 다시 실행하세요.
+* 스캔은 Replit 인프라에서 실행됩니다. Replit은 여러분의 코드나 데이터를 Semgrep, HoundDog.ai를 비롯한 제3자에게 전송하지 않습니다.
+* 스캔 구성과 결과는 해당 Replit App에 연결된 상태로 유지됩니다.
+* 스캔만으로 완전한 보안 검토가 이루어지지는 않습니다. 코드 리뷰, 테스트, 종속성 검토, 실행 중인 앱 점검과 함께 활용하세요.
+* 코드를 크게 변경한 후, 종속성을 추가하거나 업데이트한 후, 그리고 새 버전을 게시하기 전에 스캔을 다시 실행하세요.
 
-## 다음 단계
+<div id="next-steps">
+  ## 다음 단계
+</div>
 
-* [Project Security Center](/ko/features/security/project-security-center)가 보안 검사를 어떻게 결합하는지 알아보세요.
-* [블랙박스 침투 테스트](/ko/features/security/black-box-pen-tests)로 실행 중인 앱에 대한 평가를 추가하세요.
-* 관련 용어는 [보안 개념](/ko/features/security/concepts)에서 확인하세요.
+* [Project Security Center](/ko/features/security/project-security-center)가 보안 검사를 어떻게 통합하는지 알아보세요.
+* [black-box pen test](/ko/features/security/black-box-pen-tests)로 실행 중인 앱에 대한 평가를 추가해 보세요.
+* [보안 개념](/ko/features/security/concepts)에서 관련 용어를 살펴보세요.

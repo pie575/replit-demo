@@ -1,6 +1,8 @@
 ---
-title: "고객 피드백 분석하기"
-description: "지원 티켓을 팀이 실행에 옮길 수 있는 테마, 트렌드, 대시보드로 바꾸세요."
+title: "고객 feedback 분석하기"
+description: "지원 tickets을 테마와 트렌드, 그리고 팀이 바로 실행에 옮길 수 있는 대시보드로 바꿔보세요."
+sidebarTitle: "고객 feedback 분석하기"
+icon: "comments"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                기본 제공 connector가 아닙니다. Agent가 API key를 요청합니다.
               </div> : null}
           </div>
         </div>)}
@@ -67,71 +69,85 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Zendesk에서 지원 티켓을 가져와 이슈를 분류하고, 트렌드를 파악하고, 상위 테마와 지난주 대비
-볼륨, 제안되는 후속 조치가 담긴 Notion 대시보드를 업데이트하세요. 새로운 테마가 나타나거나
-볼륨이 급증하면 Slack으로 알려서 팀이 로드맵에 반영되기 전에 대응할 수 있게 하세요.
+Zendesk에서 지원 티켓을 가져와 이슈를 분류하고 추세를 파악한 뒤, 주요 테마와 지난주 대비 건수,
+제안된 후속 조치를 Notion 대시보드에 업데이트하세요. 새로운 테마가 등장하거나 건수가 급증하면
+Slack으로 알림을 보내, 로드맵에 반영되기 전에 팀이 미리 대응할 수 있도록 합니다.
 
-## 적합한 대상
+<div id="best-for">
+  ## 이런 분들에게 적합합니다
+</div>
 
-* Zendesk 기반의 주간 리뷰가 필요한 프로덕트 매니저
-* 로드맵에 반영되기 전에 새로운 이슈를 포착해야 하는 지원 및 프로덕트 리드
+* Zendesk에서 주간 리뷰가 필요한 프로덕트 매니저.
+* 새로운 이슈가 로드맵에 오르기 전에 미리 파악해야 하는 지원 및 제품 담당자.
 
-## 커넥터
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
-{ id: "zendesk", name: "Zendesk", why: "티켓과 대화 텍스트" },
-{ id: "slack", name: "Slack", why: "급증 또는 새로운 테마 알림" },
-{ id: "notion", name: "Notion", why: "테마 로그 및 대시보드" },
+{ id: "zendesk", name: "Zendesk", why: "티켓 및 대화 텍스트" },
+{ id: "slack", name: "Slack", why: "급증 또는 새로운 테마 발생 시 알림" },
+{ id: "notion", name: "Notion", why: "테마 기록 및 대시보드" },
 ]}
 />
 
-<Note>Intercom, Front, Zoho Desk에서도 작동합니다.</Note>
+<Note>Intercom, Front, Zoho Desk에서도 사용할 수 있습니다.</Note>
 
-## 시작하기 전에
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
-Zendesk, Slack, Notion을 연결하세요. 어떤 제품이나 태그를 포함할지 Agent에게 알려주세요.
+Zendesk, Slack, Notion을 연결하세요. 포함할 제품 또는 태그를 Agent에게 알려주세요.
 
-## Agent에게 요청하기
-
-<AiPrompt>
-  매주 월요일 9시에 실행되는 루틴을 만들어 주세요. Zendesk에서 지난주 티켓을 가져오세요.
-  이슈를 분류하고, 트렌드를 파악하고, 상위 테마와 지난주 대비 볼륨, 제안되는 후속 조치가 담긴
-  Notion 대시보드를 업데이트하세요. 새로운 테마가 나타나거나 볼륨이 급증하면 Slack으로
-  알려주세요.
-</AiPrompt>
-
-## 예상되는 결과
-
-Agent는 티켓을 테마별로 묶고, 볼륨을 집계하고, 짧은 "해야 할 일"을 작성합니다. 테마당 몇 개
-티켓을 샘플로 확인해 라벨이 맞는지 검토하세요. 첫 주가 지나면 Slack이 계속 유용하도록 급증으로
-간주하는 기준을 높이거나 낮추세요. Zendesk에서 상위 테마마다 티켓 두 개를 열어 라벨이 적합한지
-확인하세요. Slack 알림이 왔다면 정말로 지난주 대비 볼륨이 급증했는지 확인하세요.
-
-## 나에게 맞게 조정하기
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
 
 <AiPrompt>
-  버그, 결제, 기능 요청을 분리해 주세요. 기능 요청은 빈도순으로 순위를 매겨 주세요.
+  매주 월요일 9시에 실행되는 Routine을 만들어 줘. Zendesk에서 지난주 티켓을
+  가져와서 이슈를 분류하고 트렌드를 파악한 다음, 주요 테마와 지난주 대비 건수,
+  추천 후속 조치를 정리해 Notion 대시보드를 업데이트해 줘. 새로운 테마가
+  등장하거나 건수가 급증하면 Slack으로 알려 줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상 결과
+</div>
+
+Agent는 티켓을 테마로 묶고 건수를 집계한 뒤, &quot;무엇을 해야 하는지&quot;를 짧게 정리해 줍니다. 테마별로 티켓을 몇 건씩 살펴보며 labels가 적절한지 점검하세요. 첫 주가 지나면 급증으로 볼 기준을 높이거나 낮춰 Slack 알림이 계속 유용하도록 조정하세요. Zendesk에서 상위 테마마다 티켓을 두 건씩 열어 label이 맞는지 확인하세요. Slack 알림이 왔다면 지난주 대비 건수가 실제로 급증했는지 확인하세요.
+
+<div id="make-it-work-for-you">
+  ## 나에게 맞게 활용하기
+</div>
+
+<AiPrompt>
+  버그, 결제, 기능 요청을 분류해 줘. 기능 요청은 빈도순으로
+  순위를 매겨 줘.
 </AiPrompt>
 
 <AiPrompt>
-  이번 주 상위 테마에 대한 고객 답변 템플릿 초안을 작성해 주세요.
+  이번 주 상위 테마에 대한 고객 답변 템플릿 초안을 작성해 줘.
 </AiPrompt>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
-* **테마가 너무 모호하거나 관련 없는 티켓이 섞여 있음:** 어떤 제품이나 태그를 포함할지 Agent에게 알려주고, 버그·결제·기능 요청을 분리하도록 요청하세요. 테마당 몇 개 티켓을 샘플로 확인해 라벨이 맞는지 검토하세요.
-* **Slack이 작은 변화마다 알림을 보냄:** 기준을 높이세요. 새로운 테마가 나타나거나 지정한 비율만큼 볼륨이 급증할 때만 알리도록 하세요.
-* **잘못된 워크스페이스에서 티켓이 옴:** Zendesk를 올바른 워크스페이스에 연결하고 어떤 제품이나 태그를 포함할지 알려주세요.
+* **테마가 너무 모호하거나 서로 관련 없는 티켓이 섞이는 경우:** 어떤 products나 태그를 포함할지 Agent에 알려주고, 버그, 결제, 기능 요청을 구분하도록 요청하세요. 테마별로 티켓 몇 건을 표본으로 확인해 labels가 적절한지 점검하세요.
+* **사소한 변경마다 Slack 알림이 오는 경우:** 기준을 높이세요. 새로운 테마가 등장하거나 건수가 지정한 비율만큼 늘어날 때만 alert를 보내도록 설정하세요.
+* **엉뚱한 workspace의 티켓이 들어오는 경우:** Zendesk를 올바른 workspace에 연결하고 어떤 products나 태그를 포함할지 지정하세요.
 
-## 관련 문서
+<div id="related">
+  ## 관련 자료
+</div>
 
 <CardGroup cols={2}>
-  <Card title="브랜드 언급 모니터링하기" href="/ko/use-cases/monitor-brand-mentions">
-    티켓뿐 아니라 공개 여론을 위한 동일한 Slack 및 Notion 설정입니다.
+  <Card title="브랜드 언급 모니터링" href="/ko/use-cases/monitor-brand-mentions">
+    동일한 Slack 및 Notion 설정으로 고객 문의뿐 아니라 대중의 반응까지 파악합니다.
   </Card>
 
-  <Card title="릴리스 노트 생성하기" href="/ko/use-cases/generate-release-notes">
-    Notion에서 주간 체인지로그도 함께 발행하는 프로덕트 매니저를 위한 문서입니다.
+  <Card title="릴리스 노트 생성" href="/ko/use-cases/generate-release-notes">
+    Notion으로 주간 변경 로그까지 발행하는 프로덕트 매니저를 위한 가이드입니다.
   </Card>
 </CardGroup>

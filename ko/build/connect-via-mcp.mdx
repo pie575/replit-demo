@@ -1,6 +1,8 @@
 ---
 title: "MCP로 연결하기"
-description: "Model Context Protocol(MCP)을 통해 Replit Agent를 외부 도구, 데이터 소스, API에 연결하세요 — 사전 등록된 서버에 로그인하거나 커스텀 서버를 추가하세요."
+description: "Model Context Protocol(MCP)을 통해 Replit Agent를 외부 도구, 데이터 소스, API에 연결하세요. 미리 등록된 서버에 로그인하거나 사용자 지정 서버를 추가할 수 있습니다."
+sidebarTitle: "MCP로 연결하기"
+icon: "server"
 ---
 
 export const McpLinkGenerator = () => {
@@ -32,31 +34,31 @@ export const McpLinkGenerator = () => {
   };
   return <div className="space-y-4">
       <div>
-        <label htmlFor="mcp-display-name" className="block text-sm font-medium mb-1">Display name</label>
+        <label htmlFor="mcp-display-name" className="block text-sm font-medium mb-1">표시 이름</label>
         <input type="text" id="mcp-display-name" placeholder="My MCP Server" onInput={updateOutputs} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
       </div>
       <div>
-        <label htmlFor="mcp-base-url" className="block text-sm font-medium mb-1">Base URL</label>
+        <label htmlFor="mcp-base-url" className="block text-sm font-medium mb-1">기본 URL</label>
         <input type="text" id="mcp-base-url" placeholder="https://example.com/mcp" onInput={updateOutputs} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Install link</label>
+        <label className="block text-sm font-medium mb-1">설치 링크</label>
         <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
           <code id="mcp-link-output">https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6Ik15IE1DUCBTZXJ2ZXIiLCJiYXNlVXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9tY3AifQ==</code>
         </pre>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Badge preview</label>
+        <label className="block text-sm font-medium mb-1">배지 미리보기</label>
         <Frame>
           <a href="#" onClick={handleBadgeClick} style={{
     cursor: 'pointer'
   }}>
-            <img src="https://replit.com/badge?caption=Add%20to%20Replit" alt="Add to Replit badge" noZoom />
+            <img src="https://replit.com/badge?caption=Add%20to%20Replit" alt="Add to Replit 배지" noZoom />
           </a>
         </Frame>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Badge markdown</label>
+        <label className="block text-sm font-medium mb-1">배지 마크다운</label>
         <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
           <code id="mcp-badge-markdown">[![Add to Replit](https://replit.com/badge?caption=Add%20to%20Replit)](https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6Ik15IE1DUCBTZXJ2ZXIiLCJiYXNlVXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9tY3AifQ==)</code>
         </pre>
@@ -64,92 +66,102 @@ export const McpLinkGenerator = () => {
     </div>;
 };
 
-Replit Agent는 AI 도구 통합을 위한 오픈 표준인 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)을 통해 수백 개의 외부 도구와 데이터 소스에 연결할 수 있습니다. 사전 등록된 서버에 로그인하거나 신뢰하는 커스텀 MCP 서버를 추가하세요.
+Replit Agent는 AI 도구 통합을 위한 개방형 표준인 [Model Context Protocol(MCP)](https://modelcontextprotocol.io)을 통해 수백 개의 외부 도구와 데이터 소스에 연결할 수 있습니다. 미리 등록된 서버에 로그인하거나, 신뢰할 수 있는 사용자 지정 MCP 서버를 직접 추가할 수 있습니다.
 
-## 사전 등록된 MCP 서버 연결하기
+<div id="connect-a-pre-listed-mcp-server">
+  ## 미리 등록된 MCP 서버 연결하기
+</div>
 
-Replit은 Stripe, Linear, Notion, Sentry 등 인기 서비스를 위한 큐레이션된 MCP 서버 목록을 제공합니다. 연결은 단 한 번의 로그인 클릭으로 완료됩니다.
+Replit에는 Stripe, Linear, Notion, Sentry 등 인기 서비스를 위한 MCP 서버 목록이 엄선되어 기본 제공됩니다. 로그인 한 번이면 연결이 완료됩니다.
 
 <Frame>
-  <img src="/assets/mirror/mcp-servers-pane-8e1f431ca33c.png" alt="Stripe, Linear, Notion, Sentry, Atlassian, Miro, PostHog, Amplitude, Mixpanel, Granola, Razorpay 등 사전 등록된 서버와 각 서버의 로그인 버튼이 나열된 Replit Agent용 MCP 서버 설정 패널" width="3452" height="1988" data-path="images/replitai/mcp-servers-pane.png" />
+  <img src="/assets/mirror/mcp-servers-pane-8e1f431ca33c.png" alt="Stripe, Linear, Notion, Sentry, Atlassian, Miro, PostHog, Amplitude, Mixpanel, Granola, Razorpay 등 미리 등록된 서버가 각각 로그인 버튼과 함께 나열된 Replit Agent용 MCP Servers 설정 창" width="3452" height="1988" data-path="images/replitai/mcp-servers-pane.png" />
 </Frame>
 
 <Steps>
-  <Step title="Integrations 패널 열기">
-    [replit.com/integrations](https://replit.com/integrations)로 이동하여 **MCP Servers for Replit Agent**로 스크롤하세요.
+  <Step title="Integrations 창 열기">
+    [replit.com/integrations](https://replit.com/integrations)로 이동한 후 **MCP Servers for Replit Agent**까지 스크롤합니다.
   </Step>
 
   <Step title="서버 선택">
-    연결하려는 서비스를 찾으세요 — Stripe, Linear, Notion, Sentry, Atlassian, Miro, PostHog, Amplitude, Mixpanel, Granola, Razorpay 등이 있습니다.
+    연결할 서비스를 찾습니다. Stripe, Linear, Notion, Sentry, Atlassian, Miro, PostHog, Amplitude, Mixpanel, Granola, Razorpay 등이 있습니다.
   </Step>
 
   <Step title="로그인">
-    서버 옆의 **Sign in**을 클릭하세요. 해당 서비스의 OAuth 흐름이 안내됩니다. 연결이 완료되면 서버의 연결 상태가 업데이트되고 Agent가 해당 도구를 사용할 수 있게 됩니다.
+    해당 서버 옆의 **Sign in**을 클릭합니다. 이후 해당 서비스의 OAuth flow에 따라 인증을 진행합니다. 연결이 완료되면 서버의 연결 status가 업데이트되고, Agent가 해당 서버의 도구를 사용할 수 있게 됩니다.
   </Step>
 </Steps>
 
-전체 카탈로그는 [MCP 서버 레퍼런스](/ko/features/mcp/overview)를 참조하세요.
+전체 목록은 [MCP Servers 참고 문서](/ko/features/mcp/overview)를 확인하세요.
 
-## 커스텀 MCP 서버 추가하기
+<div id="add-a-custom-mcp-server">
+  ## custom MCP 서버 추가하기
+</div>
 
-원하는 서버가 사전 등록된 카탈로그에 없다면 URL로 추가하세요.
+원하는 서버가 미리 등록된 카탈로그에 없다면 URL로 직접 추가할 수 있습니다.
 
 <Frame>
-  <img src="/assets/mirror/mcp-connect-dialog-5b8f9b0d828e.png" alt="표시 이름 필드, MCP 서버 URL 필드, 확장 가능한 고급 설정 섹션이 있는 MCP 서버 연결 대화상자" width="3452" height="1988" data-path="images/replitai/mcp-connect-dialog.png" />
+  <img src="/assets/mirror/mcp-connect-dialog-5b8f9b0d828e.png" alt="Display name 필드, MCP Server URL 필드, Advanced settings 확장 섹션이 표시된 MCP 서버 연결 대화 상자" width="3452" height="1988" data-path="images/replitai/mcp-connect-dialog.png" />
 </Frame>
 
 <Steps>
-  <Step title="서버 추가 대화상자 열기">
-    MCP 서버 설정 패널에서 **+ Add MCP server**를 클릭하세요.
+  <Step title="서버 추가 대화 상자 열기">
+    MCP 서버 설정 창에서 **+ Add MCP server**를 클릭합니다.
   </Step>
 
-  <Step title="표시 이름 설정">
-    알아보기 쉬운 이름을 입력하세요 — Agent가 채팅 로그에서 서버를 참조할 때 이 이름을 사용합니다.
+  <Step title="표시 이름 설정하기">
+    알아보기 쉬운 이름을 지정하세요. Agent가 채팅 로그에서 해당 서버를 가리킬 때 이 이름을 사용합니다.
   </Step>
 
-  <Step title="서버 URL 입력">
-    MCP 서버의 HTTPS 엔드포인트를 붙여넣으세요. 서버에 인증이 필요하다면 **Advanced settings**를 열어 커스텀 헤더(예: `X-API-Key`)를 추가하세요.
+  <Step title="서버 URL 입력하기">
+    MCP 서버의 HTTPS 엔드포인트를 붙여넣습니다. 서버에 authentication이 필요한 경우 **Advanced settings**를 열어 사용자 지정 headers(예: `X-API-Key`)를 추가하세요.
   </Step>
 
-  <Step title="테스트 및 저장">
-    **Test & save**를 클릭하세요. Replit이 연결을 시도하고 서버가 요구하는 OAuth 흐름을 안내합니다. 저장이 완료되면 MCP 서버 목록에 상태와 함께 연결이 표시됩니다.
+  <Step title="테스트 및 저장하기">
+    **Test &amp; save**를 클릭합니다. Replit이 연결을 시도하며, 서버에 OAuth flow가 필요한 경우 그 과정을 안내합니다. 저장이 완료되면 해당 연결이 상태와 함께 MCP 서버 아래에 표시됩니다.
   </Step>
 </Steps>
 
 <Warning>
-  신뢰하는 MCP 서버에만 연결하세요. 연결된 서버는 Agent에 도구와 데이터를 제공할 수 있습니다 — 익숙하지 않은 엔드포인트를 추가하기 전에 소스를 검토하세요.
+  신뢰할 수 있는 MCP 서버에만 연결하세요. 연결된 서버는 Agent에 도구와 데이터를 제공할 수 있으므로, 익숙하지 않은 엔드포인트를 추가하기 전에 반드시 출처를 확인하세요.
 </Warning>
 
-## Agent에서 MCP 도구 사용하기
+<div id="use-mcp-tools-in-agent">
+  ## Agent에서 MCP 도구 사용하기
+</div>
 
-서버가 연결되면 Agent가 자동으로 도구 목록을 가져와 모든 프로젝트에서 기능을 사용할 수 있게 합니다. 서버를 사용하려면 채팅에서 언급하기만 하면 됩니다:
+서버를 연결하면 Agent가 해당 서버의 도구 목록을 자동으로 가져와 모든 project에서 그 기능을 사용할 수 있게 해줍니다. 서버를 사용하려면 Chat에서 언급하기만 하면 됩니다:
 
-> Use the Notion MCP server to find the most recent meeting notes.
+> Notion MCP 서버를 사용해 가장 최근 회의록을 찾아줘.
 
 <Frame>
-  <img src="/assets/mirror/tool-call-7a53f51a11ae.png" alt="Agent가 채팅에서 커스텀 MCP 서버의 도구를 호출하는 모습" width="571" height="817" data-path="images/replitai/custom-mcp/tool-call.png" />
+  <img src="/assets/mirror/tool-call-7a53f51a11ae.png" alt="Chat에서 custom MCP 서버의 도구를 호출하는 Agent" width="571" height="817" data-path="images/replitai/custom-mcp/tool-call.png" />
 </Frame>
 
-Agent는 요청에 따라 서버에서 적합한 도구를 선택합니다. 도구가 확인이 필요한 경우 실행 전에 프롬프트가 표시됩니다.
+Agent는 요청 내용에 맞는 도구를 서버에서 알아서 선택합니다. 확인이 필요한 도구라면 실행 전에 확인 메시지가 표시됩니다.
 
-## 설치 링크 공유하기
+<div id="share-an-install-link">
+  ## 설치 링크 공유하기
+</div>
 
-설치 링크를 사용하면 누구든 클릭 한 번으로 MCP 서버를 Replit에 추가할 수 있습니다 — 문서, README, 또는 통합을 홍보하려는 어느 곳에서나 유용합니다.
+설치 링크를 사용하면 누구나 클릭 한 번으로 여러분의 MCP 서버를 Replit에 추가할 수 있습니다. 문서나 README 등 integration을 알리고 싶은 곳이라면 어디서든 유용합니다.
 
-아래 양식을 사용하여 서버의 설치 링크와 클릭 가능한 배지를 생성하세요:
+아래 양식으로 서버의 설치 링크와 클릭 가능한 배지를 생성해 보세요:
 
 <McpLinkGenerator />
 
-링크 형식은 [설치 링크 레퍼런스](/ko/features/mcp/overview#share-your-own-install-link)를 참조하세요.
+링크 형식은 [설치 링크 참고 문서](/ko/features/mcp/overview#share-your-own-install-link)를 확인하세요.
 
-## 다음 단계
+<div id="next-steps">
+  ## 다음 단계
+</div>
 
 <CardGroup cols={2}>
   <Card title="Model Context Protocol" icon="server" href="/ko/learn/model-context-protocol">
-    MCP가 무엇인지, 어떻게 작동하는지, AI를 위해 어떤 기능을 제공하는지 이해하세요.
+    MCP란 무엇이고 어떻게 작동하는지, 그리고 AI에서 어떤 기능을 활용할 수 있는지 알아보세요.
   </Card>
 
   <Card title="MCP 목록" icon="folder-tree" href="/ko/features/mcp/overview">
-    원클릭 설치 버튼이 있는 큐레이션된 MCP 서버 목록을 탐색하세요.
+    원클릭 설치 버튼과 함께 엄선된 MCP 서버 목록을 둘러보세요.
   </Card>
 </CardGroup>

@@ -1,267 +1,291 @@
 ---
-title: "다른 워크스페이스로 프로젝트를 수동으로 복사하기"
-description: "라이브 앱을 다른 워크스페이스나 계정으로 직접 복사하기: 코드를 복사하고, 새 앱을 설정하고, 최소한의 다운타임으로 사용자를 새 앱으로 안내하고, 되돌리는 방법을 알아보세요"
-sidebarTitle: "수동 프로젝트 복사"
+title: "다른 workspace로 project 직접 복사하기"
+description: "live app을 다른 workspace나 계정으로 직접 복사하는 방법: 코드를 복사하고, 새 앱을 설정하고, 다운타임을 최소화하면서 사용자를 새 앱으로 옮기고, 되돌리는 방법까지 알아보세요"
+sidebarTitle: "project 수동 복사"
 icon: "copy"
 ---
 
-이 가이드는 앱을 다른 워크스페이스나 계정으로 직접 복사하는 방법을 안내합니다. 코드를 복사하고, 새 앱을 설정하고, 데이터를 복사한 다음, 사용자를 새 앱으로 안내합니다.
+이 가이드에서는 앱을 다른 workspace나 계정으로 직접 복사하는 방법을 안내합니다. 코드를 복사하고, 새 앱을 설정하고, 데이터를 옮긴 다음, 사용자를 새 앱으로 연결합니다.
 
-아무것도 이동되거나 삭제되지 않습니다. 이전 프로젝트는 원래 있던 자리에 그대로 남아 있으며, 두 복사본은 서로 동기화되지 않습니다. 작업이 끝나면 이전 프로젝트를 유지할지 삭제할지 선택할 수 있습니다.
+이동되거나 삭제되는 항목은 없습니다. 기존 project는 원래 위치에 그대로 남아 있으며, 두 복사본은 서로 동기화되지 않습니다. 작업을 마친 뒤 기존 project를 유지할지 삭제할지는 직접 선택하면 됩니다.
 
 <Note>
-  기본 제공되는 원클릭 이전 기능을 찾고 계신가요? [팀으로 앱 이전하기](/ko/teams/identity-and-access-management/transfer-app-to-teams)를 참조하세요. 이 옵션을 사용할 수 없거나 계정 간에 복사해야 하는 경우 이 가이드를 사용하세요.
+  기본 제공되는 원클릭 이전 기능을 찾고 계신가요? [Transfer App to Teams](/ko/teams/identity-and-access-management/transfer-app-to-teams)를 참고하세요. 해당 옵션을 사용할 수 없거나 계정 간 복사가 필요할 때 이 가이드를 활용하세요.
 </Note>
 
-## 시작하기 전에
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
 다음이 필요합니다:
 
-* 이전 프로젝트와 새 워크스페이스 또는 계정 모두에 대한 액세스 권한
-* 최종 전환을 위한 약 1시간의 집중 시간. 이전 단계들은 며칠에 걸쳐 진행할 수 있습니다.
-* 앱에 커스텀 웹 주소가 있는 경우, 해당 도메인을 관리하는 곳에 대한 액세스 권한
+* 기존 project와 새 workspace 또는 Account 양쪽에 대한 접근 권한
+* 최종 전환에 집중할 수 있는 약 1시간. 그 이전 단계들은 며칠에 걸쳐 나누어 진행해도 됩니다.
+* 앱에 사용자 지정 웹 주소를 사용 중이라면, 해당 도메인을 관리하는 곳에 대한 접근 권한
 
-두 가지는 자동으로 복사되지 않으며 가장 많은 시간이 소요됩니다: **데이터베이스**와 **웹 주소**입니다. 이 가이드에서는 두 가지 모두를 다룹니다.
+자동으로 옮겨지지 않아 가장 많은 시간이 걸리는 두 가지는 **database**와 **웹 주소**입니다. 이 가이드에서는 두 가지 모두를 다룹니다.
 
 <Note>
-  워크스페이스 관리자가 [소스 코드 내보내기 금지](/ko/teams/enterprise-privacy-settings#ban-source-code-export)를 활성화한 경우, 프로젝트를 zip으로 다운로드할 수 없습니다. 시작하기 전에 워크스페이스 관리자와 협의하세요—관리자는 수동 복사가 허용되는지, 코드와 데이터베이스를 이동하는 방법을 확인해 줄 수 있습니다.
+  workspace admin이 [Ban source code export](/ko/teams/enterprise-privacy-settings#ban-source-code-export)를 활성화한 경우에는 project를 zip 파일로 download할 수 없습니다. 시작하기 전에 workspace admin과 상의하세요. 수동 복사가 허용되는지, 코드와 database를 어떤 방법으로 옮겨야 하는지 알려줄 수 있습니다.
 </Note>
 
-## 다운타임 계획하기
+<div id="plan-for-downtime">
+  ## 다운타임 계획하기
+</div>
 
-두 번째 매장을 열고 첫 번째 매장을 닫는 것으로 생각하세요. 이전 매장이 닫히고 새 매장이 아직 열리지 않는 짧은 시간이 있습니다. 그 시간 동안 아무도 앱을 사용할 수 없습니다.
+두 번째 매장을 연 다음 첫 번째 매장을 닫는 것이라고 생각하면 됩니다. 기존 매장은 문을 닫았는데 새 매장은 아직 열리지 않은 짧은 시간이 생깁니다. 그동안에는 아무도 앱을 사용할 수 없습니다.
 
-**앱이 얼마나 오래 오프라인 상태가 되나요?** 보통 15분에서 60분입니다. 데이터베이스에 저장된 데이터 양과 웹 주소가 얼마나 빨리 업데이트되는지에 따라 다릅니다.
+**앱이 얼마나 오래 offline 상태인가요?** 보통 15분에서 60분 정도입니다. database에 저장된 데이터 양과 웹 주소가 갱신되는 속도에 따라 달라집니다.
 
-**데이터를 잃을 수 있나요?** 데이터베이스를 복사한 후 누군가 이전 앱에 데이터를 추가하는 경우에만 그렇습니다. 이를 방지하기 위해 최종 복사를 하기 *전에* 이전 앱을 오프라인으로 전환합니다. 이 가이드는 그 순서대로 구성되어 있습니다.
+**데이터가 손실되나요?** database를 복사한 뒤에 누군가 기존 앱에 데이터를 추가한 경우에만 손실됩니다. 이를 방지하려면 최종 복사를 하기 *전에* 기존 앱을 offline 상태로 전환하세요. 이 가이드는 그 순서에 맞게 구성되어 있습니다.
 
-**되돌릴 수 있나요?** 네. 이전 프로젝트는 삭제되지 않습니다. 문제가 발생하면 이전 앱을 다시 게시하면 이전과 똑같이 작동합니다.
+**되돌릴 수 있나요?** 네. 기존 project는 삭제되지 않습니다. 문제가 생기면 기존 앱을 다시 Publish하면 이전과 똑같이 동작합니다.
 
-**언제 해야 하나요?** 앱을 사용하는 사람이 적은 시간을 선택하세요. 가능하다면 사전에 사용자에게 알리세요.
+**언제 진행하는 것이 좋나요?** 앱을 사용하는 사람이 적은 시간대를 고르세요. 가능하다면 User에게 미리 알려주세요.
 
-## 1단계: 코드를 새 프로젝트로 복사하기
+<div id="step-1-copy-the-code-to-a-new-project">
+  ## 1단계: 코드를 새 project로 복사하기
+</div>
 
-방법을 하나 선택하세요. 이 단계에서는 이전 앱이 계속 실행됩니다. 두 방법 모두 코드를 옮깁니다. GitHub는 항상 커밋 히스토리를 옮기지만, zip은 `.git` 폴더를 포함하는 경우에만 히스토리를 옮깁니다:
+두 방법 중 하나를 선택하세요. 이 단계에서도 기존 앱은 계속 실행됩니다. 두 방법 모두 코드는 그대로 옮겨집니다. GitHub는 항상 commit history까지 함께 옮기지만, zip 파일은 `.git` 폴더가 포함된 경우에만 히스토리가 옮겨집니다:
 
-|              | GitHub 사용                      | zip 파일 사용                                                                |
-| ------------ | ------------------------------ | ------------------------------------------------------------------------ |
-| **코드 파일**    | 커밋하고 푸시한 파일만                   | 커밋되지 않은 변경 사항을 포함한 디스크의 모든 것                                             |
-| **커밋 히스토리**  | 원격 저장소의 전체 히스토리                | zip에 `.git` 폴더가 포함된 경우 전체 히스토리. 가져오기 제한 이하로 유지하기 위해 `.git`을 제외하면 히스토리 없음 |
-| **의존성 폴더**   | `.gitignore`를 따름               | 제외됨 (`node_modules`, `.venv`, `build` 등); 가져오기 시 재설치됨                    |
-| **요구 사항**    | 두 Replit 계정 모두에 연결된 GitHub 계정  | 없음                                                                       |
-| **지속적인 동기화** | 두 복사본 모두 동일한 저장소를 푸시 및 풀할 수 있음 | 없음—일회성 스냅샷                                                               |
-| **적합한 경우**   | Git으로 장기간 백업하려는 프로젝트           | 빠른 일회성 복사                                                                |
+|                    | GitHub 사용                                | zip 파일 사용                                                                |
+| ------------------ | ---------------------------------------- | ------------------------------------------------------------------------ |
+| **코드 파일**          | commit 후 push한 파일만                       | 커밋하지 않은 changes를 포함한 디스크상의 모든 파일                                         |
+| **Commit history** | remote에 있는 전체 히스토리                       | zip에 `.git` 폴더가 포함되면 전체 히스토리. import limit을 넘지 않으려고 `.git`을 제외하면 히스토리 없음 |
+| **Dependency 폴더**  | `.gitignore` 설정을 따름                      | 제외됨(`node_modules`, `.venv`, `build` 등); import 시 재설치                    |
+| **Requirements**   | 두 Replit accounts에 모두 연결된 GitHub account | 없음                                                                       |
+| **지속적인 동기화**       | 두 사본 모두 동일한 저장소에 push, pull 가능           | 없음—일회성 snapshot                                                          |
+| **적합한 경우**         | Git에 장기간 백업해 두고 싶은 projects              | 빠른 일회성 복사                                                                |
 
-### GitHub 사용
+<div id="via-github">
+  ### GitHub 사용
+</div>
 
 <Steps>
-  <Step title="이전 프로젝트를 GitHub에 푸시하기">
-    이전 프로젝트에서 [Git 창](/ko/features/workspace-tools/git-interface)을 열고, GitHub 저장소에 연결한 다음 커밋하고 푸시하세요. 코드를 공개하려는 경우가 아니라면 비공개 저장소를 사용하세요.
+  <Step title="기존 project를 GitHub에 push하기">
+    기존 project에서 [Git pane](/ko/features/workspace-tools/git-interface)을 열고 GitHub 저장소를 연결한 다음 commit하고 push하세요. 코드를 공개할 목적이 아니라면 비공개 저장소를 사용하세요.
   </Step>
 
   <Step title="새 계정에 액세스 권한 부여하기">
-    새 워크스페이스가 다른 Replit 계정에 속한 경우, 해당 계정의 GitHub 계정이 저장소에 액세스할 수 있어야 합니다. 비공개 저장소의 경우, 해당 GitHub 계정을 협력자로 추가하거나 공유 GitHub 조직을 사용하세요.
+    새 workspace가 다른 Replit 계정에 속해 있다면, 해당 계정의 GitHub 계정에 저장소 액세스 권한이 필요합니다. 비공개 저장소라면 해당 GitHub 계정을 협업자로 추가하거나 공유 GitHub 조직을 사용하세요.
   </Step>
 
-  <Step title="새 워크스페이스에서 가져오기">
-    새 계정에 로그인하고 [replit.com/import](https://replit.com/import)를 연 다음 **GitHub**을 선택하고, GitHub 계정을 연결하고, 저장소를 선택하세요. 문제 해결 방법은 [제공업체에서 가져오기](/ko/build/import-from-providers)를 참조하세요.
+  <Step title="새 workspace에서 import하기">
+    새 계정으로 로그인한 뒤 [replit.com/import](https://replit.com/import)를 열고 **GitHub**를 선택한 다음, GitHub 계정을 연결하고 저장소를 선택하세요. 문제 해결 방법은 [provider에서 import하기](/ko/build/import-from-providers)를 참고하세요.
   </Step>
 
   <Step title="복사본 확인하기">
-    새 프로젝트를 열고 파일과 커밋 히스토리가 있는지 확인하세요. Replit은 가져오기 중에 의존성을 설치하고 실행 명령을 구성합니다.
+    새 project를 열어 파일과 commit history가 제대로 있는지 확인하세요. Replit은 import 과정에서 dependencies를 설치하고 실행 명령을 구성합니다.
   </Step>
 </Steps>
 
 <Warning>
-  GitHub는 커밋하고 푸시한 것만 받습니다. `.gitignore`에 일치하는 파일과 커밋되지 않은 변경 사항은 남습니다. 시크릿 값이나 데이터베이스 덤프를 저장소에 절대 커밋하지 마세요.
+  GitHub에는 commit하고 push한 내용만 반영됩니다. `.gitignore`에 해당하는 파일과 commit하지 않은 changes는 옮겨지지 않습니다. secret 값이나 database 덤프는 절대 저장소에 commit하지 마세요.
 </Warning>
 
-### zip 파일 사용
+<div id="via-zip-file">
+  ### zip 파일 이용
+</div>
 
 <Steps>
-  <Step title="이전 프로젝트 다운로드하기">
-    이전 프로젝트에서 파일 트리 상단의 세 점 메뉴를 선택하고 **zip으로 다운로드**를 선택하세요.
+  <Step title="기존 project 다운로드">
+    기존 project에서 파일 트리 상단의 점 3개 메뉴를 선택한 다음 **Download as zip**을 선택합니다.
 
-    다운로드가 성공하고 파일이 200MB 미만이면 다음 단계로 넘어가세요.
+    다운로드가 정상적으로 되고 파일이 200MB 미만이라면 다음 단계로 넘어가세요.
 
-    200MB보다 큰 zip 파일도 다운로드는 성공할 수 있습니다. 하지만 [ZIP 가져오기](/ko/build/import-from-providers#limitations)는 200MB를 초과하는 파일을 거부하므로 Replit이 이를 사용해 새 프로젝트를 만들 수 없습니다. 다운로드가 실패하거나 zip이 200MB를 초과하면 더 작은 파일을 만드세요:
+    200MB보다 큰 zip 파일도 다운로드 자체는 성공할 수 있습니다. 하지만 [ZIP import](/ko/build/import-from-providers#limitations)는 200MB가 넘는 파일을 받지 않으므로, Replit에서 이 파일로 새 project를 만들 수 없습니다. 다운로드가 실패하거나 zip이 200MB를 초과하면 더 작은 파일을 만드세요.
 
-    1. 이전 프로젝트에서 **Shell** 도구를 여세요.
+    1. 기존 project에서 **Shell** 도구를 엽니다.
 
-    2. 다음 명령을 붙여넣고 Enter를 누르세요. 이 명령은 `project.zip`이라는 파일을 만들고 Replit이 자체적으로 재구성할 수 있는 폴더는 제외합니다:
+    2. 다음 명령어를 붙여넣고 Enter를 누릅니다. `project.zip` 파일이 생성되며, Replit이 알아서 다시 만들 수 있는 폴더는 제외됩니다.
 
        ```bash theme={null}
        zip -r project.zip . -x ".cache/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
        ```
 
-    3. 크기를 확인하세요. 다음 명령을 붙여넣고 Enter를 누르세요. 이 명령은 150MB의 경우 `150M`과 같이 MB 단위로 크기를 출력합니다:
+    3. 크기를 확인합니다. 다음 명령어를 붙여넣고 Enter를 누릅니다. 150MB인 경우 `150M`처럼 MB 단위로 크기가 출력됩니다.
 
        ```bash theme={null}
        du -h project.zip
        ```
 
-    4. 크기가 200MB를 초과하면 편집 히스토리를 제외하여 파일을 더 작게 만드세요. 두 줄을 모두 붙여넣고 Enter를 누르세요:
+    4. 크기가 200MB를 넘으면 편집 기록을 제외해 파일 크기를 줄이세요. 아래 두 줄을 모두 붙여넣고 Enter를 누릅니다.
 
        ```bash theme={null}
        rm project.zip
        zip -r project.zip . -x ".cache/*" ".local/*" ".git/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
        ```
 
-       zip을 200MB 미만으로 줄여야 할 때만 `.local`과 `.git`을 제외하세요. 이렇게 제외해도 이전 프로젝트에서 두 폴더가 삭제되지는 않습니다. 하지만 `.git`이 없는 zip에는 프로젝트의 커밋 히스토리가 포함되지 않습니다. 히스토리를 보존해야 한다면 GitHub 방법을 사용하세요.
+       `.local`과 `.git`은 zip을 200MB 미만으로 줄여야 할 때만 제외하세요. 이렇게 제외해도 기존 project에서 두 폴더가 삭제되지는 않습니다. 다만 `.git`이 빠진 zip에는 project의 commit history가 포함되지 않습니다. 기록을 보존해야 한다면 GitHub 방식을 사용하세요.
 
-    5. 파일 트리에서 `project.zip`을 찾아 옆의 세 점 메뉴를 선택하고 **Download**를 선택하세요.
+    5. 파일 트리에서 `project.zip`을 찾아 옆의 점 3개 메뉴를 선택한 다음 **Download**를 선택합니다.
 
-    `.cache` 폴더에는 캐시된 시크릿 값을 포함한 Replit 내부 상태가 저장됩니다. 직접 만드는 zip 파일에서는 항상 이 폴더를 제외하세요. 프로젝트에 다른 큰 생성 폴더가 있다면 제외 목록에 추가하세요.
+    `.cache` 폴더에는 캐시된 secret 값을 비롯한 Replit 내부 상태가 들어 있습니다. 직접 만드는 zip 파일에서는 항상 제외하세요. project에 크기가 큰 다른 생성 폴더가 있다면 제외 목록에 추가하세요.
   </Step>
 
-  <Step title="새 워크스페이스에서 가져오기">
-    새 계정에 로그인하고 [replit.com/import](https://replit.com/import)를 연 다음 **ZIP**을 선택하고 파일을 업로드하세요.
+  <Step title="새 workspace에서 가져오기">
+    새 계정으로 로그인한 뒤 [replit.com/import](https://replit.com/import)를 열고 **ZIP**을 선택한 다음 파일을 업로드합니다.
   </Step>
 
-  <Step title="복사본 확인하기">
-    새 프로젝트를 열고 파일이 있는지 확인하세요. zip에 `.git` 폴더가 포함되어 있다면 커밋 히스토리도 함께 옮겨집니다. 더 작은 아카이브 명령을 사용했다면 새 프로젝트는 커밋 히스토리 없이 시작됩니다. Replit은 가져오기 중에 제외된 의존성을 다시 설치합니다.
+  <Step title="복사 결과 확인">
+    새 project를 열고 파일이 모두 있는지 확인하세요. zip에 `.git` 폴더가 포함되어 있다면 commit history도 함께 옮겨집니다. 크기를 줄인 아카이브 명령어를 사용했다면 새 project는 commit history 없이 시작됩니다. 제외된 dependencies는 import 과정에서 Replit이 다시 설치합니다.
   </Step>
 </Steps>
 
-## 2단계: 새 앱 설정하기
+<div id="step-2-set-up-the-new-app">
+  ## 2단계: 새 앱 설정하기
+</div>
 
-이전 앱은 여전히 실행 중입니다. 이 단계에서는 데이터의 *테스트 복사본*으로 새 앱을 완전히 작동시켜, 나중에 최종 전환을 빠르게 진행할 수 있도록 합니다.
+기존 앱은 여전히 라이브 상태입니다. 이 단계에서는 데이터의 *테스트 사본*으로 새 앱이 완전히 동작하도록 만들어, 나중에 최종 전환을 빠르게 진행할 수 있도록 합니다.
 
 <Steps>
-  <Step title="시크릿 추가하기">
-    시크릿 값(API 키, 비밀번호)은 이전 프로젝트를 벗어나지 않습니다. 두 프로젝트 모두에서 [시크릿](/ko/core-concepts/project-editor/app-setup/secrets) 도구를 열고 각 항목을 직접 복사하세요. 배포 시크릿도 포함하세요.
+  <Step title="Secrets 추가하기">
+    secret 값(API key, 비밀번호)은 기존 project 밖으로 절대 나가지 않습니다. 두 project 모두에서 [Secrets](/ko/core-concepts/project-editor/app-setup/secrets) 도구를 열고 각 값을 직접 하나씩 옮겨 적으세요. deployment secret도 빠짐없이 포함하세요.
   </Step>
 
-  <Step title="커넥터와 기타 서비스 다시 연결하기">
-    새 프로젝트의 **도구 → 커넥터**에서 각 통합을 다시 연결하세요. App Storage, 협력자 및 기타 항목은 [자동으로 복사되지 않는 항목 다시 만들기](#re-create-what-doesnt-copy-over)를 참조하세요.
+  <Step title="Connectors 및 기타 서비스 다시 연결하기">
+    새 project에서 **Tools → Connectors**로 이동해 각 integration을 다시 연결하세요. App Storage, 공동 작업자를 비롯한 나머지 항목은 [복사되지 않는 항목 다시 만들기](#re-create-what-doesnt-copy-over)를 참고하세요.
   </Step>
 
   <Step title="새 앱 게시하기">
-    새 프로젝트를 [게시](/ko/features/publishing/overview)하세요. 새 프로젝트는 자체 `replit.app` 웹 주소와 자체 빈 프로덕션 데이터베이스를 갖게 됩니다. 아직 커스텀 도메인은 연결하지 마세요.
+    새 project를 [Publish](/ko/features/publishing/overview)하세요. 새 project는 자체 `replit.app` 웹 주소와 비어 있는 자체 production database를 갖게 됩니다. custom domain은 아직 연결하지 마세요.
   </Step>
 
   <Step>
-    아래 [데이터베이스 복사하기](#copy-the-database)를 따라, 새 프로젝트의 **프로덕션** 데이터베이스를 대상으로 사용하세요. 이렇게 하면 테스트할 실제 데이터를 얻을 수 있습니다. 3단계에서 이 복사본을 최신 데이터로 교체합니다.
+    아래 [database 복사하기](#copy-the-database)를 따르되, 새 project의 **production** database를 대상으로 지정하세요. 이렇게 하면 실제 데이터로 테스트할 수 있습니다. 3단계에서 이 사본을 최신 데이터로 교체합니다.
   </Step>
 
   <Step>
-    새 앱을 `replit.app` 주소로 열고 사용자처럼 사용해 보세요. 다음 단계로 넘어가기 전에 문제가 있는 부분을 수정하세요. 아직 사용자에게는 영향이 없습니다.
+    `replit.app` 주소로 새 앱을 열고 실제 사용자처럼 사용해 보세요. 다음 단계로 넘어가기 전에 문제가 있는 부분을 모두 수정하세요. 아직 사용자에게는 아무런 영향이 없습니다.
   </Step>
 </Steps>
 
-## 3단계: 사용자를 새 앱으로 전환하기
+<div id="step-3-switch-your-users-to-the-new-app">
+  ## 3단계: 사용자를 새 앱으로 전환하기
+</div>
 
-다운타임이 발생하는 부분입니다. 한 번에 진행하세요.
+이 단계에서는 다운타임이 발생합니다. 한 번에 끝내세요.
 
 <Steps>
-  <Step title="이전 앱 오프라인으로 전환하기">
-    이전 프로젝트에서 **Publishing** 도구를 열고 **Unpublish**를 선택하세요. 이제 앱이 오프라인 상태가 됩니다. 이 시점부터 아무도 새 데이터를 추가할 수 없으므로, 다음에 만드는 복사본은 완전한 데이터를 담게 됩니다.
+  <Step title="기존 앱을 offline으로 전환하기">
+    기존 project에서 **Publishing** 도구를 열고 **Unpublish**를 선택하세요. 이제 앱이 offline 상태가 됩니다. 이 시점부터는 아무도 새 데이터를 추가할 수 없으므로, 다음에 만드는 복사본이 최종본이 됩니다.
   </Step>
 
-  <Step title="데이터베이스를 마지막으로 한 번 더 복사하기">
-    아래 [데이터베이스 복사하기](#copy-the-database)를 따라, 새 프로젝트의 **프로덕션** 데이터베이스를 대상으로 사용하세요. 이 복사본에는 최신 데이터가 모두 담겨 있습니다.
+  <Step title="database를 마지막으로 한 번 더 복사하기">
+    아래 [database 복사하기](#copy-the-database)를 따라 진행하되, 새 project의 **production** database를 대상으로 지정하세요. 이 복사본에는 최신 데이터가 모두 담겨 있습니다.
   </Step>
 
   <Step title="웹 주소를 새 앱으로 연결하기">
-    앱이 커스텀 도메인을 사용하는 경우: 이전 프로젝트에서 **Publishing → Domains**를 열고 도메인 연결을 해제하세요. 새 프로젝트에서 **Publishing → Domains**를 열고 [연결](/ko/features/publishing/custom-domains#connect-a-domain-you-already-own)하세요. Replit이 요청하면 도메인 제공업체(예: GoDaddy나 Namecheap)에서 레코드를 업데이트하세요.
+    앱에서 custom domain을 사용하는 경우: 기존 project에서 **Publishing → Domains**를 열고 도메인 연결을 해제하세요. 그런 다음 새 project에서 **Publishing → Domains**를 열고 [도메인을 연결하세요](/ko/features/publishing/custom-domains#connect-a-domain-you-already-own). Replit이 요청하면 도메인 provider(예: GoDaddy 또는 Namecheap)에서 레코드를 업데이트하세요.
 
-    새 주소가 모든 사용자에게 적용되기까지 몇 분에서 몇 시간이 걸릴 수 있습니다. 그동안 일부 방문자는 오류를 볼 수 있습니다.
+    새 주소가 모든 사용자에게 적용되기까지 몇 분에서 몇 시간이 걸릴 수 있습니다. 그전까지는 일부 방문자에게 오류가 표시될 수 있습니다.
 
-    앱이 `replit.app` 주소만 사용한다면 대신 사용자에게 새 주소를 공유하세요.
+    앱이 `replit.app` 주소만 사용하는 경우에는 새 주소를 사용자에게 공유하세요.
   </Step>
 
-  <Step title="새 앱이 실행 중인지 확인하기">
-    웹 주소를 열고 새 앱이 데이터와 함께 로드되는지 확인하세요. 앱이 다시 온라인 상태가 되었습니다.
+  <Step title="새 앱이 정상 작동하는지 확인하기">
+    웹 주소에 접속해 새 앱이 데이터와 함께 제대로 로드되는지 확인하세요. 이제 앱이 다시 온라인 상태입니다.
   </Step>
 </Steps>
 
-## 데이터베이스 복사하기
+<div id="copy-the-database">
+  ## database 복사하기
+</div>
 
-코드 복사는 데이터베이스에 영향을 주지 않습니다. PostgreSQL의 `pg_dump` 및 `pg_restore` 도구를 사용해 데이터를 복사하세요. 두 도구 모두 두 프로젝트의 Shell에서 사용할 수 있습니다. 2단계와 3단계 모두 여기를 참조합니다. 명령은 매번 동일하며 *대상*만 바뀝니다.
+코드 복사는 database에 영향을 주지 않습니다. 데이터는 두 project의 Shell에서 모두 사용할 수 있는 PostgreSQL의 `pg_dump` 및 `pg_restore` 도구로 복사하세요. 2단계와 3단계 모두 이 섹션을 가리킵니다. 명령어는 매번 동일하며, *대상*만 달라집니다.
 
 <Warning>
-  `pg_dump`를 실행한 후 기록된 데이터는 복사본에 포함되지 않습니다. 3단계의 최종 복사에서는 먼저 이전 앱을 오프라인으로 전환하세요.
+  `pg_dump`를 실행한 뒤에 기록된 데이터는 복사본에 포함되지 않습니다. 3단계의 최종 복사 시에는 기존 앱을 먼저 offline 상태로 전환하세요.
 </Warning>
 
 <Steps>
-  <Step title="이전 프로젝트에서 데이터 내보내기">
-    이전 프로젝트에서 **Shell** 도구를 여세요. 다음 명령을 붙여넣고 Enter를 누르세요. 이 명령은 파일 트리에 `backup.dump`라는 파일을 만듭니다:
+  <Step title="기존 project에서 데이터 내보내기">
+    기존 project에서 **Shell** 도구를 엽니다. 다음 명령어를 붙여넣고 Enter를 누르세요. 파일 트리에 `backup.dump`라는 파일이 생성됩니다:
 
     ```bash theme={null}
     pg_dump -Fc "$DATABASE_URL" --no-owner --no-privileges -f backup.dump
     ```
 
-    이는 **개발** 데이터베이스를 내보냅니다. 실제 데이터는 보통 **프로덕션** 데이터베이스에 있습니다. 프로덕션 데이터베이스를 내보내려면:
+    이 명령은 **development** database를 내보냅니다. 실제 운영 데이터는 보통 **production** database에 있으므로, 이를 내보내려면 다음과 같이 하세요.
 
-    1. **Database** 도구를 열고 프로덕션 데이터베이스를 선택한 다음 **Settings**를 여세요.
-    2. 연결 문자열을 복사하세요.
-    3. 위 명령에서 `"$DATABASE_URL"`을 연결 문자열로 바꾸고, 인용 부호는 그대로 유지하세요.
+    1. **Database** 도구를 열고 production database를 선택한 뒤 **Settings**를 엽니다.
+    2. 연결 문자열을 복사합니다.
+    3. 위 명령어에서 `"$DATABASE_URL"`을 따옴표는 그대로 둔 채 복사한 연결 문자열로 바꿉니다.
 
-    찾을 수 없다면 [연결 세부 정보](/ko/features/data-and-storage/connection-details)를 참조하세요.
+    연결 문자열을 찾을 수 없다면 [Connection details](/ko/features/data-and-storage/connection-details)를 참고하세요.
   </Step>
 
-  <Step title="덤프 파일을 새 프로젝트로 이동하기">
-    이전 프로젝트의 파일 트리에서 `backup.dump` 옆의 세 점 메뉴를 선택하고 다운로드하세요. 그런 다음 파일 트리의 **Upload files** 옵션으로 새 프로젝트에 업로드하세요.
+  <Step title="덤프 파일을 새 project로 옮기기">
+    기존 project의 파일 트리에서 `backup.dump` 옆의 three-dot menu를 선택해 download합니다. 그런 다음 파일 트리의 **Upload files** 옵션으로 새 project에 upload합니다.
 
-    GitHub로 코드를 복사한 경우, 덤프 파일을 커밋하지 마세요. 데이터가 저장소에 남지 않도록 별도로 이동하세요.
+    GitHub를 통해 코드를 복사했다면 덤프 파일은 commit하지 마세요. 데이터가 저장소에 들어가지 않도록 별도로 옮겨야 합니다.
   </Step>
 
-  <Step title="새 프로젝트에서 데이터 가져오기">
-    새 프로젝트에서 **Shell** 도구를 여세요. 다음 명령을 붙여넣고 Enter를 누르세요:
+  <Step title="새 project에서 데이터 가져오기">
+    새 project에서 **Shell** 도구를 엽니다. 다음 명령어를 붙여넣고 Enter를 누르세요:
 
     ```bash theme={null}
     pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
     ```
 
-    위와 같이 작성하면 새 프로젝트의 **개발** 데이터베이스로 가져옵니다. 2단계에서는 이것이 필요합니다.
+    위 명령어는 새 project의 **development** database로 데이터를 가져옵니다. 2단계에서는 이 방식이 적합합니다.
 
-    3단계의 최종 복사에서는 대신 **프로덕션** 데이터베이스가 필요합니다. 새 프로젝트에서 **Database** 도구를 열고 프로덕션 데이터베이스를 선택한 다음 **Settings**를 열고 연결 문자열을 복사하여 `"$DATABASE_URL"` 대신 사용하세요.
+    3단계의 최종 복사에서는 **production** database가 대상이어야 합니다. 새 project에서 **Database** 도구를 열고 production database를 선택한 뒤 **Settings**를 열어 연결 문자열을 복사하고, `"$DATABASE_URL"` 자리에 사용하세요.
 
-    이 명령은 대상 데이터베이스의 일치하는 객체를 삭제한 다음 데이터를 로드합니다. 출력 없이 완료되면 성공한 것입니다.
+    이 명령은 대상 database에서 일치하는 객체를 삭제한 후 데이터를 불러옵니다. 아무 출력 없이 완료되면 성공한 것입니다.
   </Step>
 </Steps>
 
 <Note>
-  `pg_restore`가 역할 또는 정책 오류로 실패하면, 데이터베이스가 새 프로젝트에 아직 존재하지 않는 커스텀 PostgreSQL 역할을 사용하고 있는 것입니다. 도움이 필요하면 [지원팀에 문의](https://replit.com/support)하세요.
+  `pg_restore`가 역할 또는 정책 오류로 실패한다면, database가 새 project에는 아직 없는 사용자 지정 PostgreSQL 역할을 사용하고 있는 것입니다. [지원팀에 문의](https://replit.com/support)하세요.
 </Note>
 
 <Note>
-  새 프로젝트가 [레거시 Neon 개발 데이터베이스](/ko/features/data-and-storage/development-and-production#legacy-development-database)를 사용하는 경우, 게시 플로우에서 **현재 개발 데이터로 프로덕션 데이터베이스 설정**을 제공합니다. 이는 게시하는 시점에 개발 데이터베이스에 있는 내용을 복사합니다. 테스트용으로는 괜찮지만, 최종 전환에서는 최신 데이터를 얻기 위해 위의 단계를 사용하세요.
+  새 project가 [레거시 Neon development database](/ko/features/data-and-storage/development-and-production#legacy-development-database)를 사용하는 경우, publish flow에서 **Set up your production database with your current development data** 옵션이 제공됩니다. 이 옵션은 publish 시점의 development database 내용을 그대로 복사합니다. 테스트 용도로는 괜찮지만, 최종 전환 시에는 최신 데이터를 확보할 수 있도록 위 단계를 따르세요.
 </Note>
 
-## 자동으로 복사되지 않는 항목 다시 만들기
+<div id="re-create-what-doesnt-copy-over">
+  ## 복사되지 않는 항목 다시 만들기
+</div>
 
-프로젝트 설정의 나머지 부분은 파일 시스템 외부에 저장됩니다. 각 항목을 새 프로젝트에서 다시 만드세요:
+project 설정의 나머지 부분은 파일 시스템 외부에 저장됩니다. 새 project에서 각 항목을 다시 설정하세요.
 
-| 항목              | 해야 할 일                                                                                                                                               |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **시크릿**         | 시크릿 값은 이전 프로젝트를 벗어나지 않습니다. 배포 시크릿을 포함해 새 프로젝트의 [시크릿](/ko/core-concepts/project-editor/app-setup/secrets) 도구에 다시 추가하세요.                               |
-| **계정 시크릿**      | 새 프로젝트에서 [연결](/ko/core-concepts/project-editor/app-setup/secrets#manage-account-secrets)하세요. 새 프로젝트가 다른 계정에 속한 경우 먼저 해당 계정에 추가하세요.                   |
-| **App Storage** | 버킷은 이동하지 않습니다. 동일한 계정 내에서는 [기존 버킷을 추가](/ko/features/data-and-storage/object-storage#bucket-access-management)하세요. 계정 간에는 객체를 다운로드하여 새 버킷에 업로드하세요.    |
-| **커넥터**         | 새 프로젝트의 **도구 → 커넥터**에서 각 통합을 다시 연결하세요. [통합 개요](/ko/features/integrations/overview)를 참조하세요.                                                           |
-| **배포**          | 복사본은 게시되지 않은 상태입니다. [2단계](#step-2-set-up-the-new-app)에서처럼 새 워크스페이스에서 [게시](/ko/features/publishing/overview)하세요.                                      |
-| **커스텀 도메인**     | 이전 배포에서 도메인을 제거하고 새 배포에 연결한 다음 DNS 레코드를 업데이트하세요. [3단계](#step-3-switch-your-users-to-the-new-app)에서 다룹니다.                                             |
-| **협력자**         | 새 워크스페이스에서 협력자를 다시 초대하고 [액세스 권한](/ko/teams/identity-and-access-management/groups-and-permissions)을 설정하세요.                                            |
-| **Agent 히스토리**  | Agent 대화와 [체크포인트](/ko/features/version-control/checkpoints-and-rollbacks) 롤백은 이전 프로젝트에 남습니다. 체크포인트 커밋은 Git 히스토리와 함께 이동하지만, 복사본에서는 그 지점으로 롤백할 수 없습니다. |
+| 항목                  | 해야 할 일                                                                                                                                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Secrets**         | secret 값은 기존 project 밖으로 나가지 않습니다. deployment secrets를 포함해 새 project의 [Secrets](/ko/core-concepts/project-editor/app-setup/secrets) 도구에서 다시 추가하세요.                                                      |
+| **Account Secrets** | 새 project에서 [연결하세요](/ko/core-concepts/project-editor/app-setup/secrets#manage-account-secrets). 새 project가 다른 Account에 속해 있다면 먼저 해당 Account에 추가하세요.                                                     |
+| **App Storage**     | bucket은 함께 이동하지 않습니다. 같은 Account 내에서는 [기존 bucket을 추가](/ko/features/data-and-storage/object-storage#bucket-access-management)해 새 project에 연결하세요. 다른 Account로 옮기는 경우 객체를 download한 뒤 새 bucket에 upload하세요. |
+| **Connectors**      | 새 project의 **Tools → Connectors**에서 각 integration을 다시 연결하세요. [integrations 개요](/ko/features/integrations/overview)를 참고하세요.                                                                              |
+| **Deployments**     | 복사본은 게시되지 않은 상태입니다. [2단계](#step-2-set-up-the-new-app)와 같이 새 workspace에서 [Publish](/ko/features/publishing/overview)하세요.                                                                                 |
+| **Custom Domains**  | 기존 deployment에서 도메인을 제거하고 새 deployment에 연결한 뒤 DNS 레코드를 업데이트하세요. [3단계](#step-3-switch-your-users-to-the-new-app)에서 다룹니다.                                                                              |
+| **공동 작업자**          | 공동 작업자를 다시 초대하고 새 workspace에서 [접근 권한](/ko/teams/identity-and-access-management/groups-and-permissions)을 설정하세요.                                                                                          |
+| **Agent 기록**        | Agent 대화와 [checkpoint](/ko/features/version-control/checkpoints-and-rollbacks) rollback은 기존 project에 그대로 남습니다. checkpoint commit은 Git 기록과 함께 옮겨지지만, 복사본에서 해당 시점으로 roll back할 수는 없습니다.                   |
 
-## 문제가 발생한 경우
+<div id="if-something-goes-wrong">
+  ## 문제가 생겼을 때
+</div>
 
-이전 프로젝트는 여전히 존재합니다. 돌아가려면:
+기존 project는 그대로 남아 있습니다. 되돌리려면 다음과 같이 하세요.
 
-1. 이전 프로젝트에서 **Publishing** 도구를 열고 **Publish**를 선택하세요.
-2. 커스텀 도메인을 이동했다면 같은 방법으로 다시 이동하세요.
+1. 기존 project에서 **Publishing** 도구를 열고 **Publish**를 선택합니다.
+2. custom domain을 옮겼다면 같은 방법으로 다시 옮깁니다.
 
-앱은 오프라인으로 전환했을 때의 데이터로 다시 실행됩니다. 아무것도 손실되지 않았습니다.
+App을 offline으로 전환할 당시의 데이터를 그대로 유지한 채 다시 게시됩니다. 손실된 데이터는 없습니다.
 
-## 정리하기
+<div id="clean-up">
+  ## 정리
+</div>
 
-새 앱이 정상적으로 작동하는지 확인하기 위해 일주일 정도 기다리세요. 그런 다음:
+새 앱이 제대로 작동하는지 확인할 수 있도록 일주일 정도 기다립니다. 그런 다음:
 
-* 두 프로젝트와 기기에서 `backup.dump`를 제거하세요. 각 복사본에는 데이터의 전체 내보내기가 포함되어 있습니다.
-* 원한다면 이전 프로젝트를 삭제하세요.
+* 두 project와 사용 중인 기기에서 `backup.dump`를 삭제하세요. 사본마다 데이터 전체가 내보내기된 상태로 들어 있습니다.
+* 필요하다면 이전 project도 삭제하세요.
 
-## 관련 리소스
+<div id="related-resources">
+  ## 관련 자료
+</div>
 
-* [팀으로 앱 이전하기](/ko/teams/identity-and-access-management/transfer-app-to-teams): 프로젝트를 팀 워크스페이스로 또는 팀 워크스페이스 간에 이동하기 위한 기본 제공 이전 기능
-* [제공업체에서 가져오기](/ko/build/import-from-providers): 지원되는 모든 가져오기 소스
-* [공유 데이터베이스를 사용하는 게시된 앱 수정하기](/ko/features/data-and-storage/shared-database-migration): 더 많은 `pg_dump` 및 `pg_restore` 문제 해결 방법
+* [Transfer App to Teams](/ko/teams/identity-and-access-management/transfer-app-to-teams): project를 team workspace로 옮기거나 team workspace 간에 이동할 때 사용하는 기본 제공 전송 기능
+* [provider에서 가져오기](/ko/build/import-from-providers): 지원되는 모든 import 소스
+* [공유 database를 사용하는 published app 수정하기](/ko/features/data-and-storage/shared-database-migration): `pg_dump` 및 `pg_restore` 관련 추가 문제 해결 방법

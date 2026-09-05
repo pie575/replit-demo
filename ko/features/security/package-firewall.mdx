@@ -1,71 +1,85 @@
 ---
 title: "Package Firewall"
-description: "Package Firewall은 설치 시점에 악성 및 손상된 패키지를 앱에 도달하기 전에 차단합니다. 기본으로 켜져 있으며 Socket을 기반으로 동작합니다."
+description: "Package Firewall는 악성 및 침해된 패키지를 설치 시점에 차단하여 해당 코드가 앱에 도달하지 못하게 막습니다. 기본으로 켜져 있으며 Socket 기반으로 동작합니다."
+sidebarTitle: "Package Firewall"
+icon: "shield-check"
 ---
 
 <Frame>
-  <img src="/assets/mirror/blocked-package-message-04011660ce75.png" alt="Agent 채팅에서 Replit의 보안 정책에 의해 form-data 설치가 차단된 모습과 패키지의 알려진 취약점에 대한 설명" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
+  <img src="/assets/mirror/blocked-package-message-04011660ce75.png" alt="Replit의 보안 정책에 의해 form-data 설치가 차단된 내용과 해당 패키지의 알려진 취약점 설명을 보여주는 Agent chat" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
 </Frame>
 
 <Note>
-  종속성 보안이 처음이신가요? CVE, SBOM, 노출도, Fix with Agent, Republish, Auto-Protect의 정의는 [보안 개념](/ko/features/security/concepts)을 참고하세요.
+  dependency 보안이 처음이신가요? CVE, SBOM, exposure, Fix with Agent, Republish, Auto-Protect의 정의는 [보안 개념](/ko/features/security/concepts)에서 확인하세요.
 </Note>
 
-Package Firewall은 악성 및 손상된 패키지가 앱에 설치되기 전, 네트워크 수준에서 차단합니다. 이는 모든 빌더에게 기본으로 켜져 있는 보호 기능 모음인 [Replit Auto-Protect](/ko/features/security/concepts#auto-protect)의 일부이며, 소프트웨어 공급망 보안 기업인 [Socket](https://socket.dev)을 기반으로 동작합니다.
+Package Firewall는 악성 및 침해된 패키지를 네트워크 수준에서 차단하여, 앱에 설치되기 전에 미리 막아줍니다. 모든 builder에게 기본으로 켜져 있는 보호 기능 모음인 [Replit Auto-Protect](/ko/features/security/concepts#auto-protect)의 일부이며, 소프트웨어 공급망 보안 기업 [Socket](https://socket.dev) 기반으로 동작합니다.
 
-여러분이나 Agent가 `npm install`이나 `pip install`과 같은 설치 명령을 실행하면 해당 요청은 먼저 Package Firewall을 통과합니다. 안전한 패키지는 평소처럼 설치되며 아무런 차이를 느끼지 못합니다. Socket이 악성 또는 손상된 것으로 표시한 패키지는 어떤 코드도 여러분의 환경에 도달하기 전에 차단됩니다.
+사용자나 Agent가 `npm install`이나 `pip install` 같은 설치 명령을 실행하면, 요청은 먼저 Package Firewall를 거칩니다. 안전한 패키지는 평소대로 설치되므로 아무런 차이도 느껴지지 않습니다. Socket이 악성 또는 침해된 것으로 표시한 패키지는 해당 코드가 환경에 도달하기 전에 차단됩니다.
 
-Package Firewall은 **모든 빌더에게 기본으로 켜져 있으며, 별도로 설정하거나 마이그레이션할 것이 없습니다**. 새 앱과 기존 앱을 동일하게 보호하며, 구성할 설정도 없습니다.
+Package Firewall는 **모든 builder에게 기본으로 켜져 있으며, 따로 설정하거나 마이그레이션할 것이 없습니다**. 새 앱과 기존 앱을 모두 보호하며, 구성할 설정도 없습니다.
 
 <Frame>
-  <img src="/assets/mirror/auto-protect-layers-a65bc848b675.png" alt="기본으로 활성화된 세 가지 보호 기능인 WAF Firewall, Socket 기반 Package Firewall, SSL/TLS Encryption을 보여주는 Replit Auto-Protect 패널" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
+  <img src="/assets/mirror/auto-protect-layers-a65bc848b675.png" alt="WAF Firewall, Socket 기반 Package Firewall, SSL/TLS 암호화 등 기본으로 활성화된 세 가지 보호 기능을 보여주는 Replit Auto-Protect 패널" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
 </Frame>
 
-## 설치 시점 보호가 중요한 이유
+<div id="why-install-time-protection-matters">
+  ## 설치 시점 보호가 중요한 이유
+</div>
 
-대부분의 공급망 보안 도구는 패키지가 이미 설치된 지 오랜 시간이 지난 게시 시점에만 종속성을 스캔합니다. 일반적인 취약점이라면 이것만으로도 충분할 수 있습니다. 하지만 악성코드는 다릅니다. 설치되는 즉시 피해를 일으킵니다 — 시크릿을 탈취하거나, 백도어를 열거나, 환경 변수를 유출합니다. 게시 시점 스캔이 이를 감지할 때쯔음이면 공격은 이미 실행된 뒤입니다.
+대부분의 공급망 보안 도구는 게시 시점에만 dependencies를 검사합니다. 이미 패키지가 설치되고 한참 지난 뒤죠. 일반적인 취약점이라면 그것으로도 충분할 수 있습니다. 하지만 malware는 다릅니다. 설치되는 순간 바로 secret을 훔치거나 백도어를 열거나 environment variables를 빼내는 등 피해를 입힙니다. 게시 시점 검사가 이를 탐지했을 때는 이미 공격이 끝난 뒤입니다.
 
-Package Firewall은 이 공백을 없앱니다. 악성 패키지가 다운로드되기 전에 차단함으로써, 단 한 줄의 악성 코드도 실행되기 전에 공격을 막습니다.
+Package Firewall은 바로 이 빈틈을 메웁니다. 악성 패키지를 download되기 전에 차단하므로, 악성 코드가 단 한 줄도 실행되기 전에 공격을 막아냅니다.
 
-## 동작 방식
+<div id="how-it-works">
+  ## 작동 방식
+</div>
 
-1. 여러분이나 Agent가 `npm install <package>` 또는 `pip install <package>`와 같은 설치 명령을 실행합니다.
-2. 요청은 Package Firewall을 통과하며, Socket의 위협 인텔리전스를 기준으로 패키지를 검사합니다.
-3. 패키지가 안전하면 설치는 눈에 띄는 차이 없이 정상적으로 진행됩니다.
-4. 패키지가 악성이거나 손상되었다면, 어떤 코드도 환경에 도달하기 전에 설치가 차단됩니다.
+1. 사용자 또는 Agent가 `npm install <package>`나 `pip install <package>` 같은 설치 명령을 실행합니다.
+2. 이 요청은 Package Firewall을 거치며, Socket의 위협 인텔리전스를 기준으로 패키지를 검사합니다.
+3. 패키지에 문제가 없으면 설치는 평소와 똑같이 진행되며, 차이를 느낄 수 없습니다.
+4. 패키지가 악성이거나 침해된 경우, 코드가 환경에 도달하기 전에 설치가 차단됩니다.
 
-무언가가 차단되면, 무엇이 왜 중단되었는지에 대한 명확한 메시지를 받게 되며, 차단을 유발한 취약점이나 정책도 함께 표시됩니다. Agent도 동일한 신호를 확인하므로 안전한 대안을 제안하거나 — 예를 들어 잘못 입력된 패키지 이름을 수정하는 식으로 — 결정을 다시 여러분에게 넘길 수 있습니다.
+차단이 발생하면 무엇이 왜 차단되었는지, 그리고 차단을 유발한 취약점이나 정책까지 명확한 메시지로 안내됩니다. Agent도 동일한 신호를 확인하므로, 잘못 입력된 패키지 이름을 바로잡는 등 안전한 대안을 제안하거나 결정을 사용자에게 다시 넘길 수 있습니다.
 
-### 지원되는 패키지 관리자
+<div id="supported-package-managers">
+  ### 지원되는 패키지 manager
+</div>
 
-Package Firewall은 다음에 대한 설치를 보호합니다.
+Package Firewall는 다음 환경에서의 설치를 보호합니다.
 
 * **JavaScript** — npm, yarn, pnpm
 * **Python** — pip
 * **Go** — Go 모듈
 
-## Package Firewall이 탐지하는 것
+<div id="what-package-firewall-catches">
+  ## Package Firewall가 차단하는 대상
+</div>
 
-Package Firewall은 순수한 악성코드뿐만 아니라 널리 사용되는 패키지를 포함해 손상되었거나 알려진 취약점이 있는 정상 패키지 버전도 차단합니다. 이러한 취약점 중 다수는 이를 추천하는 모델의 학습 마감 시점 이후에 공개되었기 때문에, 모델은 학습 데이터에서는 안전했지만 이후 문제가 발견된 종속성 버전을 자신 있게 추천할 수 있습니다. 이러한 위험에는 다음과 같은 이름이 붙어 있습니다.
+Package Firewall는 노골적인 malware는 물론, 널리 쓰이는 것까지 포함해 정상적인 패키지의 침해된 버전이나 취약점이 알려진 버전도 차단합니다. 이러한 취약점 중 상당수는 해당 패키지를 추천하는 model의 학습 데이터 기준 시점 이후에 공개되었습니다. 그래서 model은 학습 시점에는 안전했지만 그 이후 문제가 보고된 dependency 버전을 자신 있게 제안하기도 합니다. 이런 위험에는 업계에서 통용되는 명칭이 있습니다.
 
-* **타이포스쿼트(Typosquats)** — `requests` 대신 `reqeusts`처럼 실제 패키지 이름에서 한 글자만 다른 악성 패키지입니다. 잘못된 패키지를 요청했다가 악성코드를 내려받게 됩니다.
-* **슬롭스쿼트(Slopsquats)** — 모델이 존재하지 않는 패키지 이름을 만들어내고, 공격자가 정확히 그 이름으로 패키지를 등록해 다음 에이전트가 설치하기를 기다리는 방식입니다.
-* **오래된 추천(Stale recommendations)** — 학습 마감 시점 이전에는 안전했기 때문에 모델이 추천하는, 이후 취약점이 공개된 실제 패키지입니다.
+* **타이포스쿼팅(Typosquats)** — `requests` 대신 `reqeusts`처럼 실제 패키지와 철자 하나만 다른 이름을 쓰는 악성 패키지입니다. 잘못된 패키지를 요청하는 순간 malware를 download하게 됩니다.
+* **슬롭스쿼팅(Slopsquats)** — model이 존재하지도 않는 패키지 이름을 지어내면, 공격자가 바로 그 이름을 선점해 두고 다음 agent가 설치하기를 기다립니다.
+* **오래된 추천** — 학습 데이터 기준 시점 이전에 안전했다는 이유만으로 model이 추천하지만, 이미 취약점이 공개된 실존 패키지입니다.
 
-이 마지막 유형이 바로 AI로 빌드된 앱에서 Package Firewall이 특히 중요한 이유입니다. 에이전트는 더 이상 안전하지 않은 종속성을 자신 있게 선택할 수 있고, Package Firewall은 그 코드가 실행되기 전에 설치를 막아줍니다.
+AI로 만든 App에서 Package Firewall가 특히 중요한 이유가 바로 이 마지막 유형 때문입니다. Agent는 더 이상 안전하지 않은 dependency를 아무렇지 않게 가져다 쓸 수 있지만, Package Firewall가 해당 코드가 실행되기 전에 설치 단계에서 막아 줍니다.
 
-## Package Firewall과 Replit의 다른 보안 도구의 관계
+<div id="how-package-firewall-fits-with-replits-other-security-tools">
+  ## Package Firewall와 Replit의 다른 보안 도구의 관계
+</div>
 
-Package Firewall은 상호 보완적인 세 계층 중 하나입니다. 각 계층은 앱 생애주기의 서로 다른 시점을 보호하므로, 하나를 선택하기보다는 함께 사용하세요.
+Package Firewall는 서로를 보완하는 세 가지 계층 중 하나입니다. 각 계층은 앱 수명 주기의 서로 다른 지점을 보호하므로, 하나만 선택하지 말고 함께 사용하세요.
 
-| 계층                   | 실행 시점       | 하는 일                                                                                                                                                            |
-| -------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Package Firewall** | 설치 시점       | 악성 및 손상된 패키지가 다운로드되기 전에 차단합니다(예방).                                                                                                                              |
-| **자동 종속성 스캔**        | 설치 후, 지속적으로 | 설치된 종속성에서 새로 공개된 CVE를 탐지하며, 선택적으로 Agent가 패치를 준비합니다. [Project Security Center](/ko/features/security/project-security-center#automatic-dependency-scans)를 참고하세요. |
-| **Security Agent**   | 게시 전        | 코드, 종속성, 개인정보 관련 취약점에 대해 전체 코드베이스를 감사합니다. [Agent 보안 스캔](/ko/features/security/agent-security-scans)을 참고하세요.                                                     |
+| 계층                   | 실행 시점      | 역할                                                                                                                                                                         |
+| -------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Package Firewall** | 설치 시점      | 악성 및 침해된 패키지가 download되기 전에 차단합니다(예방).                                                                                                                        |
+| **자동 dependency 검사** | 설치 후 지속적으로 | 설치된 dependencies에서 새로 공개된 CVE를 탐지하고, 필요에 따라 Agent가 준비한 패치를 제공합니다. [Project Security Center](/ko/features/security/project-security-center#automatic-dependency-scans)를 참조하세요. |
+| **Security Agent**   | 게시 전  | 전체 codebase를 대상으로 코드, dependency, 개인정보 관련 취약점을 audit합니다. [Agent security scans](/ko/features/security/agent-security-scans)를 참조하세요.                                           |
 
-## 다음 단계
+<div id="next-steps">
+  ## 다음 단계
+</div>
 
-* [Project Security Center](/ko/features/security/project-security-center)에서 단일 프로젝트의 발견 사항을 검토하세요.
-* [Workspace Security Center](/ko/features/security/workspace-security-center)에서 모든 프로젝트의 종속성을 감사하세요.
-* Replit의 보안 접근 방식에 대해 더 알아보려면 [Replit이 AI 생성 코드를 보호하는 방법](https://blog.replit.com/securing-ai-generated-code)을 읽어보세요.
+* [Project Security Center](/ko/features/security/project-security-center)에서 개별 project의 findings를 검토하세요.
+* [Workspace Security Center](/ko/features/security/workspace-security-center)에서 모든 project의 dependencies를 audit하세요.
+* Replit의 보안 접근 방식을 자세히 알아보려면 [How Replit Secures AI-Generated Code](https://blog.replit.com/securing-ai-generated-code)를 읽어보세요.

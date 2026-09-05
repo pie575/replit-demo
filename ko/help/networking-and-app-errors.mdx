@@ -1,23 +1,25 @@
 ---
 title: "네트워킹 및 앱 오류"
-description: "배포된 앱의 일반적인 오류에 대한 답변—403 Forbidden, Application failed to respond, CORS, 502 Bad Gateway, 아웃바운드 요청 문제."
+description: "게시된 앱에서 자주 발생하는 오류에 대한 해결 방법 — 403 Forbidden, Application failed to respond, CORS, 502 Bad Gateway, 아웃바운드 요청 문제."
+sidebarTitle: "네트워킹 및 앱 오류"
+icon: "triangle-exclamation"
 ---
 
-이 답변은 배포된 앱에서 발생할 수 있는 오류를 다룹니다. 더 광범위한 문제 해결은 [배포 문제 해결](/ko/build/troubleshooting)을 참조하세요.
+여기서는 게시된 앱에서 발생할 수 있는 오류를 다룹니다. 더 폭넓은 문제 해결 방법은 [deployment 문제 해결](/ko/build/troubleshooting)을 참고하세요.
 
 <AccordionGroup>
-  <Accordion title="배포된 앱이 403 Forbidden 오류를 반환합니다—어떻게 수정하나요?">
-    배포된 앱의 403은 일반적으로 다음 중 하나에서 발생합니다:
+  <Accordion title="게시한 앱에서 403 Forbidden 오류가 발생합니다. 어떻게 해결하나요?">
+    published app에서 발생하는 403 오류는 대개 다음 중 하나가 원인입니다.
 
-    * **과도한 크기의 요청 헤더**—쿠키가 너무 많으면 헤더가 너무 커져 엣지에서 거부될 수 있습니다. 해당 도메인의 브라우저 쿠키를 지우고 다시 테스트하세요.
-    * **인증 누락**—요청에 필요한 로그인 토큰이나 세션이 포함되지 않은 경우.
-    * **액세스 제한**—앱이 일부 트래픽을 차단하도록 구성되어 있을 수 있습니다. [비공개 배포](/ko/features/publishing/private-deployments) 및 [외부 액세스 토큰](/ko/features/deployment-customization/external-access-tokens)을 참조하세요.
+    * **요청 headers 크기 초과**—쿠키가 너무 많으면 headers가 커져 엣지에서 거부될 수 있습니다. 해당 도메인의 브라우저 쿠키를 삭제한 후 다시 테스트해 보세요.
+    * **authentication 누락**—요청에 필요한 login token 또는 session이 포함되어 있지 않은 경우입니다.
+    * **접근 제한**—일부 트래픽을 차단하도록 앱이 구성되어 있을 수 있습니다. [private deployments](/ko/features/publishing/private-deployments) 및 [external access tokens](/ko/features/deployment-customization/external-access-tokens)를 참조하세요.
 
-    자세한 진단을 위해 배포 로그를 새 Agent 채팅에 붙여넣으세요.
+    자세한 진단이 필요하면 deployment logs를 새 Agent chat에 붙여넣으세요.
   </Accordion>
 
-  <Accordion title="앱에 &#x22;Application failed to respond&#x22;가 표시됩니다—무슨 의미인가요?">
-    앱 프로세스가 Replit이 예상하는 포트에서 수신 대기하지 않습니다. Replit은 `PORT` 환경 변수를 통해 올바른 포트를 전달하므로 하드코딩된 값 대신 이를 사용하여 바인딩하세요:
+  <Accordion title="내 App에 &#x22;Application failed to respond&#x22;가 표시되면 무엇을 의미하나요?">
+    앱 프로세스가 Replit이 예상하는 포트에서 수신 대기하고 있지 않습니다. Replit은 `PORT` 환경 변수를 통해 올바른 포트를 전달하므로, 값을 하드코딩하지 말고 이 변수에 바인딩하세요:
 
     ```js theme={null}
     const PORT = process.env.PORT || 3000;
@@ -27,63 +29,65 @@ description: "배포된 앱의 일반적인 오류에 대한 답변—403 Forbid
     port = int(os.environ.get("PORT", 3000))
     ```
 
-    바인딩 전에 앱이 충돌했을 수도 있습니다—배포 로그에서 시작 오류를 확인하세요. [Autoscale 배포](/ko/features/publishing/deployment-types#autoscale)에서 조용한 기간 후 첫 번째 요청은 몇 초가 걸릴 수 있습니다(콜드 스타트). 이는 정상입니다.
+    바인딩 전에 앱이 충돌했을 수도 있습니다. deployment 로그에서 시작 오류가 있는지 확인하세요. [Autoscale deployments](/ko/features/publishing/deployment-types#autoscale)에서는 한동안 요청이 없다가 들어온 첫 요청을 처리하는 데 몇 초가 걸릴 수 있으며(콜드 스타트), 이는 정상적인 동작입니다.
   </Accordion>
 
-  <Accordion title="배포된 Replit 앱에서 CORS 오류를 어떻게 수정하나요?">
-    CORS 오류는 프론트엔드와 백엔드가 서로 다른 오리진에 있고 백엔드가 이를 허용하도록 설정되지 않은 것을 의미합니다. 동일한 앱의 일부라면 상대 URL(예: `/api/endpoint`)을 사용하여 CORS를 완전히 피하세요.
+  <Accordion title="게시한 Replit 앱의 CORS 오류는 어떻게 해결하나요?">
+    CORS 오류는 frontend와 backend의 출처(origin)가 서로 다른데, backend가 이를 허용하도록 설정되어 있지 않다는 뜻입니다. 둘이 같은 App에 속해 있다면 `/api/endpoint`처럼 상대 URL을 사용해 CORS 문제를 아예 피할 수 있습니다.
 
-    그렇지 않은 경우 프론트엔드 오리진을 허용하도록 백엔드를 구성하세요. Express의 경우 예를 들면:
+    그렇지 않다면 frontend의 출처를 허용하도록 backend를 설정하세요. 예를 들어 Express에서는 다음과 같습니다:
 
     ```js theme={null}
     const cors = require("cors");
     app.use(cors({ origin: "https://your-frontend.replit.app" }));
     ```
 
-    게시 전에 필요한 특정 오리진만 허용하세요. [배포 문제 해결](/ko/build/troubleshooting)을 참조하세요.
+    게시하기 전에 필요한 특정 origin만 허용하세요. [deployment 문제 해결](/ko/build/troubleshooting)을 참고하세요.
   </Accordion>
 
-  <Accordion title="앱이 로컬에서는 작동하지만 배포 후 네트워크 오류가 발생합니다">
-    프로덕션 환경이 로컬 설정과 다를 때 배포된 앱이 실패합니다. 세 가지를 확인하세요:
+  <Accordion title="내 앱은 로컬에서는 작동하지만 게시하면 네트워크 오류가 발생합니다">
+    production 환경이 로컬 환경과 다르면 배포된 앱이 정상적으로 동작하지 않습니다. 다음 세 가지를 확인하세요.
 
-    1. **하드코딩된 localhost URL**—`localhost:3000` 또는 `127.0.0.1`을 상대 경로 또는 환경 기반 URL로 교체한 다음 다시 배포하세요.
-    2. **누락된 프로덕션 시크릿**—모든 필수 키가 배포 시크릿에 설정되어 있는지 확인하세요. [시크릿](/ko/core-concepts/project-editor/app-setup/secrets)을 참조하세요.
-    3. **프로덕션에서 실행되지 않은 마이그레이션**—게시 전에 프로덕션 데이터베이스에 대해 보류 중인 마이그레이션을 실행하세요.
+    1. **하드코딩된 localhost URL**—`localhost:3000` 또는 `127.0.0.1`을 상대 경로나 환경 기반 URL로 바꾼 뒤 다시 배포하세요.
+    2. **누락된 production secret**—필요한 키가 모두 deployment secrets에 설정되어 있는지 확인하세요. [Secrets](/ko/core-concepts/project-editor/app-setup/secrets)를 참고하세요.
+    3. **production에서 실행되지 않은 migration**—게시하기 전에 production database에 대기 중인 migration을 실행하세요.
 
-    오류가 계속되면 오류 메시지와 시도한 단계를 포함하여 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+    오류가 계속되면 오류 메시지와 시도한 단계를 함께 적어 [Replit Support에 문의](https://replit.com/support)하세요.
   </Accordion>
 
-  <Accordion title="배포된 앱에서 502 Bad Gateway 오류를 어떻게 디버깅하나요?">
-    502는 일반적으로 앱 프로세스가 충돌했거나 서버가 사용할 수 없는 출력을 반환한 것을 의미합니다. 502가 발생하기 직전의 충돌 오류에 대해 배포 로그를 확인하세요—처리되지 않은 프라미스 거부 및 포착되지 않은 예외가 Node.js 프로세스를 자동으로 충돌시킬 수 있습니다.
+  <Accordion title="게시한 앱에서 502 Bad Gateway 오류를 어떻게 디버깅하나요?">
+    502는 대개 앱 프로세스가 충돌했거나 서버가 사용할 수 없는 출력을 반환했음을 의미합니다. 502가 발생하기 직전에 충돌 오류가 있었는지 deployment logs를 확인하세요. 처리되지 않은 프로미스 거부(unhandled promise rejection)와 잡히지 않은 예외는 Node.js 프로세스를 조용히 종료시킬 수 있습니다.
 
-    충돌을 표면화하는 핸들러를 추가하세요:
+    충돌을 드러내려면 다음 핸들러를 추가하세요:
 
     ```js theme={null}
     process.on("uncaughtException", (err) => console.error("Uncaught:", err));
     ```
 
-    로그에서 기본 오류를 확인할 수 있으면 새 Agent 채팅에 붙여넣어 수정 도움을 받으세요.
+    logs에서 실제 오류를 확인했다면, 해당 내용을 새 Agent chat에 붙여넣어 수정에 도움을 받으세요.
   </Accordion>
 
-  <Accordion title="앱이 외부 API에 요청할 수 없습니다—무엇을 확인해야 하나요?">
-    먼저 요청이 코드에서 실패하는 것이 아니라 차단되고 있는지 확인하세요. 배포 로그를 열고 차단되거나 리디렉션된 아웃바운드 요청에 대한 메시지를 찾으세요.
+  <Accordion title="내 앱에서 외부 API로 요청을 보낼 수 없습니다. 무엇을 확인해야 하나요?">
+    먼저 코드에서 오류가 발생한 것인지, 아니면 요청이 차단된 것인지 확인하세요. deployment logs를 열고 외부 요청이 차단되거나 리디렉션되었다는 메시지가 있는지 살펴보세요.
 
-    일반적인 원인 및 수정 방법:
+    일반적인 원인과 해결 방법:
 
-    * **자기 참조 URL**—백엔드가 자체 공개 URL(예: `fetch("https://myapp.replit.app/api/...")`)을 호출하는 경우 대신 상대 경로 `fetch("/api/...")`를 사용하세요.
-    * **빌드 단계의 요청**—런타임에 아웃바운드 호출을 수행하고 빌드 중에는 하지 마세요.
-    * **네트워크 제한**—회사 또는 학교 네트워크에서는 아웃바운드 연결이 차단될 수 있습니다. 네트워크 관리자에게 확인하세요.
+    * **자기 참조 URL** — backend가 자신의 public URL을 호출하는 경우(예: `fetch("https://myapp.replit.app/api/...")`), 대신 `fetch("/api/...")`와 같은 상대 경로를 사용하세요.
+    * **빌드 단계 중의 요청** — 외부 호출은 빌드 중이 아니라 런타임에 수행하세요.
+    * **네트워크 제한** — 회사나 학교 네트워크에서는 외부 연결이 차단될 수 있습니다. 네트워크 관리자에게 문의하세요.
 
-    이 중 어느 것도 해당되지 않고 요청이 여전히 차단된다면 관련 로그 라인을 포함하여 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+    위의 경우에 해당하지 않는데도 요청이 계속 차단된다면, 관련 로그 내용을 첨부해 [Replit Support에 문의하세요](https://replit.com/support).
   </Accordion>
 
-  <Accordion title="재게시 후 앱 URL이 변경되었습니다—이전 서브도메인을 되찾을 수 있나요?">
-    `.replit.app` 서브도메인은 프로젝트 이름에서 파생되며, 특히 프로젝트 이름이 변경된 경우 게시 취소 및 재게시 시 동일하게 유지된다는 보장이 없습니다.
+  <Accordion title="App을 다시 게시한 후 URL이 변경되었습니다. 이전 하위 도메인을 다시 사용할 수 있나요?">
+    `.replit.app` 서브도메인은 project 이름에서 생성되므로, 게시를 해제했다가 다시 게시할 때 동일하게 유지된다는 보장이 없습니다. 특히 project 이름을 변경한 경우에는 더욱 그렇습니다.
 
-    영구적인 해결책은 [커스텀 도메인](/ko/features/publishing/custom-domains)으로, 재배포 시에도 동일하게 유지됩니다. 이전 서브도메인을 복원하려면 프로젝트 이름이 원래 이름과 일치하는지 확인하고(필요하면 되돌리기) 재게시하세요—Replit은 릴리스된 서브도메인을 수동으로 재할당할 수 없습니다. [프로젝트 지역](/ko/features/publishing/project-geography)을 참조하세요.
+    근본적인 해결책은 [custom domain](/ko/features/publishing/custom-domains)을 사용하는 것으로, custom domain은 재배포 후에도 그대로 유지됩니다. 기존 서브도메인을 되찾으려면 project 이름을 원래 이름과 동일하게 맞춘 뒤(필요하다면 이름을 원래대로 변경) 다시 게시하세요. Replit에서 이미 해제된 서브도메인을 수동으로 재할당해 드릴 수는 없습니다. [Project geography](/ko/features/publishing/project-geography)를 참조하세요.
   </Accordion>
 </AccordionGroup>
 
-## 도움이 더 필요하신가요?
+<div id="still-need-help">
+  ## 여전히 도움이 필요하신가요?
+</div>
 
-여기서 오류가 다루어지지 않았다면 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+여기에 없는 오류가 발생했다면 [Replit Support에 문의하세요](https://replit.com/support).

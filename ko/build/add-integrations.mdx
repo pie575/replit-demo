@@ -1,6 +1,8 @@
 ---
-title: "통합 추가"
-description: "모든 Velocity 예약을 고객의 Google Calendar에 전송합니다."
+title: "integration 추가"
+description: "Velocity의 모든 예약을 고객의 Google Calendar로 전송하세요."
+sidebarTitle: "integration 추가"
+icon: "plug"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,78 +20,90 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-이 작업이 끝나면 모든 Velocity 예약이 픽업 및 반납 시간이 이미 입력된 채로 고객의 Google Calendar에 나타나게 됩니다.
+이 과정을 마치면 모든 Velocity 예약이 픽업 및 반납 시간까지 채워진 상태로 고객의 Google Calendar에 등록됩니다.
 
-통합을 통해 Velocity가 다른 도구와 소통할 수 있습니다. 각 예약을 고객의 캘린더에 전송하거나, 고가 렌탈이 예약될 때 담당자에게 이메일을 보내거나, 날씨 정보를 여행 계획 페이지에 불러올 수 있습니다. 지금은 하나만 선택하세요 — Google Calendar는 모든 고객에게 명확하고 검증 가능한 결과물을 제공하며("렌탈이 내 캘린더에 있어"), 테스트 중에 자신의 캘린더에서 확인할 수 있습니다.
+Integrations를 사용하면 Velocity가 다른 도구와 연동할 수 있습니다. 각 예약 건을 고객의 캘린더로 보내거나, 고액 대여가 예약되면 담당자에게 이메일을 보내거나, 여행 계획 페이지에 날씨 정보를 불러올 수도 있습니다. 지금은 하나만 선택하세요. Google Calendar는 모든 고객에게 명확하고 확인 가능한 artifact(&quot;대여 일정이 내 캘린더에 있다&quot;)를 제공하며, 테스트 중에 여러분의 캘린더에서 직접 확인할 수 있습니다.
 
-## Agent에게 캘린더 통합 추가 요청
+<div id="tell-agent-to-add-the-calendar-integration">
+  ## Agent에게 calendar integration 추가를 요청하세요
+</div>
 
-Replit은 Google Calendar를 포함하는 내장 **Google Workspace 커넥터**를 제공합니다. Agent가 한 번의 클릭으로 Google에 로그인합니다 — 생성할 API 프로젝트, 복사할 OAuth 자격 증명, 붙여넣을 시크릿이 없습니다.
+Replit은 Google Calendar를 지원하는 기본 제공 **Google Workspace connector**를 제공합니다. Agent가 클릭 한 번으로 Google에 로그인하므로 새로 만들 API 프로젝트도, 복사할 OAuth 자격 증명도, 붙여넣을 secret도 없습니다.
 
 <AiPrompt>
-  Velocity 고객이 예약을 확인하면 렌탈을 Google Calendar에 추가하세요.<br />
-  Google Calendar에 Replit의 Google Workspace 커넥터를 사용하세요 — OAuth 자격 증명을 요청하지 마세요.<br />
-  이벤트 제목은 "Velocity rental: \[차량 제조사 및 모델]"이어야 합니다.<br />
-  이벤트는 픽업 시간부터 반납 시간까지 걸쳐야 하며, 설명에 픽업 주소와 예약 참조 번호를 포함해야 합니다.<br />
-  고객이 날짜를 변경하거나 예약을 취소하면 캘린더 이벤트가 자동으로 업데이트되어야 합니다.<br />
-  캘린더 추가가 실패해도 예약은 확인되도록 Velocity에 명확한 메시지를 추가하세요.
+  Velocity 고객이 예약을 확정하면 해당 대여 일정을 고객의 Google Calendar에 추가해 주세요.<br />
+  Google Calendar 연동에는 Replit의 Google Workspace connector를 사용하고, OAuth 자격 증명은 요청하지 마세요.<br />
+  이벤트 제목은 &quot;Velocity rental: [차량 제조사 및 모델]&quot; 형식으로 해주세요.<br />
+  이벤트는 픽업 시간부터 반납 시간까지로 설정하고, 설명에는 픽업 주소와 예약 참조 번호를 포함해 주세요.<br />
+  고객이 날짜를 변경하거나 예약을 취소하면 캘린더 이벤트를 자동으로 업데이트해 주세요.<br />
+  calendar 추가에 실패하면 Velocity에 명확한 메시지를 표시하되, 예약은 그대로 확정되도록 해주세요.
 </AiPrompt>
 
-Agent가 Google Workspace 커넥터를 프로비저닝하고, 워크스페이스에서 단일 Connect 대화창을 열며, 캘린더를 소유한 Google 계정으로 로그인하면 예약이 확인될 때마다 이벤트를 추가하도록 Velocity를 연결합니다.
+Agent는 Google Workspace connector를 준비하고 workspace에 Connect 대화 상자를 하나 띄웁니다. 해당 calendar를 소유한 Google account로 로그인하면, 예약이 확정될 때마다 이벤트가 추가되도록 Velocity를 연결해 줍니다.
 
 <Note>
-  커넥터는 Core, Pro, 또는 Enterprise 기능입니다. 무료 플랜에서는 Agent에게 대신 Google OAuth 프로젝트를 사용하도록 요청하세요 — Google Cloud 프로젝트를 만들고, Calendar API를 활성화하고, 결과 자격 증명을 앱의 Secrets 패널에 붙여넣어야 합니다.
+  Connectors는 Core, Pro, Enterprise 기능입니다. 무료 plan에서는 Agent에게 Google OAuth 프로젝트를 대신 사용하도록 요청하세요. 이 경우 Google Cloud 프로젝트를 생성하고, Calendar API를 활성화한 뒤, 발급된 자격 증명을 앱의 Secrets pane에 붙여넣어야 합니다.
 </Note>
 
-## 처음부터 끝까지 테스트
+<div id="test-it-end-to-end">
+  ## 엔드투엔드 테스트
+</div>
 
-1. 새 탭에서 자신의 Google Calendar를 엽니다.
+1. 새 탭에서 본인의 Google Calendar를 엽니다.
 2. Preview에서 Velocity에 로그인합니다.
-3. 다음 토요일-일요일에 차량을 예약하고 예약을 확인합니다.
-4. Google Calendar 탭으로 전환합니다. 토요일-일요일에 설명에 픽업 주소가 포함된 새 "Velocity rental: \[차량]" 이벤트가 나타나야 합니다.
-5. Velocity에서 예약을 일요일-월요일로 변경합니다. 캘린더 이벤트가 자동으로 이동해야 합니다.
+3. 다음 주 토요일~일요일로 차량을 예약하고 예약 건을 확정합니다.
+4. Google Calendar 탭으로 전환합니다. 토요일~일요일에 &quot;Velocity rental: [car]&quot; 이벤트가 새로 표시되고, 설명란에는 픽업 주소가 들어 있어야 합니다.
+5. Velocity에서 예약을 일요일~월요일로 변경합니다. 캘린더 이벤트도 자동으로 옮겨져야 합니다.
 6. 예약을 취소합니다. 캘린더 이벤트가 사라져야 합니다.
-7. 두 번째 테스트로, 워크스페이스의 **Integrations**를 열고 Google Workspace의 연결을 끊은 다음 예약을 시도합니다. Velocity가 여전히 예약을 확인하고 "캘린더에 추가할 수 없었습니다 — 예약이 확인되었습니다."와 같은 명확한 메시지를 표시해야 합니다. 테스트가 통과하면 커넥터를 다시 연결합니다.
+7. 두 번째 테스트로, workspace에서 **Integrations**를 열어 Google Workspace 연결을 해제한 뒤 예약을 시도해 보세요. 이때도 Velocity는 예약을 정상적으로 확정하고 &quot;캘린더에 추가하지 못했습니다 — 예약은 확정되었습니다.&quot;처럼 명확한 메시지를 표시해야 합니다. 테스트를 통과했다면 connector를 다시 연결하세요.
 
-예약이 확인되었지만 이벤트가 나타나지 않으면 정확한 오류를 Agent에게 전달하세요.
+예약은 확정되는데 이벤트가 나타나지 않는다면, 오류 내용을 그대로 복사해 Agent에게 붙여넣으세요:
 
 <AiPrompt>
-  통합이 이 오류와 함께 실패했습니다: \[Velocity 또는 Replit 로그에서 오류 붙여넣기].<br />
-  가능성이 높은 원인을 알려주고 가장 작은 문제를 수정하세요.<br />
-  Google Calendar에 접근할 수 없어도 Velocity에서 차량 예약이 여전히 작동하는지 확인하세요.
+  다음 오류로 integration이 실패했습니다: [Velocity 또는 Replit logs에 표시된 오류를 붙여넣으세요].<br />
+  예상되는 원인을 알려주고, 가장 작은 문제부터 수정해 주세요.<br />
+  Google Calendar에 연결할 수 없더라도 Velocity에서 차량 예약이 계속 동작하도록 해주세요.
 </AiPrompt>
 
-## 배포하고 공개 URL에서 테스트
+<div id="publish-and-try-it-from-the-public-url">
+  ## Publish로 배포하고 public URL에서 사용해 보기
+</div>
 
-캘린더 통합이 Preview에서 작동하면:
+Preview에서 calendar integration이 정상적으로 동작한다면:
 
-1. Agent 채팅에서 Velocity를 다시 배포합니다.
-2. 공개 URL을 열고 실제 고객의 관점에서 차량을 예약합니다.
-3. 예약한 계정의 캘린더에 이벤트가 나타나는지 확인합니다.
-4. 공개 URL에서 예약을 업데이트하고 취소해서 캘린더 이벤트가 따라오는지 확인합니다.
+1. Agent chat에서 Velocity를 다시 Publish합니다.
+2. public URL을 열고 실제 고객의 입장에서 차량을 예약해 봅니다.
+3. 예약에 사용한 계정의 Calendar에 일정이 표시되는지 확인합니다.
+4. public URL에서 예약 건을 수정하고 취소한 뒤, 캘린더 이벤트에도 그대로 반영되는지 확인합니다.
 
-이제 고객이 Velocity를 떠날 때 렌탈이 이미 캘린더에 등록되어 있습니다. 예약이 단순한 확인 이메일이 아니라 잊을 수 없는 이벤트가 됩니다.
+이제 고객은 Velocity를 떠나는 순간 이미 자신의 캘린더에 대여 일정이 등록되어 있습니다. 예약은 단순한 확인 이메일이 아니라, 잊으려야 잊을 수 없는 일정이 됩니다.
 
-## 다음 개선 사항
+<div id="improve-it-next">
+  ## 다음 단계로 개선하기
+</div>
 
 <CardGroup cols={2}>
   <Card title="커스텀 도메인 추가" icon="globe" href="/ko/build/add-custom-domain">
-    고객이 공유할 수 있는 브랜드 URL로 Velocity를 이동합니다.
+    Velocity를 고객과 공유할 수 있는 브랜드 URL로 옮겨보세요.
   </Card>
 
-  <Card title="결제 추가" icon="credit-card" href="/ko/build/add-payments">
-    예약 시 환불 가능한 보증금을 받습니다.
+  <Card title="결제 기능 추가" icon="credit-card" href="/ko/build/add-payments">
+    예약 시 환불 가능한 보증금을 받으세요.
   </Card>
 </CardGroup>
 
-## 추가 도움이 필요하신가요?
+<div id="need-further-help">
+  ## 추가 도움이 필요하신가요?
+</div>
 
-* **Google Calendar에 이벤트가 나타나지 않음:** 워크스페이스의 **Integrations**를 열고, Google Workspace 커넥터가 Connected로 표시되는지, Calendar 범위가 부여되어 있는지 확인하세요.
-* **커넥터가 Connected로 표시되지만 이벤트가 여전히 도착하지 않음:** Agent에게 보내는 캘린더 페이로드를 로그에 기록하도록 요청하고, 필드 매핑을 수정하세요.
-* **날짜 또는 주소 필드가 이벤트의 잘못된 위치에 들어감:** Agent에게 보내는 이벤트 모양을 로그에 기록하도록 요청하고, 필드 매핑을 수정하세요.
-* **다른 통합을 원함:** "Google Calendar"를 다른 커넥터로 교체하세요 — 팀을 위한 Slack 알림, 고객을 CRM 연락처로 기록하는 HubSpot, 공유 베이스에서 예약을 추적하는 Airtable. Agent는 Integrations 패널을 통해 각각을 동일하게 처리합니다.
+* **Google Calendar에 일정이 생성되지 않는 경우:** workspace에서 **Integrations**를 열고, Google Workspace connector가 Connected로 표시되는지, Calendar scope가 부여되었는지 확인하세요.
+* **connector는 Connected로 표시되는데 일정이 여전히 등록되지 않는 경우:** Agent에게 전송하는 캘린더 페이로드를 로그로 남겨 달라고 요청한 다음, 필드 mapping을 수정하세요.
+* **날짜나 주소 필드가 일정의 엉뚱한 위치에 들어가는 경우:** Agent에게 전송하는 이벤트 구조를 로그로 남겨 달라고 요청한 다음, 필드 mapping을 수정하세요.
+* **다른 integration을 사용하고 싶은 경우:** &quot;Google Calendar&quot; 대신 원하는 connector로 바꾸기만 하면 됩니다. 팀에 알림을 보내는 Slack, 고객을 CRM 연락처로 기록하는 HubSpot, 공유 베이스에서 예약 건을 추적하는 Airtable 등을 사용할 수 있습니다. Agent는 Integrations pane을 통해 어떤 connector든 동일한 방식으로 처리합니다.
 
-## 관련 문서
+<div id="related">
+  ## 관련 문서
+</div>
 
 * [Integrations](/ko/features/integrations/overview)
 * [Replit AI integrations](/ko/features/integrations/replit-ai-integrations)

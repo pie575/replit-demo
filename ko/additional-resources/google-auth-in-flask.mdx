@@ -1,30 +1,34 @@
 ---
-title: "Python과 Flask에서의 Google 인증"
-description: "Replit에서 Flask 앱에 Google OAuth 인증을 구현하는 방법을 알아보세요. 사용자 로그인 및 Google Sheets API 통합을 포함합니다."
+title: "Python과 Flask에서 Google 인증 구현하기"
+description: "Replit의 Flask 앱에서 사용자 로그인과 Google Sheets API 연동을 포함한 Google OAuth 인증을 구현하는 방법을 알아보세요."
 ---
 
-사용자가 Google 계정으로 웹사이트에 로그인할 수 있도록 허용하면 다음과 같은 이점이 있습니다:
+사용자가 Google 계정으로 여러분의 웹사이트에 로그인할 수 있게 하면 다음과 같은 이점이 있습니다.
 
-1. 자체 인증 방식을 구현할 필요가 없습니다.
-2. 사용자의 이름과 연락처 정보를 쉽게 얻을 수 있습니다.
-3. 동일한 자격 증명을 사용하여 Sheets, Drive와 같은 사용자의 Google 리소스에 접근할 수 있습니다.
+1. 직접 인증 체계를 구현할 필요가 없습니다.
+2. 사용자의 이름과 연락처 정보를 손쉽게 얻을 수 있습니다.
+3. 동일한 자격 증명으로 Sheets, Drive 같은 사용자의 Google 리소스에 접근할 수 있습니다.
 
-이 가이드에서는 Replit에서 Python과 Flask를 사용하여 이를 구현하는 방법을 안내합니다.
+이 가이드에서는 Replit에서 Python과 Flask로 이를 구현하는 방법을 단계별로 안내합니다.
 
-먼저 기본 OAuth 인증 설정 방법을 살펴보고, 그 후에 인증 결과로 얻은 자격 증명을 사용하여 사용자의 Google 리소스에 접근하는 방법을 알아보겠습니다.
+먼저 기본적인 OAuth 인증을 설정하는 방법을 살펴본 다음, 이렇게 얻은 자격 증명으로 사용자의 Google 리소스에 접근하는 방법을 다룹니다.
 
-## OAuth 소개
+<div id="introduction-to-oauth">
+  ## OAuth 소개
+</div>
 
-Google 인증은 OAuth 표준을 기반으로 합니다. OAuth의 작동 방식은 다음과 같습니다:
+Google 인증은 OAuth 표준을 기반으로 합니다. OAuth의 작동 방식은 다음과 같습니다.
 
-1. 웹사이트 어딘가에서 사용자를 로그인 페이지로 안내합니다.
-2. 사용자가 로그인 페이지로 이동하면, 웹사이트에 로그인 폼을 구현하는 대신 Google의 로그인 서비스로 리다이렉트하여 사용자를 로그인시킵니다.
-3. Google의 로그인 서비스가 사용자를 성공적으로 로그인시키면, 미리 정의한 URL(예: `https://YOUR_DOMAIN/oauth2callback`)로 사용자 및 로그인 세션과 관련된 정보를 전송하면서 웹사이트로 다시 리다이렉트합니다.
-4. 사용자의 로그인 정보를 사용하여 액세스 토큰을 추가로 획득합니다. 이 토큰은 프로필 정보, 스프레드시트, 문서 등 사용자의 리소스에 접근하는 데 사용할 수 있는 패스와 같습니다.
+1. 웹사이트의 특정 위치에서 사용자를 로그인 페이지로 안내합니다.
+2. 사용자가 로그인 페이지로 이동하면, 웹사이트에 로그인 양식을 직접 구현하는 대신 Google의 로그인 서비스로 리디렉션하여 사용자를 로그인시킵니다.
+3. Google의 로그인 서비스에서 사용자가 성공적으로 로그인하면, 미리 지정해 둔 URL(예: `https://YOUR_DOMAIN/oauth2callback`)로 다시 리디렉션하면서 사용자 및 로그인 세션과 관련된 정보를 함께 전달합니다.
+4. 이 로그인 정보를 사용해 액세스 토큰을 발급받습니다. 토큰은 사용자의 프로필 정보, 스프레드시트, 문서 등 사용자의 리소스에 접근할 수 있는 출입증과 같은 역할을 합니다.
 
-## OAuth: 코드 보기
+<div id="oauth-show-me-the-code">
+  ## OAuth: 코드부터 보여주세요
+</div>
 
-코드를 먼저 보고 싶으시다면, 아래 코드가 필요한 것입니다. 단, 모든 것이 동작하려면 Google Cloud Console에서 몇 가지 설정이 필요합니다. 이 부분은 다음 섹션에서 다룹니다. [Flask 템플릿](https://replit.com/@replit/Flask?v=1)을 사용하여 새 Replit 앱을 만들고 `main.py`에 다음 코드를 넣으세요. 코드의 주석이 각 부분의 기능을 설명합니다:
+저와 비슷한 분이라면 가장 먼저 보고 싶은 건 실제로 동작하는 코드일 겁니다. 필요한 코드는 아래와 같습니다. 다만 모든 것이 제대로 동작하려면 Google Cloud Console에서 몇 가지를 설정해야 하는데, 이 내용은 다음 섹션에서 다룹니다. [Flask 템플릿](https://replit.com/@replit/Flask?v=1)으로 새 Replit App을 만들고 아래 내용을 `main.py`에 넣으세요. 코드의 주석에 각 부분이 어떤 역할을 하는지 설명되어 있습니다:
 
 ```python theme={null}
 from flask import Flask, redirect, session, url_for, request
@@ -34,18 +38,18 @@ import os
 import requests
 
 app = Flask('app')
-# `FLASK_SECRET_KEY`는 세션에 사용됩니다. 임의의 문자열을 생성하여
-# 시크릿으로 저장해야 합니다.
+# `FLASK_SECRET_KEY`는 세션에서 사용됩니다. 임의의 문자열을 생성해
+# secret으로 저장하세요.
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
 
-# `GOOGLE_APIS_OAUTH_SECRET`은 Google Cloud Credentials 패널에서
-# 다운로드할 JSON 파일의 내용을 담고 있습니다. 다음 섹션 참조.
+# `GOOGLE_APIS_OAUTH_SECRET`에는 Google Cloud 사용자 인증 정보 패널에서 download한
+# JSON 파일의 내용이 들어 있습니다. 다음 섹션을 참고하세요.
 oauth_config = json.loads(os.environ['GOOGLE_OAUTH_SECRETS'])
 
-# OAuth 플로우 구성 설정
+# OAuth flow에 사용할 설정을 구성합니다
 oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
     oauth_config,
-    # scopes는 인증 후 사용자를 대신하여 접근할 API를 정의합니다
+    # scopes는 인증 후 사용자를 대신해 접근할 API를 정의합니다
     scopes=[
         "https://www.googleapis.com/auth/userinfo.email",
         "openid",
@@ -53,22 +57,22 @@ oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
     ]
 )
 
-# 로그인 페이지의 진입점입니다. `authorization_url`에 위치한 Google 로그인 서비스로
-# 리다이렉트합니다. `redirect_uri`는 Google 로그인 서비스가 이 앱으로 다시
-# 리다이렉트하는 데 사용할 URI입니다.
+# login 페이지의 entrypoint입니다. `authorization_url`에 있는 Google 로그인 서비스로
+# 리디렉션합니다. `redirect_uri`는 Google 로그인 서비스가 이 앱으로 다시 리디렉션할 때
+# 사용하는 URI입니다.
 @app.route('/signin')
 def signin():
-    # Replit 앱 내부에서는 http를 사용하지만 외부에서는 https로 접근하므로
-    # redirect_uri가 이와 일치해야 하기 때문에 URL을 http에서 https로 변환합니다
+    # Replit App 내부에서는 http를 사용하지만 외부에서는 https로 접근하며
+    # redirect_uri도 여기에 맞아야 하므로 URL을 http에서 https로 rewrite합니다
     oauth_flow.redirect_uri = url_for('oauth2callback', _external=True).replace('http://', 'https://')
     authorization_url, state = oauth_flow.authorization_url()
     session['state'] = state
     return redirect(authorization_url)
 
-# Google 로그인 서비스가 다시 리다이렉트하는 엔드포인트입니다. Google Cloud의
-# API 자격 증명 패널에서 "Authorized redirect URIs"에 추가해야 합니다.
-# 액세스 토큰을 요청하기 위해 Google 엔드포인트를 호출하고 사용자 세션에 저장합니다.
-# 이후 이 액세스 토큰을 사용하여 사용자를 대신해 API에 접근할 수 있습니다.
+# Google 로그인 서비스가 다시 리디렉션해 오는 엔드포인트입니다. Google Cloud의 API 사용자 인증 정보 패널에서
+# "Authorized redirect URIs"에 추가해야 합니다. Google 엔드포인트를 호출해 액세스 토큰을 요청하고
+# 이를 사용자 session에 저장합니다. 이후에는 이 액세스 토큰으로 사용자를 대신해
+# API에 접근할 수 있습니다.
 @app.route('/oauth2callback')
 def oauth2callback():
     if not session['state'] == request.args['state']:
@@ -77,8 +81,8 @@ def oauth2callback():
     session['access_token'] = oauth_flow.credentials.token
     return redirect("/")
 
-# 앱의 홈 페이지입니다. 로그인하지 않은 경우 로그인하도록 안내하고,
-# 이미 로그인한 경우 사용자 정보를 표시합니다.
+# 앱의 홈 페이지입니다. 아직 로그인하지 않은 사용자는 login하도록 안내하고,
+# 이미 로그인한 경우에는 사용자 정보를 표시합니다.
 @app.route('/')
 def welcome():
     if "access_token" in session:
@@ -94,8 +98,8 @@ def welcome():
         <a href="/signin">Sign In via Google</a><br>
     """
 
-# 유효한 액세스 토큰으로 userinfo API를 호출하여 사용자 정보를 가져옵니다.
-# 이것은 액세스 토큰으로 사용자를 대신해 API에 접근하는 첫 번째 예시입니다.
+# 유효한 액세스 토큰으로 userinfo API를 호출해 사용자 정보를 가져옵니다.
+# 액세스 토큰으로 사용자를 대신해 API에 접근하는 첫 번째 예시입니다.
 def get_user_info(access_token):
     response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
        "Authorization": f"Bearer {access_token}"
@@ -117,159 +121,171 @@ if __name__ == '__main__':
 
 ```
 
-## OAuth 앱 / 클라이언트 설정
+<div id="set-up-your-oauth-app-client">
+  ## OAuth App / Client 설정
+</div>
 
-위 코드가 동작하려면 Google Cloud에서 다음 작업을 수행해야 합니다.
+위 코드를 실행하려면 Google Cloud에서 다음 작업을 완료해야 합니다.
 
-1. Google Cloud 프로젝트 만들기 (아직 없는 경우).
-2. OAuth 동의 화면 구성하기.
-3. 앱의 OAuth 클라이언트 ID 만들기.
+1. Google Cloud 프로젝트를 생성합니다(아직 없는 경우).
+2. OAuth consent screen을 설정합니다.
+3. 앱에 사용할 OAuth 클라이언트 ID를 생성합니다.
 
-### Google Cloud 프로젝트 만들기
+<div id="create-a-google-cloud-project">
+  ### Google Cloud 프로젝트 생성
+</div>
 
-이 작업에 사용할 Google Cloud 프로젝트가 이미 있다면 이 단계를 건너뛸 수 있습니다.
+이 실습에 사용할 Google Cloud 프로젝트가 이미 있다면 이 단계는 건너뛰어도 됩니다.
 
 1. [Google Cloud Console](https://console.cloud.google.com/)로 이동합니다.
-2. Google Cloud 로고 옆의 프로젝트 선택기 드롭박스를 클릭합니다:
+2. Google Cloud 로고 옆에 있는 프로젝트 선택 드롭다운을 클릭합니다.
 
 <Frame>
-  <img src="/assets/mirror/google-project-dropdown-d64bd797ae82.png" alt="Google 프로젝트 드롭다운" width="734" height="94" data-path="images/google-auth-in-flask/google-project-dropdown.png" />
+  <img src="/assets/mirror/google-project-dropdown-d64bd797ae82.png" alt="Google Project Dropdown" width="734" height="94" data-path="images/google-auth-in-flask/google-project-dropdown.png" />
 </Frame>
 
-3. 기존 프로젝트를 선택하거나 "New Project"를 클릭하여 새 프로젝트를 만듭니다.
+3. 기존 프로젝트를 선택하거나 &quot;New Project&quot;를 클릭해 새 프로젝트를 만듭니다.
 
 <Frame>
-  <img src="/assets/mirror/select-project-22c9b948c348.png" alt="프로젝트 선택" width="1092" height="868" data-path="images/google-auth-in-flask/select-project.png" />
+  <img src="/assets/mirror/select-project-22c9b948c348.png" alt="Select Project" width="1092" height="868" data-path="images/google-auth-in-flask/select-project.png" />
 </Frame>
 
-4. 새 프로젝트를 만드는 경우 프로젝트 이름을 입력하고 "Create"를 클릭합니다.
+4. 새 프로젝트를 만드는 경우 프로젝트 이름을 입력한 뒤 &quot;Create&quot;를 클릭합니다.
 
 <Frame>
-  <img src="/assets/mirror/new-project-8a60880bda21.png" alt="새 프로젝트" width="1110" height="868" data-path="images/google-auth-in-flask/new-project.png" />
+  <img src="/assets/mirror/new-project-8a60880bda21.png" alt="New Project" width="1110" height="868" data-path="images/google-auth-in-flask/new-project.png" />
 </Frame>
 
-팝업에 새 프로젝트가 표시되면 "Select project"를 클릭하여 해당 프로젝트를 *활성 프로젝트*로 설정합니다.
+팝업에 새 프로젝트가 나타나면 &quot;Select project&quot;를 클릭해 해당 프로젝트를 *활성 프로젝트*로 지정합니다.
 
-### OAuth 동의 화면 구성
+<div id="configure-the-oauth-consent-screen">
+  ### OAuth consent screen 구성하기
+</div>
 
-프로젝트가 생겼으면 OAuth 동의 화면을 구성할 수 있습니다:
+project를 만들었으니, 이제 해당 project의 OAuth consent screen을 구성해 보겠습니다:
 
-1. [OAuth 동의 화면](https://console.cloud.google.com/apis/credentials/consent)으로 이동합니다.
+1. [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent)으로 이동합니다
 
 <Frame>
-  <img src="/assets/mirror/oauth-consent-screen-8c5d7264f4ba.png" alt="OAuth 동의 화면" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-screen.png" />
+  <img src="/assets/mirror/oauth-consent-screen-8c5d7264f4ba.png" alt="OAuth Consent Screen" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-screen.png" />
 </Frame>
 
-2. 프로젝트 드롭다운에 원하는 프로젝트가 선택되어 있는지 확인합니다.
-3. "External"을 선택하여 Google 계정이 있는 모든 사용자가 앱에 로그인할 수 있도록 합니다. "Internal"은 조직 내 사람들만 허용합니다.
-4. "Create"를 클릭합니다.
-5. 앱 이름과 이 앱을 지원하는 담당자의 이메일을 입력합니다.
+2. project 드롭다운에 원하는 project가 선택되어 있는지 확인합니다.
+3. 모든 사용자가 Google 계정으로 앱에 로그인할 수 있도록 &quot;External&quot;을 선택합니다. &quot;Internal&quot;을 선택하면 조직 구성원만 로그인할 수 있습니다.
+4. &quot;Create&quot;를 클릭합니다.
+5. 앱 이름과 이 앱을 담당하는 사람(본인이겠죠?)의 이메일을 입력합니다
 
 <Frame>
-  <img src="/assets/mirror/oauth-consent-step-2-f00ee976e9fd.png" alt="OAuth 동의 화면" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-step-2.png" />
+  <img src="/assets/mirror/oauth-consent-step-2-f00ee976e9fd.png" alt="OAuth Consent Screen" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-step-2.png" />
 </Frame>
 
-6. "Developer contact information" 아래에 이메일 주소를 입력합니다.
+6. &quot;Developer contact information&quot;에 이메일 주소를 입력합니다.
 
 <Frame>
-  <img src="/assets/mirror/oauth-consent-step-2-b-a2f1a259f431.png" alt="개발자 연락처 정보" width="533" height="207" data-path="images/google-auth-in-flask/oauth-consent-step-2-b.png" />
+  <img src="/assets/mirror/oauth-consent-step-2-b-a2f1a259f431.png" alt="Developer contact information" width="533" height="207" data-path="images/google-auth-in-flask/oauth-consent-step-2-b.png" />
 </Frame>
 
-7. "Save and continue"를 클릭합니다.
-8. Scopes 화면에서 앱이 접근할 API를 추가할 수 있습니다. 기본 사용자 정보를 가져오는 API에는 이미 접근 권한이 있습니다.
+7. &quot;Save and continue&quot;를 클릭합니다.
+8. Scopes 화면에서는 앱이 접근할 API를 추가할 수 있습니다. 기본 사용자 정보를 가져오는 API에는 이미 접근 권한이 있습니다.
 
 <Frame>
-  <img src="/assets/mirror/oauth-scopes-f99364e44221.png" alt="OAuth 범위" width="1093" height="647" data-path="images/google-auth-in-flask/oauth-scopes.png" />
+  <img src="/assets/mirror/oauth-scopes-f99364e44221.png" alt="OAuth Scopes" width="1093" height="647" data-path="images/google-auth-in-flask/oauth-scopes.png" />
 </Frame>
 
-지금은 그대로 두고 "Save and continue"를 클릭합니다.
-9\. Test Users에서 테스트 단계 동안 앱을 테스트할 사용자의 이메일을 추가해야 합니다.
+지금은 그대로 두고 &quot;Save and continue&quot;를 클릭합니다.
+9. Test Users에는 테스트 단계에서 앱을 테스트하도록 할 사용자의 이메일을 추가해야 합니다.
 
 <Frame>
-  <img src="/assets/mirror/test-users-048f029f4d9f.png" alt="테스트 사용자" width="1050" height="641" data-path="images/google-auth-in-flask/test-users.png" />
+  <img src="/assets/mirror/test-users-048f029f4d9f.png" alt="Test Users" width="1050" height="641" data-path="images/google-auth-in-flask/test-users.png" />
 </Frame>
 
-"Add users"를 클릭합니다.
-10\. 하나 이상의 Google 이메일 주소를 추가하고 "Add"를 클릭합니다.
+&quot;Add users&quot;를 클릭합니다
+10. Google 이메일 주소를 하나 이상 추가하고 &quot;Add&quot;를 클릭합니다.
 
 <Frame>
-  <img src="/assets/mirror/test-users-add-43e7efabac17.png" alt="테스트 사용자" width="1050" height="641" data-path="images/google-auth-in-flask/test-users-add.png" />
+  <img src="/assets/mirror/test-users-add-43e7efabac17.png" alt="Test Users" width="1050" height="641" data-path="images/google-auth-in-flask/test-users-add.png" />
 </Frame>
 
-그런 다음 "Save and continue"를 클릭합니다.
-11\. 요약 화면을 검토합니다. 언제든지 돌아가서 각 단계를 편집할 수 있습니다.
+그런 다음 &quot;Save and continue&quot;를 클릭합니다.
+11. 요약 화면을 검토합니다. 언제든지 이전 단계로 돌아가 수정할 수 있습니다.
 
 <Frame>
-  <img src="/assets/mirror/summary-54322ee205dd.png" alt="테스트 사용자" width="735" height="328" data-path="images/google-auth-in-flask/summary.png" />
+  <img src="/assets/mirror/summary-54322ee205dd.png" alt="Test Users" width="735" height="328" data-path="images/google-auth-in-flask/summary.png" />
 </Frame>
 
-### 앱의 OAuth 클라이언트 ID 만들기
+<div id="create-an-oauth-client-id-for-your-app">
+  ### 앱용 OAuth 클라이언트 ID 만들기
+</div>
 
-마지막 단계입니다. OAuth가 동작하려면 앱의 OAuth 클라이언트 ID를 만들어야 합니다.
+이제 마지막 단계입니다. OAuth가 작동하려면 앱에 사용할 OAuth 클라이언트 ID를 만들어야 합니다.
 
 1. [Credentials](https://console.cloud.google.com/apis/credentials)로 이동합니다.
 
 <Frame>
-  <img src="/assets/mirror/credentials-37967178ae47.png" alt="테스트 사용자" width="1050" height="605" data-path="images/google-auth-in-flask/credentials.png" />
+  <img src="/assets/mirror/credentials-37967178ae47.png" alt="Test Users" width="1050" height="605" data-path="images/google-auth-in-flask/credentials.png" />
 </Frame>
 
-2. "Create credentials"를 클릭합니다.
+2. &quot;Create credentials&quot;를 클릭합니다.
 
 <Frame>
-  <img src="/assets/mirror/create-credentials-411c8b243090.png" alt="테스트 사용자" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials.png" />
+  <img src="/assets/mirror/create-credentials-411c8b243090.png" alt="Test Users" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials.png" />
 </Frame>
 
-"OAuth client ID"를 선택합니다.
-3\.  Application type으로 "Web application"을 선택하고 이 클라이언트 ID의 이름을 입력합니다.
+그런 다음 &quot;OAuth client ID&quot;를 선택합니다.
+3.  Application type에서 &quot;Web application&quot;을 선택하고, 이 클라이언트 ID의 이름을 입력합니다.
 
 <Frame>
-  <img src="/assets/mirror/create-credentials-web-53cd170ef6ff.png" alt="테스트 사용자" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials-web.png" />
+  <img src="/assets/mirror/create-credentials-web-53cd170ef6ff.png" alt="Test Users" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials-web.png" />
 </Frame>
 
-4. 이제 Flask Replit 앱으로 이동합니다. Shell을 열고 다음을 입력합니다: `echo https://$REPLIT_DEV_DOMAIN/oauth2callback`. 결과는 다음과 같이 보일 것입니다: `https://81309e9b-c4df-48e0-a2c2-0a8d3c0e3162-00-35ppsa0tcuv6v.infra-staging.replit.dev/oauth2callback`. 이 텍스트를 복사하여 폼 하단의 "Authorized redirect URIs"에 입력합니다.
+4. 이제 Flask Replit App으로 이동합니다. Shell을 열고 `echo https://$REPLIT_DEV_DOMAIN/oauth2callback`을 입력하세요. 결과는 `https://81309e9b-c4df-48e0-a2c2-0a8d3c0e3162-00-35ppsa0tcuv6v.infra-staging.replit.dev/oauth2callback`과 비슷한 형태로 나타납니다. 이 텍스트를 복사해 양식 하단의 &quot;Authorized redirect URIs&quot; 항목 중 하나로 입력합니다.
 
 <Frame>
-  <img src="/assets/mirror/authorized-redirect-uris-6a5811acd49a.png" alt="테스트 사용자" width="800" height="271" data-path="images/google-auth-in-flask/authorized-redirect-uris.png" />
+  <img src="/assets/mirror/authorized-redirect-uris-6a5811acd49a.png" alt="Test Users" width="800" height="271" data-path="images/google-auth-in-flask/authorized-redirect-uris.png" />
 </Frame>
 
-나중에 앱을 게시할 때 `https://YOUR_APP_DOMAIN/oauth2callback` 항목을 추가해야 합니다.
+나중에 앱을 게시할 때는 이 화면으로 다시 돌아와 `https://YOUR_APP_DOMAIN/oauth2callback` 항목을 추가해야 합니다.
 
-5. "Create"를 클릭합니다.
-6. "Download JSON"을 클릭합니다:
+5. &quot;Create&quot;를 클릭합니다.
+6. &quot;Download JSON&quot;을 클릭합니다:
 
 <Frame>
-  <img src="/assets/mirror/secrets_json-d507ecb4ea34.png" alt="테스트 사용자" width="573" height="607" data-path="images/google-auth-in-flask/secrets_json.png" />
+  <img src="/assets/mirror/secrets_json-d507ecb4ea34.png" alt="Test Users" width="573" height="607" data-path="images/google-auth-in-flask/secrets_json.png" />
 </Frame>
 
-7. Replit 앱으로 이동하여 Secrets 패널을 엽니다. `GOOGLE_OAUTH_SECRETS`라는 시크릿을 만들고 다운로드한 파일의 내용을
-   시크릿 값으로 붙여넣습니다.
+7. 다시 Replit App으로 이동해 Secrets pane을 엽니다. `GOOGLE_OAUTH_SECRETS`라는 이름의 secret을 만들고, 다운로드한 파일의 내용을
+   secret 값으로 붙여넣습니다.
 
 <Frame>
-  <img src="/assets/mirror/add-secret-92f7d85d5156.png" alt="테스트 사용자" width="1060" height="677" data-path="images/google-auth-in-flask/add-secret.png" />
+  <img src="/assets/mirror/add-secret-92f7d85d5156.png" alt="Test Users" width="1060" height="677" data-path="images/google-auth-in-flask/add-secret.png" />
 </Frame>
 
-수고하셨습니다! 여기까지 따라오셨다면 축하합니다! 이제 Flask 앱을 실행하고 테스트 사용자 Google 계정으로 로그인할 수 있습니다. 모든 Google 사용자가 앱을 사용할 수 있게 하려면 [동의 화면 페이지](https://console.cloud.google.com/apis/credentials/consent)로 돌아가 "Publish App"을 클릭해야 합니다. Sheets, Drive 등의 추가 Google API가 필요한 경우 검증 과정이 필요할 수 있습니다.
+휴! 꽤 번거로운 과정이었죠. 여기까지 해내셨다면 축하드립니다! 이제 Flask 앱을 실행하고 테스트 사용자로 등록한 Google 계정으로 로그인할 수 있습니다. 모든 Google 사용자가 앱을 사용할 수 있게 하려면 [consent page](https://console.cloud.google.com/apis/credentials/consent)로 돌아가 &quot;Publish App&quot;을 클릭하세요. 앱에서 Sheets나 Drive 같은 추가 Google API가 필요한 경우에는 검증 절차를 거쳐야 할 수 있습니다.
 
-다음으로는 Sheets와 같은 Google API 연동 방법을 다룹니다. 더 나아가고 싶다면 계속 따라오세요.
+다음으로는 Sheets 같은 Google API와 연동하는 방법을 다룹니다. 더 깊이 알아보고 싶다면 계속 따라오세요.
 
-## Google Sheets API 설정
+<div id="google-sheets-api-setup">
+  ## Google Sheets API 설정
+</div>
 
-Google Sheets와 같은 Google API 연동을 추가하려면 먼저 앱에 해당 API를 활성화해야 합니다. [사용 가능한 API를 탐색](https://console.cloud.google.com/apis/library)할 수 있습니다. 예시로 Google Sheets를 사용하겠습니다.
+Google Sheets와 같은 Google API 통합(integration)을 추가하려면 먼저 해당 앱에 대해 API를 활성화해야 합니다. [사용 가능한 API 목록](https://console.cloud.google.com/apis/library)을 둘러볼 수 있습니다. 여기서는 예시로 Google Sheets를 사용하겠습니다.
 
-1. [Google Sheets API 목록 페이지](https://console.cloud.google.com/apis/library/sheets.googleapis.com)로 이동합니다.
-2. "Enable"을 클릭합니다.
+1. [Google Sheets API 등록 페이지](https://console.cloud.google.com/apis/library/sheets.googleapis.com)로 이동합니다.
+2. &quot;Enable&quot;을 클릭합니다.
 
-끝입니다! 이 부분의 Google Cloud 설정은 여기까지입니다.
+완료되었습니다! 이 단계에서 필요한 Google Cloud 설정은 이것이 전부입니다.
 
-## Google Sheets 연동: 코드 보기
+<div id="google-sheets-integration-show-me-the-code">
+  ## Google Sheets 통합: 코드 살펴보기
+</div>
 
-먼저 원본 코드의 OAuth 플로우 섹션에서 모든 것을 그대로 두고, 범위 목록에 `"https://www.googleapis.com/auth/spreadsheets.readonly"`만 추가합니다:
+먼저, 기존 코드의 OAuth flow 섹션에서는 scopes 목록에 `"https://www.googleapis.com/auth/spreadsheets.readonly"`를 추가하는 것 외에 나머지는 모두 그대로 둡니다:
 
 ```python theme={null}
-# OAuth 플로우 구성 설정
+# OAuth flow에 사용할 configuration을 설정합니다
 oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
     oauth_config,
-    # scopes는 인증 후 사용자를 대신하여 접근할 API를 정의합니다
+    # scopes는 인증이 완료된 후 user를 대신해 어떤 API에 접근할지를 정의합니다
     scopes=[
         "https://www.googleapis.com/auth/userinfo.email",
         "openid",
@@ -279,7 +295,7 @@ oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
 )
 ```
 
-이제 `googleapiclient.discovery` 라이브러리로 Google API에 접근하는 방법은 먼저 액세스 토큰을 사용하여 `Credentials` 객체를 만들고, `build` 함수를 사용하여 호출 가능한 API 객체를 만드는 것입니다. Sheets API의 경우 다음과 같습니다:
+이제 `googleapiclient.discovery` 라이브러리로 Google API에 접근하려면, 먼저 액세스 토큰으로 `Credentials` 객체를 생성한 다음 `build` 함수를 사용해 호출 가능한 API 객체를 만들면 됩니다. Sheets API의 경우 다음과 같습니다.
 
 ```python theme={null}
 credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
@@ -287,15 +303,15 @@ service = build("sheets", "v4", credentials=credentials)
 sheets_api = service.spreadsheets()
 ```
 
-Sheets API를 실제로 사용하는 방법에 대해 몇 가지 헬퍼 함수를 만들었습니다:
+Sheets API를 실제로 어떻게 사용하는지에 대해서는, 몇 가지 헬퍼 함수를 만들어 두었습니다:
 
 ```python theme={null}
-# Google 스프레드시트 내의 모든 시트 가져오기
+# Google 스프레드시트에 포함된 모든 시트를 가져옵니다
 def get_sheets(sheets_api, spreadsheet_id) -> list[str]:
     result = sheets_api.get(spreadsheetId=spreadsheet_id).execute()
     return [sheet["properties"]["title"] for sheet in result["sheets"]]
 
-# Google 스프레드시트 내 특정 시트의 데이터 가져오기
+# Google 스프레드시트에서 지정한 시트의 데이터를 가져옵니다
 def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
     result = (
         sheets_api.values()
@@ -305,7 +321,7 @@ def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
     return result["values"]
 ```
 
-위의 도움으로 Google 스프레드시트를 가져오는 POST 핸들러 엔드포인트를 다음과 같이 만들 수 있습니다:
+위 내용을 참고하면 다음과 같이 Google 스프레드시트를 가져오는 POST 핸들러 엔드포인트를 만들 수 있습니다:
 
 ```python theme={null}
 @app.route("/import_spreadsheet", methods = ['POST'])
@@ -332,7 +348,7 @@ def import_spreadsheet():
     return "upload success!"
 ```
 
-전체 동작 코드는 다음과 같습니다:
+정상 작동하는 전체 코드는 다음과 같습니다:
 
 ```python theme={null}
 from flask import Flask, redirect, session, url_for, request
@@ -345,18 +361,18 @@ import googleapiclient.errors
 import google.oauth2.credentials
 
 app = Flask('app')
-# `FLASK_SECRET_KEY`는 세션에 사용됩니다. 임의의 문자열을 생성하여
-# 시크릿으로 저장해야 합니다.
+# `FLASK_SECRET_KEY`는 session에서 사용됩니다. 임의의 문자열을 생성해
+# secret으로 저장하세요.
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
 
-# `GOOGLE_APIS_OAUTH_SECRET`은 Google Cloud Credentials 패널에서
-# 다운로드할 JSON 파일의 내용을 담고 있습니다. 다음 섹션 참조.
+# `GOOGLE_APIS_OAUTH_SECRET`에는 Google Cloud 사용자 인증 정보 pane에서 download할
+# JSON 파일의 내용이 들어갑니다. 다음 섹션을 참고하세요.
 oauth_config = json.loads(os.environ['GOOGLE_OAUTH_SECRETS'])
 
-# OAuth 플로우 구성 설정
+# OAuth flow에 사용할 설정을 구성합니다
 oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
     oauth_config,
-    # scopes는 인증 후 사용자를 대신하여 접근할 API를 정의합니다
+    # scope는 인증 후 User를 대신해 접근할 API를 정의합니다
     scopes=[
         "https://www.googleapis.com/auth/userinfo.email",
         "openid",
@@ -365,22 +381,21 @@ oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
     ]
 )
 
-# 로그인 페이지의 진입점입니다. `authorization_url`에 위치한 Google 로그인 서비스로
-# 리다이렉트합니다. `redirect_uri`는 Google 로그인 서비스가 이 앱으로 다시
-# 리다이렉트하는 데 사용할 URI입니다.
+# login 페이지의 entrypoint입니다. `authorization_url`에 있는 Google login 서비스로
+# 리디렉션합니다. `redirect_uri`는 Google login 서비스가 이 App으로 다시
+# 리디렉션할 때 사용하는 URI입니다.
 @app.route('/signin')
 def signin():
-    # Replit 앱 내부에서는 http를 사용하지만 외부에서는 https로 접근하므로
-    # redirect_uri가 이와 일치해야 하기 때문에 URL을 http에서 https로 변환합니다
+    # Replit App 내부에서는 http를 쓰지만 외부에서는 https로 접근하고
+    # redirect_uri도 여기에 맞아야 하므로 URL을 http에서 https로 rewrite합니다
     oauth_flow.redirect_uri = url_for('oauth2callback', _external=True).replace('http://', 'https://')
     authorization_url, state = oauth_flow.authorization_url()
     session['state'] = state
     return redirect(authorization_url)
 
-# Google 로그인 서비스가 다시 리다이렉트하는 엔드포인트입니다. Google Cloud의
-# API 자격 증명 패널에서 "Authorized redirect URIs"에 추가해야 합니다.
-# 액세스 토큰을 요청하기 위해 Google 엔드포인트를 호출하고 사용자 세션에 저장합니다.
-# 이후 이 액세스 토큰을 사용하여 사용자를 대신해 API에 접근할 수 있습니다.
+# Google login 서비스가 다시 리디렉션하는 엔드포인트입니다. Google Cloud의 API 사용자 인증 정보 pane에 있는
+# "Authorized redirect URIs"에 추가해야 합니다. Google 엔드포인트를 호출해 액세스 token을 요청하고
+# 이를 User session에 저장합니다. 이후 이 액세스 token으로 User를 대신해 API에 접근할 수 있습니다.
 @app.route('/oauth2callback')
 def oauth2callback():
     if not session['state'] == request.args['state']:
@@ -389,8 +404,8 @@ def oauth2callback():
     session['access_token'] = oauth_flow.credentials.token
     return redirect("/")
 
-# 유효한 액세스 토큰으로 userinfo API를 호출하여 사용자 정보를 가져옵니다.
-# 이것은 액세스 토큰으로 사용자를 대신해 API에 접근하는 첫 번째 예시입니다.
+# 유효한 액세스 token으로 userinfo API를 호출해 User 정보를 가져옵니다.
+# 액세스 token으로 User를 대신해 API에 접근하는 첫 번째 예시입니다.
 def get_user_info(access_token):
     response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
        "Authorization": f"Bearer {access_token}"
@@ -407,12 +422,12 @@ def logout():
     session.clear()
     return redirect('/')
 
-# Google 스프레드시트 내의 모든 시트 가져오기
+# Google 스프레드시트 내의 모든 Sheet를 가져옵니다
 def get_sheets(sheets_api, spreadsheet_id) -> list[str]:
     result = sheets_api.get(spreadsheetId=spreadsheet_id).execute()
     return [sheet["properties"]["title"] for sheet in result["sheets"]]
 
-# Google 스프레드시트 내 특정 시트의 데이터 가져오기
+# Google 스프레드시트 내 특정 Sheet의 데이터를 가져옵니다
 def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
     result = (
         sheets_api.values()
@@ -421,7 +436,7 @@ def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
     )
     return result["values"]
 
-# 스프레드시트 가져오기 폼 렌더링
+# 스프레드시트를 Import할 수 있는 폼을 렌더링합니다
 @app.route("/import_spreadsheet_form")
 def import_spreadsheet_form():
     return """
@@ -478,9 +493,9 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 ```
 
-앱을 게시하는 경우 반드시:
+앱을 Publish할 때는 다음 사항을 꼭 확인하세요:
 
-1. "Authorized redirect URIs"에 프로덕션 `/oauth2callback` URI를 추가하세요.
-2. [동의 화면 페이지](https://console.cloud.google.com/apis/credentials/consent)로 이동하여 "Publish App"을 클릭하세요.
+1. production `/oauth2callback` URI를 &quot;Authorized redirect URIs&quot;에 추가했는지 확인합니다.
+2. [consent page](https://console.cloud.google.com/apis/credentials/consent)로 이동해 &quot;Publish App&quot;을 실행합니다.
 
-좋은 경험이 되셨기를 바랍니다. 앞으로의 여정도 즐겁게 이어나가시길 바랍니다.
+즐거운 경험이 되셨길 바라며, 앞으로의 여정도 즐기시길 바랍니다.

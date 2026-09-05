@@ -1,9 +1,11 @@
 ---
-title: "첫 번째 앱 빌드하기"
-description: "프롬프트로 시작해 Free Mode에서 Agent로 작은 앱을 빌드하고, Preview에서 테스트하고, 집중적인 후속 조치로 개선하세요."
+title: "첫 번째 앱 만들기"
+description: "프롬프트로 시작해 Free Mode에서 Agent로 간단한 앱을 만들고, Preview에서 테스트한 뒤 핵심을 짚은 follow-up으로 개선해 보세요."
+sidebarTitle: "첫 번째 앱 만들기"
+icon: "rocket"
 ---
 
-export const FreeModePlanAvailability = `Free Mode is available on the Starter, Core, and Pro plans. Your Free Mode limits depend on your plan, and Core and Pro include an allowance that refreshes every ${FreeModeAllowanceRefreshPeriod}.`;
+export const FreeModePlanAvailability = `Free Mode는 Starter, Core, Pro 요금제에서 사용할 수 있습니다. Free Mode 한도는 요금제에 따라 다르며, Core와 Pro에는 ${FreeModeAllowanceRefreshPeriod}마다 갱신되는 사용량이 포함됩니다.`;
 
 export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
   const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
@@ -33,7 +35,7 @@ export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) =
     }
     const original = btn.dataset.label || btn.innerText;
     btn.dataset.label = original;
-    btn.innerText = "Copied!";
+    btn.innerText = "복사됨!";
     setTimeout(() => {
       if (btn.isConnected) btn.innerText = original;
     }, 1500);
@@ -77,7 +79,7 @@ export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) =
     color: "inherit",
     border: "1px solid rgba(127,127,127,0.4)"
   }}>
-        Copy the prompt
+        프롬프트 복사
       </button>
       <button type="button" onClick={handleBuild} style={{
     ...baseButtonStyle,
@@ -90,125 +92,133 @@ export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) =
     </div>;
 };
 
-export const GATHER_PROMPT = `Build a responsive workshop-discovery app called Gather.
+export const GATHER_PROMPT = `Gather라는 반응형 워크숍 탐색 앱을 만드세요.
 
-Visitors should be able to browse upcoming workshops, open event details, and submit an RSVP using realistic sample data.
+방문자는 예정된 워크숍을 찾아보고, 이벤트 세부 정보를 확인하며, 현실적인 샘플 데이터를 사용해 RSVP를 제출할 수 있어야 합니다.
 
-Success means the navigation works, submitting an RSVP shows a clear confirmation, and the layout works well on mobile and desktop.
+성공 기준은 내비게이션이 정상적으로 작동하고, RSVP를 제출하면 명확한 확인 메시지가 표시되며, 레이아웃이 모바일과 데스크톱 모두에서 잘 작동하는 것입니다.
 
-Do not add login, a database, payments, or external integrations yet.`;
+아직 로그인, 데이터베이스, 결제 또는 외부 통합은 추가하지 마세요.`;
 
-⏰ *Estimated time: 10 minutes*
+⏰ *예상 소요 시간: 10분*
 
-By the end of this guide, you will have built and improved a small app from a prompt using **Free Mode**.
+이 가이드를 마치면 **Free Mode**를 사용해 prompt 하나로 간단한 앱을 만들고 개선할 수 있습니다.
 
 <Frame>
-  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="The finished Gather workshop app showing the My RSVPs view in Preview" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="Preview에서 My RSVPs 화면을 보여주는 완성된 Gather 워크숍 앱" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
 </Frame>
 
 <PromptActions prompt={GATHER_PROMPT} campaign="docs-your-first-app" />
 
-## Before you start
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
-You need a [Replit account](https://replit.com). This guide uses **Free Mode**, which uses intelligent model routing to select the model. {FreeModePlanAvailability}
+[Replit 계정](https://replit.com)이 필요합니다. 이 가이드는 **Free Mode**를 사용하며, Free Mode는 intelligent model routing으로 모델을 자동 선택합니다. {FreeModePlanAvailability}
 
-The goal is to practice a repeatable prompting loop:
+목표는 반복해서 활용할 수 있는 프롬프트 loop를 익히는 것입니다.
 
-1. Describe one useful outcome.
-2. Add observable success criteria.
-3. Set boundaries for what not to build yet.
-4. Test the result in Preview.
-5. Ask for one focused improvement.
+1. 유용한 결과 하나를 설명합니다.
+2. 눈으로 확인할 수 있는 성공 기준을 추가합니다.
+3. 아직 만들지 않을 부분의 범위를 정합니다.
+4. Preview에서 결과를 테스트합니다.
+5. 개선 사항 하나만 콕 집어 요청합니다.
 
-## Build the first version
+<div id="build-the-first-version">
+  ## 첫 번째 버전 만들기
+</div>
 
 <Steps>
-  <Step title="Start a new Website">
-    Start a new conversation and choose **Website** as the artifact. You can select it from the **New** menu or from **Add attachment → Create something new → Website** in the prompt box.
+  <Step title="새 Website 시작하기">
+    새 conversa를 시작하고 artifact로 **Website**를 선택합니다. **New** 메뉴에서 선택하거나 프롬프트 box의 **Add attachment → Create something new → Website**에서 선택할 수 있습니다.
 
-    Open the mode selector and choose **Free**.
+    모드 선택기를 열고 **Free**를 선택합니다.
 
     <Tip>
-      You can also ask Replit to build a website directly in natural language. Selecting Website first makes the intended artifact explicit and adds a Website pill to the prompt.
+      자연어로 Replit에 웹사이트를 만들어 달라고 바로 요청할 수도 있습니다. Website를 먼저 선택하면 의도한 artifact가 명확해지고 프롬프트에 Website 표시가 추가됩니다.
     </Tip>
   </Step>
 
-  <Step title="Describe the outcome and success criteria">
-    Use this prompt:
+  <Step title="결과물과 성공 기준 설명하기">
+    다음 프롬프트를 사용하세요:
 
     <PromptActions prompt={GATHER_PROMPT} campaign="docs-your-first-app" />
 
     <Frame>
-      <img src="/assets/mirror/01-prompt-free-mode-f5c56ce766c8.jpg" alt="The Gather prompt ready to send with the Website artifact selected and Free Mode enabled" width="1280" height="720" data-path="images/first-app-gather/01-prompt-free-mode.jpg" />
+      <img src="/assets/mirror/01-prompt-free-mode-f5c56ce766c8.jpg" alt="Website artifact가 선택되고 Free Mode가 활성화된 상태로 전송 준비가 된 Gather 프롬프트" width="1280" height="720" data-path="images/first-app-gather/01-prompt-free-mode.jpg" />
     </Frame>
 
-    The prompt starts with one outcome: a workshop-discovery app. It then says what visitors must be able to do, defines observable success criteria, and postpones login, data, payments, and integrations.
+    이 프롬프트는 워크숍 탐색 앱이라는 하나의 결과물에서 출발합니다. 이어서 방문자가 할 수 있어야 하는 일을 명시하고, 관찰 가능한 성공 기준을 정의하며, 로그인, 데이터, payments, 통합은 뒤로 미룹니다.
 
-    Those boundaries keep the first build focused. You can add production capabilities after the core experience works.
+    이렇게 범위를 정해 두면 첫 build가 핵심에만 집중할 수 있습니다. production capabilities는 핵심 경험이 제대로 작동한 뒤에 추가하면 됩니다.
   </Step>
 
-  <Step title="Let Agent build in Free Mode">
-    Send the prompt. Agent plans the artifact, creates the app, starts it, and checks the result. Follow progress in chat and wait until Agent presents a Website artifact and Preview is running.
+  <Step title="Free Mode에서 Agent가 만들도록 하기">
+    프롬프트를 전송합니다. Agent가 artifact를 계획하고, 앱을 만들고, 실행한 뒤 결과를 확인합니다. Chat에서 진행 상황을 지켜보며 Agent가 Website artifact를 제시하고 Preview가 실행될 때까지 기다립니다.
 
-    Free Mode may take a few minutes for a complete first build. If Replit recommends a higher mode for a more complex request, you can decide whether to escalate; this Gather build completes in Free Mode.
+    Free Mode에서는 첫 build를 완성하는 데 몇 분이 걸릴 수 있습니다. 더 복잡한 요청에 대해 Replit이 더 높은 모드를 권장하더라도 상향 여부는 직접 결정하면 됩니다. 이 Gather build는 Free Mode에서 완료됩니다.
 
     <Frame>
-      <img src="/assets/mirror/02-first-version-163a5fb49aac.jpg" alt="The first working Gather website in the default Build layout with Agent chat and Preview" width="1393" height="868" data-path="images/first-app-gather/02-first-version.jpg" />
+      <img src="/assets/mirror/02-first-version-163a5fb49aac.jpg" alt="Agent chat과 Preview가 있는 기본 Build layout에 표시된, 처음으로 작동하는 Gather 웹사이트" width="1393" height="868" data-path="images/first-app-gather/02-first-version.jpg" />
     </Frame>
   </Step>
 
-  <Step title="Test the result in Preview">
-    Use the app like a visitor. Check that you can:
+  <Step title="Preview에서 결과 테스트하기">
+    방문자의 입장에서 앱을 사용해 보세요. 다음을 확인합니다:
 
-    * Browse the workshop list.
-    * Open a workshop detail page.
-    * Submit an RSVP.
-    * See a clear confirmation after submitting.
-    * Use the main navigation.
-    * Resize Preview to a phone-sized width.
+    * 워크숍 목록을 둘러볼 수 있는지
+    * 워크숍 상세 페이지를 열 수 있는지
+    * RSVP를 제출할 수 있는지
+    * 제출 후 명확한 확인 메시지가 표시되는지
+    * 기본 내비게이션을 사용할 수 있는지
+    * Preview를 휴대폰 크기의 너비로 조정할 수 있는지
 
-    Compare the result with the success criteria in the prompt. If something is broken, describe the symptom to Agent instead of trying to diagnose the code yourself.
+    결과를 프롬프트에 적어 둔 성공 기준과 비교해 보세요. 문제가 있다면 코드를 직접 진단하려 하지 말고 증상을 Agent에게 설명하세요.
   </Step>
 </Steps>
 
-## Improve the app with a focused prompt
+<div id="improve-the-app-with-a-focused-prompt">
+  ## 명확한 프롬프트 하나로 앱 개선하기
+</div>
 
-Once the core experience works, ask for one clear improvement at a time. For Gather, add a session-only view of submitted RSVPs:
+핵심 기능이 정상 동작하면, 한 번에 하나씩 명확한 개선 사항을 요청하세요. Gather에서는 제출한 RSVP를 현재 세션 동안만 볼 수 있는 화면을 추가해 보겠습니다.
 
-> Add a My RSVPs view and make submitted workshops appear there for the current session. Keep the existing visual style and do not add login or a database.
-
-<Frame>
-  <img src="/assets/mirror/03-refinement-prompt-94b96ae38acb.jpg" alt="A focused follow-up prompt asking Agent to add a session-only My RSVPs view in Free Mode" width="1393" height="868" data-path="images/first-app-gather/03-refinement-prompt.jpg" />
-</Frame>
-
-Test the RSVP flow again, then open **My RSVPs**. The submitted workshop should appear for the current browser session.
+> My RSVPs 뷰를 추가하고, 제출한 workshops이 현재 세션에 표시되도록 해줘. 기존 시각적 스타일은 그대로 유지하고 로그인이나 데이터베이스는 추가하지 마.
 
 <Frame>
-  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="The refined Gather app showing a submitted workshop in the My RSVPs view" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+  <img src="/assets/mirror/03-refinement-prompt-94b96ae38acb.jpg" alt="Free Mode에서 Agent에게 세션 전용 My RSVPs 뷰 추가를 요청하는 명확한 follow-up 프롬프트" width="1393" height="868" data-path="images/first-app-gather/03-refinement-prompt.jpg" />
 </Frame>
 
-You have now completed the core Replit loop: **prompt, build, test, and refine**.
+RSVP flow를 다시 테스트한 다음 **My RSVPs**를 열어보세요. 제출한 워크숍이 현재 브라우저 세션에 표시되어야 합니다.
 
-## Grow your app
+<Frame>
+  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="My RSVPs 뷰에 제출된 워크숍이 표시된 개선된 Gather 앱" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+</Frame>
 
-The first prompt deliberately postpones production capabilities. Add them when the core experience is ready:
+이것으로 Replit의 핵심 loop인 **프롬프트 작성, build, 테스트, 개선**을 모두 경험했습니다.
+
+<div id="grow-your-app">
+  ## 앱 성장시키기
+</div>
+
+첫 번째 프롬프트는 프로덕션 기능을 의도적으로 뒤로 미룹니다. 핵심 경험이 완성되면 다음 기능을 추가하세요:
 
 <CardGroup cols={2}>
-  <Card title="Add login" icon="user" href="/build/add-login">
-    Give attendees accounts and private RSVP history.
+  <Card title="로그인 추가" icon="user" href="/ko/build/add-login">
+    참가자에게 계정과 비공개 RSVP 기록을 제공합니다.
   </Card>
 
-  <Card title="Add a database" icon="database" href="/build/add-database">
-    Persist workshops and RSVPs across sessions.
+  <Card title="데이터베이스 추가" icon="database" href="/ko/build/add-database">
+    세션이 바뀌어도 워크숍과 RSVP 정보를 유지합니다.
   </Card>
 
-  <Card title="Add payments" icon="credit-card" href="/build/add-payments">
-    Sell tickets for paid workshops.
+  <Card title="결제 추가" icon="credit-card" href="/ko/build/add-payments">
+    유료 워크숍의 티켓을 판매합니다.
   </Card>
 
-  <Card title="Add integrations" icon="plug" href="/build/add-integrations">
-    Send confirmations or connect calendars and other services.
+  <Card title="통합 추가" icon="plug" href="/ko/build/add-integrations">
+    확인 메일을 보내거나 캘린더 및 기타 서비스를 연결합니다.
   </Card>
 </CardGroup>
 
-When you are ready to share the app, follow [Publish your app](/build/publish-your-app).
+앱을 공유할 준비가 되면 [앱 게시하기](/ko/build/publish-your-app)를 참고하세요.

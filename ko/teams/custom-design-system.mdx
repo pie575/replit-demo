@@ -1,65 +1,75 @@
 ---
 title: "디자인 시스템 설정하기"
-description: "조직의 디자인 시스템(컴포넌트 라이브러리, 브랜드 에셋, 디자인 토큰, 시각적 표준)을 Agent에 설정하여 모든 앱, 사이트, 아티팩트가 디자인 언어를 따르도록 하세요."
+description: "조직의 디자인 시스템(컴포넌트 라이브러리, 브랜드 assets, 디자인 tokens, 시각적 표준)을 Agent에 구성해 모든 앱, 사이트, artifact가 조직의 디자인 언어를 따르도록 하세요."
 sidebarTitle: "디자인 시스템"
 icon: "palette"
 ---
 
-디자인 시스템은 Agent에게 Replit에서 조직이 만드는 모든 것(웹 앱, 모바일 앱, 슬라이드, 기타 아티팩트)에 걸쳐 브랜드에 맞는 UI를 구축하는 데 필요한 지식을 제공합니다. 표준 Replit pnpm 모노레포 내에 컴포넌트 라이브러리, 디자인 토큰, 브랜드 에셋, 사용 규칙을 설정하면 Agent가 첫 번째 프롬프트부터 시각적 언어를 적용합니다.
+디자인 시스템은 조직이 Replit에서 만드는 모든 결과물(web apps, mobile apps, slides 등 다양한 artifacts)에 브랜드에 맞는 UI를 구현하는 데 필요한 지식을 Agent에 제공합니다. 표준 Replit pnpm 모노레포 안에 컴포넌트 라이브러리, 디자인 tokens, 브랜드 assets, 사용 규칙을 설정해 두면 Agent가 첫 prompt부터 조직의 시각적 언어를 적용합니다.
 
 <Note>
-  디자인 시스템은 **Enterprise** 플랜에서만 사용 가능합니다. 조직 관리자만 디자인 시스템을 설정하고 관리할 수 있습니다.
+  디자인 시스템은 **Enterprise** plan에서만 사용할 수 있습니다. 디자인 시스템의 구성과 관리는 Organization 관리자만 가능합니다.
 </Note>
 
-## 디자인 시스템을 설정하는 이유
+<div id="why-set-up-a-design-system">
+  ## design system을 설정해야 하는 이유
+</div>
 
-디자인 시스템 없이는 모든 빌더가 컴포넌트 라이브러리, 색상 토큰, 레이아웃 규칙을 Agent에게 수동으로 설명해야 합니다. 디자인 시스템을 설정하면 다음과 같은 방식으로 이 문제를 해결합니다:
+design system이 없으면 모든 builder가 컴포넌트 라이브러리, color token, layout conventions를 Agent에게 일일이 설명해야 합니다. design system을 설정하면 다음과 같은 방식으로 이 문제를 해결할 수 있습니다.
 
-* **시각적 표준 인코딩**: Agent가 일반적인 기본값이 아닌 정확한 컴포넌트, 색상, 간격을 사용합니다.
-* **일관성 보장**: 모든 앱이 동일한 디자인 언어를 따릅니다.
-* **온보딩 시간 단축**: 새 빌더가 즉시 브랜드에 맞는 결과물을 만들어냅니다.
-* **암묵적 지식 포착**: 팀원들의 머릿속에 있는 디자인 결정과 컴포넌트 사용 패턴이 Agent를 위해 문서화됩니다.
+* **시각적 표준 반영**: Agent가 일반적인 기본값이 아닌, 여러분이 정한 컴포넌트, color, spacing을 그대로 사용합니다
+* **일관성 확보**: 모든 App이 동일한 디자인 언어를 따릅니다
+* **온보딩 시간 단축**: 새로운 builder도 곧바로 브랜드에 맞는 결과물을 만들어냅니다
+* **암묵지 축적**: 팀원들의 머릿속에만 있던 디자인 결정과 컴포넌트 usage 패턴이 Agent가 참고할 수 있도록 문서화됩니다
 
-## 필요한 것
+<div id="what-you-will-need">
+  ## 준비물
+</div>
 
-* tarfile 또는 tarfile 세트로 패키지된 프론트엔드 코드 컴포넌트 라이브러리
-* 디자인 시스템에서 사용하는 폰트 에셋과 아이콘
-* 디자인 시스템에 대한 AI 문서 (MCP, Agent Skills)
+* tarfile 하나 또는 여러 개로 제공되는 프런트엔드 코드 컴포넌트 라이브러리
+* 디자인 시스템에서 사용하는 폰트 에셋 및 아이콘
+* 디자인 시스템에 대한 AI 문서(MCP, Agent skills)
 
-## 설정 가능한 항목
+<div id="what-you-can-configure">
+  ## 구성할 수 있는 항목
+</div>
 
-디자인 시스템 설정은 세 가지 부분으로 구성됩니다:
+design system 설정은 크게 세 가지로 이루어집니다.
 
-1. **커스텀 지침**. `custom_instruction/instructions.md` 파일은 모든 프로젝트에 적용되는 고수준 규칙을 Agent에게 제공합니다: 사용할 컴포넌트 라이브러리, 참조할 디자인 토큰, 따를 패턴. Agent는 항상 이 파일을 컨텍스트로 갖습니다.
+1. **Custom instructions**. `custom_instruction/instructions.md` 파일은 모든 project에 적용되는 상위 수준 규칙을 Agent에게 알려줍니다. 어떤 컴포넌트 라이브러리를 사용할지, 어떤 디자인 token을 참조할지, 어떤 패턴을 따를지 등이 여기에 해당합니다. Agent는 항상 이 파일을 context로 유지합니다.
 
-2. **Skills**. `.agents/skills/`의 Skills는 Agent가 필요에 따라 로드하는 상세 참조 자료를 제공합니다. 컴포넌트 API 문서, 테마 가이드, 레이아웃 패턴 라이브러리, 기타 메인 지침 파일에 넣기에는 너무 큰 심층 참조 콘텐츠에 사용하세요.
+2. **Skills**. `.agents/skills/`에 있는 skill은 Agent가 필요할 때 불러오는 상세 참조 자료를 제공합니다. 컴포넌트 API 문서, 테마 적용 가이드, layout 패턴 라이브러리처럼 메인 instructions 파일에 담기에는 분량이 너무 많은 심층 참조 자료에 활용하세요.
 
-3. **디자인 및 브랜드 에셋**. 로고, 아이콘, 폰트 및 기타 브랜드 에셋을 전용 폴더(예: `src/assets/brand/`)에 배치하세요. `@brand/logo.svg`와 같은 깔끔한 임포트로 참조할 수 있도록 Vite 경로 별칭을 설정하여 취약한 상대 경로 대신 일관된 에셋 참조를 유지하세요.
+3. **디자인 및 브랜드 asset**. logo, icon, 폰트 등 브랜드 asset은 전용 폴더(예: `src/assets/brand/`)에 두세요. Vite 경로 별칭을 구성해 두면 Agent와 builder가 깨지기 쉬운 상대 경로 대신 `@brand/logo.svg`처럼 깔끔한 import로 참조할 수 있습니다. 이렇게 하면 project 전체에서 asset 참조가 일관되게 유지됩니다.
 
-## 단계별 가이드
+<div id="step-by-step-guide">
+  ## 단계별 가이드
+</div>
 
-이 가이드는 tarfile로 패키지된 기존 컴포넌트 라이브러리를 사용하여 디자인 시스템을 처음부터 끝까지 설정하는 방법을 안내합니다:
+이 가이드에서는 tarfile로 패키징된 기존 컴포넌트 라이브러리를 사용해 design system을 처음부터 끝까지 구축하는 과정을 안내합니다:
 
-1. **새 Replit 앱을 만들고** tarfile을 업로드하세요.
-2. **Replit Agent에게 패키지를 설치하고 모든 컴포넌트를 표시하도록 지시하세요.** Agent가 프로젝트를 설정하고 컴포넌트 라이브러리를 렌더링합니다.
-3. **출력물을 검토하세요.** 모든 컴포넌트가 올바르게 보이고 기대에 부합하는지 확인하세요. 모든 것이 확인되면 [디자인 시스템 스킬 만들기](#creating-the-design-system-skill)로 진행하세요.
+1. **새 Replit App을 만들고** tarfile을 업로드합니다.
+2. **Replit Agent에게 패키지를 설치하고 모든 컴포넌트를 표시해 달라고 요청하세요.** Agent가 project를 구성하고 컴포넌트 라이브러리를 렌더링합니다.
+3. **결과를 검토하세요.** 모든 컴포넌트가 올바르게 표시되고 기대한 대로인지 확인합니다. 모두 확인했다면 [design system skill 만들기](#creating-the-design-system-skill)로 진행하세요.
 
-### 디자인 시스템 스킬 만들기
+<div id="creating-the-design-system-skill">
+  ### design system skill 만들기
+</div>
 
-컴포넌트가 준비되면 마지막 단계는 Agent가 모든 프로젝트에서 컴포넌트, 토큰, 사용 패턴을 참조할 수 있도록 디자인 시스템 스킬을 만드는 것입니다.
+컴포넌트가 준비되었다면, 마지막으로 design system skill을 만들어 Agent가 모든 project에서 컴포넌트와 tokens, 사용 패턴을 참조할 수 있도록 합니다.
 
-아래 프롬프트 전체를 복사하여 Agent에 붙여넣으세요. `<your-design-system-name>`을 디자인 시스템 이름으로 교체하세요:
+아래 prompt 전체를 복사해 Agent에 붙여 넣으세요. `<your-design-system-name>`은 사용 중인 design system 이름으로 바꿔야 합니다:
 
 ````
-Create a `<your-design-system-name>` design system skill from the components and packages in this project.
+이 project의 컴포넌트와 packages를 바탕으로 `<your-design-system-name>` design system skill을 만들어 주세요.
 
-Use the file structure shown below with a `SKILL.md` at the root, a `references/` directory for guides and component docs, and a `packages/` directory containing all dependencies needed to function.
+아래에 제시된 파일 구조를 사용하세요. 루트에는 `SKILL.md`, 가이드와 컴포넌트 문서를 담는 `references/` 디렉터리, 동작에 필요한 모든 dependencies를 담는 `packages/` 디렉터리를 둡니다.
 
-Go through every component in the project and document each one in its own file under `references/components/`, including its props, variants, and example usage.
+project의 모든 컴포넌트를 하나씩 살펴보고, 각 컴포넌트를 `references/components/` 아래의 개별 파일에 props, 변형, 사용 예시와 함께 문서화하세요.
 
-Format `SKILL.md` as an index that links out to the guide and component reference files, with a "General Guidance" section and a "Components" section, following the example shown below.
+`SKILL.md`는 아래 예시를 따라 "General Guidance" 섹션과 "Components" 섹션을 두고, 가이드 및 컴포넌트 참조 파일로 연결되는 목차 형태로 작성하세요.
 
-File structure:
+파일 구조:
 
 .agents/skills/your-design-system/
 ├── SKILL.md
@@ -77,7 +87,7 @@ File structure:
 └── packages/
     └── (Tar files or code components)
 
-The `SKILL.md` file acts as an index that links out to separate markdown files for guides and component references. Each linked file covers one topic in detail. Here is an example of what the generated `SKILL.md` looks like:
+`SKILL.md` 파일은 가이드와 컴포넌트 참조용 개별 마크다운 파일로 연결되는 목차 역할을 합니다. 연결된 각 파일은 하나의 주제를 자세히 다룹니다. 생성된 `SKILL.md`의 예시는 다음과 같습니다:
 
 ```markdown
 ---
@@ -105,84 +115,96 @@ Individual component references (props, variants, examples):
 - ...
 ```
 
-Guide files cover one topic each — setup and installation steps, best practices and rules, reference tables for token values, and short code examples showing correct usage.
+가이드 파일은 각각 하나의 주제만 다룹니다. 설정 및 설치 단계, 모범 사례와 규칙, tokens 값 참조 표, 올바른 사용법을 보여주는 짧은 코드 예시 등입니다.
 
-Component files document a single component each, including the component name, a brief description, a props table, usage examples, and any guidelines or constraints. The more complete these files are, the better Agent's output will be.
+컴포넌트 파일은 각각 하나의 컴포넌트를 문서화하며, 컴포넌트 이름, 간단한 설명, props 표, 사용 예시, 관련 지침이나 constraints를 포함합니다. 이 파일들이 충실할수록 Agent의 결과물도 좋아집니다.
 ````
 
-### Agent에 스킬 연결하기
+<div id="connect-your-skill-to-agent">
+  ### skill을 Agent에 연결하기
+</div>
 
-스킬이 만들어지면 `custom_instruction/instructions.md`가 Agent를 스킬로 가리키도록 하세요:
+skill을 생성했다면, `custom_instruction/instructions.md`에서 Agent가 해당 skill을 참조하도록 설정하세요:
 
 ```markdown theme={null}
-# Design System
+# 디자인 시스템
 
-Read and follow the design system skill at `.agents/skills/your-design-system/`.
-Always apply the design system when building or modifying UI.
+`.agents/skills/your-design-system/`에 있는 design system skill을 읽고 따르세요.
+UI를 만들거나 수정할 때는 항상 design system을 적용하세요.
 ```
 
-마지막으로 `replit.md`에 디자인 시스템별 컨텍스트를 미리 채워 Agent가 처음부터 시각적 표준을 이해하도록 하세요. 프로젝트 개요, 선호하는 컴포넌트 라이브러리, 주요 디자인 선호 사항(간격 스케일, 접근성 요구 사항), 아키텍처 스택을 포함하세요.
+마지막으로, Agent가 처음부터 시각적 표준을 이해할 수 있도록 `replit.md`에 디자인 시스템 관련 컨텍스트를 미리 채워 두세요. 프로젝트 개요, 선호하는 컴포넌트 라이브러리, 주요 디자인 기준(여백 스케일, 접근성 요구사항), 아키텍처 스택을 함께 포함하세요.
 
-### 설정 검증하기
+<div id="validate-your-setup">
+  ### 설정 검증하기
+</div>
 
-디자인 시스템을 배포하기 전에 다음 필수 사항을 확인하세요:
+design system을 배포하기 전에 다음 필수 항목을 확인하세요:
 
-* `custom_instruction/instructions.md`가 Agent를 디자인 시스템 스킬로 가리키는지
-* `.agents/skills/`에 컴포넌트 참조, 가이드, 패키지가 포함된 스킬이 있는지
-* `replit.md`에 프로젝트 개요, 선호 사항, 아키텍처가 미리 채워져 있는지
-* 디자인 토큰 파일이 포함되어 있는지(`tokens.css` 또는 동등한 파일)
-* 디자인 시스템 패키지가 `package.json`에 사전 설치되어 있는지
-* 새 테스트 앱을 만들어 Agent가 디자인 시스템을 올바르게 사용하는지 확인하기
+* `custom_instruction/instructions.md`가 Agent를 design system skill로 연결하고 있는지
+* `.agents/skills/`에 컴포넌트 참조, 가이드, packages를 포함한 skill이 들어 있는지
+* `replit.md`에 project 개요, 선호 설정, 아키텍처가 미리 작성되어 있는지
+* 디자인 tokens 파일(`tokens.css` 또는 이에 준하는 파일)이 포함되어 있는지
+* design system package가 `package.json`에 미리 설치되어 있는지
+* 새 테스트 앱을 만들어 Agent가 design system을 올바르게 사용하는지 확인
 
-### 조직에 디자인 시스템 고정하기
+<div id="pin-the-design-system-to-your-organization">
+  ### 조직에 design system 고정하기
+</div>
 
-디자인 시스템이 준비되면 모든 조직 멤버가 사용할 수 있도록 고정하세요:
+design system이 준비되면, 모든 조직 구성원이 사용할 수 있도록 고정하세요:
 
-1. 조직의 디자인 시스템 앱으로 이동하세요.
-2. 앱의 작업 메뉴(점 세 개 메뉴)를 여세요.
-3. **Pin to Agent input box**를 선택하세요.
+1. 조직 내 design system App으로 이동합니다
+2. 해당 App의 작업 메뉴(three-dot menu)를 엽니다
+3. **Pin to Agent input box**를 선택합니다
 
-<img src="/assets/mirror/custom-templates-pin-to-agent-b733d3eb9a80.png" alt="Pin to Agent input box 옵션이 표시된 앱 작업 메뉴" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+<img src="/assets/mirror/custom-templates-pin-to-agent-b733d3eb9a80.png" alt="Pin to Agent input box 옵션이 표시된 App 작업 메뉴" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
 
 <Note>
-  조직 관리자(`system_admins` 역할 멤버)만 디자인 시스템을 고정하거나 고정 해제할 수 있습니다.
+  조직 관리자(`system_admins` 역할의 구성원)만 design system을 고정하거나 고정 해제할 수 있습니다.
 </Note>
 
-멤버 액세스를 **Read-only**로 설정하여 멤버가 편집하지 않고 고정된 디자인 시스템을 보고 사용할 수 있도록 하세요.
+구성원 접근 권한을 **Read-only**로 설정하면, 구성원은 고정된 design system을 편집할 수는 없지만 확인하고 사용할 수 있습니다.
 
-<img src="/assets/mirror/custom-templates-members-read-only-cf6aa160c8ef.png" alt="멤버 액세스가 Read-only로 설정된 초대 대화상자" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+<img src="/assets/mirror/custom-templates-members-read-only-cf6aa160c8ef.png" alt="구성원 접근 권한이 Read-only로 설정된 Invite 대화 상자" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
 
-이제 디자인 시스템이 조직의 모든 멤버를 위해 Agent 입력 창 아래에 선택 가능한 pill로 표시됩니다. 제거하려면 동일한 메뉴를 열고 **Unpin from Agent input box**를 선택하세요.
+이제 조직의 모든 구성원에게 design system이 Agent input box 아래에 선택 가능한 알약 모양 버튼으로 표시됩니다. 제거하려면 같은 메뉴를 열고 **Unpin from Agent input box**를 선택하세요.
 
-<img src="/assets/mirror/custom-templates-input-box-553384ac7dd0.png" alt="Agent 입력 창에 선택 가능한 pill로 표시된 디자인 시스템" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+<img src="/assets/mirror/custom-templates-input-box-553384ac7dd0.png" alt="Agent input box에 선택 가능한 알약 모양 버튼으로 표시된 design system" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
 
-## 디자인 시스템 유지 관리하기
+<div id="maintain-your-design-system-over-time">
+  ## design system을 꾸준히 관리하기
+</div>
 
-디자인 시스템은 진화합니다. 최신 상태를 유지하세요:
+design system은 계속 발전합니다. 항상 최신 상태로 유지하세요.
 
-* **토큰 파일 업데이트**: 디자인 시스템에 새 색상, 간격, 타이포그래피 값이 추가될 때
-* **스킬 업데이트**: 컴포넌트에 새 props, 변형, 사용 패턴이 추가될 때
-* **지침 업데이트**: 디자인 원칙이나 표준이 변경될 때
-* **패키지 버전 업데이트**: 디자인 시스템의 새 릴리스가 출시될 때
-* **정기적 테스트**: 새 앱을 만들고 Agent가 올바른 출력물을 생성하는지 확인
+* design system에 새로운 color, spacing, typography 값이 추가되면 **token 파일을 업데이트하세요**
+* 컴포넌트에 새로운 props, 변형, 사용 패턴이 생기면 **skill을 업데이트하세요**
+* 디자인 원칙이나 표준이 바뀌면 **instructions를 업데이트하세요**
+* design system의 새로운 release가 나오면 **package 버전을 올리세요**
+* 새 App을 만들어 Agent가 올바른 결과물을 생성하는지 확인하며 **정기적으로 테스트하세요**
 
-## 디자인 시스템 vs. 커스텀 템플릿
+<div id="design-systems-vs-custom-templates">
+  ## Design system과 Custom Templates 비교
+</div>
 
-디자인 시스템과 [커스텀 템플릿](/ko/teams/custom-templates)은 서로 다른 목적을 가집니다:
+Design system과 [custom template](/ko/teams/custom-templates)은 서로 목적이 다릅니다:
 
-|           | 디자인 시스템                                   | 커스텀 템플릿                                    |
-| --------- | ----------------------------------------- | ------------------------------------------ |
-| **목적**    | 팀의 프론트엔드 스택으로 변경하고 코드 컴포넌트 활용             | 기본 스택을 완전히 교체(예: Rust, Go, C++)            |
-| **스택**    | 표준 Replit pnpm 모노레포 내에서 작동                | 완전히 커스텀 프로젝트 구조 정의                         |
-| **제공 내용** | 컴포넌트 라이브러리 규칙, 디자인 토큰, 브랜드 에셋, 시각적 스킬     | 런타임, 빌드 설정, 의존성, 프로젝트 레이아웃을 포함한 전체 보일러플레이트 |
-| **적용 대상** | 웹 앱, 모바일 앱, 슬라이드, 아티팩트 - Agent가 빌드하는 모든 것 | 해당 특정 템플릿으로 만들어진 앱에만                       |
+|           | Design system                                           | Custom Templates                                        |
+| --------- | ------------------------------------------------------- | ------------------------------------------------------- |
+| **목적**    | frontend stack을 팀 기준으로 바꾸고 팀의 코드 컴포넌트를 활용               | 기본 stack을 통째로 대체(예: Rust, Go, C++)                      |
+| **Stack** | 표준 Replit pnpm 모노레포 안에서 동작                              | 완전히 맞춤화된 project 구조를 정의                                 |
+| **제공 항목** | 컴포넌트 라이브러리 규칙, design token, 브랜드 asset, 시각적 skill       | 전체 보일러플레이트: 런타임, build 설정, dependencies, project layout |
+| **적용 대상** | web app, mobile app, slides, artifact 등 Agent가 만드는 모든 것 | 해당 template으로 만든 apps에만 적용                              |
 
-일반 Replit 경험 전반에서 Agent가 시각적 표준을 따르길 원할 때는 디자인 시스템을 사용하세요. 근본적으로 다른 스택이 필요할 때는 커스텀 템플릿을 사용하세요.
+일반적인 Replit 환경 전반에서 Agent가 팀의 시각적 표준을 따르도록 하려면 design system을 사용하세요. 근본적으로 다른 stack이 필요하다면 custom template을 사용하세요.
 
-## 관련 리소스
+<div id="related-resources">
+  ## 관련 리소스
+</div>
 
-* [커스텀 템플릿](/ko/teams/custom-templates) - 조직을 위한 완전한 커스텀 스택 설정
-* [Agent Skills](/ko/features/agent/skills) - 스킬의 작동 방식과 만드는 방법
-* [스킬 사용하기](/ko/build/use-agent-skills) - 스킬 사용에 대한 실습 가이드
-* [replit.md](/ko/features/project-setup/replit-dot-md) - 프로젝트 컨텍스트로 Agent 동작 커스터마이징
-* [Enterprise 개요](/ko/category/teams) - Enterprise 기능에 대해 알아보기
+* [Custom Templates](/ko/teams/custom-templates) - 조직 전용 stack을 처음부터 구성하기
+* [Agent Skills](/ko/features/agent/skills) - skill의 작동 방식과 만드는 방법
+* [Use a skill](/ko/build/use-agent-skills) - skill 사용법 실습 가이드
+* [replit.md](/ko/features/project-setup/replit-dot-md) - project context로 Agent 동작 맞춤 설정하기
+* [Enterprise 개요](/ko/category/teams) - Enterprise 기능 알아보기

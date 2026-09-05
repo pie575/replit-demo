@@ -1,25 +1,27 @@
 ---
-title: "Shopify 스토어프론트 빌드하기"
-description: "Replit으로 커스텀 Shopify 스토어프론트를 디자인하고 출시하는 방법을 알아보세요."
+title: "Shopify 스토어프론트 구축하기"
+description: "Replit으로 맞춤형 Shopify 스토어프론트를 디자인하고 출시하는 방법을 알아보세요."
+sidebarTitle: "Shopify 스토어프론트 구축하기"
+icon: "bag-shopping"
 ---
 
-export const CANDLE_STORE_PROMPT = `Build me an online store that sells hand-poured soy candles for a brand called "Ember & Oak." Use Shopify as the backend for the store and its products.
+export const CANDLE_STORE_PROMPT = `"Ember & Oak"이라는 브랜드의 핸드메이드 소이 캔들을 판매하는 온라인 스토어를 만들어줘. 스토어와 제품의 백엔드로 Shopify를 사용해줘.
 
-It should feel warm, calm, and premium — like a boutique home-goods brand. Use a soft cream background, deep charcoal text, and a muted amber accent. Elegant serif headlines, generous spacing, and soft rounded product cards.
+부티크 홈 굿즈 브랜드처럼 따뜻하고 차분하면서 고급스러운 분위기여야 해. 부드러운 크림색 배경, 짙은 차콜색 텍스트, 은은한 앰버색 포인트를 사용해줘. 우아한 세리프 헤드라인, 넉넉한 여백, 부드럽게 둥근 제품 카드를 적용해줘.
 
-Top to bottom:
+위에서 아래 순서로:
 
-A simple header with a small "Ember & Oak" wordmark on the left, a few links in the middle (Shop, Scents, Our Story), and a cart icon on the right.
+왼쪽에 작은 "Ember & Oak" 워드마크, 가운데에 몇 개의 링크(Shop, Scents, Our Story), 오른쪽에 장바구니 icon이 있는 단순한 헤더.
 
-A hero section with a large lifestyle photo of a lit candle on a wooden table in warm light, a headline like "Light that feels like home," a one-line subhead, and a "Shop candles" button.
+따뜻한 빛이 드는 나무 테이블 위에 켜진 캔들을 담은 큰 라이프스타일 사진, "집처럼 편안한 빛"과 같은 헤드라인, 한 줄짜리 부제목, "캔들 쇼핑하기" 버튼이 있는 hero 섹션.
 
-A product grid that shows each candle with its photo, name, scent, and price, with an "Add to cart" button on each card. Read the products from the connected Shopify store.
+각 캔들의 사진, 이름, 향, 가격을 보여주고 각 카드에 "장바구니에 추가" 버튼이 있는 제품 그리드. 연결된 Shopify 스토어에서 제품을 불러와.
 
-A short "Our Story" band with a sentence or two about small-batch, hand-poured candles.
+소량으로 수제 제작한 캔들에 관한 한두 문장이 담긴 짧은 "Our Story" 영역.
 
-A simple footer with the wordmark and the same links.
+워드마크와 동일한 링크가 있는 단순한 푸터.
 
-Generate warm, cozy candle and home photography. Make it look like a real boutique brand, not a template. Wire the product grid and cart to the Shopify store you set up — don't ask me for any Shopify API keys.`;
+따뜻하고 아늑한 캔들과 홈 스타일 사진을 생성해줘. template이 아닌 실제 부티크 브랜드처럼 보이게 해줘. 제품 그리드와 장바구니를 설정한 Shopify 스토어에 연결해줘 — Shopify API keys를 요청하지 마.`;
 
 export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
   const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
@@ -49,7 +51,7 @@ export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) =
     }
     const original = btn.dataset.label || btn.innerText;
     btn.dataset.label = original;
-    btn.innerText = "Copied!";
+    btn.innerText = "복사됨!";
     setTimeout(() => {
       if (btn.isConnected) btn.innerText = original;
     }, 1500);
@@ -93,7 +95,7 @@ export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) =
     color: "inherit",
     border: "1px solid rgba(127,127,127,0.4)"
   }}>
-        Copy the prompt
+        프롬프트 복사
       </button>
       <button type="button" onClick={handleBuild} style={{
     ...baseButtonStyle,
@@ -101,7 +103,7 @@ export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) =
     color: "#FFFFFF",
     border: "1px solid #F26207"
   }}>
-        Build on Replit ↗
+        Replit에서 Build하기 ↗
       </button>
     </div>;
 };
@@ -121,197 +123,227 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-원하는 스토어를 설명하기만 하면 커스텀 Shopify 스토어프론트를 디자인하고 출시할 수 있습니다. Agent가 하나의 대화에서 Shopify 스토어를 프로비저닝하고, 스토어를 기반으로 프론트엔드를 빌드하고, 상품을 추가합니다. 판매할 준비가 되면 Shopify로 이동하여 스토어를 소유권 이전하고 결제를 활성화하기만 하면 됩니다.
+원하는 스토어를 설명하기만 하면 맞춤형 Shopify 스토어프론트를 디자인하고 출시할 수 있습니다. Agent가 Shopify 스토어를 프로비저닝하고, 여기에 연결되는 프런트엔드를 만들며, 상품까지 추가하는 모든 과정을 하나의 대화에서 처리합니다. 판매를 시작할 준비가 되면 Shopify에 한 번만 방문해 스토어 소유권을 확보하고 결제를 켜면 됩니다.
 
-이 가이드에서는 프롬프트부터 게시된 스토어프론트까지 소규모 양초 스토어인 **Ember & Oak**를 빌드합니다.
+이 가이드에서는 소량 생산 캔들 스토어인 **Ember &amp; Oak**를 프롬프트 하나에서 시작해 게시된 스토어프론트까지 만들어 봅니다.
 
 <Frame>
-  <img src="/assets/mirror/ember-and-oak-candles-a7ab5795c737.png" alt="완성된 Ember & Oak 양초 스토어프론트 — 따뜻한 크림색과 황금색 부티크 디자인에 불이 켜진 양초 히어로 이미지, '집처럼 느껴지는 빛'이라는 헤드라인, 장바구니 추가 버튼이 있는 대두유 양초 상품 그리드" width="3452" height="1978" data-path="images/build-examples/ember-and-oak-candles.png" />
+  <img src="/assets/mirror/ember-and-oak-candles-a7ab5795c737.png" alt="완성된 Ember & Oak 캔들 스토어프론트 — 불이 켜진 캔들 hero 이미지, 'Light that feels like home' 헤드라인, Add to cart 버튼이 있는 소이 캔들 상품 그리드로 구성된 크림과 앰버 톤의 따뜻한 부티크 디자인" width="3452" height="1978" data-path="images/build-examples/ember-and-oak-candles.png" />
 </Frame>
 
 <PromptActions prompt={CANDLE_STORE_PROMPT} campaign="docs-ecommerce-store" />
 
-## 달성할 것
+<div id="what-youll-achieve">
+  ## 완성하게 될 결과물
+</div>
 
-이 가이드를 마치면 다음을 갖게 됩니다:
+이 가이드를 마치면 다음을 갖추게 됩니다.
 
-* 실제 Shopify 스토어가 뒷받침하는 커스텀 디자인의 양초 스토어프론트.
-* Shopify에서 만들어져 스토어프론트에 렌더링된 상품과 가격.
-* 구매자를 Shopify 결제로 보내는 동작하는 장바구니.
-* 출시로 가는 명확한 경로: 스토어 소유권 이전, 결제 활성화, 출시.
+* 실제 Shopify 스토어와 연동된 맞춤 디자인 캔들 스토어프론트
+* Shopify에서 생성해 스토어프론트에 표시되는 products와 가격
+* 구매자를 Shopify checkout으로 연결하는 장바구니
+* go live까지의 명확한 진행 경로: store claim, payments 활성화, launch
 
-## 배울 것
+<div id="what-youll-learn">
+  ## 학습 내용
+</div>
 
-다음을 배우게 됩니다:
+다음 방법을 알아봅니다.
 
-* Agent가 Shopify를 추천하고 프로비저닝하도록 스토어를 설명하는 방법.
-* API 키를 다루지 않고 Shopify에 연결하는 방법.
-* Agent와 채팅하여 상품을 추가하고 게시하는 방법.
-* 디자인과 구매 흐름을 다듬는 방법.
-* 스토어를 개발에서 라이브 판매 가능한 스토어프론트로 전환하는 방법.
+* Agent가 Shopify를 추천하고 대신 프로비저닝하도록 store 설명하기
+* API key를 직접 다루지 않고 Shopify 연결하기
+* Agent와 Chat으로 대화하며 products 추가하고 게시하기
+* 디자인과 구매자 flow 다듬기
+* store를 개발 단계에서 판매 가능한 라이브 스토어프론트로 전환하기
 
-## Shopify 연결하기
+<div id="connect-shopify">
+  ## Shopify 연결
+</div>
 
-Shopify는 모든 앱의 모든 빌더가 사용할 수 있으며, 대화 내에서 바로 연결합니다. 만들고 싶은 스토어를 설명하는 것으로 시작하세요.
+Shopify는 모든 앱에서 모든 빌더가 사용할 수 있으며, 대화 안에서 바로 연결할 수 있습니다. 만들고 싶은 스토어를 설명하는 것부터 시작하세요.
 
 <Steps>
   <Step title="스토어 설명하기">
-    프롬프트를 복사하여 [replit.com](https://replit.com)의 프롬프트 박스에 붙여넣거나, **Build on Replit**을 클릭하여 프롬프트가 미리 입력된 Replit을 여세요.
+    프롬프트를 복사해 [replit.com](https://replit.com)의 프롬프트 상자에 붙여넣거나, **Build on Replit**을 클릭해 프롬프트가 미리 입력된 상태로 Replit을 여세요.
 
     <Frame>
-      <img src="/assets/mirror/describe-your-store-b5d724daee99.png" alt="Ember & Oak 양초 스토어 프롬프트가 입력되어 빌드 시작 준비가 된 Replit 홈 프롬프트 박스" width="1440" height="900" data-path="images/replitai/shopify/describe-your-store.png" />
+      <img src="/assets/mirror/describe-your-store-b5d724daee99.png" alt="Ember & Oak 캔들 스토어 프롬프트가 입력되어 빌드를 시작할 준비가 된 Replit 홈 프롬프트 상자" width="1440" height="900" data-path="images/replitai/shopify/describe-your-store.png" />
     </Frame>
 
     <PromptActions prompt={CANDLE_STORE_PROMPT} campaign="docs-ecommerce-store" />
 
-    Agent는 실물 상품을 판매하는 것을 인식하고 스토어프론트의 백엔드로 Shopify를 추천합니다.
+    Agent는 실물 상품을 판매한다는 점을 인식하고, 스토어프론트의 백엔드로 Shopify를 추천합니다.
 
     <Frame>
-      <img src="/assets/mirror/connect-shopify-store-7f36389f976f.png" alt="Ember & Oak 양초 스토어를 위해 Shopify 스킬로 넘어가는 Replit Agent로, Connect Shopify 버튼이 있는 'Shopify에 연결' 카드가 표시됨" width="3452" height="1984" data-path="images/replitai/shopify/connect-shopify-store.png" />
+      <img src="/assets/mirror/connect-shopify-store-7f36389f976f.png" alt="Ember & Oak 캔들 스토어를 위해 Shopify 스킬로 작업을 넘기는 Replit Agent의 화면으로, Connect Shopify 버튼이 있는 'Connect to Shopify' 카드가 표시되어 있습니다" width="3452" height="1984" data-path="images/replitai/shopify/connect-shopify-store.png" />
     </Frame>
   </Step>
 
   <Step title="Shopify 스토어 생성 승인하기">
-    Agent가 앱을 위한 Shopify 스토어를 만들도록 요청합니다. 승인하면 Agent가 Replit 소유의 개발 스토어를 프로비저닝하고 연결합니다. 추가 구성이 필요하지 않습니다.
-    나중에 스토어를 소유권 이전할 수 있도록 이메일이 Shopify와 공유됩니다.
+    Agent가 앱에 사용할 Shopify 스토어를 만들어도 되는지 묻습니다. 승인하면 Agent가 Replit 소유의 개발용 스토어를 프로비저닝하고 연결합니다. 추가 설정은 필요하지 않습니다.
+    나중에 스토어의 소유권을 가져올 수 있도록 이메일 주소가 Shopify와 공유됩니다.
 
-    스토어는 비밀번호로 보호된 상태로 시작하며 출시 전까지 실제 결제를 받을 수 없으므로 위험 없이 자유롭게 빌드할 수 있습니다.
+    스토어는 처음에 비밀번호로 보호된 상태이며 정식 오픈 전까지는 실제 결제를 받을 수 없으므로, 부담 없이 자유롭게 빌드할 수 있습니다.
   </Step>
 </Steps>
 
 <Note>
-  각 Shopify 스토어는 단일 앱에 연결됩니다. 나중에 두 번째 스토어를 빌드하면 Agent가 해당 앱을 위한 새로운 Shopify 스토어를 프로비저닝합니다. 전체 커넥터 세부 정보는 [Shopify 연결](/ko/features/integrations/shopify)을 참조하세요.
+  각 Shopify 스토어는 하나의 앱에만 적용됩니다. 나중에 두 번째 스토어를
+  만들면 Agent가 해당 앱을 위한 새 Shopify 스토어를 프로비저닝합니다. 커넥터에 대한
+  자세한 내용은 [Connect Shopify](/ko/features/integrations/shopify)를 참고하세요.
 </Note>
 
-## 스토어프론트 빌드하기
+<div id="build-the-storefront">
+  ## 스토어프론트 구축
+</div>
 
-Shopify가 연결되면 Agent가 스토어를 기반으로 스토어프론트를 디자인하고 빌드합니다.
+Shopify를 연결하면 Agent가 여러분의 store에 맞춰 스토어프론트를 디자인하고 구축합니다.
 
 <Steps>
-  <Step title="Agent가 프론트엔드 빌드하도록 하기">
-    Agent가 프롬프트에서 스토어프론트를 생성합니다 — 히어로, 상품 그리드, 장바구니, 그리고 지원 섹션들. 완료되면 오른쪽 창이 **Preview**로 전환되어 페이지를 스크롤하고 디자인을 클릭해볼 수 있습니다.
+  <Step title="Agent에게 프런트엔드 구축 맡기기">
+    Agent는 여러분의 프롬프트를 바탕으로 hero, 제품 그리드, 장바구니, 부가 섹션까지 스토어프론트 전체를 생성합니다.     작업이 끝나면 오른쪽 pane이 **Preview**로 전환되어 페이지를 스크롤하고 디자인을 클릭해 볼 수 있습니다.
 
     <Frame>
-      <img src="/assets/mirror/storefront-preview-f5ecb9011a8c.png" alt="Agent 채팅 옆 Replit Preview 창에 렌더링된 Ember & Oak 스토어프론트로, 양초 히어로 섹션과 상품 그리드가 표시됨" width="3452" height="1978" data-path="images/replitai/shopify/storefront-preview.png" />
+      <img src="/assets/mirror/storefront-preview-f5ecb9011a8c.png" alt="Agent chat 옆 Replit Preview pane에 렌더링된 Ember & Oak 스토어프론트로, 캔들 hero section과 제품 그리드가 보입니다" width="3452" height="1978" data-path="images/replitai/shopify/storefront-preview.png" />
     </Frame>
   </Step>
 
-  <Step title="첫 번째 상품 추가하기">
-    새 스토어는 빈 카탈로그로 시작합니다. Agent에게 상품을 추가하도록 요청하면 Shopify에 상품을 만들고 스토어프론트에 게시합니다.
+  <Step title="첫 products 추가하기">
+    새 store는 카탈로그가 비어 있는 상태로 시작합니다. Agent에게 product 추가를 요청하면 Shopify에 product를 생성하고 스토어프론트에 게시합니다.
 
     <AiPrompt>
-      Add a lavender soy candle for \$18 with a short cozy description, then publish it to the storefront.
+      짧고 아늑한 설명과 함께 $18짜리 라벤더 소이 캔들을 추가한 다음 스토어프론트에 게시해 줘.
     </AiPrompt>
 
-    상품이 Shopify 스토어에 만들어지고 스토어프론트 상품 그리드에 나타납니다.
+    해당 product는 여러분의 Shopify 스토어에 생성되고 스토어프론트의 제품 그리드에 표시됩니다.
 
     <Frame>
-      <img src="/assets/mirror/add-product-8b098e606340.png" alt="라벤더 대두유 양초 상품을 추가하는 Agent 채팅으로, 새 상품이 Ember & Oak 스토어프론트 상품 그리드에 표시됨" width="3452" height="1978" data-path="images/replitai/shopify/add-product.png" />
+      <img src="/assets/mirror/add-product-8b098e606340.png" alt="라벤더 소이 캔들 product를 추가하는 Agent chat과 Ember & Oak 스토어프론트 제품 그리드에 나타난 새 product" width="3452" height="1978" data-path="images/replitai/shopify/add-product.png" />
     </Frame>
   </Step>
 
   <Step title="카탈로그 채우기">
-    계속해서 상품을 설명하여 추가하세요. Agent가 각 상품을 가격, 설명, 이미지와 함께 Shopify에 만듭니다.
+    원하는 products를 설명하기만 하면 계속 추가할 수 있습니다. Agent가 각 product를 가격, 설명, 이미지와 함께 Shopify에 생성합니다.
 
     <AiPrompt>
-      Add three more candles: Cedar & Sage at $20, Vanilla Bean at $16, and Sea Salt at \$22. Give each a short description and publish them.
+      캔들 세 개를 더 추가해 줘: Cedar &amp; Sage $20, Vanilla Bean $16, Sea Salt $22. 각각 짧은 설명을 붙여서 게시해 줘.
     </AiPrompt>
   </Step>
 </Steps>
 
 <Tip>
-  **심화:** Agent에게 상품을 컬렉션으로 그룹화하도록 요청하거나("베스트셀러 세 개로 Holiday 컬렉션 만들기"), 크기나 향 같은 상품 변형을 추가하거나, 재고를 추적하여 스토어프론트에 재고 상황이 표시되도록 하세요. Shopify가 이 모든 것의 시스템 기록을 유지합니다.
+  **한 단계 더:** Agent에게 products를 컬렉션으로 group해 달라고 요청하거나(&quot;가장 잘 팔리는 캔들 세 개로 홀리데이 컬렉션을 만들어 줘&quot;),
+  크기나 향 같은 product 변형을 추가하거나, inventory를 추적해 스토어프론트에 재고 상태가 표시되도록 할 수 있습니다.
+  이 모든 것의 기준 데이터는 언제나 Shopify에 있습니다.
 </Tip>
 
-## 디자인과 결제 반복 개선하기
+<div id="iterate-on-the-design-and-checkout">
+  ## 디자인과 checkout 다듬기
+</div>
 
-스토어프론트의 모든 부분은 대화를 통해 편집할 수 있습니다. 외관을 다듬은 다음 처음부터 끝까지 구매 흐름을 확인하세요.
+스토어프론트의 모든 요소는 대화만으로 편집할 수 있습니다. 먼저 외관을 다듬은 다음, 구매자 flow를 처음부터 끝까지 점검해 보세요.
 
 <Steps>
   <Step title="디자인 다듬기">
-    변경하고 싶은 것을 설명하면 Agent가 스토어프론트를 업데이트합니다.
+    바꾸고 싶은 내용을 설명하면 Agent가 스토어프론트를 업데이트합니다.
 
     <AiPrompt>
-      Make the hero section feel more editorial — larger headline, more whitespace, and a softer amber accent on the buttons.
+      hero section을 좀 더 매거진 편집 디자인처럼 만들어 줘 — 헤드라인을 키우고, 여백을 넓히고, 버튼에는 부드러운 앰버 색상 포인트를 넣어 줘.
     </AiPrompt>
   </Step>
 
-  <Step title="장바구니 및 결제 테스트하기">
-    Preview에서 양초를 장바구니에 추가하고 결제를 시작하세요. 장바구니는 구매자를 Shopify의 호스팅된 결제로 보냅니다. 개발 중에는 스토어가 비밀번호로 보호되어 있으므로 결제 미리보기에서 비밀번호 페이지가 표시될 수 있습니다 — 이것은 정상이며 문제가 있다는 뜻이 아닙니다.
+  <Step title="장바구니와 checkout 테스트하기">
+    Preview에서 캔들을 장바구니에 담고 checkout을 시작해 보세요. 장바구니는 구매자를 Shopify가 호스팅하는 checkout으로 연결합니다. 개발 중에는 store가 비밀번호로 보호된 상태이므로 checkout 미리보기에 비밀번호 페이지가 나타날 수 있습니다. 정상적인 동작이며 문제가 생긴 것이 아닙니다.
   </Step>
 </Steps>
 
 <Tip>
-  **심화:** Agent에게 상품 상세 페이지, 장바구니 드로어, 검색, 또는 추천 상품 섹션을 추가하도록 요청하세요. 스토어프론트가 실제 Replit 프로젝트이므로 설명할 수 있는 것은 무엇이든 확장할 수 있습니다 — 블로그, 위시리스트, 또는 커스텀 랜딩 페이지 — Shopify는 결제와 주문을 처리합니다.
+  **한 단계 더:** Agent에게 상품 상세 페이지, 장바구니 drawer, 검색, 추천 products 섹션을 추가해 달라고 요청해 보세요.
+  스토어프론트는 실제 Replit project이므로 블로그, 위시리스트, 맞춤형 landing page 등
+  설명할 수 있는 것이라면 무엇이든 덧붙일 수 있고, checkout과 주문은 Shopify가 알아서 처리합니다.
 </Tip>
 
-## 출시하기
+<div id="ship-it">
+  ## 출시하기
+</div>
 
-라이브 전환은 Shopify에서 이루어집니다. Agent에게 Go Live 플로우를 시작하도록 요청한 다음 판매자 소유 단계를 완료하세요.
+실제 출시는 Shopify에서 이루어집니다. Agent에게 Go Live 플로우를 시작해 달라고 요청한 다음, 판매자가 직접 진행해야 하는 단계를 완료하세요.
 
 <Steps>
-  <Step title="Shopify에서 스토어 소유권 이전하기">
-    소유권 이전은 Shopify에서 이루어지며 Replit 외부에서 진행되는 유일한 단계입니다. 스토어가 생성될 때 이메일이 Shopify와 공유되었으므로 Replit이 제공하는 링크나 Shopify가 보내는 이메일에서 소유권을 이전할 수 있습니다.
+  <Step title="Shopify에서 스토어 소유권 확보하기">
+    소유권 확보는 Shopify에서 진행되며, Replit 밖에서 이루어지는 유일한 단계입니다.
+    스토어를 생성할 때 여러분의 이메일이 Shopify에 공유되었으므로,
+    Replit이 제공하는 링크 또는 Shopify가 보낸 이메일에서 소유권을 확보할 수 있습니다.
 
-    Shopify가 단계를 안내하는 **Store owner invitation** 이메일을 보냅니다. 열고 **Get started**를 선택하세요.
+    Shopify는 절차를 안내하는 **Store owner invitation** 이메일을 보냅니다.
+    이메일을 열고 **Get started**를 선택하세요.
 
     <Frame>
-      <img src="/assets/mirror/claim-store-email-a0d108f2191c.png" alt="스토어 소유자가 되도록 초대하는 Shopify 'Store owner invitation' 이메일로, 'Get started' 버튼이 있음" width="856" height="1024" data-path="images/replitai/shopify/claim-store-email.png" />
+      <img src="/assets/mirror/claim-store-email-a0d108f2191c.png" alt="스토어 소유자가 되도록 초대하는 Shopify 'Store owner invitation' 이메일과 'Get started' 버튼" width="856" height="1024" data-path="images/replitai/shopify/claim-store-email.png" />
     </Frame>
 
-    기존 Shopify 계정으로 로그인하거나, 초대를 수락하기 위해 계정을 만드세요.
+    기존 Shopify 계정으로 로그인하거나, 새 계정을 만들어 초대를 수락하세요.
 
     <Frame>
-      <img src="/assets/mirror/claim-store-create-account-99d2e132da19.png" alt="이메일, Google, Apple, Facebook 로그인 옵션이 있는 초대 수락을 위한 Shopify '계정 만들기' 화면" width="3452" height="1978" data-path="images/replitai/shopify/claim-store-create-account.png" />
+      <img src="/assets/mirror/claim-store-create-account-99d2e132da19.png" alt="초대를 수락하기 위한 Shopify 'Create an account' 화면으로, 이메일, Google, Apple, Facebook 로그인 옵션 제공" width="3452" height="1978" data-path="images/replitai/shopify/claim-store-create-account.png" />
     </Frame>
 
-    **Claim store**를 선택하여 스토어에서 Replit 앱을 승인하고 무료 체험을 시작하세요. 그런 다음 기본 소유자로 Shopify 관리자에 접속하게 됩니다.
+    **Claim store**를 선택해 스토어에서 Replit 앱을 승인하고 무료 체험을 시작하세요.
+    이후 기본 소유자 자격으로 Shopify admin에 접속하게 됩니다.
 
     <Frame>
-      <img src="/assets/mirror/claim-store-4facb7c8b10c.png" alt="무료 Shopify 체험을 시작하는 'Claim store' 버튼이 있는 Replit '스토어 소유권 이전' 화면" width="3452" height="1978" data-path="images/replitai/shopify/claim-store.png" />
+      <img src="/assets/mirror/claim-store-4facb7c8b10c.png" alt="Shopify 무료 체험을 시작하는 'Claim store' 버튼이 있는 Replit 'Claim your store' 화면" width="3452" height="1978" data-path="images/replitai/shopify/claim-store.png" />
     </Frame>
   </Step>
 
-  <Step title="플랜 선택 및 결제 활성화하기">
+  <Step title="플랜 선택 및 결제 활성화">
     Shopify 플랜을 선택하고 Shopify Payments 또는 다른 제공업체를 활성화하세요.
-    Shopify가 결제를 위해 필요한 신원 및 은행 정보를 수집합니다 — Replit에서는 아무것도 이루어지지 않습니다.
+    대금 지급에 필요한 신원 및 은행 정보는 Shopify가 수집하며,
+    이 과정은 Replit에서 진행되지 않습니다.
   </Step>
 
-  <Step title="배송, 세금, 도메인 구성하기">
-    Shopify에서 배송 요금을 설정하고 세금을 검토하며, 선택적으로 커스텀 도메인을 연결하세요.
+  <Step title="배송, 세금, 도메인 설정">
+    Shopify에서 배송비를 설정하고 세금을 검토하세요. 필요하다면
+    커스텀 도메인을 연결할 수도 있습니다.
   </Step>
 
-  <Step title="출시 및 게시하기">
-    Shopify에서 스토어프론트 비밀번호를 제거하여 구매자에게 스토어를 오픈하세요. Replit으로 돌아와 **Publish**를 클릭하여 스토어프론트를 공개 URL에 배포하세요.
+  <Step title="출시 및 게시">
+    Shopify에서 스토어프론트 비밀번호를 해제해 구매자에게 스토어를 공개하세요.
+    다시 Replit으로 돌아와 **Publish**를 클릭하면 스토어프론트가 공개 URL로 배포됩니다.
   </Step>
 </Steps>
 
 <Note>
-  결제, 신원 확인, 세금, 배송, 사기 확인은 Shopify에서 처리합니다. 전체 출시 체크리스트와 커넥터 세부 정보는 [Shopify 연결](/ko/features/integrations/shopify#go-live-on-shopify)을 참조하세요.
+  결제, 신원 확인, 세금, 배송, 사기 검증은 모두 Shopify에서 처리됩니다.
+  전체 출시 체크리스트와 커넥터 세부 정보는 [Shopify 연결하기](/ko/features/integrations/shopify#go-live-on-shopify)를 참고하세요.
 </Note>
 
-## 다음 단계
+<div id="next-steps">
+  ## 다음 단계
+</div>
 
 <CardGroup cols={2}>
-  <Card title="Shopify 연결" icon="bag-shopping" href="/ko/features/integrations/shopify">
-    커넥터 참고 문서: Shopify 연결 작동 방식과 전체 출시 체크리스트.
+  <Card title="Shopify 연결하기" icon="bag-shopping" href="/ko/features/integrations/shopify">
+    커넥터 레퍼런스: Shopify 연결의 작동 방식과 전체 출시 전 체크리스트를 확인하세요.
   </Card>
 
   <Card title="커스텀 도메인 추가하기" icon="globe" href="/ko/build/add-custom-domain">
-    출시 전에 스토어에 브랜드 URL을 부여하세요.
+    출시하기 전에 스토어에 브랜드에 맞는 URL을 연결하세요.
   </Card>
 
   <Card title="SEO 개선하기" icon="magnifying-glass" href="/ko/build/improve-seo">
-    구매자가 검색에서 스토어를 찾을 수 있도록 도와주세요.
+    구매자가 검색으로 내 스토어를 찾을 수 있도록 하세요.
   </Card>
 
-  <Card title="랜딩 페이지 출시하기" icon="rectangle-list" href="/ko/build/landing-page">
-    스토어로 트래픽을 유도하는 집중적인 캠페인 페이지를 빌드하세요.
+  <Card title="랜딩 페이지 만들기" icon="rectangle-list" href="/ko/build/landing-page">
+    스토어로 트래픽을 유도할 캠페인 전용 페이지를 만들어 보세요.
   </Card>
 </CardGroup>
 
-## 관련 항목
+<div id="related">
+  ## 관련 문서
+</div>
 
 * [Shopify 연결](/ko/features/integrations/shopify)
-* [커스텀 도메인 추가하기](/ko/build/add-custom-domain)
+* [사용자 지정 도메인 추가](/ko/build/add-custom-domain)
 * [Agent 통합](/ko/features/integrations/overview)

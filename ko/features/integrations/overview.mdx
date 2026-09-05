@@ -1,6 +1,8 @@
 ---
-title: "Agent 통합"
-description: "Agent가 지원하는 통합과 프롬프트에 따라 자동으로 활성화되는 방식을 알아보세요."
+title: "Agent Integrations"
+description: "Agent가 지원하는 통합과 prompt에 따라 통합이 자동으로 활성화되는 방식을 알아보세요."
+sidebarTitle: "Connectors"
+icon: "plug"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -22,429 +24,461 @@ export const AiPrompt = ({children}) => {
   <img src="/assets/mirror/agent-logo-e171ec584553.png" alt="주변에 통합 연결이 그려진 Agent 로고" width="1280" height="720" data-path="images/replitai/agent-logo.png" />
 </Frame>
 
-Agent는 아이디어에서 앱까지 빠르게 갈 수 있도록 네 가지 유형의 통합을 지원합니다.
+Agent는 네 가지 유형의 통합을 지원하므로 아이디어를 앱으로 빠르게 구현할 수 있습니다:
 
-* **Replit 관리형**: 자동으로 작동하는 내장 통합입니다. 앱을 만들면 Agent가 바로 사용할 수 있습니다.
-* **커넥터(Connectors)**: Replit이 지원하는 퍼스트파티 통합입니다. 한 번만 로그인하면 됩니다. Agent는 채팅에서 바로 이러한 서비스에서 읽고 쓸 수 있습니다 — 데이터를 가져오고, 레코드를 생성하고, 메시지를 보내고 — 여러 앱에서 이를 활용해 빌드할 수 있습니다.
-* **외부 통합(External integrations)**: 함께 빌드할 수 있는 신뢰할 수 있는 타사 서비스입니다. Agent에게 설정을 요청하면 여러분이 API 키를 제공합니다.
-* **Agent 서비스(Agent services)**: Agent가 뒤에서 사용하는 유료 타사 API입니다 — API 키가 필요하지 않습니다. 사용량은 Replit 크레딧에서 청구됩니다.
+* **Replit 관리형**: 자동으로 동작하는 내장 통합입니다. 앱을 만들면 Agent가 바로 사용할 수 있습니다.
+* **Connectors**: Replit이 지원하는 자사 통합입니다. 한 번만 로그인하면 Agent가 채팅에서 바로 해당 서비스를 읽고 쓸 수 있으며 — 데이터 가져오기, 레코드 생성, 메시지 전송 등 — 여러 앱에서 이를 활용해 빌드할 수 있습니다.
+* **외부 통합**: 함께 빌드할 수 있는 검증된 서드파티 서비스입니다. Agent에게 설정을 요청하면 되며, API 키는 직접 제공해야 합니다.
+* **Agent 서비스**: Agent가 내부적으로 사용하는 유료 서드파티 API로, API 키가 필요하지 않습니다. 사용량은 Replit 크레딧에서 청구됩니다.
 
 <Note>
-  **플랜별 이용 가능 여부**: 대부분의 커넥터는 Core, Pro, Enterprise 구독이 필요하며, 일부는 Free 플랜에서도 이용할 수 있습니다. 워크스페이스의 커넥터 카탈로그에서 현재 플랜으로 사용할 수 있는 커넥터를 확인할 수 있습니다. Free 플랜 빌더는 데이터베이스, 인증 등 Replit 관리형 통합을 언제든지 사용할 수 있습니다.
+  **plan 이용 가능 여부**: 대부분의 connector는 Core, Pro 또는 Enterprise 구독이 필요하며, 일부는 Free plan에서도 사용할 수 있습니다. workspace의 connector 카탈로그에서 현재 plan으로 사용할 수 있는 connector를 확인할 수 있습니다. Free plan builder도 데이터베이스, authentication 등 Replit 관리형 통합은 언제든 사용할 수 있습니다.
 </Note>
 
-## 시작하기
+<div id="getting-started">
+  ## 시작하기
+</div>
 
-통합을 사용하려면 필요한 서비스나 기능을 언급하세요. 예를 들어:
+통합을 사용하려면 필요한 서비스나 기능을 언급하기만 하면 됩니다. 예를 들면 다음과 같습니다.
 
 <AiPrompt>
-  Stripe로 결제를 받고 SendGrid로 확인 이메일을 보내는 웹 앱을 만들어줘
+  Stripe로 payments를 받고 SendGrid로 확인 이메일을 보내는 web app을 만들어 줘
 </AiPrompt>
 
-Agent는 이러한 키워드를 자동으로 감지하고 필요한 코드와 구성을 구현합니다.
+Agent가 이러한 키워드를 자동으로 감지해 필요한 코드와 configuration을 구현합니다.
 
-### Agent가 커넥터를 제안하도록 하기
+<div id="let-agent-suggest-a-connector">
+  ### Agent가 connector를 제안하도록 하기
+</div>
 
-때로는 파일 저장이나 이메일 전송처럼 여러 서비스가 같은 역할을 할 수 있습니다. 제공업체를 지정하지 않고 기능을 요청하면 Agent가 적합한 커넥터 목록을 간단히 보여줍니다. 원하는 것을 선택하세요.
+파일 저장이나 이메일 발송처럼 여러 서비스가 같은 일을 처리할 수 있는 경우가 있습니다. 제공업체를 지정하지 않고 필요한 기능만 요청하면 Agent가 적합한 connector를 간단한 목록으로 보여줍니다. 원하는 항목을 선택하세요.
 
-제공업체를 선택한 다음 한 번만 로그인해서 계정을 연결하세요. Agent는 빌드하는 동안 선택한 항목을 사용합니다. 목록을 건너뛰려면 특정 서비스 이름을 직접 요청할 수도 있습니다.
+제공업체를 선택한 뒤 한 번만 로그인하면 계정이 연결됩니다. Agent는 여러분이 선택한 서비스를 사용해 앱을 만듭니다. 목록을 건너뛰려면 특정 서비스를 이름으로 직접 지정해 요청할 수도 있습니다.
 
 <Frame>
-  <img src="/assets/mirror/agent-connector-suggestions-0cb07754b84c.png" alt="Google Drive, Dropbox, Microsoft OneDrive, Box, SharePoint Online을 나열하는 Agent의 연결할 통합 선택 화면" width="2000" height="786" data-path="images/replitai/agent-connector-suggestions.png" />
+  <img src="/assets/mirror/agent-connector-suggestions-0cb07754b84c.png" alt="Google Drive, Dropbox, Microsoft OneDrive, Box, SharePoint Online이 나열된 Agent의 연결할 통합 선택 화면" width="2000" height="786" data-path="images/replitai/agent-connector-suggestions.png" />
 </Frame>
 
-## Replit 관리형 통합
+<div id="replit-managed-integrations">
+  ## Replit 관리형 통합
+</div>
 
-이러한 내장 기능은 별도의 설정이 필요 없습니다. Agent에게 사용해 달라고 요청하기만 하면 됩니다.
+이 기본 제공 기능들은 별도의 설정이 필요 없습니다. Agent에게 사용해 달라고 요청하기만 하면 됩니다.
 
 <AccordionGroup>
   <Accordion title="Replit Database">
-    관계형 데이터와 SQL 쿼리를 위한 관리형 PostgreSQL로, 모든 Replit App에 내장되어 있습니다.
-    <AiPrompt>내 앱에 Replit Database를 추가해줘</AiPrompt>
+    모든 Replit App에 내장된 관리형 PostgreSQL로, 관계형 데이터와 SQL 쿼리를 지원합니다.
+    <AiPrompt>Add Replit Database to my app</AiPrompt>
   </Accordion>
 
   <Accordion title="Replit App Storage">
-    앱 파일과 자산을 위한 내장 저장소입니다.
-    <AiPrompt>파일을 저장하기 위해 Replit App Storage를 사용해줘</AiPrompt>
+    앱 파일과 assets를 위한 기본 제공 스토리지입니다.
+    <AiPrompt>Use Replit App Storage to save files</AiPrompt>
   </Accordion>
 
   <Accordion title="App Storage">
-    이미지, 영상, 기타 파일을 위한 클라우드 기반 저장소입니다.
-    <AiPrompt>파일 저장을 위해 내 앱에 App Storage를 추가해줘</AiPrompt>
+    이미지, 동영상 등 각종 파일을 위한 클라우드 기반 스토리지입니다.
+    <AiPrompt>Add App Storage to my app to store files</AiPrompt>
   </Accordion>
 
   <Accordion title="Replit Auth">
-    사람들이 Replit으로 로그인할 수 있는 네이티브 인증입니다.
-    <AiPrompt>내 앱에 Replit Auth를 추가해줘</AiPrompt>
+    사용자가 Replit 계정으로 로그인할 수 있는 기본 제공 authentication입니다.
+    <AiPrompt>Add Replit Auth to my app</AiPrompt>
   </Accordion>
 
   <Accordion title="Replit Domains">
-    앱을 위한 커스텀 도메인을 구성하고 관리합니다.
-    <AiPrompt>내 앱을 위한 커스텀 도메인을 설정해줘</AiPrompt>
+    앱의 custom domain을 설정하고 관리합니다.
+    <AiPrompt>Set up a custom domain for my app</AiPrompt>
   </Accordion>
 </AccordionGroup>
 
-## 커넥터
+<div id="connectors">
+  ## Connectors
+</div>
 
-커넥터는 Agent가 서비스에서 직접 읽고 쓸 수 있게 해줍니다. Replit이 지원하는 퍼스트파티 통합입니다. Project Editor의 Connectors 페이지에서 한 번 로그인하면 모든 앱에서 해당 연결을 재사용할 수 있습니다.
+Connectors를 사용하면 Agent가 여러분의 서비스를 직접 읽고 쓸 수 있습니다. Connectors는 Replit이 공식 지원하는 자사 통합입니다. Project Editor의 Connectors 페이지에서 한 번만 로그인해 두면, 해당 연결을 여러 앱에서 재사용할 수 있습니다.
 
 <Note>
-  연결은 Replit 계정에 연결되어 모든 앱에서 유지됩니다. 서비스를 한 번 연결하면 생성하는 어떤 앱에서도 사용할 수 있습니다.
+  연결 정보는 Replit account에 연결되어 모든 앱에서 그대로 유지됩니다. 서비스를 한 번 연결해 두면 이후 만드는 어떤 앱에서든 사용할 수 있습니다.
 </Note>
 
-### 사용 가능한 커넥터
+<div id="available-connectors">
+  ### 사용 가능한 connector
+</div>
 
 <AccordionGroup>
   <Accordion title="Google Workspace" icon="google">
-    * **Google Drive**: 파일과 폴더에 접근 및 관리
+    * **Google Drive**: 파일 및 폴더 접근과 관리
     * **Google Docs**: 문서 생성, 읽기, 편집
     * **Google Sheets**: 스프레드시트 데이터 읽기 및 쓰기
     * **Google Slides**: 프레젠테이션 생성, 읽기, 편집
-    * **Google Calendar**: 이벤트와 설정 읽기 및 쓰기
-    * **Gmail**: 이메일 전송, 수신, 관리
+    * **Google Calendar**: 일정 및 설정 읽기와 쓰기
+    * **Gmail**: 이메일 발송, 수신, 관리
   </Accordion>
 
   <Accordion title="Microsoft 365" icon="microsoft">
-    * **OneDrive**: 파일과 폴더에 접근 및 관리
-    * **Outlook**: 이메일 전송, 수신 및 캘린더 이벤트 관리
-    * **SharePoint**: 사이트와 문서 읽기, 쓰기, 관리
+    * **OneDrive**: 파일 및 폴더 액세스와 관리
+    * **Outlook**: 이메일 발신·수신 및 캘린더 일정 관리
+    * **SharePoint**: 사이트 및 문서 읽기, 쓰기, 관리
   </Accordion>
 
   <Accordion title="개발자 도구" icon="code">
-    * **Bitbucket**: 저장소, 프로젝트, 워크스페이스에 접근
-    * **Bitbucket (Source Control)**: Replit의 소스 제어를 Bitbucket에 연결
-    * **GitHub**: 저장소, 사용자, 조직에 접근
-    * **GitHub (Source Control)**: Replit의 소스 제어를 GitHub에 연결
-    * **GitLab**: 프로젝트, 이슈, 병합 요청, 파이프라인에 접근
-    * **GitLab (Source Control)**: Replit의 소스 제어를 GitLab에 연결
-    * **Linear**: 이슈, 댓글, 일정 생성 및 관리
-    * **Jira**: 사용자 읽기 및 작업 항목, 이슈 관리
-    * **Asana**: 작업과 프로젝트 데이터 읽기
-    * **Basecamp**: 프로젝트, 할 일, 메시지, 일정 읽기 및 관리
-    * **Teamwork**: 프로젝트, 작업, 시간 기록 읽기 및 관리
-    * **Confluence**: 사용자와 그룹 읽기, 스페이스에 콘텐츠 쓰기
-    * **Productboard**: 기능, 릴리스, 고객 피드백 읽기 및 업데이트
+    * **Bitbucket**: 저장소, 프로젝트, workspace 액세스
+    * **Bitbucket (Source Control)**: Replit의 source control을 Bitbucket에 연결
+    * **GitHub**: 저장소, 사용자, 조직 액세스
+    * **GitHub (Source Control)**: Replit의 source control을 GitHub에 연결
+    * **GitLab**: 프로젝트, issues, merge 요청, pipeline 액세스
+    * **GitLab (Source Control)**: Replit의 source control을 GitLab에 연결
+    * **Linear**: issues, 댓글, schedule 생성 및 관리
+    * **Jira**: 사용자 조회, 작업 항목 및 issues 관리
+    * **Asana**: task 및 프로젝트 데이터 조회
+    * **Basecamp**: 프로젝트, 할 일, 메시지, schedule 조회 및 관리
+    * **Teamwork**: 프로젝트, task, 시간 기록 조회 및 관리
+    * **Confluence**: 사용자 및 groups 조회, 스페이스에 콘텐츠 작성
+    * **Productboard**: 기능, release, 고객 feedback 조회 및 업데이트
   </Accordion>
 
-  <Accordion title="클라우드 저장소" icon="cloud">
+  <Accordion title="클라우드 스토리지" icon="cloud">
     * **Dropbox**: 파일, 콘텐츠, 메타데이터 읽기
-    * **Box**: 파일과 폴더 읽기 및 접근
+    * **Box**: 파일 및 폴더 읽기와 액세스
   </Accordion>
 
   <Accordion title="커뮤니케이션" icon="comments">
-    * **AgentMail**: 프로그래밍 방식으로 이메일 전송 및 수신
-    * **Discord**: 길드 정보와 사용자 프로필 접근
-    * **Intercom**: 대화, 연락처, 지원 워크플로 읽기 및 쓰기
-    * **Resend**: 트랜잭션 이메일 전송
-    * **SendGrid**: 트랜잭션 이메일 전송
-    * **Slack**: Slack 검색, 대화와 스레드 읽기, 메시지 전송, 캔버스 관리
-    * **Slack Agent**: 더 깊은 워크스페이스 통합으로 Slack 네이티브 에이전트 구축
-    * **Slack Agent Builder**: Slack Agent를 설계하고 구성하는 도구
-    * **Twilio**: SMS 메시지 전송 및 음성 통화
-    * **Zoom**: 미팅, 녹화, 연락처 생성 및 관리
+    * **AgentMail**: 프로그래밍 방식으로 이메일 발송 및 수신
+    * **Discord**: 길드 정보 및 사용자 프로필 접근
+    * **Intercom**: 대화, 연락처, 지원 workflow 읽기 및 쓰기
+    * **Resend**: 트랜잭션 이메일 발송
+    * **SendGrid**: 트랜잭션 이메일 발송
+    * **Slack**: Slack 검색, 대화 및 thread 읽기, 메시지 발송, 캔버스 관리
+    * **Slack Agent**: workspace와 더 긴밀하게 통합되는 Slack 네이티브 에이전트 구축
+    * **Slack Agent Builder**: Slack Agent 설계 및 구성 도구
+    * **Twilio**: SMS 메시지 발송 및 음성 통화 걸기
+    * **Zoom**: 미팅, 녹화본, 연락처 생성 및 관리
   </Accordion>
 
   <Accordion title="CRM 및 영업" icon="building">
-    * **Salesforce**: REST API를 통해 CRM 데이터에 접근하고 작업 수행
-    * **HubSpot**: CRM 객체, 연락처, 거래 읽기
-    * **Zendesk**: 지원 워크플로를 위한 Ticket API 읽기 및 쓰기 접근
+    * **Salesforce**: REST API를 통해 CRM 데이터에 액세스하고 작업을 수행합니다
+    * **HubSpot**: CRM 객체, 연락처, 거래를 읽습니다
+    * **Zendesk**: 고객 지원 워크플로를 위한 Ticket API 읽기 및 쓰기 액세스를 제공합니다
   </Accordion>
 
-  <Accordion title="HR 및 채용" icon="user-tie">
-    * **Ashby**: 후보자, 채용 공고, 인터뷰 데이터 읽기
+  <Accordion title="인사 및 채용" icon="user-tie">
+    * **Ashby**: 지원자, 채용 공고, 면접 데이터 읽기
   </Accordion>
 
-  <Accordion title="결제 및 수익화" icon="credit-card">
-    * **RevenueCat**: 인앱 구매와 구독 관리
-    * **Stripe**: 결제 처리 및 구독 관리. [Stripe 결제 가이드](/ko/features/monetization/stripe-payments)를 참고하세요.
-    * **Square**: 결제 수락 및 주문, 고객, 재고 관리
-    * **Plaid**: 지원되는 경우 금융 계정 잔액, 거래, 투자 데이터에 접근. [Plaid 커넥터 가이드](/ko/features/integrations/plaid-connector)를 참고하세요.
-    * **Shopify**: Agent에서 Shopify 스토어를 프로비저닝하고, 커스텀 스토어프론트를 구축하고, 제품과 재고를 관리. [Shopify 커넥터 가이드](/ko/features/integrations/shopify)를 참고하세요.
+  <Accordion title="결제 및 수익 창출" icon="credit-card">
+    * **RevenueCat**: 인앱 구매 및 구독 관리
+    * **Stripe**: 결제 처리 및 구독 관리. [Stripe 결제 가이드](/ko/features/monetization/stripe-payments)를 참조하세요.
+    * **Square**: 결제 수락, 주문·고객·재고 관리
+    * **Plaid**: 지원되는 범위 내에서 금융 계좌 잔액, 거래 내역, 투자 데이터 조회. [Plaid Connector 가이드](/ko/features/integrations/plaid-connector)를 참조하세요.
+    * **Shopify**: Shopify 스토어 생성, 맞춤형 storefront 구축, Agent에서 상품 및 재고 관리. [Shopify connector 가이드](/ko/features/integrations/shopify)를 참조하세요.
   </Accordion>
 
   <Accordion title="AI 및 미디어" icon="wand-magic-sparkles">
-    * **Browserbase**: 가져오기, 검색, 전체 세션 자동화를 위한 관리형 헤드리스 브라우저 실행
+    * **Browserbase**: 관리형 헤드리스 브라우저를 실행해 페치, 검색, 전체 세션 자동화 수행
     * **ElevenLabs**: AI 음성 및 오디오 콘텐츠 생성
-    * **OpenAI**: 텍스트 생성 및 어시스턴트를 위한 GPT 모델 사용
+    * **OpenAI**: GPT 모델을 사용해 텍스트 생성 및 어시스턴트 구현
     * **Quiver AI**: SVG 일러스트레이션 생성 및 래스터 이미지 벡터화
-    * **Tripo3D**: 게임, 제품 목업, AR을 위해 텍스트나 이미지로부터 3D 모델 생성
+    * **Tripo3D**: 텍스트나 이미지로 게임, 제품 목업, AR용 3D 모델 생성
   </Accordion>
 
   <Accordion title="데이터 및 분석" icon="chart-line">
-    * **BigQuery**: 대규모 데이터셋 쿼리 및 분석
-    * **Databricks (U2M)**: 사용자-머신 인증으로 Databricks Apps 연결
-    * **Databricks (M2M)**: 머신-머신 인증으로 Databricks 연결
+    * **BigQuery**: 대규모 dataset 쿼리 및 분석
+    * **Databricks (U2M)**: 사용자 대 머신 auth로 Databricks Apps 연결
+    * **Databricks (M2M)**: 머신 대 머신 auth로 Databricks 연결
     * **Snowflake**: Snowflake 데이터 웨어하우스 쿼리 및 관리
-    * **Microsoft Fabric**: 분석, 데이터 엔지니어링, BI 서비스에 접근
-    * **PostgreSQL**: PostgreSQL 데이터베이스에 연결
-    * **Hex**: 데이터 노트북과 앱 구축 및 공유
-    * **Amplitude**: 제품 분석 및 사용자 행동 데이터에 접근
-    * **Segment**: 고객 이벤트와 속성을 데이터 파이프라인으로 전송
+    * **Microsoft Fabric**: 분석, 데이터 엔지니어링, BI 서비스 이용
+    * **PostgreSQL**: PostgreSQL database에 연결
+    * **Hex**: 데이터 노트북 및 apps 구축과 공유
+    * **Amplitude**: 제품 분석 및 user 행동 데이터 확인
+    * **Segment**: 고객 이벤트와 속성을 데이터 pipeline으로 전송
   </Accordion>
 
-  <Accordion title="마케팅 및 소셜" icon="megaphone">
-    * **Facebook**: 페이지, 게시물, 광고 데이터에 접근
+  <Accordion title="마케팅 및 소셜 미디어" icon="megaphone">
+    * **Facebook**: 페이지, 게시물, 광고 데이터 접근
     * **Instagram**: 미디어, 댓글, 계정 데이터 읽기
     * **Mailchimp**: 오디언스, 캠페인, 이메일 마케팅 데이터 읽기 및 관리
     * **Twitch**: 스트림, 채널, 시청자 활동 읽기
     * **YouTube**: 동영상, 채널, 재생목록 데이터 읽기
-    * **X**: X(구 Twitter)에서 읽기 및 게시하기
+    * **X**: X(구 Twitter) 읽기 및 게시
     * **Sprout Social**: 소셜 메시지, 프로필, 리포팅 관리
   </Accordion>
 
   <Accordion title="지도 및 위치" icon="map">
-    * **Mobile Maps**: 모바일 앱에 지도 경험 임베드
+    * **Mobile Maps**: 모바일 앱에 지도 기능을 임베드합니다
   </Accordion>
 
   <Accordion title="생산성" icon="list-check">
     * **Airtable**: 베이스, 테이블, 레코드 읽기 및 쓰기
-    * **Calendly**: 예약된 이벤트 읽기 및 관리
-    * **ClickUp**: 작업, 목록, 스페이스 읽기 및 관리
-    * **Excalidraw**: 다이어그램과 화이트보드 생성 및 편집
-    * **Monday.com**: 보드, 항목, 업데이트에 접근
-    * **Notion**: 워크스페이스와 페이지 읽기 및 쓰기
-    * **Spotify**: 재생목록과 라이브러리 접근 및 관리
-    * **Todoist**: 작업과 프로젝트 생성 및 관리
+    * **Calendly**: 예약된 일정 조회 및 관리
+    * **ClickUp**: task, 목록, 스페이스 조회 및 관리
+    * **Excalidraw**: 다이어그램 및 화이트보드 생성·편집
+    * **Monday.com**: board, 항목, 업데이트 액세스
+    * **Notion**: workspace 및 페이지 읽기 및 쓰기
+    * **Spotify**: 플레이리스트 및 라이브러리 액세스·관리
+    * **Todoist**: task 및 project 생성·관리
   </Accordion>
 </AccordionGroup>
 
-### Agent와 함께 Slack 사용하기
+<div id="use-slack-with-agent">
+  ### Agent와 함께 Slack 사용하기
+</div>
 
-Slack을 연결하면 Agent가 접근할 수 있는 대화에서 맥락을 얻을 수 있습니다. Agent에게 메시지, 파일, 채널, 사람을 검색하도록 요청한 다음 결과를 사용해 질문에 답하거나 작업을 계속하세요.
+Slack을 연결하면 사용자가 접근할 수 있는 대화를 Agent에게 context로 제공할 수 있습니다. Agent에게 메시지, 파일, 채널, 사람을 검색하도록 요청한 다음, 그 결과를 활용해 질문에 답하거나 작업을 이어가세요.
 
-여러분의 허락을 받으면 Agent는 다음을 할 수 있습니다.
+사용자가 권한을 허용하면 Agent는 다음 작업을 수행할 수 있습니다.
 
-* 여러분이 속한 비공개 채널, 다이렉트 메시지, 그룹 다이렉트 메시지 읽기
-* 주변 맥락이 필요할 때 전체 스레드 답장 읽기
-* 여러분을 대신해 메시지 보내기
-* Slack 캔버스 생성, 읽기, 업데이트
+* 사용자가 속한 비공개 채널, 다이렉트 메시지, 그룹 다이렉트 메시지 읽기
+* 앞뒤 context가 필요할 때 thread의 전체 답글 읽기
+* 사용자 명의로 메시지 보내기
+* Slack canvas 생성, 읽기, 업데이트
 
 <AiPrompt>
-  Alex와의 다이렉트 메시지에서 출시 계획에 대한 논의를 요약한 다음 후속 조치 초안을 작성해줘.
+  Alex와 나눈 다이렉트 메시지에서 launch plan에 대한 논의를 요약한 다음, follow-up 초안을 작성해 줘.
 </AiPrompt>
 
 <Info>
   Agent는 연결된 Slack 계정이 접근할 수 있는 Slack 대화와 콘텐츠에만 접근할 수 있습니다.
 </Info>
 
-### 커넥터 접근하기
+<div id="accessing-connectors">
+  ### Connectors 사용하기
+</div>
 
-Project Editor의 사이드바에서 커넥터에 접근할 수 있습니다.
+Project Editor의 사이드바에서 Connectors에 접근할 수 있습니다:
 
 <Steps>
   <Step title="Project Editor 열기">
-    Project Editor에서 앱을 여세요.
+    Project Editor에서 앱을 엽니다.
   </Step>
 
   <Step title="Connectors 선택">
-    사이드바에서 **Connectors**를 선택하세요.
+    사이드바에서 **Connectors**를 선택합니다.
   </Step>
 
   <Step title="새 통합 추가">
-    **Add new integration**을 선택해 사용 가능한 커넥터를 살펴보세요.
+    **Add new 통합**을 선택해 사용 가능한 connector를 둘러봅니다.
   </Step>
 
   <Step title="연결">
-    통합하려는 서비스 옆의 **Connect**를 선택하세요.
+    연동하려는 서비스 옆의 **Connect**를 선택합니다.
   </Step>
 </Steps>
 
 <Tip>
-  서비스 연결을 해제하려면 Connectors 패널로 돌아가서 연결된 서비스 옆의 **Manage**를 선택하세요.
+  서비스 연결을 해제하려면 Connectors 패널로 돌아가 연결된 서비스 옆의 **Manage**를 선택하세요.
 </Tip>
 
 <Frame>
-  <img src="/assets/mirror/connectors-overview-4295e541a5ab.png" alt="GitHub, OneDrive, Outlook, Spotify, Linear, Dropbox, Monday.com, Google Docs, YouTube 등 연결 상태와 관리 옵션을 보여주는 사용 가능한 통합 목록의 앱 커넥터 인터페이스" width="3456" height="1688" data-path="images/replitai/connectors-overview.png" />
+  <img src="/assets/mirror/connectors-overview-4295e541a5ab.png" alt="GitHub, OneDrive, Outlook, Spotify, Linear, Dropbox, Monday.com, Google Docs, YouTube 등 사용 가능한 통합과 각각의 연결 상태 및 관리 옵션을 보여주는 앱 connector 인터페이스" width="3456" height="1688" data-path="images/replitai/connectors-overview.png" />
 </Frame>
 
-서비스에 대해 Connect를 선택하면, Replit은 해당 서비스로 인증하고 Replit이 데이터에 접근할 수 있는 권한을 부여하도록 리디렉션합니다.
+특정 서비스의 Connect를 선택하면 Replit이 해당 서비스의 인증 화면으로 이동시키며, 여기서 Replit이 데이터에 접근할 수 있도록 permissions를 부여합니다:
 
 <Frame>
-  <img src="/assets/mirror/connectors-oauth-flow-3873e6fcdaf4.png" alt="데이터 사용과 사용자 제어를 설명하는 개인정보 및 보안 정보가 담긴 Linear 연결 대화 상자를 보여주는 OAuth 인증 흐름" width="1345" height="1213" data-path="images/replitai/connectors-oauth-flow.png" />
+  <img src="/assets/mirror/connectors-oauth-flow-3873e6fcdaf4.png" alt="데이터 사용 방식과 사용자 제어 권한을 설명하는 개인정보 및 보안 안내가 포함된 Linear 연결 대화상자를 보여주는 OAuth 인증 flow" width="1345" height="1213" data-path="images/replitai/connectors-oauth-flow.png" />
 </Frame>
 
-### Replit과 함께 OAuth 앱 구성하기
+<div id="configuring-oauth-app-with-replit">
+  ### Replit에서 OAuth 앱 구성하기
+</div>
 
 <Note>
-  **Enterprise 전용**: 커스텀 OAuth 앱을 구성하려면 Enterprise 구독이 필요합니다.
+  **Enterprise 전용**: 사용자 지정 OAuth 앱을 구성하려면 Enterprise 구독이 필요합니다.
 </Note>
 
-Enterprise 플랜에서는 Replit의 기본값 대신 커넥터를 위한 자체 OAuth 앱을 가져올 수 있습니다. 이를 통해 조직이 OAuth 클라이언트를 소유하고, 동의 화면에 자체 브랜딩을 표시하고, 빌더가 요청할 수 있는 정확한 스코프를 제어할 수 있습니다.
+Enterprise plan에서는 Replit의 기본 앱 대신 직접 만든 OAuth 앱을 connector에 사용할 수 있습니다. 이렇게 하면 조직이 OAuth 클라이언트를 직접 소유하고, 동의 화면에 자체 브랜딩을 표시하며, builder가 요청할 수 있는 scope를 정확하게 제어할 수 있습니다.
 
-커넥터를 자체 OAuth 앱으로 구성하려면 제공업체로부터 세 가지가 필요합니다: **Client ID**, **Client Secret**, 승인하려는 \*\*스코프(scopes)\*\*입니다. 인증을 완료할 수 있도록 제공업체에 Replit의 콜백 URL도 등록해야 합니다.
+직접 만든 OAuth 앱으로 connector를 구성하려면 제공업체에서 세 가지를 준비해야 합니다. **Client ID**, **Client Secret**, 그리고 승인하려는 **scopes**입니다. 또한 authentication이 완료될 수 있도록 Replit의 콜백 URL을 제공업체에 등록해야 합니다.
 
 <Frame>
-  <img src="/assets/mirror/connector-oauth-configuration-100911ce0c48.png" alt="Client ID, Client Secret, Connector Scopes 입력란과 https://replit.com/connectors/oauth/callback으로 설정된 Redirect URL이 있는 커넥터 OAuth 구성 대화 상자" width="1112" height="1218" data-path="images/replitai/connector-oauth-configuration.png" />
+  <img src="/assets/mirror/connector-oauth-configuration-100911ce0c48.png" alt="Client ID, Client Secret, Connector Scopes 필드와 https://replit.com/connectors/oauth/callback으로 설정된 Redirect URL이 있는 connector OAuth 구성 대화 상자" width="1112" height="1218" data-path="images/replitai/connector-oauth-configuration.png" />
 </Frame>
 
 <Steps>
-  <Step title="제공업체에서 OAuth 앱 생성">
-    제공업체의 개발자 콘솔이나 관리자 설정에 로그인하고 새 OAuth 2.0 애플리케이션을 생성하세요. 제공업체마다 이 단계의 이름이 다릅니다 — **Create OAuth app**, **Register application**, **Create client credentials** 같은 옵션을 찾아보세요.
+  <Step title="제공업체에서 OAuth 앱 만들기">
+    제공업체의 개발자 콘솔 또는 관리자 설정에 로그인해 새 OAuth 2.0 애플리케이션을 만듭니다. 제공업체마다 이 단계의 이름이 다르므로 **Create OAuth app**, **Register application**, **Create client credentials** 같은 옵션을 찾아보세요.
   </Step>
 
-  <Step title="리디렉션 URL 설정">
-    제공업체가 **Authorized redirect URI**(때때로 **Callback URL** 또는 **Redirect URL**이라고도 함)를 요청하면 다음을 입력하세요.
+  <Step title="리디렉션 URL 설정하기">
+    제공업체가 **Authorized redirect URI**(**Callback URL** 또는 **Redirect URL**이라고도 함)를 요청하면 다음을 입력하세요.
 
     ```
     https://replit.com/connectors/oauth/callback
     ```
 
-    이 URL은 빌더가 앱을 승인한 후 제공업체가 Replit으로 되돌려 보내는 위치입니다. 정확히 일치해야 합니다 — 후행 슬래시, 프로토콜, 서브도메인 모두 중요합니다. 리디렉션 URI를 여러 개 추가하는 경우, 이 URL이 반드시 포함되어야 합니다.
+    이 URL은 builder가 앱을 승인한 뒤 제공업체가 builder를 Replit으로 다시 보내는 주소입니다. 후행 슬래시, 프로토콜, 서브도메인까지 정확히 일치해야 합니다. 리디렉션 URI를 여러 개 추가하는 경우에도 이 주소는 반드시 포함해야 합니다.
   </Step>
 
-  <Step title="Client ID와 Client Secret 복사">
-    앱을 만들면 제공업체가 **Client ID**와 **Client Secret**을 표시합니다.
+  <Step title="Client ID와 Client Secret 복사하기">
+    앱을 만들고 나면 제공업체가 **Client ID**와 **Client Secret**을 표시합니다.
 
     * **Client ID**: OAuth 앱의 공개 식별자입니다. URL이나 클라이언트 측 코드에 노출해도 안전합니다.
-    * **Client Secret**: 요청이 여러분의 앱에서 오는 것임을 증명하는 기밀 값입니다. 비밀번호처럼 다루세요 — 절대 저장소에 커밋하거나 공개적으로 공유하지 마세요. Replit은 이를 안전하게 저장합니다.
+    * **Client Secret**: 요청이 해당 앱에서 온 것임을 증명하는 기밀 값입니다. 비밀번호처럼 다뤄야 하며, 저장소에 커밋하거나 공개적으로 공유해서는 안 됩니다. Replit이 이 값을 안전하게 대신 보관합니다.
 
-    일부 제공업체는 생성 시점에 클라이언트 시크릿을 한 번만 표시합니다. 즉시 복사해 Replit에 붙여넣을 때까지 안전한 곳에 보관하세요.
+    일부 제공업체는 생성 시점에 client secret을 한 번만 표시합니다. 즉시 복사한 뒤 Replit에 붙여넣을 때까지 안전한 곳에 보관하세요.
   </Step>
 
-  <Step title="스코프 선택">
-    \*\*스코프(Scopes)\*\*는 OAuth 앱이 빌더를 대신해 읽거나 쓸 수 있는 권한을 정의하는 항목입니다. 각 제공업체는 API 문서에 자체 스코프 목록을 게시합니다.
+  <Step title="scope 선택하기">
+    **Scope**는 OAuth 앱이 builder를 대신해 무엇을 읽고 쓸 수 있는지 정의하는 permissions입니다. 제공업체마다 자체 API 문서에 scope 목록을 공개합니다.
 
-    Replit에서 커넥터를 구성할 때 입력하는 스코프는 제공업체에 등록한 스코프와 **정확히 일치**(URL 접두사를 포함해 문자 단위로)해야 합니다. 불일치 오류의 일반적인 원인은 다음과 같습니다.
+    Replit에서 connector를 구성할 때 입력하는 scope는 제공업체에 등록한 scope와 **정확히 일치**해야 합니다(URL 접두사를 포함해 문자 하나까지 동일해야 함). 불일치 오류가 발생하는 흔한 원인은 다음과 같습니다.
 
-    * 전체 URL 접두사가 누락됨(예: `drive.file` 대신 `https://www.googleapis.com/auth/drive.file`).
-    * 여분의 공백이나 후행 쉼표.
-    * 제공업체의 앱에서 활성화되지 않은 스코프를 Replit에서 요청함.
+    * 전체 URL 접두사 누락(예: `https://www.googleapis.com/auth/drive.file` 대신 `drive.file` 입력).
+    * 불필요한 공백이나 후행 쉼표.
+    * 제공업체의 앱에서 활성화되지 않은 scope를 Replit에서 요청.
 
-    빌더에게 필요한 최소한의 스코프부터 시작하고, 필요하면 나중에 더 추가하세요 — 대부분의 제공업체는 앱을 다시 만들지 않고도 스코프를 업데이트할 수 있게 해줍니다.
+    builder에게 필요한 최소한의 scope로 시작하고, 필요하면 나중에 추가하세요. 대부분의 제공업체는 앱을 다시 만들지 않고도 scope를 업데이트할 수 있습니다.
   </Step>
 
-  <Step title="Replit에서 커넥터 구성">
-    조직의 **Connectors** 페이지에서 **Add new integration**을 선택하고, 서비스를 선택한 후 제공업체로부터 받은 **Client ID**, **Client Secret**, **Scopes**를 붙여넣으세요. **Configure**를 선택해 저장하세요.
+  <Step title="Replit에서 connector 구성하기">
+    조직의 **Connectors** 페이지에서 **Add new 통합**을 선택하고 서비스를 고른 다음, 제공업체에서 받은 **Client ID**, **Client Secret**, **Scopes**를 붙여넣습니다. **Configure**를 선택해 저장하세요.
   </Step>
 </Steps>
 
 <Note>
-  구성 후 인증이 실패하면, 제공업체의 리디렉션 URL이 `https://replit.com/connectors/oauth/callback`과 정확히 일치하는지, Replit에 입력한 모든 스코프가 제공업체의 앱에서도 승인되어 있는지 다시 확인하세요.
+  구성 후에도 authentication에 실패한다면, 제공업체에 등록한 리디렉션 URL이 `https://replit.com/connectors/oauth/callback`과 정확히 일치하는지, 그리고 Replit에 입력한 모든 scope가 제공업체의 앱에서도 승인되어 있는지 다시 확인하세요.
 </Note>
 
-### 예시 프롬프트
+<div id="example-prompts">
+  ### 예시 prompt
+</div>
 
-* "Outlook과 통합해 이메일 대시보드를 만들어줘"
-* "연결된 내 GitHub 계정을 사용해 GitHub 저장소 관리자를 빌드해줘"
-* "우리 팀을 위한 Linear 작업 추적기를 만들어줘"
-* "연결된 내 Notion 워크스페이스를 사용해 Notion 기반 웹사이트를 빌드해줘"
-* "Monday.com 프로젝트 대시보드를 만들어줘"
+* &quot;Outlook과 연동해서 이메일 dashboard를 만들어줘&quot;
+* &quot;연결된 내 GitHub 계정으로 GitHub 저장소 관리 도구를 만들어줘&quot;
+* &quot;우리 팀이 쓸 Linear task 추적기를 만들어줘&quot;
+* &quot;연결된 내 Notion workspace를 활용해 Notion 기반 website를 만들어줘&quot;
+* &quot;Monday.com project dashboard를 만들어줘&quot;
 
 <Note>
-  커넥터는 외부 서비스에 대한 인증된 접근을 제공하므로, API 키나 인증 토큰을 직접 관리할 필요가 없습니다.
+  connector는 외부 서비스에 대한 인증된 접근을 제공하므로 API key나 authentication token을 직접 관리하지 않아도 됩니다.
 </Note>
 
 <Tip>
-  워크스페이스나 조직의 커넥터 관리를 찾고 계신가요? [커넥터 관리하기](/ko/replitai/managing-connectors)를 참고하세요.
+  Workspace 또는 조직의 connector 관리 방법을 찾고 계신가요? [Managing your connectors](/ko/replitai/managing-connectors)를 참조하세요.
 </Tip>
 
-## 외부 통합
+<div id="external-integrations">
+  ## 외부 통합
+</div>
 
-신뢰할 수 있는 타사 서비스입니다. Agent에게 설정을 요청하면 여러분이 API 키를 제공합니다.
+신뢰할 수 있는 서드파티 서비스입니다. Agent에게 설정을 요청하면 되며, API 키는 직접 입력해야 합니다.
 
 <Note>
-  API 키는 앱의 [Secrets](/ko/core-concepts/project-editor/app-setup/secrets)에 안전하게 저장됩니다. 필요할 때 Agent가 키를 추가하라고 안내합니다.
+  API 키는 앱의 [Secrets](/ko/core-concepts/project-editor/app-setup/secrets)에 안전하게 저장됩니다. 키가 필요한 시점에 Agent가 추가하라고 안내합니다.
 </Note>
 
-### AI 제공업체
+<div id="ai-providers">
+  ### AI 제공업체
+</div>
 
 <AccordionGroup>
   <Accordion title="OpenAI">
-    텍스트 생성, 분석, 어시스턴트를 위한 GPT 모델에 접근합니다.
-    <AiPrompt>OpenAI로 텍스트를 요약하는 웹 앱을 만들어줘</AiPrompt>
+    텍스트 생성, 분석, 어시스턴트 기능에 GPT 모델을 활용합니다.
+    <AiPrompt>Create a web app that uses OpenAI to summarize text</AiPrompt>
   </Accordion>
 
   <Accordion title="Google AI (Gemini)">
-    멀티모달 이해와 생성을 위해 Gemini 모델을 사용합니다.
-    <AiPrompt>Google Gemini로 문서를 분석하고 요약해줘</AiPrompt>
+    멀티모달 이해와 생성에 Gemini 모델을 활용합니다.
+    <AiPrompt>Use Google Gemini to analyze and summarize documents</AiPrompt>
   </Accordion>
 
   <Accordion title="Anthropic (Claude)">
-    추론, 작성, 코딩을 위한 Claude 모델에 접근합니다.
-    <AiPrompt>Anthropic으로 콘텐츠를 생성하는 웹 앱을 만들어줘</AiPrompt>
+    추론, 작문, 코딩에 Claude 모델을 활용합니다.
+    <AiPrompt>Create a web app that uses Anthropic to generate content</AiPrompt>
   </Accordion>
 
   <Accordion title="Perplexity">
-    인용을 포함한 AI 기반 검색과 답변 생성입니다.
-    <AiPrompt>Perplexity로 질문에 답하는 웹 앱을 만들어줘</AiPrompt>
+    출처 인용을 제공하는 AI 기반 검색 및 답변 생성 기능입니다.
+    <AiPrompt>Create a web app that uses Perplexity to answer questions</AiPrompt>
   </Accordion>
 
   <Accordion title="Mistral AI">
-    NLP 작업을 위한 빠르고 효율적인 언어 모델입니다.
-    <AiPrompt>Mistral을 사용해 텍스트에서 핵심 사실을 추출해줘</AiPrompt>
+    자연어 처리 작업에 적합한 빠르고 효율적인 언어 모델입니다.
+    <AiPrompt>Use Mistral to extract key facts from text</AiPrompt>
   </Accordion>
 
   <Accordion title="OpenRouter">
-    단일 API로 여러 제공업체의 수백 개 AI 모델에 접근합니다.
-    <AiPrompt>OpenRouter를 사용해 내 챗봇에 Llama 모델을 적용해줘</AiPrompt>
+    하나의 API로 여러 제공업체의 수백 가지 AI 모델을 사용합니다.
+    <AiPrompt>Use OpenRouter to access Llama models for my chatbot</AiPrompt>
   </Accordion>
 </AccordionGroup>
 
-### 비즈니스 및 자동화
+<div id="business-and-automation">
+  ### 비즈니스 및 자동화
+</div>
 
 <AccordionGroup>
   <Accordion title="Workato">
-    앱에서 자동화 레시피를 실행하고 API를 호출합니다.
-    <AiPrompt>내 앱을 리드를 동기화하는 Workato 레시피에 연결해줘</AiPrompt>
+    앱에서 자동화 레시피를 트리거하고 API를 호출합니다.
+    <AiPrompt>Connect my app to a Workato recipe that syncs leads</AiPrompt>
   </Accordion>
 
   <Accordion title="HubSpot">
     CRM 데이터에 접근하고 연락처를 관리합니다.
-    <AiPrompt>연락처 관리를 위해 내 앱을 HubSpot에 연결해줘</AiPrompt>
+    <AiPrompt>Connect my app to HubSpot to manage contacts</AiPrompt>
   </Accordion>
 </AccordionGroup>
 
-### 커뮤니케이션 및 커뮤니티
+<div id="communication-and-community">
+  ### 커뮤니케이션 및 커뮤니티
+</div>
 
 <AccordionGroup>
   <Accordion title="Discord">
-    앱에서 메시지를 보내고 서버를 관리합니다.
-    <AiPrompt>새 가입이 발생하면 내 Discord 채널로 메시지를 보내줘</AiPrompt>
+    App에서 메시지를 보내고 서버를 관리하세요.
+    <AiPrompt>새로운 가입이 발생하면 내 Discord 채널로 메시지를 보내줘</AiPrompt>
   </Accordion>
 </AccordionGroup>
 
-## Agent 서비스
+<div id="agent-services">
+  ## Agent 서비스
+</div>
 
-일부 기능은 뒤에서 유료 타사 API를 사용합니다. Agent가 통합을 자동으로 처리합니다 — API 키나 설정이 필요하지 않습니다. 제공업체의 요율로 청구되며 Replit 크레딧에서 차감됩니다.
+일부 기능은 내부적으로 유료 서드파티 API를 사용합니다. Agent가 통합을 자동으로 처리하므로 API 키나 별도의 설정이 필요하지 않습니다. 요금은 제공업체의 요율로 청구되며 Replit 크레딧에서 차감됩니다.
 
 <AccordionGroup>
-  <Accordion title="Brave Image Search">
-    Brave의 이미지 검색 API를 사용해 웹에서 이미지를 검색합니다.
-    <AiPrompt>내 이커머스 스토어를 위한 제품 이미지를 찾아줘</AiPrompt>
+  <Accordion title="Brave 이미지 검색">
+    Brave의 이미지 검색 API를 사용해 웹 전체에서 이미지를 검색합니다.
+    <AiPrompt>내 전자상거래 스토어에 쓸 제품 이미지를 찾아줘</AiPrompt>
   </Accordion>
 
   <Accordion title="ElevenLabs">
-    실감나는 텍스트-투-스피치 오디오와 음성 콘텐츠를 생성합니다.
-    <AiPrompt>내 앱의 온보딩 플로우에 음성 내레이션을 추가해줘</AiPrompt>
+    사실적인 텍스트 음성 변환 오디오와 음성 콘텐츠를 생성합니다.
+    <AiPrompt>내 앱의 온보딩 흐름에 음성 내레이션을 추가해줘</AiPrompt>
   </Accordion>
 
-  <Accordion title="Google Gemini image generation (Nano Banana)">
+  <Accordion title="Google Gemini 이미지 생성(Nano Banana)">
     Google의 Gemini 이미지 모델을 사용해 이미지를 생성합니다.
-    <AiPrompt>내 랜딩 페이지를 위한 히어로 이미지를 생성해줘</AiPrompt>
+    <AiPrompt>내 랜딩 페이지에 쓸 히어로 이미지를 생성해줘</AiPrompt>
   </Accordion>
 </AccordionGroup>
 
 <Note>
-  Agent 서비스는 제공업체의 공개 API 요율로 청구됩니다. 비용은 Replit 크레딧에서 차감되며 [사용량 페이지](/ko/billing/managing-spend)에 표시됩니다.
+  Agent 서비스는 제공업체의 공개 API 요율로 청구됩니다. 비용은 Replit 크레딧에서 차감되며 [사용량 페이지](/ko/billing/managing-spend)에서 확인할 수 있습니다.
 </Note>
 
-## 통합 재연결하기
+<div id="reconnecting-integrations">
+  ## 통합 다시 연결하기
+</div>
 
-로그인 세션이 만료되거나 권한이 변경되는 등의 이유로 연결된 서비스가 작동을 멈추면, Replit은 Project Editor에 재연결 알림을 표시합니다. 알림을 선택하면 에디터를 벗어나지 않고 바로 통합을 재연결할 수 있습니다.
+연결된 서비스가 작동을 멈추면(예: 로그인 세션이 만료되거나 권한이 변경된 경우) Replit이 Project Editor에 재연결 알림을 표시합니다. 이 알림을 선택하면 편집기를 벗어나지 않고 바로 통합을 다시 연결할 수 있습니다.
 
-## 커넥터 디버깅
+<div id="debugging-connectors">
+  ## connector 디버깅
+</div>
 
-서비스를 연결하는 데 문제가 있으신가요? 다음 가이드에서 일반적인 오류와 해결 방법을 안내합니다.
+서비스 연결에 문제가 있나요? 다음 가이드에서 자주 발생하는 오류와 해결 방법을 안내합니다.
 
 <AccordionGroup>
   <Accordion title="Google Workspace: &#x22;This app is blocked&#x22;">
-    Google Drive, Docs, Sheets, Calendar, Gmail을 연결할 때 \*\*"This app is blocked"\*\*가 표시되면, 조직의 Google Workspace가 타사 OAuth 앱을 제한하고 있을 가능성이 높습니다. 해결하려면 전체 문제 해결 가이드를 참고하세요.
+    Google Drive, Docs, Sheets, Calendar 또는 Gmail을 연결할 때 **&quot;This app is blocked&quot;** 메시지가 표시된다면, 조직의 Google Workspace에서 서드파티 OAuth app을 제한하고 있을 가능성이 높습니다. 해결 방법은 전체 문제 해결 가이드를 참고하세요.
 
-    [Google 커넥터의 "This app is blocked" 해결하기](/ko/features/troubleshooting/debugging-google-connectors)
+    [Google connector의 &quot;This app is blocked&quot; 오류 해결하기](/ko/features/troubleshooting/debugging-google-connectors)
   </Accordion>
 
   <Accordion title="Salesforce: &#x22;Connection Expired&#x22;">
-    Salesforce 커넥터가 **"Connection Expired"** 오류와 함께 작동을 멈추면, Salesforce 조직의 새로고침 토큰 정책이 일정 기간 후 토큰을 만료시키도록 구성되어 있을 가능성이 높습니다. Connected App 설정을 업데이트하는 방법은 전체 문제 해결 가이드를 참고하세요.
+    Salesforce connector가 **&quot;Connection Expired&quot;** 오류와 함께 작동을 멈춘다면, Salesforce 조직의 refresh token 정책이 일정 기간이 지나면 token을 만료시키도록 설정되어 있을 가능성이 높습니다. Connected App 설정을 업데이트하는 방법은 전체 문제 해결 가이드를 참고하세요.
 
     [Salesforce 연결 만료 오류 해결하기](/ko/features/troubleshooting/debugging-salesforce-connectors)
   </Accordion>

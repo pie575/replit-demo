@@ -1,6 +1,8 @@
 ---
-title: "주간 판매 보고서 생성하기"
-description: "매주 HubSpot의 판매 파이프라인 변화와 추세를 보여줍니다."
+title: "주간 영업 리포트 생성하기"
+description: "HubSpot의 영업 파이프라인 변경 사항과 추이를 매주 확인하세요."
+sidebarTitle: "주간 영업 리포트 생성하기"
+icon: "chart-line"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                기본 제공 connector가 아닙니다. Agent가 API 키를 요청합니다.
               </div> : null}
           </div>
         </div>)}
@@ -67,76 +69,90 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-HubSpot에서 이번 주 판매 파이프라인을 가져와 지난주와 비교하고, 새로운 거래,
-단계 이동, 지연된 거래, 전망을 담은 짧은 보고서를 작성합니다. Google Sheets에
-표를 넣고 하이라이트를 Slack에 게시하여 스탠드업이 정적인 스냅샷이 아니라
-변화에 관한 것이 되도록 합니다.
+HubSpot에서 이번 주 영업 파이프라인을 가져와 지난주와 비교하고, 신규 거래, 단계 이동, 지연된 거래, 예측을 담은 짧은 보고서를 작성해 줘. 표는 Google Sheets에 정리하고 핵심 내용은 Slack에 올려서, 스탠드업이 정적인 스냅샷이 아니라 변화에 대한 이야기가 되도록 해 줘.
 
-## 다음과 같은 경우에 적합합니다
+<div id="best-for">
+  ## 이럴 때 가장 좋습니다
+</div>
 
-* 정적인 스냅샷이 아니라 변화가 담긴 월요일 스탠드업이 필요한 영업 매니저.
-* 주간 파이프라인 변화를 한곳에서 확인해야 하는 매출 운영 리드.
+* 고정된 스냅샷이 아니라 변화의 흐름이 보이는 월요일 standup이 필요한 영업 관리자
+* 주 대비 파이프라인 변화를 한곳에서 파악해야 하는 revenue 운영 책임자
 
-## 커넥터
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 { id: "hubspot", name: "HubSpot", why: "거래, 단계, 금액" },
 {
-  id: "google-sheets",
-  name: "Google Sheets",
-  why: "감사 가능한 추세 표",
+id: "google-sheets",
+name: "Google Sheets",
+why: "직접 검증할 수 있는 추세 표",
 },
-{ id: "slack", name: "Slack", why: "보고서 전달" },
+{ id: "slack", name: "Slack", why: "리포트 전달" },
 ]}
 />
 
-<Note>Salesforce, Attio, Pipedrive 등 다른 CRM에서도 작동합니다.</Note>
+<Note>Salesforce, Attio, Pipedrive 등 다른 CRM에서도 사용할 수 있습니다.</Note>
 
-## 시작하기 전에
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
-HubSpot, Sheets, Slack을 연결하세요. 어떤 파이프라인이나 팀을 포함할지 말해주세요.
+HubSpot, Sheets, Slack을 연결하세요. 어떤 파이프라인 또는 팀을 포함할지 알려주세요.
 
-## Agent에게 요청하기
-
-<AiPrompt>
-  매주 월요일 9시에 실행되는 루틴을 만들어 주세요. HubSpot에서 이번 주
-  파이프라인을 가져오세요. 파이프라인 변화와 추세를 보여주는 주간 보고서를
-  작성하세요: 새로운 거래, 단계 이동, 지연된 거래, 지난주 대비 전망. Google
-  Sheets에 표를 넣고 하이라이트를 Slack에 게시해 주세요.
-</AiPrompt>
-
-## 예상 결과
-
-Agent가 이번 주를 지난주와 비교하여 짧은 서술과 시트를 작성합니다. 몇 개의
-거래 금액을 HubSpot과 대조 확인하세요. Slack 하이라이트는 스탠드업에 사용하고,
-시트는 감사 추적용으로 보관하세요. 새로운 거래 하나와 지연된 거래 하나를
-선택해 HubSpot에서 열어보고, 단계, 금액, 종료일이 시트와 일치하는지 확인하세요.
-
-## 나에게 맞게 조정하기
+<div id="prompt-the-agent">
+  ## 에이전트에 프롬프트 입력하기
+</div>
 
 <AiPrompt>
-  14일 동안 이동이 없는 \[금액] 이상의 거래를 알려주세요.
+  매주 월요일 9:00에 실행되는 Routine을 만들어 줘. HubSpot에서 이번 주 파이프라인을
+  가져와 줘. 신규 거래, 단계 이동, 지연된 거래, 지난주 대비 예측 등 파이프라인 변경 사항과
+  추세를 보여주는 주간 리포트를 작성해 줘. 표는 Google Sheets에 넣고 핵심 내용은
+  Slack에 올려 줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상 결과
+</div>
+
+Agent는 이번 주와 지난주를 비교해 짧은 설명글과 Sheet를 작성합니다. 거래 금액 몇 건은
+HubSpot과 대조해 확인하세요. Slack 하이라이트는 standup에서 활용하고, Sheet는 audit
+기록용으로 보관하세요. 새로 생긴 거래 하나와 지연된 거래 하나를 골라 HubSpot에서 열어본 뒤,
+단계와 금액, 마감일이 Sheet와 일치하는지 확인하세요.
+
+<div id="make-it-work-for-you">
+  ## 나에게 맞게 활용하기
+</div>
+
+<AiPrompt>
+  14일 동안 진전이 없는 $[amount] 이상의 거래를 알려줘.
 </AiPrompt>
 
 <AiPrompt>
-  종료일과 마지막 활동을 기준으로 "위험" 섹션을 추가해 주세요.
+  마감일과 최근 활동을 기준으로 &quot;위험&quot; 섹션을 추가해줘.
 </AiPrompt>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
-* **거래 금액이 HubSpot과 일치하지 않음:** 어떤 파이프라인이나 팀을 포함할지, 어떤 금액 필드(금액 대 가중 전망)를 사용할지 말해주세요. 시트를 신뢰하기 전에 몇 개의 거래를 HubSpot과 대조 확인하세요.
-* **지연된 거래가 잘못되어 보임:** HubSpot에서 종료일과 단계를 확인하세요. 종료일이 미뤄지거나 단계가 뒤로 이동한 경우에만 거래를 지연된 것으로 처리하도록 Agent에게 요청하세요.
-* **Slack이 잘못된 곳에 게시됨:** 채널을 지정하고 하이라이트만 원하는지 전체 시트 링크를 원하는지 말해주세요.
+* **거래 금액이 HubSpot과 일치하지 않는 경우:** 어떤 파이프라인 또는 팀을 포함할지, 어떤 금액 필드를 사용할지(amount vs. 가중 예측)를 명시하세요. 시트를 믿고 사용하기 전에 몇 건의 거래를 HubSpot과 대조해 보세요.
+* **지연된 거래가 잘못 표시되는 경우:** HubSpot에서 마감일와 단계를 확인하세요. 마감일가 뒤로 밀렸거나 단계가 역행한 경우에만 해당 거래를 slipped로 처리하도록 Agent에게 요청하세요.
+* **Slack에서 엉뚱한 곳에 게시되는 경우:** 채널을 지정하고, 하이라이트만 받을지 전체 시트 링크를 받을지 알려주세요.
 
-## 관련 문서
+<div id="related">
+  ## 관련 자료
+</div>
 
 <CardGroup cols={2}>
   <Card title="경쟁사 모니터링하기" href="/ko/use-cases/monitor-competitors">
-    가격 변경이 거래에 영향을 미치기 전에 영업팀을 위한 동일한 Slack 알림을 사용합니다.
+    가격 변동이 거래에 영향을 미치기 전에 영업팀에 동일한 Slack 알림을 보냅니다.
   </Card>
 
-  <Card title="투자자 피치 덱 만들기" href="/ko/use-cases/pitch-deck-from-website">
-    투자자 재무 슬라이드를 만드는 창업자를 위해 동일한 Google Sheets 소스를 사용합니다.
+  <Card title="투자자용 pitch deck 만들기" href="/ko/use-cases/pitch-deck-from-website">
+    투자자용 재무 슬라이드를 만드는 창업자를 위한 동일한 Google Sheets
+    소스입니다.
   </Card>
 </CardGroup>

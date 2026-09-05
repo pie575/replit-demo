@@ -1,6 +1,8 @@
 ---
-title: "브랜드 언급 모니터링하기"
-description: "브랜드에 대한 중요한 대화를 포착하고 팀이 이미 사용 중인 곳으로 전달합니다."
+title: "브랜드 멘션 모니터링"
+description: "브랜드에 관한 중요한 대화를 놓치지 않고 포착해 팀이 이미 사용 중인 채널로 전달하세요."
+sidebarTitle: "브랜드 멘션 모니터링"
+icon: "hashtag"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                기본 제공 connector가 아닙니다. Agent가 API 키를 요청합니다.
               </div> : null}
           </div>
         </div>)}
@@ -67,87 +69,101 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-X에서 브랜드 언급을 모니터링하고, 중요한 대화를 감지하고, 감정과 맥락을 요약하고,
-관련 언급을 Slack으로 전송하고, Notion에 보관합니다. Agent는 노이즈는 무시하고
-답변이 필요한 것만 플래그로 표시하므로, 급증이 고객 지원이나 홍보 문제로
-번지기 전에 포착할 수 있습니다.
+X에서 브랜드 멘션을 모니터링하고, 중요한 대화를 감지하며, 감정과 맥락을 요약하고, 관련 멘션을 Slack으로 전송한 뒤 Notion에 보관하세요. Agent가 불필요한 잡음은 걸러내고 답변이 필요한 내용만 표시해 주므로, 멘션량 급증이 고객 지원이나 홍보 문제로 번지기 전에 미리 파악할 수 있습니다.
 
-## 다음과 같은 경우에 적합합니다
+<div id="best-for">
+  ## 이런 분께 적합합니다
+</div>
 
-* 감정 급증이 고객 지원이나 홍보 문제로 번지기 전에 알아야 하는 브랜드 및 커뮤니티 매니저.
-* 모든 언급이 아니라 답변이 필요한 언급만 필요한 소셜 및 지원 리드.
+* 감정가 급변하는 조짐을 지원 문제나 홍보 이슈로 번지기 전에 포착해야 하는 브랜드 및 커뮤니티 관리자
+* 모든 멘션이 아니라 답변이 필요한 멘션만 확인하고 싶은 소셜 및 지원 담당 리드
 
-## 커넥터
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 {
-  id: "x",
-  name: "X",
-  why: "공개 언급 및 대화의 소스",
-  auth: "api-key",
+id: "x",
+name: "X",
+why: "공개 멘션과 대화를 수집하는 소스",
+auth: "api-key",
 },
 {
-  id: "slack",
-  name: "Slack",
-  why: "언급에 대응이 필요할 때 팀에 알림",
+id: "slack",
+name: "Slack",
+why: "응답이 필요한 멘션이 있으면 팀에 알림",
 },
 { id: "notion", name: "Notion", why: "나중에 검토할 수 있도록 요약 보관" },
 ]}
 />
 
-## 시작하기 전에
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
-관심 있는 브랜드명이나 핸들, 알림을 받을 Slack 채널, 보관용 Notion 데이터베이스를
-준비하세요.
+관심 있는 브랜드 이름이나 핸들, 알림을 받을 Slack 채널, 아카이브용 Notion
+데이터베이스를 준비하세요.
 
-Agent가 여러분의 **X Bearer Token**을 요청합니다. [console.x.com](https://console.x.com)에서
+Agent가 **X Bearer Token**을 요청합니다. [console.x.com](https://console.x.com)에서
 계정을 만들고 Bearer Token을 생성하세요.
 
-X 개발자 계정에 크레딧을 추가하세요. 크레딧이 없으면 X에서 언급 검색이 실패합니다.
+X 개발자 계정에 크레딧을 추가하세요. 크레딧이 없으면 X에서 멘션 검색이
+실패합니다.
 
-## Agent에게 요청하기
-
-<AiPrompt>
-  매일 아침 8시에 실행되는 루틴을 만들어 주세요. X에서 \[브랜드]의 언급을
-  모니터링하세요. 중요한 대화를 감지하고, 감정과 맥락을 요약하고, 관련 언급을
-  Slack으로 전송하고, Notion에 보관하세요. 노이즈는 무시하세요. 답변이 필요한
-  것은 플래그로 표시해 주세요.
-</AiPrompt>
-
-## 예상 결과
-
-Agent가 언급을 지켜보고, 어느 것이 중요한지 점수를 매기고, 짧은 요약을 Slack에
-게시하고, 스레드를 Notion에 저장합니다. 첫 번째 배치를 검토하고 "중요"로 간주할
-기준을 조정하세요. 언급이 전혀 들어오지 않는다면 Bearer Token이 설정되어 있는지,
-X 개발자 계정에 크레딧이 있는지 확인하세요. 첫 아침 실행 후, Slack 알림을 열고
-X로 이동해 Notion 행이 같은 링크를 가지고 있는지 확인하세요.
-
-## 나에게 맞게 조정하기
+<div id="prompt-the-agent">
+  ## 에이전트에 프롬프트 입력하기
+</div>
 
 <AiPrompt>
-  부정적인 감정이거나 좋아요가 \[n]개 이상인 언급만 Slack에 알려주세요. 나머지는
-  모두 Notion에 보관하세요.
+  매일 아침 8시에 실행되는 Routine을 만들어 주세요. X에서 [brand] 멘션을
+  모니터링하고, 중요한 대화를 감지해 감정과 맥락을 요약한 뒤 관련 멘션은
+  Slack으로 보내고 Notion에 보관하세요. 잡음은 무시하고, 답변이
+  필요한 항목은 표시해 주세요.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상 동작
+</div>
+
+Agent가 멘션을 모니터링해 중요도를 점수로 매기고, 짧은 요약을 Slack에 게시한 뒤
+thread를 Notion에 저장합니다. 첫 번째 결과 묶음을 검토하면서 &quot;중요함&quot;의 기준을 더 좁혀 보세요.
+멘션이 전혀 들어오지 않는다면 Bearer Token이 설정되어 있는지, X 개발자 계정에
+크레딧가 남아 있는지 확인하세요. 첫 오전 run이 끝나면 Slack alert를 열어 X로 이동한 다음,
+Notion 행에 동일한 링크가 있는지 확인하세요.
+
+<div id="make-it-work-for-you">
+  ## 내 방식대로 활용하기
+</div>
+
+<AiPrompt>
+  감정이 부정적이거나 좋아요가 [n]개를 넘는 멘션만 Slack으로 알려줘.
+  나머지는 모두 Notion에 보관해줘.
 </AiPrompt>
 
 <AiPrompt>
-  상위 5개 언급과 전체 감정을 담은 일일 다이제스트를 Slack에 추가해 주세요.
+  상위 5개 멘션과 전체 감정을 정리한 일일 요약을 Slack에 추가해줘.
 </AiPrompt>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
-* **언급이 전혀 들어오지 않음:** X Bearer Token이 설정되어 있고 X 개발자 계정에 크레딧이 있는지 확인하세요. 크레딧이 없으면 유효한 토큰이 있어도 언급 검색이 실패합니다.
-* **Slack은 조용한데 Notion은 계속 쌓임:** Agent가 모든 것을 노이즈로 처리하고 있을 수 있습니다. "중요"로 간주할 기준을 조정하거나, 답변이 필요 없어도 일일 다이제스트를 게시하도록 요청하세요.
-* **보관 내역이 지저분함:** 이미 사용 중인 열(날짜, 링크, 감정, 답변 필요 여부)이 있는 Notion 데이터베이스를 Agent에게 알려주세요. 매번 새 페이지를 만드는 대신 해당 필드에 매핑하도록 요청하세요.
+* **멘션이 전혀 들어오지 않는 경우:** X Bearer Token이 설정되어 있는지, X 개발자 계정에 크레딧가 남아 있는지 확인하세요. 크레딧가 없으면 유효한 token이 있어도 멘션 검색에 실패합니다.
+* **Slack은 조용한데 Notion에만 쌓이는 경우:** Agent가 모든 것을 잡음로 판단하고 있을 수 있습니다. &quot;중요&quot;의 기준을 더 좁히거나, 답장할 내용이 없더라도 매일 일일 요약을 올려 달라고 요청하세요.
+* **아카이브가 정리되지 않는 경우:** 이미 사용 중인 열(날짜, 링크, 감정, 답장 필요 여부)이 있는 Notion 데이터베이스를 Agent에 지정해 주세요. 매번 새 페이지를 만드는 대신 해당 필드에 매핑하도록 요청하면 됩니다.
 
-## 관련 문서
+<div id="related">
+  ## 관련 문서
+</div>
 
 <CardGroup cols={2}>
   <Card title="고객 피드백 분석하기" href="/ko/use-cases/analyze-customer-feedback">
-    지원 티켓용으로 동일한 Slack 및 Notion 설정을 사용합니다.
+    지원 티켓에도 동일한 Slack 및 Notion 설정을 사용합니다.
   </Card>
 
   <Card title="경쟁사 모니터링하기" href="/ko/use-cases/monitor-competitors">
-    경쟁사 사이트용으로 동일한 Slack 알림 및 Notion 보관을 사용합니다.
+    경쟁사 사이트에도 동일한 Slack 알림과 Notion 아카이브를 사용합니다.
   </Card>
 </CardGroup>
