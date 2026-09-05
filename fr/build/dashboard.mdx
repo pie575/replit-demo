@@ -1,6 +1,8 @@
 ---
 title: "Créer un tableau de bord à partir de données"
-description: "Transformez un CSV public, une feuille de calcul, une base de données, un connecteur d'entrepôt ou une API en tableau de bord qui répond à une question claire."
+description: "Transformez un CSV public, une feuille de calcul, une base de données, un connecteur d’entrepôt de données ou une API en tableau de bord répondant à une question précise."
+sidebarTitle: "Créer un tableau de bord"
+icon: "chart-simple"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,182 +20,208 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Un tableau de bord aide quelqu'un à prendre une décision à partir de données.
+Un dashboard permet de prendre des décisions à partir de données.
 
-Vous allez créer un **Explorateur de progrès mondial** à partir d'un CSV public : des données au niveau des pays avec l'année, la population, le continent, l'espérance de vie et le PIB par habitant.
+Vous allez créer un **explorateur des progrès mondiaux** à partir d’un fichier CSV public : des données par pays comprenant l’année, la population, le continent, l’espérance de vie et le PIB par habitant.
 
-## Ce que vous allez accomplir
+<div id="what-youll-achieve">
+  ## Ce que vous allez accomplir
+</div>
 
-À la fin de ce guide, vous aurez :
+À la fin de ce guide, vous disposerez de :
 
-* Un tableau de bord Explorateur de progrès mondial construit à partir d'un CSV public réaliste.
-* Des métriques de synthèse pour les pays, la population, l'espérance de vie et le PIB par habitant.
-* Des graphiques et des filtres montrant comment le progrès a évolué dans le temps.
-* Un moyen de vérifier que les chiffres du tableau de bord correspondent aux données source.
-* Un tableau de bord partageable ou publiable pour les parties prenantes.
+* Un dashboard Global Progress Explorer créé à partir d’un CSV public réaliste.
+* Des indicateurs clés sur les pays, la population, l’espérance de vie et le PIB par habitant.
+* Des graphiques et des filtres montrant l’évolution des progrès au fil du temps.
+* Un moyen de vérifier que les chiffres du dashboard correspondent aux données sources.
+* Un dashboard partageable ou publiable pour les parties prenantes.
 
-## Ce que vous allez apprendre
+<div id="what-youll-learn">
+  ## Ce que vous allez apprendre
+</div>
 
 Vous apprendrez à :
 
-* Commencer par une décision, pas un type de graphique.
-* Demander à Agent de construire un tableau de bord à partir d'un CSV public.
-* Vérifier les calculs par rapport aux données sous-jacentes.
-* Ajouter des filtres et un résumé d'insights.
-* Décider quand un tableau de bord nécessite une connexion, un rafraîchissement, des exports ou des données connectées.
+* Partir d&#39;une décision à prendre, et non d&#39;un type de graphique.
+* Demander à Agent de créer un dashboard à partir d&#39;un fichier CSV public.
+* Vérifier les calculs à la lumière des données sous-jacentes.
+* Ajouter des filtres et une synthèse des enseignements.
+* Déterminer si un dashboard nécessite une authentification, une actualisation, des exports ou des données connectées.
 
-## À qui s'adresse ce guide
+<div id="who-this-is-for">
+  ## À qui s&#39;adresse ce guide
+</div>
 
-Utilisez ce guide si vous avez des données clients, commerciales, produit, opérationnelles, de recherche ou publiques et avez besoin d'un tableau de bord que les gens peuvent comprendre.
+Utilisez ce guide si vous disposez de données clients, commerciales, produit, opérationnelles, de recherche ou publiques et que vous avez besoin d&#39;un dashboard compréhensible par tous.
 
-C'est utile pour les analystes, les opérateurs, les fondateurs, les chefs de produit, les éducateurs et les équipes qui ont besoin de transformer des données brutes en décisions.
+Il s&#39;adresse aux analystes, aux opérationnels, aux fondateurs, aux PM, aux enseignants et aux équipes qui doivent transformer des données brutes en décisions.
 
-## Définir la décision
+<div id="define-the-decision">
+  ## Définir la décision
+</div>
 
-Avant de construire, rédigez la décision que le tableau de bord doit soutenir.
+Avant de créer le tableau de bord, identifiez clairement la décision qu&#39;il doit permettre d&#39;éclairer.
 
-Pour le jeu de données sur le progrès mondial :
+Pour l&#39;ensemble de données sur les progrès mondiaux :
 
-* **Question** : Où l'espérance de vie et le PIB par habitant se sont-ils améliorés dans le temps ?
-* **Audience** : équipes d'éducation, de recherche, de stratégie ou à but non lucratif.
-* **Métriques utiles** : nombre de pays, plage d'années, dernière espérance de vie médiane, population totale représentée et PIB par habitant médian.
-* **Filtres utiles** : continent, pays et plage d'années.
+* **Question** : Où l&#39;espérance de vie et le PIB par habitant se sont-ils améliorés au fil du temps ?
+* **Public** : équipes des secteurs de l&#39;éducation, de la recherche, de la stratégie ou du monde associatif.
+* **Indicateurs utiles** : nombre de pays, plage d&#39;années, espérance de vie médiane la plus récente, population totale représentée et PIB médian par habitant.
+* **Filtres utiles** : continent, pays et plage d&#39;années.
 
-Si vous ne pouvez pas énoncer la décision, le tableau de bord deviendra une collection de graphiques plutôt qu'un outil utile.
+Si vous ne parvenez pas à formuler cette décision, le tableau de bord deviendra une collection de graphiques plutôt qu&#39;un outil utile.
 
-## Construire à partir d'un CSV public
+<div id="build-from-a-public-csv">
+  ## Créer à partir d&#39;un CSV public
+</div>
 
-Utilisez un jeu de données public positif avec des champs significatifs et suffisamment de lignes à explorer.
+Utilisez un jeu de données public positif comportant des champs pertinents et suffisamment de lignes à explorer.
 
-Jeu de données : [CSV de progrès mondial Gapminder](https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv)
+Jeu de données : [CSV Gapminder sur le progrès mondial](https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv)
 
-Demandez à Agent de construire le tableau de bord à partir de ce CSV :
+Demandez à Agent de créer le dashboard à partir de ce CSV :
 
 <AiPrompt>
-  Build a Global Progress Explorer dashboard from this public CSV:<br />
+  Crée un dashboard « Global Progress Explorer » à partir de ce CSV public :<br />
   [https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv](https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv)<br />
-  The dashboard should help an education or research team understand how life expectancy, population, and GDP per capita changed across countries and continents from 1952 to 2007.<br />
-  Include summary cards for total countries, year range, latest median life expectancy, total population represented, and latest median GDP per capita.<br />
-  Add a line chart for life expectancy over time by continent.<br />
-  Add a bubble chart where GDP per capita is on the x-axis, life expectancy is on the y-axis, bubble size represents population, and color represents continent.<br />
-  Add a bar chart showing the countries with the largest life expectancy gains between their first and latest year in the dataset.<br />
-  Add filters for continent, country, and year range.<br />
-  Include a short insights summary that explains the biggest patterns and which regions or countries improved most.<br />
-  Show how key metrics are calculated so I can verify the numbers.<br />
-  Make the dashboard polished, responsive, and easy to read on desktop and mobile.
+  Le dashboard doit aider une équipe pédagogique ou de recherche à comprendre comment l&#39;espérance de vie, la population et le PIB par habitant ont évolué selon les pays et les continents de 1952 à 2007.<br />
+  Inclus des cartes récapitulatives pour le nombre total de pays, la plage d&#39;années, l&#39;espérance de vie médiane la plus récente, la population totale représentée et le PIB par habitant médian le plus récent.<br />
+  Ajoute un graphique en courbes de l&#39;espérance de vie au fil du temps, par continent.<br />
+  Ajoute un graphique à bulles où le PIB par habitant figure sur l&#39;axe des x et l&#39;espérance de vie sur l&#39;axe des y, la taille des bulles représentant la population et la couleur, le continent.<br />
+  Ajoute un graphique à barres montrant les pays ayant enregistré les plus fortes progressions d&#39;espérance de vie entre leur première et leur dernière année dans le jeu de données.<br />
+  Ajoute des filtres pour le continent, le pays et la plage d&#39;années.<br />
+  Inclus un bref résumé d&#39;analyse expliquant les grandes tendances et indiquant quelles régions ou quels pays ont le plus progressé.<br />
+  Montre comment les indicateurs clés sont calculés afin que je puisse vérifier les chiffres.<br />
+  Fais en sorte que le dashboard soit soigné, responsive et facile à lire sur ordinateur comme sur mobile.
 </AiPrompt>
 
-## Vérifier votre travail
+<div id="check-your-work">
+  ## Vérifiez votre travail
+</div>
 
-Ouvrez Preview et vérifiez le tableau de bord avant de le partager.
+Ouvrez Preview et vérifiez le dashboard avant de le partager.
 
-Vérifiez que :
+Vérifiez les points suivants :
 
 * Le nombre total de pays correspond au nombre de pays uniques dans le CSV.
-* La plage d'années affiche de 1952 à 2007.
-* La dernière espérance de vie médiane utilise la dernière année du jeu de données.
+* La plage d&#39;années s&#39;étend de 1952 à 2007.
+* L&#39;espérance de vie médiane la plus récente est calculée à partir de l&#39;année la plus récente du jeu de données.
 * Les totaux de population utilisent les pays et les années filtrés.
-* Les filtres mettent à jour les cartes de synthèse et les graphiques.
-* Le graphique à bulles utilise correctement le PIB par habitant, l'espérance de vie, la population et le continent.
-* Le résumé d'insights correspond à ce que les graphiques montrent.
-* Le tableau de bord fonctionne sur un écran de téléphone.
+* Les filtres mettent à jour les cartes récapitulatives et les graphiques.
+* Le graphique à bulles utilise correctement le PIB par habitant, l&#39;espérance de vie, la population et le continent.
+* Le résumé des analyses correspond à ce que montrent les graphiques.
+* Le dashboard fonctionne sur un écran de la taille d&#39;un téléphone.
 
-Si un nombre semble différent de ce qu'on attend, demandez à Agent de montrer le calcul.
-
-<AiPrompt>
-  The latest median life expectancy looks different than I expected.<br />
-  Show me how you calculated it from the CSV.<br />
-  Check that you used only rows from the latest year in the filtered data.<br />
-  Update the calculation if needed and tell me how to verify it.
-</AiPrompt>
-
-## Ajouter des filtres et des exports
-
-Après que le premier tableau de bord fonctionne, demandez à Agent l'interaction qui aide l'audience à explorer les données.
+Si un nombre semble différent de ce que vous attendiez, demandez à Agent d&#39;afficher le calcul.
 
 <AiPrompt>
-  Add an exploration panel for the global progress dashboard.<br />
-  Let me filter by continent, country, and year range.<br />
-  Add a button to export the filtered chart data to CSV.<br />
-  Keep the summary cards and insights summary in sync with the filters.
+  L&#39;espérance de vie médiane la plus récente semble différente de ce que j&#39;attendais.<br />
+  Montrez-moi comment vous l&#39;avez calculée à partir du CSV.<br />
+  Vérifiez que vous avez utilisé uniquement les lignes de l&#39;année la plus récente dans les données filtrées.<br />
+  Mettez à jour le calcul si nécessaire et dites-moi comment le vérifier.
 </AiPrompt>
 
-Les tableaux de bord peuvent aussi prendre en charge l'export PDF, l'export CSV des graphiques, le rafraîchissement, le rafraîchissement automatique, le mode clair/sombre et les résumés d'analyse. Consultez [Visualisation de données](/fr/features/artifact-types/data-apps) pour la vue d'ensemble conceptuelle.
+<div id="add-filters-and-exports">
+  ## Ajoutez des filtres et des options d’exportation
+</div>
 
-## Utiliser des données connectées si nécessaire
-
-Utilisez un CSV public quand vous apprenez ou prototypez. Utilisez une source de données connectée quand le tableau de bord doit rester à jour.
-
-Vous pouvez connecter des tableaux de bord à :
-
-* Une base de données d'application Replit.
-* Un connecteur d'entrepôt comme BigQuery, Databricks ou Snowflake.
-* Des outils d'analyse comme Segment, Amplitude ou Hex.
-* Des APIs externes.
-
-Pour les données d'entrepôt, demandez à Agent d'expliquer les champs et les requêtes qu'il utilise.
+Une fois le premier dashboard opérationnel, demandez à Agent d’ajouter des interactions permettant à votre audience d’explorer les données.
 
 <AiPrompt>
-  Create a growth dashboard using our warehouse connector.<br />
-  Identify the customer, product usage, billing, and retention fields needed.<br />
-  Build charts for active customers over time, account growth by segment, and expansion revenue by plan.<br />
-  Explain the fields and calculations you used so I can verify the dashboard.
+  Ajoutez un panneau d’exploration au dashboard de progression mondiale.<br />
+  Permettez de filtrer par continent, pays et plage d’années.<br />
+  Ajoutez un bouton pour exporter les données filtrées des graphiques au format CSV.<br />
+  Gardez les cartes récapitulatives et le résumé des analyses synchronisés avec les filtres.
 </AiPrompt>
 
-Pour les détails de configuration et de disponibilité, consultez [Connecteurs de données](/fr/connectors/warehouses/overview).
+Les dashboards peuvent également prendre en charge l’exportation au format PDF, l’exportation des graphiques au format CSV, l’actualisation manuelle ou automatique, le mode clair/sombre et des résumés d’analyse. Consultez [Visualisation de données](/fr/features/artifact-types/data-apps) pour une présentation générale.
 
-## Partager le tableau de bord
+<div id="use-connected-data-when-needed">
+  ## Utilisez des données connectées lorsque nécessaire
+</div>
 
-Partagez le tableau de bord quand les chiffres sont fiables.
+Utilisez un fichier CSV public pour apprendre ou réaliser un prototype. Utilisez une source de données connectée pour que le dashboard reste à jour.
 
-Si le tableau de bord utilise des données clients ou commerciales privées, ajoutez un contrôle d'accès avant de le partager largement. Pour les données publiques ou d'exemple, vous pouvez publier et partager l'URL directement.
+Vous pouvez connecter des dashboards à :
 
-Demandez aux évaluateurs :
+* Une base de données d’une app Replit.
+* Un connector d’entrepôt de données tel que BigQuery, Databricks ou Snowflake.
+* Des outils d’analytique tels que Segment, Amplitude ou Hex.
+* Des API externes.
 
-> Examinez le tableau de bord de progrès mondial et dites-moi quelle histoire régionale ou nationale vous mettriez en avant en premier, et pourquoi.
+Pour les données d’entrepôt, demandez à Agent d’expliquer les champs et les requêtes qu’il utilise.
 
-## Vous avez terminé quand
+<AiPrompt>
+  Créez un dashboard de croissance à l’aide de notre connector d’entrepôt de données.<br />
+  Identifiez les champs nécessaires concernant les clients, l’utilisation du produit, la facturation et la fidélisation.<br />
+  Créez des graphiques montrant l’évolution du nombre de clients actifs, la croissance des comptes par segment et les revenus d’expansion par plan.<br />
+  Expliquez les champs et les calculs utilisés afin que je puisse vérifier le dashboard.
+</AiPrompt>
 
-* Le tableau de bord charge le CSV public.
-* Les cartes de synthèse et les graphiques répondent à la question de progrès.
-* Vous avez vérifié manuellement au moins une métrique clé.
-* Les filtres mettent correctement à jour le tableau de bord.
-* Le résumé d'insights correspond aux données.
-* Vous savez si le tableau de bord doit rester public, nécessiter une connexion ou se connecter à des données en direct.
+Pour connaître les détails de configuration et de disponibilité, consultez [Data Connectors](/fr/connectors/warehouses/overview).
 
-## Étapes suivantes
+<div id="share-the-dashboard">
+  ## Partager le tableau de bord
+</div>
+
+Partagez le tableau de bord lorsque les chiffres sont fiables.
+
+Si le tableau de bord utilise des données privées de clients ou d&#39;entreprise, mettez en place un contrôle d&#39;accès avant de le partager largement. Pour des données publiques ou d&#39;exemple, vous pouvez publier et partager l&#39;URL directement.
+
+Demandez aux personnes chargées de la révision :
+
+> Examinez le tableau de bord mondial de progression et indiquez-moi quelle région ou quel pays vous mettriez en avant en premier, et pourquoi.
+
+<div id="youre-done-when">
+  ## Vous avez terminé lorsque
+</div>
+
+* Le dashboard charge bien le CSV public.
+* Les cartes de synthèse et les graphiques répondent à la question de la progression.
+* Vous avez vérifié manuellement au moins un indicateur clé.
+* Les filtres mettent correctement à jour le dashboard.
+* Le résumé des enseignements correspond aux données.
+* Vous savez si le dashboard doit rester public, exiger une connexion ou se brancher sur des données en temps réel.
+
+<div id="next-steps">
+  ## Étapes suivantes
+</div>
 
 <CardGroup cols={2}>
   <Card title="Ajouter une connexion" icon="lock" href="/fr/build/add-login">
-    Mettez le tableau de bord derrière une authentification pour que seules les bonnes personnes le voient.
+    Protégez le dashboard par authentification afin que seules les personnes autorisées puissent y accéder.
   </Card>
 
   <Card title="Ajouter une base de données" icon="database" href="/fr/build/add-database">
-    Sauvegardez les données pour qu'elles persistent et se rafraîchissent entre les sessions.
+    Enregistrez les données pour qu’elles persistent et restent à jour d’une session à l’autre.
   </Card>
 
   <Card title="Ajouter des intégrations" icon="plug" href="/fr/build/add-integrations">
-    Importez une autre source de données ou envoyez des insights vers des outils existants.
+    Importez une autre source de données ou envoyez des informations à des outils existants.
   </Card>
 
-  <Card title="Connecteurs de données" icon="network-wired" href="/fr/connectors/warehouses/overview">
-    Connectez un entrepôt en direct pour que le tableau de bord reflète des données à jour.
+  <Card title="Data Connectors" icon="network-wired" href="/fr/connectors/warehouses/overview">
+    Connectez un entrepôt de données en direct pour que le dashboard reflète des données à jour.
   </Card>
 
-  <Card title="Transformer les insights en présentation" icon="presentation-screen">
-    Demandez à Agent de créer une présentation pour les parties prenantes à partir des conclusions du tableau de bord.
+  <Card title="Transformer les informations en présentation" icon="presentation-screen">
+    Demandez à Agent de créer une présentation pour les parties prenantes à partir des constats du dashboard.
   </Card>
 </CardGroup>
 
-## Besoin d'aide supplémentaire ?
+<div id="need-further-help">
+  ## Besoin d’aide supplémentaire ?
+</div>
 
-* **Les chiffres semblent différents de ce qu'on attend :** demandez à Agent de montrer la requête, la formule ou la transformation.
-* **Le CSV est indisponible :** vérifiez l'URL, l'accès réseau et les en-têtes CSV.
-* **Les filtres ne mettent pas à jour les graphiques :** demandez à Agent de connecter les filtres aux cartes de synthèse et aux données de graphique.
-* **Le tableau de bord est lent :** demandez à Agent de résumer les données, d'ajouter des filtres ou de réduire les lignes chargées au démarrage.
-* **Le tableau de bord utilise des données privées :** ajoutez une connexion avant de le partager largement.
+* **Les chiffres ne correspondent pas à vos attentes :** demandez à Agent d’afficher la requête, la formule ou la transformation.
+* **Le CSV est indisponible :** vérifiez l’URL, l’accès au réseau et les en-têtes CSV.
+* **Les filtres ne mettent pas à jour les graphiques :** demandez à Agent de connecter les filtres aux cartes récapitulatives et aux données des graphiques.
+* **Le dashboard est lent :** demandez à Agent de synthétiser les données, d’ajouter des filtres ou de réduire le nombre de lignes chargées au démarrage.
+* **Le dashboard utilise des données privées :** ajoutez une authentification avant de le partager largement.
 
-## En relation
+<div id="related">
+  ## Articles associés
+</div>
 
 * [Visualisation de données](/fr/features/artifact-types/data-apps)
 * [Connecteurs de données](/fr/connectors/warehouses/overview)

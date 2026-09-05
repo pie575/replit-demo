@@ -1,0 +1,193 @@
+---
+title: "Подключение Plaid"
+description: "Настройте коннектор Plaid, чтобы разработчики могли с помощью Agent создавать приложения, которые подключаются к финансовым счетам через Plaid Link и получают данные о балансах, транзакциях и инвестициях."
+---
+
+export const WistiaEmbed = ({videoId, title = "Видео Wistia", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+  if (!videoId) {
+    return null;
+  }
+  const url = "https://fast.wistia.net/embed/iframe/" + videoId + "?seo=false&playerColor=" + playerColor + "&controlsVisibleOnLoad=" + controlsVisibleOnLoad;
+  return <Frame>
+      <iframe src={url} title={title} allow="autoplay; fullscreen" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Info>
+  Коннектор Plaid доступен на платных тарифах Replit и требует [командного рабочего пространства](/ru/ja/features/collaboration/team-workspaces#create-a-team-workspace).
+</Info>
+
+<WistiaEmbed videoId="fcqtulftwk" title="Посмотрите, что создают с помощью Replit и Plaid" />
+
+Plaid подключает приложения к финансовым учреждениям. С помощью коннектора Plaid разработчики могут создавать приложения, которые используют данные о балансах счетов, транзакциях и инвестициях — в объёме, поддерживаемом подключёнными учреждениями.
+
+Настройка состоит из двух частей. Администратор рабочего пространства один раз указывает учётные данные Plaid в Replit, после чего каждый пользователь приложения подключает свои финансовые счета через Plaid Link. Токены доступа Plaid выдаются в рамках отдельного пользователя и хранятся безопасно, поэтому приложение может работать с финансовыми данными, не обращаясь напрямую к секретам Plaid.
+
+<div id="section">
+  ## Что можно создать
+</div>
+
+С помощью коннектора Plaid можно создавать такие приложения, как:
+
+* панели личных финансов;
+* инструменты для ведения бюджета и категоризации расходов;
+* приложения для поиска и анализа транзакций;
+* трекеры портфеля для поддерживаемых инвестиционных счетов;
+* финансовые помощники, которые обобщают структуру расходов.
+
+<div id="section-2">
+  ## Предварительные требования
+</div>
+
+Перед настройкой Plaid в Replit вам потребуется следующее:
+
+* [Командное рабочее пространство](/ru/ja/features/collaboration/team-workspaces#create-a-team-workspace) — Build для Plaid выполняется на уровне команды
+* [Аккаунт Plaid](https://dashboard.plaid.com/signup)
+* **Client ID** Plaid из [панели управления Plaid](https://dashboard.plaid.com/developers/keys)
+* **Секрет** Plaid для используемой среды
+* Решение о том, какую среду Plaid использовать: `sandbox` или `production`
+
+Используйте `sandbox` для тестирования с демонстрационными учреждениями и учётными данными Plaid. Когда будете готовы подключиться к реальным финансовым счетам, переходите на `production`.
+
+<div id="replitplaid">
+  ## Настройка коннектора Plaid в Replit
+</div>
+
+Администратор рабочего пространства добавляет учётные данные Plaid в Replit. После настройки коннектора разработчики смогут использовать данные Plaid через Agent.
+
+<Steps>
+  <Step title="Откройте интеграции">
+    Откройте настройки рабочего пространства или приложения в Replit и выберите **Интеграции**.
+
+    <Frame>
+      <img src="/assets/mirror/integrations-panel-9c9a11a93f25.png" alt="Панель интеграций рабочего пространства команды Avenger с разделами управления интеграциями и коннекторами Replit (кнопка добавления нового коннектора выделена в правом верхнем углу)" width="1440" height="900" data-path="images/replitai/plaid-connector/integrations-panel.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Добавьте коннектор Plaid">
+    Выберите **Добавить новый коннектор**, а затем — **Plaid**.
+
+    <Frame>
+      <img src="/assets/mirror/plaid-connector-search-1283aace7d36.png" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-search.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите среду">
+    Выберите `sandbox` или `production`. Значение должно соответствовать используемому секрету Plaid.
+  </Step>
+
+  <Step title="Введите учётные данные Plaid">
+    Вставьте **Client ID** и **секрет** Plaid из панели управления Plaid.
+  </Step>
+
+  <Step title="Задайте имя клиента">
+    Введите название приложения, которое будет отображаться в Plaid Link. В поле уже подставлено значение `My Plaid App` — замените его на название, которое увидят пользователи. Уложитесь в 30 символов, чтобы Plaid отображал его корректно.
+  </Step>
+
+  <Step title="Сохраните коннектор">
+    Выберите **Настроить**, чтобы сохранить коннектор. Replit надёжно сохранит учётные данные и будет использовать их, когда разработчики подключают аккаунты Plaid.
+
+    <Frame>
+      <img src="/assets/mirror/plaid-config-dialog-6f2537e3be30.png" alt="Диалог настройки Plaid с полями среды, Client ID, секрета клиента и имени клиента, а также кнопкой настройки для сохранения" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-config-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+Чтобы изменить настройки позже, откройте **Управление коннекторами** на панели интеграций и выберите **Управление** рядом с Plaid.
+
+<Frame>
+  <img src="/assets/mirror/plaid-connector-manage-89e796daff17.png" alt="Панель управления коннектором Plaid с сохранёнными средой, Client ID, секретом клиента и именем клиента, а также кнопкой обновления для сохранения изменений" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-manage.png" />
+</Frame>
+
+Об управлении коннекторами в масштабах организации см. [Управление коннекторами](/ru/ja/replitai/managing-connectors).
+
+<div id="plaid-link">
+  ## Вход через Plaid Link
+</div>
+
+Вместо стандартного перенаправления OAuth Plaid использует [Plaid Link](https://plaid.com/docs/link/). Чтобы начать, найдите Plaid в таблице коннекторов и выберите **Войти**. Replit покажет простой экран согласия для подтверждения подключения, после чего откроет Plaid Link.
+
+<Frame>
+  <img src="/assets/mirror/connect-plaid-consent-ea05ebe1a916.png" alt="Диалог согласия на подключение Plaid с логотипами Replit и Plaid, тремя пунктами о подключении к Plaid, использовании данных и отзываемых разрешениях, а также кнопкой «Продолжить в Plaid»" width="1440" height="900" data-path="images/replitai/plaid-connector/connect-plaid-consent.png" />
+</Frame>
+
+Plaid Link открывает встроенный процесс, в котором каждый пользователь выбирает финансовое учреждение и проходит в нём аутентификацию.
+
+<Frame>
+  <img src="/assets/mirror/plaid-link-picker-2e241c8e1271.png" alt="Окно выбора учреждения Plaid Link с заголовком «Выберите учреждение». Отображаются поле поиска и логотипы крупных банков США, таких как Chase, Bank of America, Wells Fargo, Citibank, US Bank, Capital One, PNC, USAA, American Express, TD, Regions, Navy Federal, а внизу — баннер режима песочницы" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-link-picker.png" />
+</Frame>
+
+Каждый пользователь привязывает свой счёт. Replit сохраняет полученный токен доступа Plaid для подключения этого пользователя и использует его, когда Agent или приложение запрашивает данные Plaid.
+
+<div id="plaid">
+  ## Начните создавать приложения на данных Plaid
+</div>
+
+После подключения Plaid попросите Agent создать приложение на основе подключённых финансовых данных. Например:
+
+<AiPrompt>
+  Build a personal finance dashboard where people connect bank accounts with Plaid Link. Show account balances, monthly spending by category, and the five largest recent transactions.
+</AiPrompt>
+
+<AiPrompt>
+  Create a budgeting app where each person connects accounts through Plaid Link. Import transactions, group them by merchant and category, and show whether they are over budget this month.
+</AiPrompt>
+
+<AiPrompt>
+  Build a portfolio tracker where people connect supported investment accounts through Plaid Link. Show holdings, account balances, and changes over time where data is available.
+</AiPrompt>
+
+Доступность данных Plaid зависит от подключённого финансового учреждения и от того, какие продукты Plaid включены в вашей учётной записи Plaid.
+
+<div id="section-3">
+  ## Устранение неполадок
+</div>
+
+<AccordionGroup>
+  <Accordion title="Plaid не отображается в интеграциях">
+    Для Plaid требуется платный тариф Replit. Если у вас платный план, но Plaid не отображается, обновите страницу и убедитесь, что вы находитесь в нужном рабочем пространстве.
+
+    Если при настройке появляется сообщение **Для этой функции требуется тариф Enterprise**, обновите страницу и убедитесь, что вы используете нужное рабочее пространство.
+
+    Если Plaid по-прежнему не отображается, обратитесь в службу поддержки Replit, чтобы наша команда проверила настройки вашего рабочего пространства.
+  </Accordion>
+
+  <Accordion title="В Plaid Link отображается «это приложение» вместо названия приложения">
+    Если заданное имя клиента не найдено или слишком длинное, Plaid может показывать **это приложение**. Измените настройки коннектора Plaid и укажите название приложения длиной не более 30 символов.
+  </Accordion>
+
+  <Accordion title="Подключение отображается как отключённое">
+    Подключение Plaid может быть разорвано, если финансовое учреждение требует от владельца счёта повторного входа, если изменились учётные данные или если были отозваны разрешения.
+
+    Переподключите Plaid на панели интеграций или коннекторов, чтобы открыть Plaid Link и восстановить доступ.
+  </Accordion>
+
+  <Accordion title="Данные Sandbox и Production не совпадают">
+    В средах sandbox и production Plaid используются разные учётные данные и токены. Убедитесь, что среда коннектора соответствует введённому секрету Plaid и типу финансового счёта, который вы тестируете.
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-4">
+  ## Связанные материалы
+</div>
+
+* [Интеграции Agent](/ru/ja/features/integrations/overview) — обзор интеграций под управлением Replit, коннекторов, внешних интеграций и сервисов Agent
+* [Управление коннекторами](/ru/ja/replitai/managing-connectors) — настройка коннекторов в рабочем пространстве и управление ими
+* [Документация Plaid](https://plaid.com/docs/) — API Plaid, Link и документация по продуктам
+* [Панель управления Plaid](https://dashboard.plaid.com/developers/keys) — где найти client ID и секрет Plaid
+* [Replit x Plaid](https://replit.com/partners/plaid) — партнёрская страница с демонстрациями и материалами по настройке

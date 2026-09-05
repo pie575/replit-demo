@@ -1,0 +1,196 @@
+---
+title: "Agent Skills"
+description: "了解何时及如何使用 Agent Skills：主动与被动模式、选择性使用、安全性，以及 Skills 与 MCP 服务器的区别。"
+sidebarTitle: "Agent Skills"
+icon: "puzzle-piece"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+技能可让 Agent 学会新能力。您可以通过技能与 Agent 分享您的经验、偏好的模式和专业知识，帮助它产出更出色、更一致的结果。
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="掌握 Agent 技能：改变 AI 辅助开发方式的框架" />
+
+<div id="por-que-skills-so-importantes">
+  ## 为什么 Skills 很重要
+</div>
+
+每次使用 Agent 构建应用时，你都会积累有用的上下文：问题的解决方案、设计决策和框架偏好。但聊天结束后，这些上下文就会消失。Skills 能将其保留下来。
+
+GSAP 动画 Skill 可教会 Agent 如何正确使用特定库。设计系统 Skill 可确保它准确应用你的颜色和间距规则。错误修复 Skill 会记录解决方案，让 Agent 不再重复同样的错误。原本不一致的任务将变得可靠。
+
+Skills 也是一种[开放标准](https://agentskills.io/specification)。它们适用于任何智能体，包括 Replit Agent，因此你可以在不同工具之间使用它们。
+
+<div id="skills-proativas-vs-reativas">
+  ## 主动式与被动式 Skills
+</div>
+
+帮助你思考何时以及如何创建 Skills 的框架。了解这两种模式能让你更高效。
+
+<div id="skills-proativas">
+  ### 主动式 Skills
+</div>
+
+主动式 Skills 是指在开始构建*之前*添加的 Skills。研究你想使用的库或模式，为其查找或创建相应的 Skills，然后再开始编写提示词。
+
+**示例：**在构建带有手绘 SVG 动画的作品集网站之前，先研究网页动画库并找到 GSAP。安装 GSAP React Skill，然后向 Agent 发出提示词，让它构建这些动画。Agent 从一开始就具备所需的专业知识——它了解该库的 API、最佳实践和常见模式。没有这项 Skill，它可能会生成泛泛而谈或不正确的内容。
+
+这种模式尤其适合以下情况：
+
+* 你使用的是一个流行但包含细微模式的库，Agent 可能无法自行正确处理
+* 你希望整个项目的设计选择保持一致 (排版、间距、动画风格)
+* 你正在启动一个项目，并且已经明确了技术方向
+
+<div id="skills-reativas">
+  ### 反应式技能
+</div>
+
+反应式技能是指你在解决问题*之后*创建的技能。发现问题后，你可以与 Agent 一起调试并修复它，然后记录解决方案，防止问题再次发生。
+
+**示例：**在为移动 App 构建 Canvas 时，你发现图像边缘出现锯齿，并且在缩放时变得更加明显。通过 Agent 调试后发现，这是缩小混叠问题——一种反直觉的渲染问题，图像越缩小反而越模糊。完成修复后，请 Agent 创建一项技能：
+
+<AiPrompt>
+  创建一项技能，记录我们刚刚学到的有关修复缩小混叠的内容。包括根本原因、解决方案，以及此问题通常出现的场景，以便今后能够预防它。
+</AiPrompt>
+
+Agent 会利用对话历史编写特定于项目的技能。下次再次出现该问题时，你可以让 Agent 参考这项技能，而不必从头开始调试。
+
+这种模式尤其适用于以下情况：
+
+* 你修复了一个不易察觉的 bug，并希望避免它再次发生
+* 你在调试过程中了解到 App 架构的相关信息
+* 你想将一个经过大量努力才找到的解决方案固化下来
+
+<div id="sendo-seletivo-com-skills">
+  ## 有选择地使用 Skills
+</div>
+
+把 Skills 想象成你为让朋友找到你家公寓而提供的指引。一份有针对性的指引清单很有效；一整册文档则不行——没人有时间通读，重要细节也会被淹没。
+
+Agent 也是如此。如果添加了太多 Skills，Agent 可能会感到困惑。请慎重选择要为特定项目启用哪些 Skills，并移除不再需要的 Skills。
+
+<Note>
+  Skills 最适合用于沉淀具体、可重复的模式，而非提供笼统的指导。请聚焦于具体工作流程、既定规范和经过验证的解决方案。
+</Note>
+
+<div id="criando-skills-de-qualidade">
+  ## 创建高质量 skills
+</div>
+
+skills 可能复杂而精细。以下原则有助于保持其有效性：
+
+* **描述理想流程。** 告诉 Agent 如何正确完成任务。如果你发现自己在列举*不要*做什么，通常说明应该重新审视整个方法。
+* **尽可能使用脚本。** 确定性脚本让 Agent 无需推理，比要求它每次都执行相同步骤更可靠。
+* **引用其他文件。** 将 skill 设计为指向其他 Markdown 文件，让 Agent 只加载当前任务所需的文件。
+* **定期进行基准测试。** 这是确认 skill 确实有效的方法，而不是想当然地认为它有效。
+* **亲自编写。** 目标是简洁且经过深思熟虑的上下文；与其批量生成，不如手动编写 skills。Agent 可以帮助你起草，但请自行完善，确保每一行都物有所值。
+* **保持具体。** 不要创建用于代码清理或安全性的通用 skills——Agent 已内置这些功能。你的 skills 应涵盖你或你的组织特有的内容。
+
+大多数 skills 的问题都能诊断出来：
+
+* **skill 在不应触发时被触发。** 描述过于宽泛。缩小范围并说明何时*不*应使用它——“不用于博客文章或帮助文档”通常比任何正向说明都更有用。
+* **skill 被触发，但结果不正确。** 指令过于笼统。将“使其更专业”之类的模糊指导替换为具体规则：确切名称、明确要求，以及需要明确避免的事项。
+* **两个 skills 发生冲突。** 修改描述，确保两者不会因同一任务而触发。冲突几乎总是范围问题，而不是指令问题。
+
+skills 会过时，因此请将它们当作需要持续维护的文档。
+
+<div id="levando-skills-para-todo-o-workspace">
+  ## 将 skills 扩展到整个 Workspace
+</div>
+
+以上内容都适用于单个项目中的 skills。在团队中，你还可以为整个 Workspace 自定义 Agent，让所有人从一开始就遵循相同的约定，无需在每个项目中重复说明。Workspace 自定义包含两部分：
+
+* **自定义指令** — 在任何人输入 prompt 之前，始终注入 Agent 在每个项目和每条消息中的上下文的规则。仅用于少数真正通用的规则，例如“绝不以纯文本形式存储凭证”。由于它们会在每个回合加载，每个字都会占用 Agent 的部分上下文预算，因此请保持简短。
+* **Workspace skills** — 即上述所述的 skills，可供 Workspace 中的所有人使用并集中管理。只有在相关任务调用时才会产生极少的开销，因此你可以提供很多，而不会降低输出质量。
+
+一个简单的判断方法是：如果一条规则无论他人在构建什么都应生效，它就是自定义指令；如果它只对某类特定任务重要，它就是 skill。
+
+如需了解如何设置自定义指令和 Workspace skills，以及谁可以管理它们，请参阅 [Agent 自定义](/zh/pt/features/agent/agent-customization)。
+
+<div id="consideraes-de-segurana">
+  ## 安全注意事项
+</div>
+
+Replit Skills 面板中的 Skill 已通过安全审计。但你可以从任何来源安装 Skill——这些 Skill 来自一个任何人都可参与贡献的[开源仓库](https://github.com/vercel-labs/skills)。
+
+Skill 是 Agent 会遵循的指令，因此恶意 Skill 可能会指示 Agent 从你的项目中窃取敏感数据。从外部来源安装任何 Skill 前：
+
+1. **打开文件。** Skill 只是 Markdown 文件。使用前，请阅读 `/.agents/skills/` 中的内容。
+2. **核实来源。** 确认该 Skill 来自可信的仓库或作者。
+3. **检查其指令。** 确保该 Skill 未引用可疑的外部 URL，也未要求提供敏感信息。
+
+<Warning>
+  安装来自外部来源的 Skill 前，务必先进行检查。Replit Skills 面板中的 Skill 已经过审计，但通过 CLI 安装或从互联网复制的 Skill 尚未经过审计。
+</Warning>
+
+<div id="skills-vs-servidores-mcp">
+  ## Skills 与 MCP 服务器
+</div>
+
+Skills 和 MCP 服务器是扩展智能体的两种主要方式，各自适用于不同用途。
+
+**Skills** 对上下文的占用较少。只有在调用 Skill 时，才会加载其简要描述。请将 Skills 用于：
+
+* 工作流和约定 (“如何部署”“代码审查清单”)
+* 参考资料 (API 模式、风格指南、设计系统)
+* 可复用提示词和专业知识 (网页动画库、框架模式)
+
+**MCP 服务器** 对上下文的占用较多。所有工具描述都会预先加载；如果添加过多，可能会降低输出质量。请将 MCP 服务器用于：
+
+* 连接外部服务 (Notion、Linear、Figma)
+* 需要访问 API 的操作
+* 能够*执行*操作，而不只是提供指导的工具
+
+核心区别在于：Skills 定义智能体应*如何*工作；MCP 服务器定义智能体可以访问*什么*。两者都适用于 Replit Agent 等编程智能体，也适用于你自行构建的智能体。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Agent 自定义" icon="sliders" href="/zh/pt/features/agent/agent-customization">
+    为整个团队配置自定义指令和 workspace skills。
+  </Card>
+
+  <Card title="使用 Skill" icon="puzzle-piece" href="/zh/pt/build/use-agent-skills">
+    将 Skill 附加到消息中，在项目中安装 Skill，或基于 Skill 创建新项目。
+  </Card>
+
+  <Card title="Agent Skills 参考" icon="book" href="/zh/pt/features/agent/skills">
+    了解 Skills 的结构及其内部工作原理。
+  </Card>
+
+  <Card title="Replit 中的 MCP 服务器" icon="server" href="/zh/pt/features/mcp/overview">
+    通过 Model Context Protocol 将 Agent 连接到外部服务和工具。
+  </Card>
+
+  <Card title="有效提示词" icon="wand-magic-sparkles" href="/zh/pt/learn/effective-prompting">
+    编写更清晰的指令，让 Agent 在首次尝试时更接近预期结果。
+  </Card>
+</CardGroup>

@@ -1,0 +1,166 @@
+---
+title: "Surveiller les mentions de votre marque"
+description: "Identifiez les conversations importantes sur votre marque et transmettez-les là où votre équipe travaille déjà."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Ce n’est pas un connecteur natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Surveillez les mentions de votre marque sur X, détectez les conversations importantes, résumez le sentiment et le contexte,
+envoyez les mentions pertinentes à Slack et archivez-les dans Notion. Agent filtre le bruit et
+signale uniquement les éléments nécessitant une réponse, afin que vous puissiez repérer les pics avant qu’ils ne dégénèrent en problèmes de support client ou de relations publiques.
+
+<div id="section">
+  ## Idéal si vous êtes
+</div>
+
+* Responsable de marque ou de communauté et devez repérer les pics de sentiment avant qu’ils ne se transforment en problèmes de support client ou de relations publiques.
+* Responsable des réseaux sociaux ou du support et n’avez besoin que des mentions nécessitant une réponse, plutôt que de toutes les mentions.
+
+<div id="section-2">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{
+id: "x",
+name: "X",
+why: "Source de mentions publiques et de conversations",
+auth: "api-key",
+},
+{
+id: "slack",
+name: "Slack",
+why: "Alerter l’équipe lorsqu’une réponse aux mentions est nécessaire",
+},
+{ id: "notion", name: "Notion", why: "Conserver des résumés pour les consulter ultérieurement" },
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Préparez le nom ou l’identifiant de la marque qui vous intéresse, le canal Slack auquel envoyer les alertes et la base de données Notion où les conserver.
+
+Agent vous demandera votre **jeton Bearer X**. Créez un compte et générez un Bearer Token sur [console.x.com](https://console.x.com).
+
+Ajoutez des crédits à votre compte développeur X. Sans crédits, les recherches de mentions sur X échoueront.
+
+<div id="agent">
+  ## Demander à Agent
+</div>
+
+<AiPrompt>
+  Créez une routine qui s’exécute tous les jours à 8 h. Surveillez les mentions de [marque] sur
+  X. Détectez les conversations importantes, résumez le sentiment et le contexte, envoyez les mentions
+  pertinentes sur Slack et archivez-les dans Notion. Ignorez le bruit. Signalez
+  celles qui nécessitent une réponse.
+</AiPrompt>
+
+<div id="section-4">
+  ## Résultat attendu
+</div>
+
+Agent surveille les mentions, évalue leur importance, publie un bref résumé dans Slack et
+enregistre le fil de discussion dans Notion. Examinez le premier lot et ajustez les critères
+définissant ce qui est considéré comme « important ». Si aucune mention n&#39;est reçue, vérifiez que le Bearer Token est configuré
+et que votre compte développeur X dispose de crédits. Après la première exécution du matin, ouvrez
+la notification Slack, accédez à X et vérifiez que la ligne dans Notion contient le même lien.
+
+<div id="section-5">
+  ## Personnalisez-le selon vos besoins
+</div>
+
+<AiPrompt>
+  Envoyez à Slack uniquement les mentions au sentiment négatif ou comptant [n] J’aime ou plus. Conservez toutes les autres
+  dans Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Ajoutez à Slack un récapitulatif quotidien des 5 principales mentions et du sentiment global.
+</AiPrompt>
+
+<div id="section-6">
+  ## Résolution des problèmes
+</div>
+
+* **Aucune mention ne remonte :** vérifiez que le jeton Bearer X est configuré et que votre compte développeur X dispose de crédits. Sans crédits, la recherche de mentions échoue même avec un jeton valide.
+* **Slack reste silencieux alors que Notion continue de se remplir :** Agent traite peut-être tout comme du bruit. Ajustez les critères permettant de déterminer ce qui est « important », ou demandez-lui de publier un récapitulatif quotidien même lorsqu&#39;aucune réponse n&#39;est nécessaire.
+* **Les archives sont désordonnées :** indiquez à Agent la base de données Notion contenant les colonnes que vous utilisez déjà (date, lien, sentiment, réponse requise). Demandez-lui de mapper les informations vers ces champs au lieu de créer une nouvelle page à chaque fois.
+
+<div id="section-7">
+  ## Documentation associée
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Analyser les retours clients" href="/fr/ko/use-cases/analyze-customer-feedback">
+    Utilisez les mêmes paramètres Slack et Notion pour les tickets d’assistance.
+  </Card>
+
+  <Card title="Surveiller les concurrents" href="/fr/ko/use-cases/monitor-competitors">
+    Utilisez les mêmes alertes Slack et le même archivage dans Notion pour les sites concurrents.
+  </Card>
+</CardGroup>

@@ -1,0 +1,97 @@
+---
+title: "自定义域名"
+description: "了解如何将自己的域名连接到已部署的 Replit App。"
+---
+
+自定义域名可让您将自己的域名 (例如 `www.meu-app-incrivel.com`) 关联到已部署的 Replit App。
+Replit 会提供格式为 `<nome-do-subdominio-do-app>.replit.app` 的免费子域名，而使用
+自定义域名可创建更易记的网址。
+
+自定义域名有助于提升品牌知名度，并增强用户对您的 App 的信任。
+
+观看以下视频，快速了解如何配置自定义域名：
+
+<Frame>
+  <iframe src="https://www.youtube.com/embed/rGYdyb58wJY" title="使用 Publishing 的自定义域名" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+</Frame>
+
+<div id="recursos">
+  ## 功能
+</div>
+
+自定义域名可用于以下部署类型：
+
+* [Autoscale](/zh/pt/cloud-services/deployments/autoscale-deployments/)
+* [Reserved VM](/zh/pt/cloud-services/deployments/reserved-vm-deployments/)
+* [Static](/zh/pt/cloud-services/deployments/static-deployments/)
+
+下表对比了 Replit 子域名和自定义域名：
+
+| 功能             | Replit 子域名  | 自定义域名       |
+| :------------- | :---------- | :---------- |
+| 主机名自定义         | 仅支持子域名      | 您拥有的任意域名    |
+| DNS 更新生效时间     | 即时          | 最长 48 小时    |
+| 安全证书 (TLS/SSL) | 由 Replit 提供 | 由 Replit 提供 |
+| 价格             | 免费          | 向您的域名注册商付费  |
+
+<div id="uso">
+  ## 使用方法
+</div>
+
+<Accordion title="如何访问自定义域名">
+  1. 发布应用后，打开 <img class="icon-svg" src="/assets/mirror/deploy-icon-7dec74bde1ff.svg" width="16" height="16" data-path="images/icons/deploy-icon.svg" /> **Publishing** 工具。
+  2. 选择 **Domains** 标签页。
+  3. 如下方截图所示，选择 **Link a domain** 或 **Manually connect from another registrar**。
+
+  <Frame>
+    <img src="/assets/mirror/01-8e5c25be298f.png" alt="Domains 标签页" width="2422" height="1130" data-path="images/deployments/custom-domains/01.png" />
+  </Frame>
+</Accordion>
+
+请按照以下步骤设置自定义域名：
+
+<Warning>
+  如果存在以下任一情况，可能会导致配置问题：- 同一域名有多条指向不同服务器的 `A`
+  记录。- 同一域名同时存在 `A` 和 `AAAA` 记录，因为 Replit 仅支持 `A` 记录。- 使用 Cloudflare 代理的域名记录，因为 Replit 无法自动续订
+  此类记录的安全证书。
+</Warning>
+
+<Steps>
+  <Step title="添加自定义域名">
+    在文本字段中输入自定义域名。您可以使用已注册的域名，也可以包含子域名。
+
+    例如，`hat-tip.cc` 是已注册域名，而 `my.hat-tip.cc` 包含子域名 `my`。
+
+    <Frame>
+      <img src="/assets/mirror/02-82bc532c7741.png" alt="DNS 设置截图" width="1940" height="718" data-path="images/deployments/custom-domains/02.png" />
+    </Frame>
+  </Step>
+
+  <Step title="向域名注册商添加 DNS 记录">
+    Replit 会生成 DNS 记录，您需要将其提供给您的**域名注册商**。
+    域名注册商是管理您域名的服务，例如 GoDaddy 或 Namecheap。
+
+    复制 Replit 中 `A` 和 `TXT` 记录的值，并将其粘贴到域名注册商的 DNS 管理页面。如果您的域名注册商不支持将 `@` 用作主机名，请使用已注册的域名。
+  </Step>
+
+  <Step title="可选：添加子域名">
+    要为已部署应用添加子域名，请在 DNS 服务提供商的 DNS 管理页面中添加一条使用相同 IP 地址的 `A` 记录。
+    例如，如果您想添加 `meu-subdominio.hat-tip.cc`，则需要：
+
+    * 将 Replit 的 `A` 和 `TXT` 记录值复制到您的域名注册商
+    * 添加一条新的 `A` 记录，将主机名设为 `meu-subdominio`，并使用与主域名相同的 IP 地址
+  </Step>
+
+  <Step title="等待 DNS 传播完成">
+    添加记录后，您需要等待其在互联网上传播。
+    这可能需要几分钟到 48 小时。
+
+    传播完成后，Domains 标签页应在域名旁显示“Verified”状态，如下所示：
+
+    <Frame>
+      <img src="/assets/mirror/domain-verified-49076889c213.png" alt="已验证域名状态的截图" width="1866" height="890" data-path="images/deployments/custom-domains/domain-verified.png" />
+    </Frame>
+
+    在浏览器中打开该域名，确认其是否正常运行。
+  </Step>
+</Steps>

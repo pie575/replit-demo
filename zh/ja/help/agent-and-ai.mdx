@@ -1,0 +1,86 @@
+---
+title: "Agent 与 AI"
+description: "解答常见的 Agent 问题——修复卡住或陷入循环的 Agent、降低成本、Agent 模式、回滚更改、使用自己的 API 密钥。"
+---
+
+以下解答涵盖 Agent 的使用操作。完整参考请查阅 [Agent 概述](/zh/ja/features/agent/overview)、[Agent 模式](/zh/ja/features/agent/agent-modes)和 [AI 计费](/zh/ja/billing/ai-billing)。
+
+<AccordionGroup>
+  <Accordion title="Agent 卡住或频繁断开连接，该如何解决？">
+    1. 在 Mac 上按 `Cmd+K`、在 Windows 上按 `Ctrl+K` 打开命令面板。
+    2. 搜索并选择 **Restart compute**，重启开发环境。
+    3. 打开新的 Agent 对话，重新描述任务后继续。
+
+    当 Agent 看起来卡住时，请不要一直发送消息——多余的消息会产生相互冲突的指令。如果 Agent 在同一任务上反复卡住，请把工作拆分成更小、更聚焦的提示词。
+  </Accordion>
+
+  <Accordion title="Agent 陷入循环或反复执行相同步骤时，如何让它停止？">
+    1. 在 Agent 面板中选择**停止**，立即中止运行。
+    2. 在 Mac 上按 `Cmd+K`、在 Windows 上按 `Ctrl+K` 打开命令面板，搜索并选择 **Restart compute**。
+    3. 新开一个 Agent 对话，用更具体的说法重新描述任务。
+
+    避免陷入循环的方法：
+
+    * 把大任务拆成更小的提示词——每条消息只聚焦一个目标。
+    * 使用 [Plan 模式](/zh/ja/features/agent/plan-mode)，让 Agent 在动手构建前先明确工作范围。
+    * 在[管理支出](/zh/ja/billing/managing-spend)中设置用量上限，避免循环累积出高额账单。
+  </Accordion>
+
+  <Accordion title="如何降低使用 Agent 的成本——哪些设置确实有效？">
+    以下选择最为有效：
+
+    * **[Free 模式](/zh/ja/features/agent/agent-modes)**—面向 Core 和 Pro 订阅者，在额度范围内进行日常 Agent 工作，不产生额外费用。
+    * **[Power 模式](/zh/ja/features/agent/agent-modes)**—当任务需要更强能力时，以实惠的价格提供更高性能。
+    * **[Plan 模式](/zh/ja/features/agent/plan-mode)**—在 Agent 开始构建之前先界定并确认工作范围，避免为不必要的改动买单。
+    * **使用限制与预算**—在[管理支出](/zh/ja/billing/managing-spend)中设置硬性上限。
+
+    切换任务时开启新的 Agent 聊天也很有帮助。查看使用情况仪表板，即可了解哪些任务花费最多。
+  </Accordion>
+
+  <Accordion title="什么是 Agent 模式？不同模式之间有什么区别？">
+    Agent 提供 3 种顶层模式。完整指南请参阅 [Free 模式](/zh/ja/help/free-agent-mode)。
+
+    * **Free 模式**—面向 Core 和 Pro 订阅者的免费日常 Agent 使用，在每 5 小时重置且设有每周上限的额度内提供。Starter 计划维持现有额度限制。要查看使用情况，请前往**设置 → 使用情况**。
+    * **Power**—价格实惠的付费中档模式，可使用强大的模型。
+    * **Max**—面向最具挑战性任务的付费顶级模式，可使用最强大的前沿模型。
+    * **Turbo**—仅在 Max 中可用的可选高级设置开关。
+
+    付费模式已更名：**Economy 更名为 Power**，此前**称为 Power 的模式更名为 Max**。现有模式设置会以新名称保留。如果请求所需的能力超出 Free 模式，Agent 可能会提供付费的**单次授权**选项。Replit 会在开始付费操作前请求确认，之后 Agent 将返回 Free 模式。
+
+    此外，[Plan 模式](/zh/ja/features/agent/plan-mode)会让 Agent 在进行更改前明确工作范围，而 Build 模式会直接应用更改。请参阅 [Plan 模式与 Build 模式的比较](/zh/ja/learn/plan-vs-build-mode)。
+  </Accordion>
+
+  <Accordion title="Agent 做出了不需要的更改，如何回滚？">
+    Replit 会在 Agent 工作期间保存[检查点](/zh/ja/features/version-control/checkpoints-and-rollbacks)。在 Agent 聊天中，找到要撤销的更改之前的那条消息，选择其旁边的回滚选项，即可将项目恢复到该时间点的状态。
+
+    如需了解完整的回滚选项 (包括恢复特定文件) ，请参阅[检查点与回滚](/zh/ja/features/version-control/checkpoints-and-rollbacks)。
+  </Accordion>
+
+  <Accordion title="Agent 提示无法访问互联网或外部 API——这是预期行为吗？">
+    在构建和编辑阶段，Agent 运行在出站访问受限的沙箱环境中。已发布的应用在运行时可以进行外部 API 调用——沙箱仅作用于 Agent 的编辑环境，不影响正在运行的应用。
+
+    如果正在运行的应用出现 API 调用失败，请确认密钥已保存在 [Secrets](/zh/ja/core-concepts/project-editor/app-setup/secrets) 面板中，并查看服务提供商的状态页面。企业或学校网络可能会阻止应用的出站连接——请与网络管理员确认。
+  </Accordion>
+
+  <Accordion title="可以在 Agent 中使用自己的 API 密钥吗？">
+    是的。在 [Secrets](/zh/ja/core-concepts/project-editor/app-setup/secrets) 面板中添加密钥后，应用即可在 API 调用中使用这些密钥。打开 **Secrets** 工具，选择 **+ 新建密钥**，然后输入名称 (例如 `OPENAI_API_KEY`) 和对应的值。
+
+    对于应用调用的模型，你可以[自带 AI 提供商密钥](/zh/ja/features/integrations/replit-ai-integrations)。但驱动 Agent 体验本身的模型运行在 Replit 的基础设施上，无法更换。
+  </Accordion>
+
+  <Accordion title="Agent 总是添加我未要求的功能——如何让它更准确地按要求执行？">
+    使用更明确的提示词，让 Agent 专注于任务：
+
+    * 以 *Only* (“仅”) 一词开头——例如：“仅在用户卡片中添加删除按钮。请勿更改其他任何内容。”
+    * 先使用[Plan 模式](/zh/ja/features/agent/plan-mode)，在 Agent 作出更改前确认它打算执行哪些操作。
+    * 如果 Agent 作出了不需要的更改，请立即在同一聊天中要求它撤销这些更改。
+
+    有关详细信息，请参阅[如何编写有效提示词](/zh/ja/learn/effective-prompting)。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## 需要帮助？
+</div>
+
+如果这里没有解答你关于 Agent 的疑问，请[联系 Replit 支持团队](https://replit.com/support)。

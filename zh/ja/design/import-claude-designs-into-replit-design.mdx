@@ -1,0 +1,155 @@
+---
+title: "将 Claude 设计导入 Replit Design"
+description: "将 Claude 中的设计发送到 Replit，从静态 HTML 创建项目，并让 Agent 将其转换为交互式应用。"
+sidebarTitle: "从 Claude 导入"
+icon: "file-import"
+---
+
+export const platform_0 = "Claude"
+
+export const projectType_0 = "project"
+
+export const setupDescription_0 = "配置 Agent，将静态设计转换为可在 Replit 中运行的交互式应用"
+
+在 Claude 中构建的设计展示了最终体验应有的样子。通过 Claude 的 **Send to Replit** 选项，您可以将设计交接给 Replit；Replit 会将其导入为项目，并由 Agent 将其转化为可运行的交互式应用。
+
+<Note>
+  这是一项新的集成。只有当 Claude 将 Replit 提供为设计发送目标时，**Send to Replit** 才会显示在 Claude 的 **Send to…** 菜单中。其可用性由 Claude 控制，因此可能尚未向所有账户显示。接受交接后，Claude 会在 Replit 的同意页面中请求 **Access apps**、**Create and manage apps** 和 **Stay signed in to this application** 权限范围。
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/claude-design-canvas-fa8be1a1ea5a.png" alt="Claude 设计画布中打开的 Velocity 设计。这是一份可交接给 Replit 并转换为交互式应用的独立设计" width="2000" height="1143" data-path="images/claude-to-app/claude-design-canvas.png" />
+</Frame>
+
+<div id="section">
+  ## 工作原理
+</div>
+
+交接流程始于 Claude，完成于 Replit。
+
+1. 在 Claude 的设计画布中创建一个完整、独立的设计。
+2. 通过 Claude 的 **Share → Send to…** 菜单将设计发送至 Replit。
+3. 授权 Claude 访问你的 Replit 账户，并选择工作区。
+4. Replit 会创建一个项目，并将该设计保存为静态 `index.html` 文件。
+5. Agent 会接手 **Turn this Claude design into a real app** 任务，将其转变为可交互的应用。
+
+在此流程中，Claude 会通过已获授权的应用连接将设计*发送*至 Replit。无需事先在 Replit 中进行任何设置——流程从 Claude 开始。
+
+<div id="section-2">
+  ## 开始之前
+</div>
+
+您需要：
+
+* 一个 [Replit 账户](https://replit.com)。
+* 一个 Claude 账户，并且已在 Claude 设计画布中创建设计。
+* 一个用于创建新项目的 Replit 工作区。
+
+<div id="claudereplit">
+  ## 从 Claude 向 Replit 发送设计
+</div>
+
+在 Claude 中打开你想构建的设计，然后开始操作。
+
+<Steps>
+  <Step title="在 Claude 中打开设计">
+    在 Claude 中打开你想转换为应用的设计。
+  </Step>
+
+  <Step title="打开 Send to 菜单">
+    选择 **Share**，然后打开 **Send to…** 菜单。Replit 会显示为发送目标。
+
+    <Frame>
+      <img src="/assets/mirror/claude-send-to-menu-d4353906aea3.png" alt="Claude 的 Send to… 菜单，其中 Replit 与 Claude Code 一同显示为发送目标" width="2000" height="1143" data-path="images/claude-to-app/claude-send-to-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择 Replit">
+    选择 **Replit**，开始将设计交接给你的 Replit 账户。
+  </Step>
+
+  <Step title="授权访问 Replit">
+    在标题为 **Claude would like to access your Replit account** 的 Replit 同意页面中，确认 Claude 请求的访问权限 — **Access apps**、**Create and manage apps**、**Stay signed in to this application** — 然后批准连接。
+
+    <Frame>
+      <img src="/assets/mirror/replit-oidc-consent-76dfc4d92a2f.png" alt="标题为“Claude would like to access your Replit account”的 Replit 同意页面。显示 Access apps、Create and manage apps、Stay signed in 权限范围以及工作区选择器" width="2000" height="1143" data-path="images/claude-to-app/replit-oidc-consent.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择工作区">
+    选择要创建新项目的 Replit 工作区，然后确认。
+  </Step>
+</Steps>
+
+确认后，Replit 会根据该设计创建项目，并在该工作区中打开。
+
+<div id="section-3">
+  ## 导入的内容
+</div>
+
+Replit 会将设计导入为单个独立的 `index.html` 文件。导入会保留 Claude 在设计中包含的视觉布局、样式和资源。
+
+导入为你提供了一个可运行的起点。设计以静态 HTML 的形式导入，因此导入后你需要添加功能、数据和交互性。
+
+<div id="section-4">
+  ## 不会导入的内容
+</div>
+
+交接的是设计，而不是完整的应用。以下内容不会随导入一并导入：
+
+* 后端逻辑和服务端功能。
+* 数据库或已存储的数据。
+* 可用的表单、状态、导航等交互功能。
+
+Agent 会在将设计转换为实际应用时添加这些功能。
+
+<div id="agent">
+  ## 让 Agent 为设计添加交互功能
+</div>
+
+导入后，Agent 会在工作区中启动 **将此 Claude 设计变成真实应用** 任务。Agent 会基于静态设计进行开发，并实现设计所暗示的交互功能。
+
+<Frame caption="来自 Claude 的 Velocity 设计在 Agent 运行完成后成为 Replit Design 中的一个框架。">
+  <img src="/assets/mirror/claude-design-in-replit-design-ff81b055b1f5.webp" alt="Claude 发送的 Velocity 豪华汽车租赁设计在 Replit Design 中以 Claude 设计框架的形式打开，聊天面板显示 Agent 已完成任务" width="1600" height="1004" data-path="images/claude-to-app/claude-design-in-replit-design.webp" />
+</Frame>
+
+任务完成后，打开 Preview 测试结果。将正在运行的应用与原始 Claude 设计进行比较，并确认以下内容：
+
+* 布局和样式与设计足够接近。
+* 按钮、表单和导航均能按预期运行。
+* 刷新后，应用仍能正常运行。
+
+如果有任何缺失或偏差，请向 Agent 说明需要更改的内容，让它改进应用。
+
+<div id="configure-and-run-your-app">
+  ## 配置并运行你的应用
+</div>
+
+导入过程中，{setupDescription_0}。如果你的应用需要调整，请使用以下 Project Editor 工具：
+
+* **[Agent](/zh/features/agent/overview)**：完善功能、调试问题并修改代码
+* **[Secrets](/zh/core-concepts/project-editor/app-setup/secrets)**：添加 API 密钥和环境变量
+* **[Workflows](/zh/features/workspace-tools/workflows)**：为你的应用设置 **运行** 命令
+
+<div id="continue-your-journey">
+  ## 继续探索
+</div>
+
+现在你已导入 {platform_0} {projectType_0}，不妨尝试以下后续操作：
+
+* [Replit Agent](/zh/features/agent/overview)：获取功能开发、调试和重构方面的帮助
+* [Replit Deployments](/zh/learn/projects-and-artifacts/replit-deployments)：发布你的 App
+* [协作](/zh/build/invite-teammates)：与团队成员一起构建
+
+<div id="section-5">
+  ## 定价
+</div>
+
+使用 Agent 将设计转换为可运行的应用可能会消耗积分。积分使用量取决于 Agent 基于导入的设计构建的内容量。
+
+<div id="section-6">
+  ## 相关信息
+</div>
+
+* [从身份提供方导入](/zh/ja/build/import-from-providers)
+* [将 Figma 设计导入 Replit Design](/zh/ja/design/import-figma-designs-into-replit-design)

@@ -1,0 +1,96 @@
+---
+title: "Projets et fichiers"
+description: "Réponses aux questions courantes sur les projets : restauration d'un projet supprimé, export, partage, connexion à GitHub, Secrets, retour à un checkpoint."
+---
+
+Ces réponses concernent l&#39;utilisation des projets et des fichiers. Pour les références associées, consultez [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets), [Checkpoints et retours en arrière](/fr/ko/features/version-control/checkpoints-and-rollbacks) et [Présentation des intégrations](/fr/ko/features/integrations/overview).
+
+<AccordionGroup>
+  <Accordion title="Comment connecter Resend ou un autre service de messagerie à une application Replit ?">
+    Ouvrez votre projet, accédez à **Outils → Connecteurs**, puis recherchez le service souhaité (par exemple Resend) et connectez-le. Une fois l&#39;authentification effectuée, la clé API est enregistrée comme secret du projet. Si vous configurez un domaine d&#39;e-mail personnalisé, ajoutez les enregistrements DNS indiqués par le service chez votre fournisseur DNS.
+
+    Pour connaître les connecteurs disponibles, consultez l&#39;[aperçu des intégrations](/fr/ko/features/integrations/overview) et [Ajouter des intégrations](/fr/ko/build/add-integrations).
+  </Accordion>
+
+  <Accordion title="J’ai supprimé un projet par erreur : puis-je le restaurer ?">
+    Les projets supprimés peuvent être restaurés pendant une durée limitée. Ouvrez le Shell du projet et exécutez :
+
+    ```bash theme={null}
+    trash view
+    trash restore your-project-name
+    ```
+
+    Une fois la période de conservation écoulée, les projets supprimés sont définitivement effacés. Si ce délai est dépassé, [contactez l&#39;assistance Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Comment télécharger ou exporter un projet Replit ?">
+    Sélectionnez le menu à trois points en haut de l’arborescence des fichiers, puis **Télécharger au format zip**. Pour les grands projets, le téléchargement peut prendre un instant. En cas d’échec, ouvrez le Shell, exécutez `zip -r project.zip .`, puis téléchargez `project.zip` depuis l’arborescence des fichiers.
+  </Accordion>
+
+  <Accordion title="Comment partager un projet ou y ajouter des collaborateurs ?">
+    Trois options s&#39;offrent à vous :
+
+    * **Lecture seule** — si vous rendez le projet public, toute personne disposant du lien peut le consulter.
+    * **Accès en édition sur invitation** — sélectionnez **Inviter**, puis saisissez un nom d&#39;utilisateur ou une adresse e-mail pour définir le niveau d&#39;autorisation.
+    * **Lien de participation** — créez un lien de participation depuis **Inviter** : toute personne disposant du lien peut alors rejoindre le projet et le modifier.
+
+    Core prend en charge jusqu&#39;à 5 collaborateurs et Pro jusqu&#39;à 15. Les collaborateurs n&#39;ont pas besoin d&#39;un plan payant pour modifier le projet. Consultez [Workspaces](/fr/ko/features/collaboration/workspaces).
+  </Accordion>
+
+  <Accordion title="Comment connecter un dépôt GitHub à Replit ?">
+    Connectez votre compte GitHub depuis les services connectés de votre compte, puis ouvrez l&#39;[outil Git](/fr/ko/features/workspace-tools/git-interface) dans votre projet et reliez le dépôt. Pour une synchronisation bidirectionnelle, activez la synchronisation automatique dans le panneau Git. Pour importer un dépôt existant, consultez [Importer depuis un fournisseur](/fr/ko/build/import-from-providers).
+
+    Si la synchronisation Git s&#39;interrompt, reconnectez GitHub depuis les services connectés. Les jetons d&#39;accès personnels à portée précise offrent une connexion plus fiable.
+  </Accordion>
+
+  <Accordion title="Le Repl s’exécute lentement ou l’éditeur est lent : que puis-je faire ?">
+    En cas de latence de l&#39;éditeur, essayez ce qui suit :
+
+    * Forcez l&#39;actualisation avec `Cmd+Shift+R` sur Mac ou `Ctrl+Shift+R` sur Windows.
+    * Fermez les onglets de fichiers inutilisés.
+    * Ouvrez la palette de commandes avec `Cmd+K` (Mac) ou `Ctrl+K` (Windows), puis recherchez et sélectionnez **Restart compute**.
+    * Essayez un autre navigateur pour écarter une cause liée aux extensions.
+
+    Si le problème vient d&#39;une exécution lente du code plutôt que d&#39;une latence de l&#39;éditeur, vérifiez la présence de boucles trop gourmandes ou de limites de mémoire atteintes. Le panneau des ressources, en bas de l&#39;éditeur, vous permet de consulter l&#39;utilisation du processeur et de la mémoire.
+  </Accordion>
+
+  <Accordion title="Comment utiliser des variables d’environnement et des secrets dans un projet ?">
+    Ouvrez l&#39;outil **Secrets** (icône de cadenas), sélectionnez **+ Nouveau secret**, puis saisissez la clé et la valeur. Dans votre code, lisez-la avec `process.env.API_KEY` (Node.js) ou `os.environ["API_KEY"]` (Python).
+
+    Les secrets du panneau [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets) de développement ne sont disponibles que dans l&#39;éditeur. Pour les apps déployées, ajoutez les mêmes clés aux secrets de déploiement : les deux ensembles restent volontairement distincts.
+  </Accordion>
+
+  <Accordion title="Comment utiliser les secrets de compte (Vault) ?">
+    Les [Secrets de compte](/fr/ko/core-concepts/project-editor/app-setup/secrets) sont disponibles dans tous vos projets — pratique pour les clés que vous réutilisez. Ajoutez-les depuis les paramètres de votre compte et ils seront accessibles dans tous vos projets. Si la même clé existe à la fois dans les Secrets de compte et dans le volet des Secrets du projet, c&#39;est la valeur définie au niveau du projet qui prévaut.
+  </Accordion>
+
+  <Accordion title="Comment restaurer Git après des conflits de fusion ou un état Git corrompu ?">
+    Ouvrez le Shell et exécutez `git status` pour repérer les conflits.
+
+    <Warning>Les deux commandes suivantes suppriment les modifications non validées et sont irréversibles. Sauvegardez d&#39;abord ce que vous souhaitez conserver — par exemple, copiez les fichiers modifiés en dehors du projet.</Warning>
+
+    Pour abandonner les modifications locales et revenir au dernier état propre, exécutez `git checkout -- .` ; pour réinitialiser au dernier commit, exécutez `git reset --hard HEAD`.
+
+    Si le dossier `.git` est corrompu et que les commandes Git échouent, ouvrez un nouveau chat Agent et collez-y l&#39;erreur — l&#39;Agent parvient souvent à restaurer le dépôt. Consultez [Reprise après sinistre](/fr/ko/features/version-control/disaster-recovery).
+  </Accordion>
+
+  <Accordion title="Comment restaurer un projet à un point de contrôle précédent ?">
+    Replit enregistre des [checkpoints](/fr/ko/features/version-control/checkpoints-and-rollbacks) pendant qu&#39;Agent travaille. Dans le panneau Agent, repérez le message qui précède la modification que vous souhaitez annuler, sélectionnez l&#39;option de restauration affichée à côté, puis confirmez.
+
+    <Note>
+      Replit ne prend plus en charge la restauration d&#39;une application publiée vers une version antérieure. Pour revenir en arrière sur une application publiée, restaurez le projet à un checkpoint antérieur (comme décrit ci-dessus), puis republiez-le afin de redéployer cet état. Pour récupérer un seul fichier, ouvrez-le, sélectionnez son nom, puis utilisez **Afficher l&#39;historique** pour restaurer une version antérieure. Consultez [Historique des fichiers](/fr/ko/features/version-control/file-history).
+    </Note>
+  </Accordion>
+
+  <Accordion title="Comment transférer un projet vers un autre compte Replit ?">
+    Les projets ne peuvent pas être transférés directement, mais ils peuvent être copiés. Le plus simple est de partager le projet avec le compte de destination, puis de le forker depuis celui-ci. Vous pouvez aussi télécharger le projet au format zip et le téléverser dans un nouveau Repl sur l&#39;autre compte.
+
+    Après la copie, configurez les secrets, la base de données et les paramètres de déploiement dans le nouveau projet : ces éléments ne sont pas inclus dans la copie. Pour des instructions détaillées, notamment sur la manière de transférer les données de la base de données, consultez [Copier manuellement un projet vers un autre workspace](/fr/ko/teams/identity-and-access-management/manually-copy-projects).
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## Besoin d&#39;aide supplémentaire ?
+</div>
+
+Si vous ne trouvez pas ici la réponse à vos questions sur les projets, [contactez l&#39;assistance Replit](https://replit.com/support).

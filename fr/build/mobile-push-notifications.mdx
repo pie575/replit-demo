@@ -1,6 +1,8 @@
 ---
 title: "Envoyer des notifications push"
-description: "Informez les joueurs des nouveaux jeux et de l'activité de leurs amis dans PixelGames."
+description: "Informez les joueurs des nouveaux jeux et de l’activité de leurs amis dans PixelGames."
+sidebarTitle: "Envoyer des notifications"
+icon: "bell"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,62 +20,65 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-export const pushNotificationPrompt = "Notify a player when a friend beats their high score in PixelGames.";
+export const pushNotificationPrompt = "Envoyer une notification à un joueur lorsqu’un ami bat son meilleur score dans PixelGames.";
 
 <AiPrompt>
   {pushNotificationPrompt}
 </AiPrompt>
 
-<Frame caption="Une notification PixelGames arrivant sur l'écran de verrouillage.">
-  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="Une notification push PixelGames apparaissant sur l'écran de verrouillage du téléphone" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
+<Frame caption="Une notification PixelGames sur l’écran de verrouillage.">
+  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="Une notification push PixelGames apparaissant sur l’écran de verrouillage du téléphone" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
 </Frame>
 
-Android permet de tester cela immédiatement dans Expo Go. iOS nécessite d'abord que l'application soit
-[téléversée et installée depuis TestFlight](/build/mobile-testflight),
-Apple exige que l'application soit enregistrée auprès d'eux avant de pouvoir recevoir la moindre
-notification, même à des fins de test.
+Sur Android, vous pouvez tester cette fonctionnalité immédiatement dans Expo Go. Sur iOS, l’app doit d’abord être
+[téléversée et installée via TestFlight](/fr/build/mobile-testflight) :
+Apple exige que l’app soit enregistrée auprès d’elle avant qu’elle puisse recevoir des
+notifications, même à des fins de test.
 
 <Steps>
-  <Step title="Demander l'autorisation">
-    iOS et Android invitent tous les deux une seule fois avant la première notification. Un refus
-    signifie le silence jusqu'à ce que le joueur la réactive depuis Réglages.
+  <Step title="Demander l’autorisation">
+    iOS et Android demandent tous deux l’autorisation avant la première notification. En cas de refus, aucune notification n’est envoyée
+    jusqu’à ce que le joueur l’autorise à nouveau dans les paramètres.
   </Step>
 
-  <Step title="Enregistrer l'appareil">
-    Agent enregistre un jeton push pour le joueur connecté, afin que PixelGames sache quel appareil
+  <Step title="Enregistrer l’appareil">
+    Agent enregistre un jeton push pour le joueur connecté afin que PixelGames sache quel appareil
     notifier.
   </Step>
 
-  <Step title="L'envoyer">
-    Une notification se déclenche quand un ami bat le meilleur score de ce joueur.
+  <Step title="Envoyer la notification">
+    Une notification est envoyée lorsqu’un ami bat le meilleur score de ce joueur.
   </Step>
 </Steps>
 
-## Testez-le
+<div id="test-it">
+  ## Testez-le
+</div>
 
-1. Accordez l'autorisation de notification lorsqu'elle est demandée, PixelGames ne peut rien
-   envoyer avant que cela soit accepté, et l'invite n'apparaît qu'une seule fois.
-2. Déclenchez la condition réelle, comme battre le meilleur score d'un ami depuis un second
-   compte, plutôt que de simplement demander à Agent une notification de test ponctuelle. Cela
-   confirme que tout le parcours fonctionne : l'enregistrement du score, la vérification de qui
-   notifier, et l'envoi, pas seulement que l'autorisation a été accordée.
-3. Vérifiez qu'elle arrive sur l'écran de verrouillage, puis appuyez dessus et confirmez qu'elle
-   ouvre PixelGames. Cette dernière étape vérifie que la notification renvoie bien vers
-   l'application, pas seulement qu'elle s'affiche.
+1. Autorisez les notifications lorsque vous y êtes invité : PixelGames ne peut rien envoyer tant que cette autorisation n&#39;a pas été
+   accordée, et l&#39;invite ne s&#39;affiche qu&#39;une seule fois.
+2. Déclenchez la condition réelle, par exemple en battant le meilleur score d&#39;un ami depuis un second compte,
+   plutôt que de demander à Agent une notification de test ponctuelle. Cela permet de vérifier que tout le
+   processus fonctionne : l&#39;enregistrement du score, la détermination des personnes à notifier et l&#39;envoi, et pas seulement que
+   l&#39;autorisation a été accordée.
+3. Vérifiez qu&#39;elle arrive sur l&#39;écran de verrouillage, puis appuyez dessus et vérifiez qu&#39;elle ouvre PixelGames. Appuyer dessus
+   permet de vérifier que la notification redirige bien vers l&#39;application, et pas seulement qu&#39;elle s&#39;affiche.
 
-Faites cela sur un vrai téléphone, les notifications n'atteignent jamais un simulateur. Consultez
-[tester avec Expo Go](/build/mobile-preview-testing) pour la configuration.
+Faites-le sur un téléphone réel : les notifications n&#39;arrivent jamais dans un simulateur. Consultez
+[test with Expo Go](/fr/build/mobile-preview-testing) pour la configuration.
 
-## Dépannage
+<div id="troubleshooting">
+  ## Résolution des problèmes
+</div>
 
-* **La notification n'arrive jamais sur iOS :** vérifiez que vous testez depuis
-  [TestFlight](/build/mobile-testflight), Expo Go ne peut pas recevoir de notifications push sur
-  iOS.
-* **Le joueur a accordé l'autorisation mais ne reçoit rien :** vérifiez que le jeton a bien été
-  enregistré avec son compte, un écart fréquent quand la connexion et la configuration des
-  notifications se font séparément.
+* **La notification n’arrive jamais sur iOS :** vérifiez que vous effectuez le test depuis
+  [TestFlight](/fr/build/mobile-testflight) ; Expo Go ne peut pas recevoir de notifications push sur iOS.
+* **Le joueur a accordé l’autorisation, mais ne reçoit rien :** vérifiez que le jeton a bien été enregistré dans
+  son compte, ce qui est souvent oublié lorsque la connexion et la configuration des notifications sont effectuées séparément.
 
-## Prochaines étapes
+<div id="whats-next">
+  ## Étapes suivantes
+</div>
 
 <CardGroup cols={2}>
   <Card title="Ajouter des retours haptiques" icon="wave-square" href="/fr/build/mobile-haptics">
@@ -85,6 +90,8 @@ Faites cela sur un vrai téléphone, les notifications n'atteignent jamais un si
   </Card>
 </CardGroup>
 
-## En relation
+<div id="related">
+  ## Articles associés
+</div>
 
-* [Soumettre à l'App Store](/build/mobile-publish-ios)
+* [Soumettre une app à l’App Store](/fr/build/mobile-publish-ios)

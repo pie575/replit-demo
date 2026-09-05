@@ -1,0 +1,157 @@
+---
+title: "快速补上离开期间错过的消息"
+description: "将 Slack、邮件和日历整理成一份回归简报。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                不是原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+休假归来后，分析这段期间的 Slack、Gmail 和 Calendar，在 Notion 中撰写一份回归简报：
+包含期间发生了什么、哪些事需要你拍板、哪些需要优先回复，以及本周有哪些安排。
+Agent 不要罗列所有消息，只呈现你必须了解的内容。
+
+<div id="section">
+  ## 适合人群
+</div>
+
+* 不想通读全部内容，只需在休假或参会归来后快速了解情况的创始人和管理者
+* 需要交接工作、并为接手者提供可直接执行的简报的人
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "slack",
+name: "Slack",
+why: "离开期间的频道和私信动态",
+},
+{ id: "gmail", name: "Gmail", why: "需要回复的邮件会话" },
+{
+id: "google-calendar",
+name: "Google Calendar",
+why: "错过的会议或即将开始的会议",
+},
+{ id: "notion", name: "Notion", why: "保存简报" },
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+告诉 Agent 你外出的日期，以及哪些 Slack 频道和日历比较重要。连接 Gmail、Slack、Calendar 和 Notion。
+
+<div id="agent">
+  ## 向 Agent 提出请求
+</div>
+
+<AiPrompt>
+  我在 [日期] 期间休假不在。请分析这段时间的 Slack、Gmail 和 Calendar，
+  并在 Notion 中写一份回归简报：期间发生了哪些事、哪些事项需要我决策、
+  哪些需要我优先回复、本周有哪些安排。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期结果
+</div>
+
+Agent 会生成一份简短的简报，涵盖待定的决策、需要回复的会话以及需要确认的会议。简报不应罗列所有消息，只需包含你真正需要关注的内容。
+在实际行动之前，请先核对所使用的日期范围和频道。在 Slack 或 Gmail 中打开简报里的两个会话，确认它们是否确实需要处理。如果 Agent 起草了回复内容，可以先发一封给自己试试。
+
+<div id="section-5">
+  ## 按我的需求调整
+</div>
+
+<AiPrompt>
+  请将简报范围限定为直接指向我的决策和请求，忽略纯公告类频道。
+</AiPrompt>
+
+<AiPrompt>
+  请为对我最重要的 5 封邮件和 Slack 会话起草回复，并保持我的语气风格。
+</AiPrompt>
+
+<div id="section-6">
+  ## 问题排查
+</div>
+
+* **简报罗列了所有消息：** 指定重要的 Slack 频道和日历，并要求 Agent 只保留直接与你相关的决策事项和请求，忽略纯公告类频道。
+* **遗漏了你离开期间的日期：** 提供包含时区的准确日期，并确认 Gmail、Slack 和 Calendar 所连接的账户与你离开期间使用的账户一致。
+* **草稿不像你的语气：** 粘贴几封你实际写过的回复，让 Agent 先参照这些语气，再撰写你会发出的内容。
+
+<div id="section-7">
+  ## 相关文档
+</div>
+
+<CardGroup cols={2}>
+  <Card title="跟踪订阅" href="/zh/ko/use-cases/track-subscriptions">
+    面向创始人和运营团队的同一套 Gmail 连接器。
+  </Card>
+
+  <Card title="监控品牌提及" href="/zh/ko/use-cases/monitor-brand-mentions">
+    用于监测公开提及的同一套 Slack 与 Notion 配置。
+  </Card>
+</CardGroup>

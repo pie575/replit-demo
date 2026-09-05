@@ -1,0 +1,268 @@
+---
+title: "Ajoutez des paiements avec RevenueCat"
+description: "Faites payer les joueurs pour du contenu dans votre App avec RevenueCat."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const subscriptionPrompt = "Ajoutez un abonnement mensuel à PixelGames qui donne accès à Snake, Racer et Pinball.";
+export const paywallPrompt = "Affichez les quatre jeux à déverrouiller sous forme d’illustrations sur le paywall de PixelGames.";
+
+<div id="o-que-o-revenuecat">
+  ## Qu’est-ce que RevenueCat ?
+</div>
+
+Dans PixelGames, Snake, Racer et Pinball sont indiqués comme bientôt disponibles. RevenueCat permet à votre App de vendre un abonnement qui les déverrouille, sans avoir à intégrer directement les systèmes d’achat d’Apple et de Google ; demandez à Agent d’ajouter un abonnement et de connecter RevenueCat, il s’occupe du reste.
+
+<Warning>
+  Apple et Google exigent l’utilisation de leur propre système d’achats intégrés pour les contenus numériques de ce type, et tous deux prélèvent une part de la vente. Vous ne pouvez pas contourner cette règle avec un lien de paiement externe.
+</Warning>
+
+<div id="antes-de-comear">
+  ## Avant de commencer
+</div>
+
+* Un projet Replit configuré comme application mobile.
+* Un compte RevenueCat : une adresse e-mail et un mot de passe suffisent, sans avoir besoin de compte bancaire pour l’instant.
+
+<div id="comece">
+  ## Premiers pas
+</div>
+
+<Steps>
+  <Step title="Demandez à Agent d’ajouter un abonnement">
+    <AiPrompt>
+      {subscriptionPrompt}
+    </AiPrompt>
+  </Step>
+
+  <Step title="Connectez votre compte RevenueCat">
+    Agent vous invite à connecter RevenueCat. Sélectionnez **Connect RevenueCat** pour
+    commencer.
+
+    <Frame caption="Replit vous invite à connecter RevenueCat après avoir détecté la fonctionnalité.">
+      <img src="/assets/mirror/revenuecat-36ef7466a2e7.png" alt="Fenêtre modale de configuration Connect RevenueCat de Replit" data-path="images/pixelgames/mobile/revenuecat.png" width="964" height="297" data-path="images/pixelgames/mobile/revenuecat.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Autorisez Replit">
+    Sur la page d’autorisation de RevenueCat, accordez l’accès **Read &amp; Write**.
+  </Step>
+
+  <Step title="Agent crée l’abonnement">
+    Agent crée le projet RevenueCat, configure le produit et l’entitlement, puis intègre le flux
+    d’achat à votre application.
+  </Step>
+</Steps>
+
+<div id="teste-as-assinaturas">
+  ## Testez les abonnements
+</div>
+
+Les aperçus Replit utilisent le mode test de RevenueCat. Tester un achat dans Expo Go affiche
+une boîte de dialogue d’achat de test, sans frais réels. Une fois votre
+app approuvée par Apple pour l’App Store, les achats se feront avec de l’argent réel ; vérifiez donc le prix avant de la soumettre.
+
+<Frame caption="Le paywall de PixelGames et la boîte de dialogue d’achat de test affichée dans Expo Go.">
+  <img src="/assets/mirror/paywall-7b66dd10c595.png" alt="Écran de paywall de PixelGames à côté de la boîte de dialogue d’achat de test de RevenueCat" data-path="images/pixelgames/mobile/paywall.png" width="2274" height="1470" data-path="images/pixelgames/mobile/paywall.png" />
+</Frame>
+
+La boîte de dialogue d’achat de test ci-dessus n’est pas celle que les joueurs verront réellement. Expo Go
+est une app partagée qui permet de prévisualiser tous les projets Expo ; elle ne peut donc pas
+identifier votre app dans RevenueCat et affiche à la place un flux de test générique.
+Une fois que vous disposerez d’un véritable build ou que votre app sera publiée, le paywall lui-même sera un
+écran RevenueCat, fourni à distance plutôt qu’intégré à votre app.
+
+<div id="personalize-o-paywall">
+  ## Personnalisez le paywall
+</div>
+
+Comme le paywall est diffusé à distance, vous pouvez modifier son design sans effectuer de nouveau build, de deux
+façons :
+
+**Demandez à Agent**
+
+<AiPrompt>
+  {paywallPrompt}
+</AiPrompt>
+
+**Ou modifiez-le manuellement**
+
+<Steps>
+  <Step title="Ouvrez l'éditeur de paywall">
+    Dans votre tableau de bord RevenueCat, accédez à **Paywalls** et créez ou modifiez-en un à l&#39;aide de son éditeur visuel :
+    couleurs, image d&#39;arrière-plan, texte du titre, style du bouton, tout ce qui correspond à
+    l&#39;apparence de votre app.
+
+    <Frame caption="L'éditeur visuel de paywall de RevenueCat.">
+      <img src="/assets/mirror/customize-paywall-86e04fd14d95.png" alt="Éditeur de paywall RevenueCat affichant la mise en page et les propriétés du paywall premium de PixelGames" data-path="images/pixelgames/mobile/customize-paywall.png" width="1920" height="991" data-path="images/pixelgames/mobile/customize-paywall.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Associez-le à votre offre">
+    Connectez le paywall à votre offre actuelle.
+  </Step>
+
+  <Step title="Les modifications sont publiées à distance">
+    Le nouveau design apparaît lors de la prochaine ouverture du paywall, dans TestFlight ou après la
+    publication, sans nécessiter de mise à jour sur l&#39;App Store.
+  </Step>
+</Steps>
+
+<Frame caption="Le paywall personnalisé actif dans TestFlight, avec la confirmation d'achat réelle du système.">
+  <img src="/assets/mirror/paywall-testflight-4949e275cd87.png" alt="Paywall PixelGames dans TestFlight à côté de l'écran de confirmation d'achat réel du système" data-path="images/pixelgames/mobile/paywall-testflight.png" width="2274" height="1470" data-path="images/pixelgames/mobile/paywall-testflight.png" />
+</Frame>
+
+C&#39;est ce que les joueurs voient réellement : une vraie confirmation d&#39;achat au lieu de la boîte de
+dialogue de test d&#39;Expo Go, et votre design personnalisé au lieu de la mise en page par défaut.
+
+<div id="sincronize-com-o-app-store-connect">
+  ## Synchroniser avec App Store Connect
+</div>
+
+La synchronisation vous permet de créer ou modifier un abonnement ou un produit dans l’app directement depuis
+RevenueCat ou Replit Agent.
+
+Avant de connecter App Store Connect, trois conditions doivent être remplies :
+
+* **Inscrivez-vous** au programme Apple Developer, si ce n’est pas déjà fait. Des frais d’adhésion
+  annuels s’appliquent.
+* **Envoyez** votre app sur l’App Store. Consultez [envoyer votre app](/fr/build/mobile-upload-ios) si vous ne l’avez pas encore
+  fait. RevenueCat a besoin d’un enregistrement d’app pour synchroniser les produits.
+* **Connectez** un compte bancaire et **acceptez** le Paid Apps Agreement d’Apple. Ces deux actions s’effectuent
+  dans App Store Connect. Apple ne traite aucun paiement sans ces éléments.
+
+<Steps>
+  <Step title="Démarrez la synchronisation depuis Replit">
+    Dans Replit, ouvrez **Publishing → Manage**, puis sélectionnez **Sync RevenueCat to App Store
+    Connect**. Ce bouton apparaît après l’envoi de votre app sur TestFlight.
+
+    <Frame caption="Démarrage de la synchronisation depuis le panneau Publishing de Replit.">
+      <img src="/assets/mirror/rev-co-step1-e86c72c18850.png" alt="Panneau Publishing de Replit avec l’onglet Manage ouvert et le bouton Sync RevenueCat to App Store Connect" data-path="images/pixelgames/mobile/rev-co-step1.png" width="997" height="420" data-path="images/pixelgames/mobile/rev-co-step1.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ouvrez la page API d’App Store Connect">
+    Dans App Store Connect, accédez à **Users and Access → Integrations → App Store Connect API**
+    ([ouvrez-la directement](https://appstoreconnect.apple.com/access/integrations/api)), puis
+    sélectionnez **+** pour ajouter une nouvelle clé.
+
+    <Frame caption="Accès aux clés d’API d’App Store Connect.">
+      <img src="/assets/mirror/rev-co-step2-642a879843a1.png" alt="Page Users and Access d’App Store Connect, onglet Integrations, section App Store Connect API" data-path="images/pixelgames/mobile/rev-co-step2.png" width="1466" height="657" data-path="images/pixelgames/mobile/rev-co-step2.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Générez la clé">
+    Donnez-lui un nom (par exemple, &quot;RevenueCat&quot;), définissez **Access** sur **App Manager** et
+    sélectionnez **Generate**.
+
+    <Frame caption="Génération d’une clé API App Store Connect pour RevenueCat.">
+      <img src="/assets/mirror/rev-co-step3-dcfbd73aafd8.png" alt="Fenêtre modale Generate API Key avec le champ de nom et l’accès App Manager sélectionné" data-path="images/pixelgames/mobile/rev-co-step3.png" width="1453" height="436" data-path="images/pixelgames/mobile/rev-co-step3.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Copiez les détails de la clé">
+    Copiez l’**identifiant de clé** et téléchargez le fichier de clé.
+
+    <Frame caption="Copie de l’identifiant de clé et téléchargement de la clé API d’App Store Connect.">
+      <img src="/assets/mirror/rev-co-step4-24337a1cd6db.png" alt="Liste des clés API d’App Store Connect avec la nouvelle clé RevenueCat, actions Copier et Télécharger" data-path="images/pixelgames/mobile/rev-co-step4.png" width="1522" height="695" data-path="images/pixelgames/mobile/rev-co-step4.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ajoutez à Replit">
+    De retour dans la fenêtre modale de synchronisation de Replit (étape 1 sur 2), importez le fichier de clé, collez
+    le **Key ID** et l’**Issuer ID**, puis sélectionnez **Continue**.
+
+    <Frame caption="Saisie de la clé API App Store Connect dans Replit.">
+      <img src="/assets/mirror/rev-co-step5-73640bd1925f.png" alt="Fenêtre modale Replit, étape 1 sur 2 : importation de la clé API App Store Connect et saisie de ses informations" data-path="images/pixelgames/mobile/rev-co-step5.png" width="995" height="591" data-path="images/pixelgames/mobile/rev-co-step5.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Répétez l’opération pour la clé In-App Purchase">
+    Au même endroit dans App Store Connect, cette fois dans l’onglet **In-App Purchase**
+    ([ouvrez-le directement](https://appstoreconnect.apple.com/access/integrations/api/subs)),
+    générez une autre clé et copiez ses informations.
+
+    <Frame caption="Génération et copie d’une clé d’API In-App Purchase.">
+      <img src="/assets/mirror/rev-co-step6-aed01868e734.png" alt="Liste des clés In-App Purchase d’App Store Connect avec les actions Download et Copy" data-path="images/pixelgames/mobile/rev-co-step6.png" width="1547" height="593" data-path="images/pixelgames/mobile/rev-co-step6.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ajoutez à Replit">
+    De retour dans la fenêtre modale de synchronisation de Replit (étape 2 sur 2), importez également ce fichier de clé, collez le **Key ID** et l’**Issuer ID**, puis sélectionnez **Continue**.
+
+    <Frame caption="Ajout de la clé API In-App Purchase dans Replit.">
+      <img src="/assets/mirror/rev-co-step7-26d78bff7cc4.png" alt="Fenêtre modale Replit, étape 2 sur 2 : importation de la clé API In-App Purchase et collage de ses informations" data-path="images/pixelgames/mobile/rev-co-step7.png" width="997" height="591" data-path="images/pixelgames/mobile/rev-co-step7.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Confirmer et synchroniser">
+    Une fois la synchronisation effectuée, vous pouvez modifier manuellement le prix de votre produit à tout
+    moment, dans le même panneau **Publishing → Manage** de Replit.
+
+    <Frame caption="Vérification des produits avant la synchronisation avec App Store Connect.">
+      <img src="/assets/mirror/rev-co-step8-a790ee2b52ee.png" alt="Écran Products to Sync de Replit avec l’abonnement premium mensuel prêt à être synchronisé" data-path="images/pixelgames/mobile/rev-co-step8.png" width="996" height="550" data-path="images/pixelgames/mobile/rev-co-step8.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="soluo-de-problemas">
+  ## Résolution des problèmes
+</div>
+
+* **L’achat est finalisé, mais rien n’est déverrouillé :** vérifiez que l’entitlement dans RevenueCat
+  est associé au bon ID de produit.
+* **Cela fonctionne lors des tests, mais pas après la publication :** vérifiez que les produits sont synchronisés
+  avec App Store Connect et que le Paid Apps Agreement d’Apple est signé.
+
+<div id="perguntas-frequentes">
+  ## Questions fréquentes
+</div>
+
+<AccordionGroup>
+  <Accordion title="Ai-je besoin d'un compte bancaire pour utiliser RevenueCat ?">
+    Non. Vous avez seulement besoin d&#39;une adresse e-mail et d&#39;un mot de passe pour créer un compte. Vous connecterez votre compte bancaire
+    séparément, via Apple ou Google, lorsque vous serez prêt à recevoir des paiements.
+  </Accordion>
+
+  <Accordion title="Les achats de test sont-ils facturés ?">
+    Non. Les aperçus Replit utilisent le mode test de RevenueCat et les achats sont simulés.
+    La facturation réelle ne commence qu&#39;après qu&#39;Apple a approuvé votre app pour l&#39;App Store.
+  </Accordion>
+
+  <Accordion title="Que puis-je configurer avec RevenueCat ?">
+    Les tarifs, les entitlements et le paywall lui-même. Demandez à Agent d&#39;apporter les modifications souhaitées ; il
+    mettra à jour à la fois la configuration de RevenueCat et le code de votre app.
+  </Accordion>
+</AccordionGroup>
+
+<div id="o-que-vem-a-seguir">
+  ## Étapes suivantes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Recueillir des avis et des notes" icon="star" href="/fr/pt/build/mobile-collect-reviews">
+    Demandez aux joueurs satisfaits de laisser un avis sur PixelGames.
+  </Card>
+</CardGroup>
+
+<div id="relacionado">
+  ## Articles associés
+</div>
+
+* [Stocker des images dans votre application mobile](/fr/pt/build/mobile-store-images)
+* [Publier sur l’App Store](/fr/build/mobile-publish-ios)
+* [Publier sur Google Play](/fr/build/mobile-publish-android)

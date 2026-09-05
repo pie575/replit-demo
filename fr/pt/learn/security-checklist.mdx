@@ -1,0 +1,296 @@
+---
+title: "Liste de contrôle de sécurité"
+description: "Suivez cette liste de contrôle de sécurité complète pour garantir que vos applications créées en vibe coding respectent les bonnes pratiques de sécurité."
+sidebarTitle: "Liste de contrôle de sécurité"
+icon: "clipboard-check"
+---
+
+Ce guide propose une liste de contrôle de sécurité complète pour garantir que vos applications créées en vibe coding respectent les bonnes pratiques de sécurité.
+
+Bien que Replit offre de nombreuses fonctionnalités de sécurité [prêtes à l&#39;emploi](/fr/pt/features/security/overview), il est important de comprendre et de mettre en œuvre des mesures de sécurité supplémentaires adaptées aux besoins spécifiques de votre application.
+
+<iframe src="https://www.youtube.com/embed/0D9FMFyNBWo" title="Liste de contrôle de sécurité du vibe coding" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen />
+
+<div id="pr-requisitos">
+  ## Prérequis
+</div>
+
+* Un compte Replit
+* Des connaissances de base dans votre langage de programmation préféré
+* Une bonne connaissance de l&#39;éditeur de projet
+* Une application que vous développez sur Replit
+
+<div id="segurana-no-front-end">
+  ## Sécurité front-end
+</div>
+
+<AccordionGroup>
+  <Accordion title="HTTPS partout" icon="lock">
+    Replit utilise HTTPS par défaut dans toutes les applications. Vous n&#39;avez donc pas à vous en soucier !
+  </Accordion>
+
+  <Accordion title="Validation et assainissement des entrées" icon="shield-check">
+    Validez et assainissez toujours les entrées utilisateur afin de prévenir les attaques par cross-site scripting (XSS) :
+
+    ```javascript theme={null}
+    // Mauvaise pratique : utilisation directe de l'entrée utilisateur
+    element.innerHTML = userInput;
+
+    // Bonne pratique : assainissez l'entrée avant de l'utiliser
+    import { sanitize } from 'some-sanitizer-library';
+    element.innerHTML = sanitize(userInput);
+    ```
+
+    Demandez à Agent :
+
+    ```
+    Help me validate and sanitize inputs to protect against XSS attacks
+    ```
+  </Accordion>
+
+  <Accordion title="Gardez les données sensibles hors du navigateur" icon="eye-slash">
+    Vous devez utiliser les Secrets de Replit pour stocker les informations sensibles telles que les clés d&#39;API.
+
+    Veillez à ne pas transmettre de secrets côté client ni à les placer dans les emplacements suivants :
+
+    * Local storage
+    * Session storage
+    * JavaScript côté client
+    * Cookies sans attributs de sécurité appropriés
+
+    Demandez à Agent :
+
+    ```
+    Help me keep sensitive data out of the browser. Am I doing this correctly?
+    ```
+  </Accordion>
+
+  <Accordion title="Protection CSRF" icon="shield">
+    Mettez en place une protection contre la falsification de requête intersites (CSRF) pour les formulaires :
+
+    ```javascript theme={null}
+    // Exemple d'implémentation d'un jeton CSRF
+    const csrfToken = generateToken();
+    session.csrfToken = csrfToken;
+    ```
+
+    Demandez à Agent :
+
+    ```
+    Help me implement CSRF tokens for forms
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="segurana-no-back-end">
+  ## Sécurité du back-end
+</div>
+
+<AccordionGroup>
+  <Accordion title="Principes de base de l’authentification" icon="key">
+    Lors de la mise en place de l’authentification :
+
+    * Utilisez Replit Auth chaque fois que possible
+    * Si vous mettez en place une authentification personnalisée, utilisez des bibliothèques éprouvées
+    * Ne stockez jamais les mots de passe en clair
+
+    Demandez à Agent :
+
+    ```
+    Aide-moi à mettre en place l’authentification pour mon application avec Replit Auth
+    ```
+  </Accordion>
+
+  <Accordion title="Vérification des autorisations" icon="user-lock">
+    Vérifiez toujours les autorisations avant d’effectuer une action :
+
+    ```javascript theme={null}
+    // Exemple de vérification des autorisations
+    if (!user.canAccess(resource)) {
+      return res.status(403).send('Access denied');
+    }
+    ```
+
+    Demandez à Agent :
+
+    ```
+    Aide-moi à mettre en place des vérifications d’autorisation pour mon application
+    ```
+  </Accordion>
+
+  <Accordion title="Protection des endpoints d’API" icon="shield">
+    Protégez vos endpoints d’API :
+
+    * Ajoutez une authentification aux endpoints sensibles
+    * Configurez correctement CORS
+    * Envisagez de mettre en place une limitation du débit des requêtes
+
+    Demandez à Agent :
+
+    ```
+    Comment authentifier correctement les endpoints de mon application ?
+    ```
+  </Accordion>
+
+  <Accordion title="Prévention des injections SQL" icon="database">
+    Agent utilise des ORM par défaut, ce qui contribue à prévenir les injections SQL. Si vous écrivez des requêtes de base de données personnalisées :
+
+    ```javascript theme={null}
+    // Mauvais : concaténation de chaînes dans les requêtes
+    db.query(`SELECT * FROM users WHERE username = '${username}'`);
+
+    // Bon : requêtes paramétrées avec un ORM
+    db.query('SELECT * FROM users WHERE username = ?', [username]);
+    ```
+  </Accordion>
+
+  <Accordion title="En-têtes de sécurité" icon="code">
+    Ajoutez des en-têtes de sécurité importants à votre application :
+
+    ```html theme={null}
+    <!-- Dans index.html ou via votre back-end -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+    ```
+
+    Vous pouvez analyser votre site sur [securityheaders.com](https://securityheaders.com) pour obtenir des recommandations.
+
+    Demandez à Agent :
+
+    ```
+    Peux-tu ajouter les en-têtes de sécurité à mon application ?
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="prticas-contnuas-de-segurana">
+  ## Bonnes pratiques de sécurité à appliquer en continu
+</div>
+
+<AccordionGroup>
+  <Accordion title="Maintenez les dépendances à jour" icon="arrow-rotate-right">
+    Vérifiez régulièrement si des paquets obsolètes présentent des vulnérabilités :
+
+    ```bash theme={null}
+    npm audit
+    ```
+  </Accordion>
+
+  <Accordion title="Gestion appropriée des erreurs" icon="exclamation">
+    N’exposez pas d’informations sensibles dans les messages d’erreur :
+
+    ```javascript theme={null}
+    // Mauvais : exposition de détails sensibles
+    catch (err) {
+      res.status(500).send(`Database error: ${err.message}`);
+    }
+
+    // Bon : message d’erreur générique
+    catch (err) {
+      console.error(err); // Journal interne
+      res.status(500).send('An error occurred');
+    }
+    ```
+
+    Demandez à Agent :
+
+    ```
+    Help me implement proper error handling for my application
+    ```
+  </Accordion>
+
+  <Accordion title="Cookies sécurisés" icon="cookie">
+    Lorsque vous utilisez des cookies :
+
+    * Définissez l’indicateur HttpOnly pour empêcher l’accès via JavaScript
+    * Utilisez l’attribut Secure pour exiger HTTPS
+    * Implémentez l’attribut SameSite pour prévenir les attaques CSRF
+
+    Demandez à Agent :
+
+    ```
+    Help me secure my cookies for my application
+    ```
+  </Accordion>
+
+  <Accordion title="Sécurité des téléversements de fichiers" icon="upload">
+    Si votre application permet le téléversement de fichiers :
+
+    * Limitez les types et les tailles de fichiers
+    * Analysez-les à la recherche de logiciels malveillants si possible
+    * Stockez les fichiers dans le stockage d’objets de Replit
+    * Générez de nouveaux noms de fichiers au lieu d’utiliser ceux fournis par l’utilisateur
+
+    Demandez à Agent :
+
+    ```
+    Help me secure my file uploads for my application
+    ```
+  </Accordion>
+
+  <Accordion title="Limitation du débit des requêtes" icon="clock">
+    Implémentez une limitation du débit des requêtes pour les endpoints d’API, en particulier ceux liés à l’authentification :
+
+    ```javascript theme={null}
+    // Exemple de middleware de limitation du débit des requêtes
+    const rateLimit = require('express-rate-limit');
+
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100 // limite de 100 requêtes par IP par fenêtre windowMs
+    });
+
+    app.use('/api/', limiter);
+    ```
+
+    Demandez à Agent :
+
+    ```
+    Help me implement rate limiting for my application
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="lista-de-verificao">
+  ## Liste de contrôle
+</div>
+
+Voici le résumé ci-dessus sous forme de liste de contrôle, pour vous aider à suivre vos pratiques de sécurité.
+
+<div id="segurana-no-front-end-2">
+  ## Sécurité côté front-end
+</div>
+
+|   | Mesure de sécurité                                     | Description                                                                                    |
+| - | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| ☐ | Utiliser HTTPS partout                                 | Empêche les interceptions simples et les attaques de type man-in-the-middle                    |
+| ☐ | Validation et assainissement des entrées               | Empêche les attaques XSS en validant toutes les entrées utilisateur                            |
+| ☐ | Ne pas stocker de données sensibles dans le navigateur | Aucun secret dans le stockage local ni dans le code côté client                                |
+| ☐ | Protection CSRF                                        | Implémentez des jetons anti-CSRF pour les formulaires et les requêtes qui modifient l&#39;état |
+| ☐ | Ne jamais exposer les clés d&#39;API côté front-end    | Les identifiants d&#39;API doivent toujours rester côté serveur                                |
+
+<div id="segurana-no-back-end-2">
+  ## Sécurité du back-end
+</div>
+
+|   | Mesure de sécurité                 | Description                                                                                    |
+| - | ---------------------------------- | ---------------------------------------------------------------------------------------------- |
+| ☐ | Bases de l&#39;authentification    | Utilisez des bibliothèques éprouvées et un stockage adéquat des mots de passe (hachage+salage) |
+| ☐ | Vérification des autorisations     | Vérifiez toujours les permissions avant d&#39;effectuer une action                             |
+| ☐ | Protection des endpoints d&#39;API | Mettez en place une authentification adéquate pour chaque endpoint d&#39;API                   |
+| ☐ | Prévention des injections SQL      | Utilisez des requêtes paramétrées ou des ORM, jamais de SQL brut avec des entrées utilisateur  |
+| ☐ | En-têtes de sécurité de base       | Implémentez X-Frame-Options, X-Content-Type-Options et HSTS                                    |
+| ☐ | Protection DDoS                    | Utilisez un CDN ou un service cloud doté de fonctions intégrées d&#39;atténuation DDoS         |
+
+<div id="hbitos-prticos-de-segurana">
+  ## Bonnes pratiques de sécurité au quotidien
+</div>
+
+|   | Mesure de sécurité                | Description                                                                                    |
+| - | --------------------------------- | ---------------------------------------------------------------------------------------------- |
+| ☐ | Maintenir les dépendances à jour  | La plupart des vulnérabilités proviennent de bibliothèques obsolètes                           |
+| ☐ | Gestion appropriée des erreurs    | N&#39;exposez pas de détails sensibles dans les messages d&#39;erreur                          |
+| ☐ | Cookies sécurisés                 | Définissez les attributs HttpOnly, Secure et SameSite                                          |
+| ☐ | Téléversement de fichiers         | Validez les types et tailles de fichiers et recherchez tout contenu malveillant                |
+| ☐ | Limitation du débit des requêtes  | Appliquez-la à tous les endpoints d&#39;API, en particulier ceux liés à l&#39;authentification |

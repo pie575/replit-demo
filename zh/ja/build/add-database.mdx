@@ -1,0 +1,115 @@
+---
+title: "添加数据库"
+description: "让 Velocity 的车辆、可用状态和预订信息在刷新、重启和发布后依然保留。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+完成本指南后，Velocity 中的所有车辆、可用时段和预订都会一直保留到第二天。
+
+<Frame>
+  <img src="/assets/mirror/persisted-bookings-384fb48e8a6d.png" alt="刷新后的 Velocity，显示已登录客户的“我的预订”列表中有两条已保存的预订，车队页面上的车辆顺序也与刷新前完全一致" width="1280" height="720" data-path="images/velocity/add-database/persisted-bookings.png" />
+</Frame>
+
+在[添加登录功能](/zh/ja/build/add-login)中，我们为 Velocity 添加了登录能力。但车队中的车辆以及客户提交的预订，一刷新页面就会消失——因为它们只存在于浏览器中。下面就来添加数据库，让所有数据都持久保存。
+
+<div id="agent">
+  ## 告诉 Agent 保存数据
+</div>
+
+Velocity 使用 Neon——Replit 托管的 Postgres 数据库。Neon 可妥善处理并发预订，并根据实际客户流量扩展；Agent 会自动为开发和生产环境预配资源。无需注册 Neon 控制台，也无需粘贴密钥。
+
+<AiPrompt>
+  将 Velocity 的数据保存到数据库中，避免车辆、可用日期和预订信息在刷新后消失。<br />
+  使用 Neon (Postgres)。<br />
+  保存：每辆车 (品牌、型号、年份、日租金、照片、地点) 、每辆车的可用日期日历，以及每项预订 (取车日期、还车日期、车辆、客户) 。<br />
+  将每项预订关联到已登录的客户，以便每个人只能查看自己的预订。<br />
+  防止同一辆车在日期重叠时被预订。<br />
+  告诉我更改后需要测试哪些内容。
+</AiPrompt>
+
+Agent 会预配 Neon 数据库，将车队和预订从内存数据迁移到数据库，并添加重叠检查，确保同一辆兰博基尼不会被重复预订。
+
+<Frame>
+  <img src="/assets/mirror/agent-db-connected-e266fa2f9db8.png" alt="Neon 迁移后的 Agent chat，显示验证清单——防止日期重叠、阻止未登录用户、按用户限定预订、拒绝无效日期、拒绝无效车辆——以及“刚刚创建 Checkpoint”指示器；旁边是显示已持久化车队的 Velocity Preview" width="1280" height="720" data-path="images/velocity/add-database/agent-db-connected.png" />
+</Frame>
+
+<div id="section">
+  ## 测试数据是否都能保留
+</div>
+
+1. 在 Preview 中登录 Velocity，预订下周六的一辆车。
+2. 刷新页面，确认“我的预订”中的预订仍在。
+3. 从 Agent 聊天中重启应用，确认车队和预订都还在。
+4. 换一个账号，尝试预订同一个周六的同一辆车。Velocity 应显示该车不可用，并推荐其他日期或车辆。
+5. 退出登录后重新登录，确认预订仍在。
+
+如果在某一步中预订消失了，请把具体的现象粘贴给 Agent：
+
+<AiPrompt>
+  I reserved a car in Velocity, but the reservation disappears after refresh.<br />
+  Check whether the reservation is being saved to the database or only stored in the page.<br />
+  Fix the smallest issue and tell me how to verify it.
+</AiPrompt>
+
+你也可以让 Agent 做一个简单的管理视图，用来查看数据库中的内容：
+
+<AiPrompt>
+  Show me a simple admin page in Velocity that lists every car and every reservation in the database, grouped by car.<br />
+  Only show it to me as the project owner.
+</AiPrompt>
+
+<div id="url">
+  ## 通过发布 URL 验证
+</div>
+
+得益于 Agent 的 Neon 配置，Velocity 从一开始就拥有彼此独立的开发环境和生产环境。在 Agent 聊天或 Publishing 面板中重新发布 Velocity，然后在新标签页中打开发布 URL。Replit 会自动将生产环境的 Neon 凭据应用到已发布的部署中——在发布 URL 上创建一条预订，再刷新页面，确认预订依然存在。
+
+至此，Velocity 会记住每一辆车、每一个可用日期和每一条预订，下次刷新时预订不会再丢失。
+
+<div id="section-2">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加支付功能" icon="credit-card" href="/zh/ja/build/add-payments">
+    在客户预订车辆时收取可退还的押金。
+  </Card>
+
+  <Card title="添加集成" icon="plug" href="/zh/ja/build/add-integrations">
+    将每笔预订同步到客户的日历中。
+  </Card>
+
+  <Card title="用数据创建仪表板" icon="chart-simple" href="/zh/ja/build/dashboard">
+    将已保存的预订转化为使用率图表。
+  </Card>
+</CardGroup>
+
+<div id="section-3">
+  ## 还需要更多帮助？
+</div>
+
+* **在 Preview 中能保存预订，但在发布 URL 上保存不了：** 请让 Agent 检查生产环境的 Neon 凭据是否已应用到已发布的部署上。
+* **不方便查看数据：** 请让 Agent 添加一个简单的管理视图，列出数据库中的全部内容。
+* **想给车队填充数据：** 请让 Agent 添加一个一次性脚本，把真实车辆数据导入数据库。
+* **需要一个免配置、适合快速原型的数据库：** 可以改用 [Replit Database](/zh/ja/features/data-and-storage/sql-database) —— 它内置于每个 Repl，无需单独预配。
+
+<div id="section-4">
+  ## 相关内容
+</div>
+
+* [生产数据库](/zh/ja/features/data-and-storage/development-and-production)
+* [Replit Database](/zh/ja/features/data-and-storage/sql-database)

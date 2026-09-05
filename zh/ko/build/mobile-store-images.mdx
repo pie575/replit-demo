@@ -1,0 +1,73 @@
+---
+title: "在移动 App 中保存图片"
+description: "将个人资料照片等图片关联到各个玩家，并存储到 App Storage 中。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const profileImagesPrompt = "将玩家拍摄的头像照片存储在 App Storage 中，并与其账户关联。";
+
+PixelGames 需要一个存放玩家照片的地方。本指南假定玩家已能够
+[登录](/zh/ko/build/mobile-login)，因为存储功能需要知道是谁在上传照片。
+
+<AiPrompt>
+  {profileImagesPrompt}
+</AiPrompt>
+
+Agent 会连接 [App Storage](/zh/features/data-and-storage/object-storage)，并将每次上传的照片与
+已登录的玩家关联。这样，PixelGames 就能显示真实的个人资料，在玩家姓名旁展示其上传的照片。
+
+<Frame caption="PixelGames 个人资料页面，显示玩家照片和最高分。">
+  <img src="/assets/mirror/database-ef6b19f2ecde.png" alt="PixelGames 个人资料页面，显示玩家照片、姓名和最高分" data-path="images/pixelgames/mobile/database.png" width="1516" height="590" data-path="images/pixelgames/mobile/database.png" />
+</Frame>
+
+<div id="section">
+  ## 测试
+</div>
+
+1. 使用现有账号登录 PixelGames。
+2. 拍摄或选择一张头像并上传。
+3. 关闭应用后重新打开，确认照片是否仍然存在。
+4. 在第二部手机上使用同一账号登录，确认是否显示同一张照片。
+
+<div id="section-2">
+  ## 故障排除
+</div>
+
+* **已登录但照片未显示：** 应用可能连接到了非预期的存储空间或身份验证实例。请让 Agent 检查连接。
+* **上传失败：** 请确认应用在上传前已请求相机和存储权限。
+
+<div id="section-3">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="在手机上预览和测试" icon="mobile" href="/zh/build/mobile-preview-testing">
+    从 Expo Go 迁移到可完全访问原生功能的开发构建。
+  </Card>
+
+  <Card title="提交到 App Store" icon="rocket" href="/zh/build/mobile-publish-ios">
+    将 PixelGames 提交审核。
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ## 相关内容
+</div>
+
+* [添加登录功能](/zh/ko/build/mobile-login)
+* [使用相机](/zh/ko/build/mobile-camera)
+* [为 PixelGames 添加支付功能](/zh/ko/build/mobile-payments)

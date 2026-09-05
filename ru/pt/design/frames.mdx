@@ -1,0 +1,166 @@
+---
+title: "Фреймы"
+description: "Типы фреймов, панель действий фрейма и действия Build и Focus на Canvas."
+sidebarTitle: "Фреймы"
+icon: "square-dashed"
+---
+
+Каждый блок на Canvas — это **фрейм**. Именно фреймы вы выделяете, перетаскиваете и с ними работаете. На этой странице описаны типы фреймов, панель действий фрейма, которая появляется при выделении, и возможности, которые с неё запускаются: Build и Focus.
+
+<Frame>
+  <img src="/assets/mirror/canvas-overview-d32e8d2ab073.png" alt="Canvas с тремя фреймами, размещёнными на холсте: Website (Scroll Hero), APEX X1 Design System и мокап Design суперкара APEX X1, с плавающей панелью инструментов (Chat, Draw, Edit, Generate) внизу" width="2000" height="1255" data-path="images/replitai/canvas-overview.png" />
+</Frame>
+
+<div id="tipos-de-frame">
+  ## Типы фреймов
+</div>
+
+Два основных типа — **Artifacts** (интерактивные поверхности с работающим App) и **Designs** (макеты). Заголовок в левом верхнем углу фрейма показывает его тип.
+
+| Тип                | Метка в заголовке               | Основан на                         | Взаимодействует как работающее App? | Преобразуется в полноценное App?                                    |
+| ------------------ | ------------------------------- | ---------------------------------- | ----------------------------------- | ------------------------------------------------------------------- |
+| Артефакт           | **Website**, **Slides** и т. д. | Работающем артефакте               | Да                                  | Уже является App.                                                   |
+| Мобильный артефакт | **Mobile app**                  | Работающем артефакте               | Да (в симуляторе)                   | Уже является App.                                                   |
+| Design             | **Design**                      | Статическом / интерактивном макете | Только как интерактивный фрейм      | Да — через меню **Build…** для каждого фрейма. См. [Build](#build). |
+| Изображение        | **Image**                       | Сгенерированном PNG / JPG          | Нет                                 | Нет — используйте как образец.                                      |
+| Видео              | **Video**                       | Сгенерированном видео              | Нет                                 | Нет.                                                                |
+| Векторная графика  | **Graphic**                     | Сгенерированном SVG                | Нет                                 | Нет — встроите в полноценное App.                                   |
+
+<Note>
+  Поведение фрейма Design — как статического изображения или интерактивного прототипа — зависит от функции **Interactive frames**. Когда она включена, фреймы Design реагируют на клики и ввод в формах как настоящая страница; в противном случае они отображаются как снимок, который можно дорабатывать, но с которым нельзя взаимодействовать.
+</Note>
+
+<div id="visualize-em-diferentes-dispositivos">
+  ## Просмотр на разных устройствах
+</div>
+
+Посмотрите, как дизайн смотрится при разных размерах экрана. Попросите Agent показать мобильную, планшетную или десктопную версию — например, «Покажи мобильную версию этой страницы» — и он отрисует frame нужного размера:
+
+* **Мобильный**: 390 × 844
+* **Планшет**: 768 × 1024
+* **Десктоп**: 1280 × 720
+
+<div id="barra-de-aes-por-frame">
+  ## Панель действий для frame
+</div>
+
+При выборе frame появляется панель действий. Набор действий зависит от типа frame.
+
+<div id="frames-de-artifact-e-design">
+  ### Frames Artifact и Design
+</div>
+
+Для frames Artifact (Website, Slides и т. д.) и Design панель действий располагается в верхней части frame.
+
+<Frame caption="Панель действий frame Design: Build…, Focus и дополнительные действия.">
+  <img src="/assets/mirror/canvas-frame-action-bar-86f90fdd1375.png" alt="Canvas с выбранным frame Design APEX X1: вверху показана панель действий для frame с меткой типа и действиями Build, Focus и дополнительными действиями, frame прикреплён как чип в поле prompt в чате" width="2000" height="1290" data-path="images/replitai/canvas-frame-action-bar.png" />
+</Frame>
+
+При небольшой ширине набор действий сворачивается до иконок, а по мере увеличения ширины frame появляются подписи. Полный набор, слева направо:
+
+| Действие | Что делает                                                                                                                                                                                                       |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export   | Скачивает frame в формате PNG. См. [Экспорт frame в PNG](/ru/pt/design/canvas#export-a-frame-as-png).                                                                                                               |
+| Build…   | Открывает меню со списком всех artifact проекта — выберите один, чтобы применить к нему design, или выберите **Build this design**, чтобы создать новый artifact. Только для frames Design. См. [Build](#build). |
+| Focus    | Включает режим фокуса, разворачивая frame как основное представление.                                                                                                                                            |
+| More (…) | Дополнительные действия с frame. Копирование, дублирование, изменение порядка и экспорт также доступны в [контекстном меню](/ru/pt/design/canvas#right-click-menu) по правому клику.                                |
+
+У frames приложений (Website, Slides, Mobile app) доступны Focus и дополнительные действия; у frames Design перед ними добавляется Build…. Чтобы развить новые направления на основе выбранного frame, воспользуйтесь его [подсказками](/ru/pt/design/explore-suggestions).
+
+При выборе frame он также прикрепляется к следующему сообщению в Chat с Agent в виде снимка — см. [Что находится на canvas](/ru/pt/design/canvas#what-lives-on-the-canvas).
+
+<Note>
+  Панель действий учитывает **режим только для чтения**. Когда Canvas заблокирован в контексте фоновой задачи, действия итерации скрываются и остаётся только Focus.
+</Note>
+
+<div id="frames-de-mdia">
+  ### Медиафреймы
+</div>
+
+Фреймы Image, Video и Vector graphic отображают небольшую плавающую панель действий над собой. Все три типа имеют следующие элементы управления:
+
+* **Replace media**: загрузите новый файл, чтобы заменить медиафайл в фрейме, сохранив его положение и размер на Canvas.
+* **Download**: сохраните медиафайл на компьютере.
+* **Alt text**: добавьте альтернативный текст для обеспечения доступности и чтобы Agent получал больше контекста при ссылке на фрейм.
+
+<Frame caption="Панель действий видеофрейма: Replace media, Download и Alt text.">
+  <img src="/assets/mirror/canvas-frame-video-actions-905585560e90.png" alt="Выбранный видеофрейм с синим суперкаром на Canvas и плавающей панелью действий над ним с элементами управления Replace media, Download (с подсказкой «Download original») и Alt text." width="2000" height="1252" data-path="images/replitai/canvas-frame-video-actions.png" />
+</Frame>
+
+Фреймы изображений также имеют ещё два элемента управления:
+
+* **Crop**: обрежьте изображение прямо на Canvas.
+* **Generate video**: создайте видеоклип из изображения.
+
+<Frame caption="Панель действий фрейма изображения включает Crop и Generate video.">
+  <img src="/assets/mirror/canvas-frame-image-actions-aae1378db7e3.png" alt="Выбранный фрейм изображения с жёлтым суперкаром на Canvas и плавающей панелью действий над ним с элементами управления Replace media, Crop, Download, Alt text и Generate video." width="1600" height="1002" data-path="images/replitai/canvas-frame-image-actions.png" />
+</Frame>
+
+<div id="explore-novas-direes">
+  ## Исследуйте новые направления
+</div>
+
+При выборе frame рядом с ним появляются [подсказки](/ru/pt/design/explore-suggestions) — варианты развития в один клик, основанные на том, что вы видите: другой макет, новое настроение или страница, на которую намекает ваш дизайн. Каждый вариант создаётся как новый frame рядом с исходным, поэтому оригинал остаётся нетронутым и вы можете сравнить результаты.
+
+<Frame>
+  <img src="/assets/mirror/ambient-iq-0989ea31bce7.png" alt="Выбранный frame сайта с главным экраном суперкара APEX X1 и панелью предлагаемых следующих шагов рядом, где показаны подсказки: Исследовать разные подходы, Попробовать разные макеты, Исследовать разные настроения и Удиви меня" width="2000" height="1254" data-path="images/design/replit-design/ambient-iq.png" />
+</Frame>
+
+<div id="build">
+  ## Build
+</div>
+
+Меню **Build…** у выбранного frame в Design превращает дизайн в настоящее работающее приложение. Через это же меню можно применить дизайн к уже существующему artifact.
+
+<Frame>
+  <img src="/assets/mirror/canvas-build-menu-f06b8b8b455f.png" alt="Открытое меню Build у выбранного frame в Design (APEX X1 Exact Replica) с заголовком «Build or apply your designs», где показаны пункт «Build this design», создающий новый artifact, и «Apply to an existing creation» со списком APEX X1 Design System проекта и его сайта Scroll Hero" width="2000" height="1153" data-path="images/replitai/canvas-build-menu.png" />
+</Frame>
+
+<div id="build-this-design">
+  ### Build this design
+</div>
+
+Выбор пункта **Build this design** в меню запускает создание нового Artifact на основе выбранного frame в Design. Новый Artifact добавляется в список артефактов проекта и становится полноценным работающим приложением. Для Build требуется план Core или Pro.
+
+<div id="apply-to-an-existing-artifact">
+  ### Применение к существующему артефакту
+</div>
+
+В меню Build… перечислены все артефакты проекта. Если выбрать один из них, изменения выбранного Design применятся к этому артефакту — Agent перепишет код артефакта в соответствии с дизайном, а frame Design останется на Canvas в качестве образца.
+
+<div id="modo-de-foco">
+  ## Режим фокуса
+</div>
+
+Режим фокуса позволяет работать с выбранным frame в полном размере, не выходя из Design.
+
+<Steps>
+  <Step title="Выберите Focus для frame">
+    Выберите frame, затем нажмите **Focus** на его панели действий.
+
+    <Frame caption="Действие Focus на панели действий выбранного frame.">
+      <img src="/assets/mirror/focus-before-0c9ced9218d9.png" alt="Выбранный frame в Design на Canvas с выделенным действием Focus на панели действий frame." width="2000" height="1254" data-path="images/design/replit-design/focus-before.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Работайте в полном размере">
+    Frame заполняет область просмотра, чтобы вы могли детально работать с ним, не отвлекаясь на остальные элементы Canvas.
+
+    <Frame caption="Режим фокуса">
+      <img src="/assets/mirror/focus-mode-24da418577ae.png" alt="Режим фокуса: frame в Design заполняет область просмотра, а в верхней части Canvas находится кнопка Exit focus." width="2000" height="1254" data-path="images/design/replit-design/focus-mode.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Вернитесь к Canvas">
+    Нажмите **Exit focus** в верхней части Canvas, чтобы вернуться к Canvas.
+  </Step>
+</Steps>
+
+<div id="pginas-relacionadas">
+  ## Связанные страницы
+</div>
+
+* [Canvas](/ru/pt/design/canvas) — обзор и устройство.
+* [Toolbar](/ru/pt/design/toolbar) — плавающая панель инструментов; Generate создаёт новые frame.
+* [Elements](/ru/pt/design/elements) — отдельные элементы внутри frame.
+* [Visual Editor](/ru/pt/design/visual-editor) — редактирование на уровне элементов внутри выбранного frame.

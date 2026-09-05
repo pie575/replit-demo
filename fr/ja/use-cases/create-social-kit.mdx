@@ -1,0 +1,168 @@
+---
+title: "Créer des icônes et des bannières pour les réseaux sociaux"
+description: "Générez des icônes de profil et des bannières de couverture aux dimensions adaptées à chaque réseau à partir des ressources de votre site et de Drive."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Il ne s’agit pas d’un connector natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Génère des icônes de profil et des bannières de couverture pour X, LinkedIn, Instagram, Facebook,
+TikTok et d’autres réseaux spécifiés à partir du site web et des éléments de marque stockés dans Google Drive.
+Agent utilise les dimensions et les zones de sécurité actuelles de chaque plateforme afin que les visages,
+logos et textes ne soient pas rognés sur les profils. Préserve un système visuel cohérent et exporte
+au format PNG. Lorsque des recadrages différents sont nécessaires selon les réseaux, crée des plans de
+travail dédiés afin d’éviter d’étirer les images.
+
+<div id="section">
+  ## Utilisations idéales
+</div>
+
+* Les designers de marque souhaitant créer en une seule fois des visuels de profil et de couverture pour plusieurs réseaux.
+* Les spécialistes du marketing souhaitant générer des icônes et des bannières exportables à partir d’un logo et d’un site existants.
+
+<div id="section-2">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "Logos, couleurs et éléments de marque existants",
+},
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Préparez l’URL du site ainsi que le logo (ou le dossier de marque) dans le drive. Indiquez les
+réseaux nécessaires. Si le logo est une signature typographique, précisez si l’icône doit être le symbole,
+les initiales ou les deux.
+
+<div id="section-4">
+  ## Instructions pour l’Agent
+</div>
+
+<AiPrompt>
+  À partir de ce site web[URL] et des éléments de marque stockés dans Google Drive, crée un kit
+  pour les réseaux sociaux dans Replit Design. Crée des icônes de profil et des bannières de couverture pour
+  X, LinkedIn, Instagram, Facebook et TikTok. Utilise les dimensions officielles actuelles et les zones de sécurité de chaque réseau afin que les visages, logos
+  et textes ne soient pas rognés. Conserve un système visuel cohérent. Exporte le tout au format PNG.
+  Si des recadrages différents sont nécessaires selon les réseaux, crée des plans de travail
+  dédiés et ne les étire pas.
+</AiPrompt>
+
+<div id="section-5">
+  ## À quoi vous attendre
+</div>
+
+Agent lit les éléments du site et du drive, puis crée des plans de travail aux bonnes dimensions en pixels pour
+chaque élément. Configuration type :
+
+* **X :** profil 400×400, en-tête 1500×500
+* **LinkedIn :** profil 400×400, bannière 1584×396
+* **Instagram :** profil 320×320 (ajoutez également 1080×1080 et 1080×1920 si vous avez besoin de couvertures pour les publications et les stories)
+* **Facebook :** profil 320×320, couverture 820×312 (ou 1640×624, soit le double)
+* **TikTok :** profil 200×200, couverture 1080×1920
+
+Avant l’importation, vérifiez le recadrage dans une image de profil ronde et une bannière horizontale.
+Exportez une icône et une bannière, placez-les dans un avatar rond et un en-tête horizontal, puis
+vérifiez les marges aux petites tailles.
+
+<div id="section-6">
+  ## Personnalisez selon vos besoins
+</div>
+
+<AiPrompt>
+  Ajoute YouTube (photo de profil 800×800, bannière 2560×1440 avec une zone de sécurité de 1546×423) et Pinterest
+  (photo de profil 165×165, épingle 1000×1500).
+</AiPrompt>
+
+<AiPrompt>
+  Crée une version claire et une version sombre pour chaque icône. Conserve la bannière dans la couleur principale du site.
+</AiPrompt>
+
+<div id="section-7">
+  ## Dépannage
+</div>
+
+* **Les logos ou les visages sont rognés :** vérifiez chaque visuel dans l’image de profil circulaire et la bannière horizontale. Respectez les zones de sécurité et demandez à Agent de créer des plans de travail distincts si différents recadrages sont nécessaires. Évitez de les étirer.
+* **Les dimensions ne correspondent pas aux réseaux :** indiquez les réseaux requis et demandez à Agent d’utiliser les dimensions officielles actuelles de chacun. Les spécifications des réseaux pouvant changer, vérifiez-les à nouveau avant l’importation.
+
+<div id="section-8">
+  ## Ressources associées
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Concevoir une page de destination" href="/fr/ja/use-cases/design-landing-page">
+    Vous pouvez également utiliser les mêmes éléments de marque de Google Drive pour votre page de liste d’attente ou de lancement.
+  </Card>
+
+  <Card title="Créer un pitch deck pour les investisseurs" href="/fr/ja/use-cases/pitch-deck-from-website">
+    Vous pouvez également utiliser les mêmes éléments de marque de Google Drive dans vos diapositives.
+  </Card>
+</CardGroup>

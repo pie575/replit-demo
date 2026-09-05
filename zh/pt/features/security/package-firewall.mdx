@@ -1,0 +1,83 @@
+---
+title: "软件包防火墙"
+description: "软件包防火墙会在安装过程中拦截恶意或已遭入侵的软件包，防止任何代码进入您的应用。默认启用，由 Socket 提供技术支持。"
+---
+
+<Frame>
+  <img src="/assets/mirror/blocked-package-message-04011660ce75.png" alt="Agent Chat 显示 form-data 的安装因 Replit 安全策略而被阻止，并说明该软件包的已知漏洞" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
+</Frame>
+
+<Note>
+  不熟悉依赖项安全？请参阅[安全概念](/zh/pt/features/security/concepts)，了解 CVE、SBOM、暴露面、Fix with Agent、重新发布和 Auto-Protect 的定义。
+</Note>
+
+软件包防火墙会在网络层拦截恶意或已遭入侵的软件包，防止其被安装到您的应用中。它是 [Replit Auto-Protect](/zh/pt/features/security/concepts#auto-protect) 的一部分，这套保护机制默认面向所有创作者启用，并由软件供应链安全公司 [Socket](https://socket.dev) 提供技术支持。
+
+当您或 Agent 运行 `npm install`、`pip install` 等安装命令时，请求会先经过软件包防火墙。安全的软件包会照常安装，您不会察觉到任何不同。被 Socket 标记为恶意或已遭入侵的软件包，会在任何代码进入您的环境之前被拦截。
+
+软件包防火墙 **默认面向所有创作者启用，无需配置，也无需迁移**。它以同样的方式保护新建和现有应用，无需进行任何设置。
+
+<Frame>
+  <img src="/assets/mirror/auto-protect-layers-a65bc848b675.png" alt="Replit Auto-Protect 面板显示三项默认启用的保护措施：WAF 防火墙、由 Socket 提供技术支持的软件包防火墙，以及 SSL/TLS 加密" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
+</Frame>
+
+<div id="por-que-a-proteo-no-momento-da-instalao-importante">
+  ## 为什么安装时防护至关重要
+</div>
+
+大多数供应链工具只会在发布时检查依赖项，此时软件包早已安装完成。对于常见漏洞，这或许已经足够。恶意软件则不同：它在安装时就会造成损害——窃取密钥、植入后门或外传你的环境变量。等到发布时的检查将其标记出来，攻击早已发生。
+
+软件包防火墙消除了这一时间窗口。它会在恶意软件包下载前将其拦截，从而在任何一行恶意代码执行前阻止攻击。
+
+<div id="como-funciona">
+  ## 工作原理
+</div>
+
+1. 您或 Agent 运行安装命令，例如 `npm install <package>` 或 `pip install <package>`。
+2. 请求会经过软件包防火墙，并根据 Socket 的威胁情报检查该软件包。
+3. 如果软件包安全无虞，安装将照常进行，您不会察觉到任何差异。
+4. 如果软件包包含恶意代码或已遭入侵，安装会在任何代码进入您的环境之前被阻止。
+
+当某项操作被阻止时，您会收到清晰的提示，说明被阻止的内容及原因，包括触发阻止的漏洞或策略。Agent 会收到相同的信号，因此可以建议安全的替代方案——例如更正拼写错误的软件包名称——或将决定权交给您。
+
+<div id="gerenciadores-de-pacotes-suportados">
+  ### 支持的包管理器
+</div>
+
+软件包防火墙可保护以下环境中的安装过程：
+
+* **JavaScript** — npm、yarn 和 pnpm
+* **Python** — pip
+* **Go** — Go 模块
+
+<div id="o-que-o-package-firewall-detecta">
+  ## 软件包防火墙可检测的内容
+</div>
+
+软件包防火墙会拦截明显的恶意软件，以及合法软件包中已被篡改或已知存在漏洞的版本——包括广泛使用的软件包。其中许多漏洞是在推荐这些软件包的模型训练截止日期之后才披露的。因此，模型可能会自信地推荐某个依赖版本；该版本在训练数据中被视为安全，但之后已被标记。这些风险在业内有一些常见名称：
+
+* **拼写抢注** — 恶意软件包的名称与真实软件包仅相差一个按键，例如用 `reqeusts` 替代 `requests`。你请求了错误的软件包，从而下载了恶意软件。
+* **幻觉抢注** — 模型虚构了一个不存在的软件包名称，攻击者注册完全相同的名称，并等待下一个 Agent 安装它。
+* **过时推荐** — 某个真实软件包存在已披露的漏洞，但模型仍会推荐它，因为在其训练截止日期之前，该软件包被认为是安全的。
+
+最后一类风险正是软件包防火墙对 AI 构建的应用尤为重要的原因：Agent 可能会自信地获取一个已不再安全的依赖项，而软件包防火墙会在该代码执行前阻止安装。
+
+<div id="como-o-package-firewall-se-encaixa-com-as-outras-ferramentas-de-segurana-do-replit">
+  ## 软件包防火墙如何与其他 Replit 安全工具协同工作
+</div>
+
+软件包防火墙是三层互补防护机制之一。每一层保护应用生命周期中的不同环节，因此应结合使用，而非从中择一。
+
+| 层级           | 运行时机    | 功能                                                                                                                                   |
+| ------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **软件包防火墙**   | 安装时     | 在恶意或已遭入侵的软件包下载前将其拦截 (预防) 。                                                                                                           |
+| **自动依赖项扫描**  | 安装后持续进行 | 检测已安装依赖项中最新披露的 CVE，并提供由 Agent 准备的可选修复方案。请参阅[Project Security Center](/zh/pt/features/security/project-security-center#automatic-dependency-scans)。 |
+| **安全 Agent** | 发布前     | 审核整个代码库，查找代码、依赖项和隐私方面的漏洞。请参阅 [Agent 安全扫描](/zh/pt/features/security/agent-security-scans)。                                               |
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+* 在[Project Security Center](/zh/pt/features/security/project-security-center)查看单个项目的检测结果。
+* 在[工作区安全中心](/zh/pt/features/security/workspace-security-center)审计所有项目的依赖项。
+* 阅读 [Replit 如何保护 AI 生成的代码](https://blog.replit.com/securing-ai-generated-code)，进一步了解 Replit 在安全方面的实践。

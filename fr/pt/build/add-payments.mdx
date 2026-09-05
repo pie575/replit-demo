@@ -1,0 +1,120 @@
+---
+title: "Ajouter des paiements"
+description: "Prélevez une caution remboursable lorsqu'un client réserve une voiture chez Velocity, puis le solde lors de sa prise en charge."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+À terme, un client de Velocity versera un dépôt remboursable pour réserver une voiture, puis réglera le solde lors de la prise en charge.
+
+Vous avez ajouté l’authentification et une base de données à Velocity. Transformez-la maintenant en véritable activité de réservation : sécurisez chaque voiture avec un **dépôt remboursable à la réservation** et **facturez le solde lors de la prise en charge**. Replit gère les paiements via Stripe — vous n’avez pas besoin d’écrire vous-même de code Stripe.
+
+<div id="decida-os-valores-de-depsito-e-saldo">
+  ## Définissez les montants du dépôt et du solde
+</div>
+
+Avant de demander à l’Agent de construire, définissez les modalités :
+
+* **Dépôt à la réservation :** un montant fixe ou un pourcentage du total ? Un dépôt fixe de $500 est plus simple à expliquer ; 20 % s’adaptent au prix du véhicule.
+* **Solde à la prise en charge :** le reste du coût de la location, facturé lorsque le client récupère les clés.
+* **Délai de remboursement :** jusqu’à quand une personne peut-elle annuler tout en récupérant son dépôt ? 48 heures est un délai courant.
+
+Dans ce guide, Velocity retient un dépôt fixe et remboursable de $500 à la réservation, facture le solde à la prise en charge et rembourse intégralement le dépôt si un client annule plus de 48 heures à l’avance. Adaptez ces paramètres aux besoins de votre activité.
+
+<div id="pea-ao-agent-para-adicionar-o-checkout-do-stripe">
+  ## Demandez à Agent d’ajouter le checkout Stripe
+</div>
+
+<AiPrompt>
+  Ajoute des paiements de dépôt et de solde à Velocity avec Stripe en mode test.<br />
+  Lors de la réservation, facture un dépôt remboursable de $500 et enregistre le mode de paiement du client dans son dossier.<br />
+  Lors de la prise en charge, facture le solde restant avec le mode de paiement enregistré.<br />
+  Si le client annule plus de 48 heures avant la prise en charge, rembourse intégralement le dépôt. Dans les 48 heures précédant la prise en charge, conserve-le.<br />
+  Enregistre le statut du dépôt et la référence de la carte enregistrée dans la base de données afin que le client puisse les consulter dans sa réservation.<br />
+  Indique-moi exactement quelles clés secrètes je dois copier depuis Stripe et où les coller.<br />
+  Donne-moi une liste de contrôle des tests couvrant les cas de réussite du dépôt, d’annulation du dépôt, de facturation du solde et de remboursement en cas d’annulation.
+</AiPrompt>
+
+Agent configurera Stripe, ajoutera les flux de dépôt et de solde, et indiquera quelles clés secrètes récupérer depuis Stripe. Collez-les dans les paramètres de votre application lorsque Agent vous le demandera : vos clés de test y restent, jamais dans le code.
+
+<Frame>
+  <img src="/assets/mirror/stripe-secrets-b04a3e238f51.png" alt="Panneau Secrets de Replit affichant les clés d’API Stripe (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET) qu’Agent a demandé au développeur de coller" width="1280" height="720" data-path="images/velocity/add-payments/stripe-secrets.png" />
+</Frame>
+
+<div id="teste-o-fluxo-completo-em-modo-de-teste">
+  ## Testez le parcours complet en mode test
+</div>
+
+Stripe propose une carte de test spéciale qui vous permet d’effectuer de vrais paiements sans dépenser d’argent réel : `4242 4242 4242 4242`, toute date d’expiration future et n’importe quel CVC à 3 chiffres.
+
+1. Ouvrez Velocity dans le Preview et réservez une voiture pour le week-end prochain.
+2. Au checkout, vous devriez voir « Dépôt à payer aujourd’hui : $500 » et « Solde à payer lors de la prise en charge : $1,900 » (ou le montant calculé par votre logique).
+3. Payez le dépôt avec la carte de test `4242`. Vous devriez être redirigé vers une page de confirmation indiquant que le dépôt a été payé et qu’un moyen de paiement est enregistré pour le solde.
+4. Ouvrez la réservation dans « Mes réservations » et utilisez l’action d’administration ou de prise en charge pour facturer le solde. Vérifiez que le solde apparaît comme payé.
+5. Effectuez une deuxième réservation et annulez-la plus de 48 heures à l’avance. Le dépôt doit être remboursé sur la carte de test (vous pouvez le vérifier dans le panneau du mode test de Stripe).
+6. Effectuez une troisième réservation et annulez-la moins de 48 heures à l’avance. Le dépôt doit être conservé et cette règle clairement expliquée au client.
+7. Essayez le checkout avec la carte de test de refus Stripe (`4000 0000 0000 0002`). La réservation ne doit pas être confirmée et le client doit voir un message d’erreur clair.
+
+Si le dépôt est bien payé mais que la réservation n’est pas confirmée, dites à l’Agent :
+
+<AiPrompt>
+  Le dépôt de test Stripe pour Velocity a réussi, mais la réservation n’apparaît pas comme confirmée.<br />
+  Reliez l’événement de réussite du dépôt au statut de la réservation dans la base de données.<br />
+  Montrez-moi comment vérifier cela avec une autre réservation de test.
+</AiPrompt>
+
+<div id="mude-para-pagamentos-reais-quando-estiver-pronto">
+  ## Passez aux paiements réels lorsque vous êtes prêt
+</div>
+
+Le mode test est fait pour vous. Le mode production est destiné aux vrais clients qui paient avec de l’argent réel. Lorsque Velocity est prête :
+
+1. Dans Stripe, passez du mode test au mode production et copiez les clés secrètes **de production**.
+2. Dans les paramètres de votre application, remplacez les clés de test par les clés de production.
+3. Publiez à nouveau Velocity via le Chat d’Agent.
+4. Ouvrez l’URL publique, réservez une voiture d’essai à bas prix avec votre propre carte et vérifiez que le dépôt et le solde fonctionnent de bout en bout.
+
+Effectuez ce test avec une vraie carte une fois avant de partager largement l’URL publique. Velocity accepte désormais de vraies réservations avec de l’argent réel.
+
+<div id="melhorias-a-seguir">
+  ## Prochaines améliorations
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/pt/build/add-integrations">
+    Envoyez chaque réservation dans le calendrier du client.
+  </Card>
+
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/pt/build/add-custom-domain">
+    Faites passer Velocity à une URL personnalisée avant de facturer vos clients.
+  </Card>
+</CardGroup>
+
+<div id="precisa-de-mais-ajuda">
+  ## Besoin d’aide supplémentaire ?
+</div>
+
+* **Le dépôt est effectué, mais la réservation n’est pas confirmée :** demandez à Agent de relier l’événement de réussite Stripe au statut de la réservation dans la base de données.
+* **Le mode test fonctionne, mais pas le mode production :** assurez-vous d’avoir remplacé les clés de test par les clés réelles dans les paramètres de votre app.
+* **Vous souhaitez un paiement anticipé unique plutôt qu’un dépôt + solde :** demandez à Agent de configurer Velocity pour un paiement unique et intégral lors de la réservation.
+* **Vous souhaitez une tarification par abonnement récurrent (accès mensuel à la flotte) :** Replit prend également en charge RevenueCat ; demandez à Agent de l’utiliser à la place de Stripe.
+
+<div id="relacionado">
+  ## Articles associés
+</div>
+
+* [Pagamentos com Stripe](/fr/pt/features/monetization/stripe-payments)
+* [Assinaturas com RevenueCat](/fr/pt/features/monetization/revenuecat-subscriptions)

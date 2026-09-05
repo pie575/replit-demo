@@ -1,0 +1,143 @@
+---
+title: "使用 Agent 技能"
+description: "通过 Agent 技能为 Agent 提供专业知识：将技能附加到消息中、安装到项目中，或基于技能创建项目。"
+sidebarTitle: "使用 Agent 技能"
+icon: "puzzle-piece"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+技能可让 Agent 掌握新能力——首选模式、库的使用细节、设计系统规则，或已解决问题的方案。你可以将技能附加到消息中、安装到项目中，或将其作为新项目的起点。
+
+<div id="use-a-skill-in-chat">
+  ## 在聊天中使用技能
+</div>
+
+试用技能的最快方式是将其添加到单条消息中，无需安装。
+
+<Frame>
+  <img src="/assets/mirror/agent-skills-picker-ee4058454475.png" alt="通过聊天输入框旁的 + 按钮打开的技能选择器，显示含有 Ad Creative、AI Recruiter、AI SDR 和 AI Secretary 的技能列表" width="723" height="529" data-path="images/replitai/agent-skills-picker.png" />
+</Frame>
+
+<Steps>
+  <Step title="打开技能选择器">
+    点击聊天输入框旁的 **+** 按钮，然后选择 **使用技能**。
+  </Step>
+
+  <Step title="浏览并选择技能">
+    按类别浏览技能，例如 Business &amp; finance、Creative、Research &amp; analysis 等。选择一个或多个技能添加到消息中。
+  </Step>
+
+  <Step title="发送消息">
+    输入请求并发送。Agent 只会在该消息中使用所选技能。消息上会显示技能标签，方便你查看当前启用了哪些技能。
+  </Step>
+</Steps>
+
+例如，添加 **Stock Analyzer** 并让 Agent 撰写股票研究报告，或添加 **Deep Research**，让 Agent 调研某个主题并提供结构化发现。
+
+<Tip>
+  在聊天中添加技能不会在项目中安装任何内容。它们可立即在每个项目中使用。
+</Tip>
+
+<div id="start-a-project-with-a-skill">
+  ## 使用技能启动项目
+</div>
+
+创建新项目时，你可以选择一个经过审核的技能作为起点。Agent 会按照该技能的指令搭建项目。
+
+<Steps>
+  <Step title="打开起点选择器">
+    在新建项目界面，点击 **+**，然后选择 **使用技能**。
+  </Step>
+
+  <Step title="选择一个技能">
+    浏览精选技能，例如 **AI SDR**、**SEO Auditor**、**Ad Creative** 或 **Programmatic SEO**，从中选择与你想构建的应用类型相符的那一个。
+  </Step>
+
+  <Step title="描述你的应用">
+    告诉 Agent 你想要什么。Agent 会从一开始就套用该技能的模式和约定来构建项目。
+  </Step>
+</Steps>
+
+<div id="install-a-skill-in-your-project">
+  ## 在项目中安装技能
+</div>
+
+如果你希望 Agent 在项目的每次对话中都始终应用某个技能，就把它安装到项目中。已安装的技能位于项目的 `/.agents/skills` 目录下，并会在各个聊天会话中持续生效。
+
+<div id="install-from-the-skills-pane">
+  ### 从技能面板安装
+</div>
+
+在 Project Editor 中打开 **技能面板**，切换到 **Discover** 标签页即可搜索社区贡献的技能。找到需要的技能后点击 **Install**，它就会自动添加到你的项目中。
+
+<Frame>
+  <img src="/assets/mirror/agent-skills-discover-732b2b0c488a.png" alt="Discover 标签页，展示可搜索的社区贡献技能及安装按钮" width="2542" height="1850" data-path="images/replitai/agent-skills-discover.png" />
+</Frame>
+
+例如，在构建带有高级动画的作品集网站时，你可以安装：
+
+* **GSAP React** — 教会 Agent 制作滚动触发动画、文字显现效果和 SVG 路径绘制
+* **Tailwind design system** — 让 Agent 掌握 Tailwind CSS 在排版、间距和视图过渡方面的模式
+* **Find skills** — 教会 Agent 如何代你发现并安装新的技能
+
+<Tip>
+  你也可以通过 [npx skills CLI](https://github.com/vercel-labs/skills) 安装技能：
+
+  ```bash theme={null}
+  npx skills <skill> -a replit
+  ```
+</Tip>
+
+<div id="create-a-skill-from-a-conversation">
+  ### 从对话中创建技能
+</div>
+
+通过与 Agent 对话是创建技能最自然的方式。在共同解决问题或研究新库后，可以请 Agent 将它学到的内容整理下来：
+
+<AiPrompt>
+  调研 GSAP 与 React 集成的最佳实践，并为此项目创建一个技能。
+</AiPrompt>
+
+Agent 会利用完整的对话上下文编写详细的技能文件。这种方式尤其适合调试结束后，因为此时你们已逐步形成对问题的共同理解。
+
+<div id="write-a-custom-skill">
+  ### 编写自定义技能
+</div>
+
+对于高级用例，可直接遵循 [Agent Skills specification](https://agentskills.io/specification) 编写技能。在文件侧边栏中开启 **显示隐藏文件**，打开 `/.agents/skills/`，然后新建一个 Markdown 文件。这样，你就能完全控制 Agent 知晓的内容及其行为方式。
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Agent 技能（概念）" icon="puzzle-piece" href="/zh/learn/agent-skills">
+    了解何时使用技能、主动式与响应式模式，以及技能与 MCP 服务器的区别。
+  </Card>
+
+  <Card title="Agent 技能参考" icon="book" href="/zh/features/agent/skills">
+    了解技能的结构、管理方式及其底层工作原理等技术细节。
+  </Card>
+
+  <Card title="浏览社区技能" icon="arrow-up-right-from-square" href="https://skills.sh">
+    在 skills.sh 上查找由社区构建的技能。
+  </Card>
+
+  <Card title="Agent 技能规范" icon="file-lines" href="https://agentskills.io/specification">
+    阅读这项开放标准，编写可在任何 agent 中运行的技能。
+  </Card>
+</CardGroup>

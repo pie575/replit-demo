@@ -1,0 +1,57 @@
+---
+title: "Planifier une migration d’authentification personnalisée"
+description: "Planifiez une migration sécurisée de votre système d’authentification personnalisé vers Clerk Auth tout en préservant les données utilisateur et les règles d’accès de votre application."
+---
+
+Utilisez cette page si votre application dispose de son propre système d’authentification, d’un stockage des utilisateurs ou d’une logique de session. Migrer vers [Clerk Auth](/fr/ko/features/auth-and-identity/clerk-auth) ne consiste pas simplement à modifier du code : il s’agit d’une migration de données et d’identités. Sans plan, les utilisateurs existants risquent d’avoir l’impression d’avoir perdu l’accès à leurs données.
+
+<Note>
+  **Vous utilisez Replit Auth ?** Le processus de migration automatisée est uniquement disponible pour les applications Replit Auth éligibles. Suivez plutôt [Migrer de Replit Auth vers Clerk](/fr/ko/features/auth-and-identity/migrate-auth-to-clerk).
+
+  Replit ne migre pas automatiquement les systèmes d’authentification personnalisés. Cette page fournit des conseils pour la planification et la validation, et non une procédure d’importation automatisée.
+</Note>
+
+<div id="section">
+  ## Planifier la continuité des identités
+</div>
+
+* Identifiez la valeur stable qui relie actuellement les personnes aux données de l’application. Il peut s’agir d’un ID utilisateur, d’une adresse e-mail, d’un nom d’utilisateur ou d’un enregistrement de compte distinct.
+* Répertoriez toutes les tables et tous les services qui dépendent de cette valeur, notamment pour la propriété, les autorisations, les abonnements, les préférences et les journaux d’audit.
+* Avant de modifier le comportement de connexion, déterminez comment le nouveau système d’identité interprétera chaque enregistrement local existant.
+* Définissez comment les nouveaux utilisateurs seront attribués et associés aux enregistrements locaux après la transition.
+
+<Warning>
+  Ne supposez pas que l’ID utilisateur du fournisseur, l’adresse e-mail ou le nouveau compte créé lors de la première connexion correspondra aux enregistrements existants. Vérifiez le mappage avec des comptes représentatifs avant la transition.
+</Warning>
+
+<div id="section-2">
+  ## Identifiants de compte et sessions
+</div>
+
+* Répertoriez séparément les hachages de mots de passe, les identités OAuth, les facteurs MFA, l’état d’authentification et les sessions actives. Ces éléments peuvent avoir des exigences différentes en matière de portabilité et de sécurité.
+* Avant de traiter de vrais comptes, validez la migration des mots de passe conformément à la documentation la plus récente du fournisseur choisi. Si vous ne pouvez pas migrer les identifiants en toute sécurité, prévoyez un flux de réinitialisation de mot de passe ou de liaison de comptes.
+* Ne supposez pas que les identités OAuth ou les sessions actives seront automatiquement transférées. Planifiez la manière dont les utilisateurs existants se reconnecteront et dont vous éviterez les doublons de comptes.
+* À moins d’avoir explicitement prévu une solution de remplacement, conservez les autorisations et les données propres à l’application dans le modèle de données local. L’authentification et l’autorisation nécessitent souvent des opérations de migration distinctes.
+
+<div id="section-3">
+  ## Tester avant la transition
+</div>
+
+* Testez dans un environnement hors production avec des comptes et des données non sensibles représentatifs.
+* Connectez-vous avec des comptes existants, puis ouvrez les pages qui lisent des données propres à chaque utilisateur, comme le tableau de bord, le profil et les éléments enregistrés.
+* Vérifiez les règles d’autorisation, la restauration de compte, la déconnexion et les flux de création de nouveaux comptes.
+* Surveillez les enregistrements en double et les échecs d’accès pendant la transition. Conservez un plan de retour arrière jusqu’à la fin de la vérification.
+
+<div id="section-4">
+  ## Obtenir de l’aide
+</div>
+
+* Si vous devez migrer un système d’authentification personnalisé vers Clerk Auth, géré par Replit, [contactez l’assistance Replit](https://replit.com/support) avant de modifier les données des comptes de production.
+* Si vous gérez l’authentification auprès d’un autre fournisseur, utilisez sa documentation de migration la plus récente et vérifiez le mappage des identités avant la transition.
+
+<div id="section-5">
+  ## Ressources supplémentaires
+</div>
+
+* [Présentation de Clerk Auth](/fr/ko/features/auth-and-identity/clerk-auth) — Découvrez comment Clerk Auth fonctionne avec Replit
+* [Migrer de Replit Auth vers Clerk](/fr/ko/features/auth-and-identity/migrate-auth-to-clerk) — Utilisez le flux de migration d’application approprié pour Replit Auth

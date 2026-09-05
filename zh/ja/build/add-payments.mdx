@@ -1,0 +1,120 @@
+---
+title: "添加支付功能"
+description: "客户预订 Velocity 车辆时收取可退还的押金，并在取车时收取尾款。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+完成后，Velocity 的客户即可在预订车辆时支付可退还的押金，并在取车时支付尾款。
+
+我们已为 Velocity 添加了登录功能和数据库。接下来，让我们将其打造为真正的预订业务：客户可在预订时支付可退还的**押金**预留车辆，并在**取车时支付尾款**。Replit 会通过 Stripe 处理付款，因此您无需自行编写 Stripe 代码。
+
+<div id="section">
+  ## 确定押金和尾款金额
+</div>
+
+在请 Agent 构建应用之前，先确定收费方式：
+
+* **预订时的押金：** 是收取固定金额，还是按总金额的一定比例收取？固定 $500 简单明了，而 20% 则会随车辆价格而变化。
+* **取车时的尾款：** 即剩余的租车费用，在客户领取钥匙时收取。
+* **退款期限：** 取消预订后，最晚可在何时退还押金？提前 48 小时是常见的默认设置。
+
+在本指南中，Velocity 会在预订时收取固定 $500 的可退还押金，在取车时收取尾款；如果在 48 小时或更早前取消，则全额退款。请根据实际业务情况进行调整。
+
+<div id="agentstripe">
+  ## 指示 Agent 使用 Stripe 添加结账功能
+</div>
+
+<AiPrompt>
+  使用测试模式的 Stripe 为 Velocity 添加押金和尾款支付功能。<br />
+  预订时，收取 $500 可退还押金，并保存客户的付款方式。<br />
+  取车时，向已保存的付款方式收取剩余尾款。<br />
+  如果客户在取车前超过 48 小时取消，请全额退还押金。取车前 48 小时内取消则保留押金。<br />
+  将押金状态和已保存卡片的引用保存到数据库中，以便客户在预订信息中查看这两项内容。<br />
+  请准确告诉我需要从 Stripe 复制哪些密钥，以及粘贴到哪里。<br />
+  请提供一份测试清单，涵盖押金支付成功、取消押金支付、收取尾款和取消退款的情况。
+</AiPrompt>
+
+Agent 会在后台设置 Stripe、添加押金和尾款支付流程，并告知你需要从 Stripe 获取哪些密钥。当 Agent 提示你操作时，请将密钥粘贴到应用设置中 — 测试密钥应保存在那里，绝不要写入代码。
+
+<Frame>
+  <img src="/assets/mirror/stripe-secrets-b04a3e238f51.png" alt="Replit Secrets 窗格显示 Agent 提示构建者粘贴的 Stripe API 密钥（STRIPE_SECRET_KEY、STRIPE_PUBLISHABLE_KEY、STRIPE_WEBHOOK_SECRET）" width="1280" height="720" data-path="images/velocity/add-payments/stripe-secrets.png" />
+</Frame>
+
+<div id="section-2">
+  ## 在测试模式下测试完整流程
+</div>
+
+Stripe 提供专用测试卡，让您无需使用真实资金即可模拟实际支付：`4242 4242 4242 4242`，有效期填写任意未来日期，CVC 填写任意三位数字即可。
+
+1. 在 Preview 中登录 Velocity，并预订下周六至周日的车辆。
+2. 结账时，您应看到“今日押金：$500”和“取车时支付尾款：$1,900” (或您自行计算的金额) 。
+3. 使用 `4242` 测试卡支付押金。您应返回确认页面，其中会显示押金已支付，以及用于支付尾款的已保存付款方式。
+4. 从“我的预订”中打开该预订，并通过管理员操作或取车操作收取尾款。确认尾款显示为已支付。
+5. 进行第二次预订，并提前至少 48 小时取消。押金应退回测试卡 (可在 Stripe 测试模式控制台中确认) 。
+6. 进行第三次预订，并在 48 小时内取消。押金应被保留，并向客户清楚说明原因。
+7. 使用 Stripe 的支付失败测试卡 (`4000 0000 0000 0002`) 尝试结账。预订不应被确认，客户应看到清晰易懂的失败提示。
+
+如果押金支付成功但预订未显示为已确认，请告知 Agent：
+
+<AiPrompt>
+  Velocity 的 Stripe 测试押金已成功支付，但预订没有显示为已确认。<br />
+  将押金支付成功事件关联到数据库中的预订状态。<br />
+  告诉我如何通过另一笔测试预订进行验证。
+</AiPrompt>
+
+<div id="section-3">
+  ## 准备就绪后切换至正式支付
+</div>
+
+测试模式供你测试使用；正式模式面向实际付款的真实客户。准备好让 Velocity 上线后：
+
+1. 在 Stripe 中从测试模式切换到正式模式，并复制**正式**密钥。
+2. 在应用设置中，将测试密钥替换为正式密钥。
+3. 通过 Agent 聊天重新发布 Velocity。
+4. 打开发布 URL，使用你自己的真实银行卡预订一辆低价测试车辆，确认押金和尾款流程都能端到端正常运行。
+
+在广泛分享发布 URL 之前，请先使用真实银行卡完成一次测试。这样，Velocity 就可以开始接受真实付款的预订了。
+
+<div id="section-4">
+  ## 后续改进
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加集成" icon="plug" href="/zh/ja/build/add-integrations">
+    将每个预约同步到客户的日历。
+  </Card>
+
+  <Card title="添加自定义域名" icon="globe" href="/zh/ja/build/add-custom-domain">
+    在向客户收费前，将 Velocity 迁移到品牌域名。
+  </Card>
+</CardGroup>
+
+<div id="section-5">
+  ## 如需更多帮助
+</div>
+
+* **押金支付成功，但预订未确认：** 请让 Agent 将 Stripe 的 Success 事件与数据库中的预订状态关联起来。
+* **测试模式可用，但正式模式不可用：** 请检查是否已在应用设置中将测试密钥替换为正式密钥。
+* **想要全额预付，而非支付押金和尾款：** 请让 Agent 修改 Velocity，使用户在预订时一次性支付全额。
+* **需要按月收取订阅费 (每月可使用车队) ：** Replit 也支持 RevenueCat — 请让 Agent 使用 RevenueCat 替代 Stripe。
+
+<div id="section-6">
+  ## 相关信息
+</div>
+
+* [Stripe 支付](/zh/ja/features/monetization/stripe-payments)
+* [RevenueCat 订阅](/zh/ja/features/monetization/revenuecat-subscriptions)

@@ -1,0 +1,296 @@
+---
+title: "安全检查清单"
+description: "遵循这份全面的安全检查清单，确保您的 vibe coded 应用遵循安全最佳实践。"
+sidebarTitle: "安全检查清单"
+icon: "clipboard-check"
+---
+
+本指南提供了一份全面的安全检查清单，帮助确保您的 vibe coded 应用遵循安全最佳实践。
+
+虽然 Replit 提供了许多[开箱即用](/zh/pt/features/security/overview)的安全功能，但了解并实施满足应用特定需求的额外安全措施仍然十分重要。
+
+<iframe src="https://www.youtube.com/embed/0D9FMFyNBWo" title="Vibe code 安全检查清单" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen />
+
+<div id="pr-requisitos">
+  ## 前置条件
+</div>
+
+* 一个 Replit 账户
+* 具备所选编程语言的基础知识
+* 熟悉项目编辑器
+* 一个正在 Replit 中开发的应用
+
+<div id="segurana-no-front-end">
+  ## 前端安全
+</div>
+
+<AccordionGroup>
+  <Accordion title="全程使用 HTTPS" icon="lock">
+    Replit 默认对所有应用启用 HTTPS，因此无需担心！
+  </Accordion>
+
+  <Accordion title="输入验证与清理" icon="shield-check">
+    始终验证并清理用户输入，以防范跨站脚本 (XSS) 攻击：
+
+    ```javascript theme={null}
+    // 不佳：直接使用用户输入
+    element.innerHTML = userInput;
+
+    // 推荐：使用前先清理输入
+    import { sanitize } from 'some-sanitizer-library';
+    element.innerHTML = sanitize(userInput);
+    ```
+
+    询问 Agent：
+
+    ```
+    帮我验证并清理输入，以防范 XSS 攻击
+    ```
+  </Accordion>
+
+  <Accordion title="不要在浏览器中存储敏感数据" icon="eye-slash">
+    应使用 Replit Secrets 存储 API 密钥等敏感信息。
+
+    请确保不要将密钥传递到客户端，也不要存放在以下位置：
+
+    * 本地存储
+    * 会话存储
+    * 客户端 JavaScript
+    * 未设置适当安全属性的 Cookie
+
+    询问 Agent：
+
+    ```
+    帮我确保敏感数据不暴露在浏览器中。我这样做对吗？
+    ```
+  </Accordion>
+
+  <Accordion title="CSRF 防护" icon="shield">
+    为表单实施跨站请求伪造 (CSRF) 防护：
+
+    ```javascript theme={null}
+    // CSRF 令牌实现示例
+    const csrfToken = generateToken();
+    session.csrfToken = csrfToken;
+    ```
+
+    询问 Agent：
+
+    ```
+    帮我为表单实现 CSRF 令牌
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="segurana-no-back-end">
+  ## 后端安全
+</div>
+
+<AccordionGroup>
+  <Accordion title="身份验证基础" icon="key">
+    实现身份验证时：
+
+    * 尽可能使用 Replit Auth
+    * 如需自定义身份验证，请使用成熟的库
+    * 切勿以明文存储密码
+
+    向 Agent 提问：
+
+    ```
+    Help me implement authentication for my application with Replit Auth
+    ```
+  </Accordion>
+
+  <Accordion title="授权检查" icon="user-lock">
+    执行操作前，始终检查权限：
+
+    ```javascript theme={null}
+    // 授权检查示例
+    if (!user.canAccess(resource)) {
+      return res.status(403).send('Access denied');
+    }
+    ```
+
+    向 Agent 提问：
+
+    ```
+    Help me implement authorization checks for my application
+    ```
+  </Accordion>
+
+  <Accordion title="API 端点保护" icon="shield">
+    保护你的 API 端点：
+
+    * 为敏感端点添加身份验证
+    * 正确配置 CORS
+    * 考虑实施速率限制
+
+    向 Agent 提问：
+
+    ```
+    How do I properly authenticate endpoints in my app?
+    ```
+  </Accordion>
+
+  <Accordion title="防范 SQL 注入" icon="database">
+    Agent 默认使用 ORM，有助于防范 SQL 注入。如果你要编写自定义数据库查询：
+
+    ```javascript theme={null}
+    // 不佳：在查询中拼接字符串
+    db.query(`SELECT * FROM users WHERE username = '${username}'`);
+
+    // 推荐：使用 ORM 的参数化查询
+    db.query('SELECT * FROM users WHERE username = ?', [username]);
+    ```
+  </Accordion>
+
+  <Accordion title="安全标头" icon="code">
+    为你的应用添加重要的安全标头：
+
+    ```html theme={null}
+    <!-- 在 index.html 中或通过后端添加 -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+    ```
+
+    你可以在 [securityheaders.com](https://securityheaders.com) 扫描网站，获取相关建议。
+
+    向 Agent 提问：
+
+    ```
+    Can you add the security headers to my application?
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="prticas-contnuas-de-segurana">
+  ## 持续安全最佳实践
+</div>
+
+<AccordionGroup>
+  <Accordion title="及时更新依赖项" icon="arrow-rotate-right">
+    定期检查是否存在可能含有漏洞的过时包：
+
+    ```bash theme={null}
+    npm audit
+    ```
+  </Accordion>
+
+  <Accordion title="妥善处理错误" icon="exclamation">
+    不要在错误消息中泄露敏感信息：
+
+    ```javascript theme={null}
+    // 不佳：泄露敏感信息
+    catch (err) {
+      res.status(500).send(`Database error: ${err.message}`);
+    }
+
+    // 良好：通用错误消息
+    catch (err) {
+      console.error(err); // 内部日志
+      res.status(500).send('An error occurred');
+    }
+    ```
+
+    向 Agent 提问：
+
+    ```
+    帮我为我的应用实现适当的错误处理
+    ```
+  </Accordion>
+
+  <Accordion title="安全 Cookie" icon="cookie">
+    使用 Cookie 时：
+
+    * 设置 HttpOnly 标志，防止通过 JavaScript 访问
+    * 使用 Secure 属性，确保仅通过 HTTPS 传输
+    * 设置 SameSite 属性，防止 CSRF
+
+    向 Agent 提问：
+
+    ```
+    帮我保护应用中的 Cookie
+    ```
+  </Accordion>
+
+  <Accordion title="文件上传安全" icon="upload">
+    如果你的应用允许上传文件：
+
+    * 限制文件类型和大小
+    * 尽可能扫描恶意软件
+    * 将文件存储在 Replit 对象存储中
+    * 生成新的文件名，而不是使用用户提供的文件名
+
+    向 Agent 提问：
+
+    ```
+    帮我保护应用中的文件上传功能
+    ```
+  </Accordion>
+
+  <Accordion title="速率限制" icon="clock">
+    对 API 端点实施速率限制，尤其是与身份验证相关的端点：
+
+    ```javascript theme={null}
+    // 速率限制中间件示例
+    const rateLimit = require('express-rate-limit');
+
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 分钟
+      max: 100 // 每个 IP 在每个 windowMs 内最多 100 个请求
+    });
+
+    app.use('/api/', limiter);
+    ```
+
+    向 Agent 提问：
+
+    ```
+    帮我为我的应用实现速率限制
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="lista-de-verificao">
+  ## 检查清单
+</div>
+
+以下将上述内容整理成检查清单，帮助你跟踪自己的安全实践落实情况。
+
+<div id="segurana-no-front-end-2">
+  ## 前端安全
+</div>
+
+|   | 安全措施           | 说明                     |
+| - | -------------- | ---------------------- |
+| ☐ | 全站使用 HTTPS     | 防止基本的拦截和中间人攻击          |
+| ☐ | 输入验证和清理        | 验证所有用户输入，防止 XSS 攻击     |
+| ☐ | 不在浏览器中存储敏感数据   | 不要在本地存储或客户端代码中存放密钥     |
+| ☐ | CSRF 防护        | 为表单和会更改状态的请求实施 CSRF 令牌 |
+| ☐ | 切勿在前端暴露 API 密钥 | API 凭据必须始终保留在服务器端      |
+
+<div id="segurana-no-back-end-2">
+  ## 后端安全
+</div>
+
+|   | 安全措施      | 描述                                               |
+| - | --------- | ------------------------------------------------ |
+| ☐ | 身份验证基础    | 使用成熟的库，并妥善存储密码 (哈希处理和加盐)                         |
+| ☐ | 授权检查      | 执行操作前始终检查权限                                      |
+| ☐ | API 端点保护  | 为每个 API 端点实施适当的身份验证                              |
+| ☐ | 防范 SQL 注入 | 使用参数化查询或 ORM，切勿将用户输入直接拼接到原始 SQL 中                |
+| ☐ | 基本安全标头    | 实施 X-Frame-Options、X-Content-Type-Options 和 HSTS |
+| ☐ | DDoS 防护   | 使用具备内置 DDoS 缓解功能的 CDN 或云服务                       |
+
+<div id="hbitos-prticos-de-segurana">
+  ## 实用安全做法
+</div>
+
+|   | 安全措施      | 描述                               |
+| - | --------- | -------------------------------- |
+| ☐ | 保持依赖项更新   | 大多数漏洞源于过时的库                      |
+| ☐ | 妥善处理错误    | 不要在错误消息中暴露敏感信息                   |
+| ☐ | 安全 Cookie | 设置 HttpOnly、Secure 和 SameSite 属性 |
+| ☐ | 文件上传安全    | 验证文件类型和大小，并扫描恶意内容                |
+| ☐ | 速率限制      | 在所有 API 端点实施速率限制，尤其是与身份验证相关的端点   |

@@ -1,0 +1,146 @@
+---
+title: "Générer des notes de version"
+description: "Chaque semaine, transformez les changements issus de GitHub et de Linear en notes de version que l'on lit vraiment."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Il ne s’agit pas d’un connecteur natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Chaque semaine, les modifications sont récupérées depuis GitHub et Linear, puis des notes de version destinées aux clients sont générées, regroupées par nouvelles fonctionnalités, améliorations et correctifs, avant d&#39;être publiées sur Notion. Les travaux purement internes sont ignorés et tout élément susceptible de constituer un changement incompatible est signalé, afin que les équipes produit, le support et les clients partagent régulièrement les mêmes informations.
+
+<div id="section">
+  ## Cas d&#39;usage privilégiés
+</div>
+
+* Les chefs de produit qui ont besoin d&#39;un journal des modifications hebdomadaire, sans attendre une version taguée.
+* Les équipes marketing produit et support qui ont besoin des mêmes informations que les clients.
+
+<div id="section-2">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{ id: "github", name: "GitHub", why: "Pull requests fusionnées et tags" },
+{ id: "linear", name: "Linear", why: "Tickets et titres destinés aux clients" },
+{ id: "notion", name: "Notion", why: "Notes publiées" },
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Indiquez à Agent le dépôt concerné ainsi que l&#39;équipe Linear. Connectez Notion pour les pages publiées. Précisez le jour de la semaine de l&#39;exécution hebdomadaire.
+
+<div id="section-4">
+  ## Instructions pour l&#39;agent
+</div>
+
+<AiPrompt>
+  Crée une routine qui s&#39;exécute tous les lundis à 9h00. Récupère les modifications de la semaine dernière depuis GitHub et Linear,
+  génère des notes de version destinées aux clients, regroupées en nouvelles fonctionnalités, améliorations et corrections, puis publie-les
+  dans Notion. Ignore les travaux réservés à un usage interne. Signale tout ce qui ressemble à un changement incompatible.
+</AiPrompt>
+
+<div id="section-5">
+  ## À quoi s&#39;attendre
+</div>
+
+Agent rédige les notes de version de la semaine écoulée à partir des pull requests et des tickets, puis crée la page Notion. Peaufinez le style avant de l&#39;envoyer aux clients. Écartez ce qui relève d&#39;un travail purement interne et placez les changements incompatibles en tête. Avant la publication, comparez la page aux pull requests fusionnées la semaine dernière.
+
+<div id="section-6">
+  ## Personnalisez selon vos besoins
+</div>
+
+<AiPrompt>
+  Crée deux versions : une pour les clients et une pour le journal des modifications interne. Conserve-les
+  dans la même page Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Ajoute un message Slack dans le canal #ship, avec un lien vers la page Notion et trois points clés.
+</AiPrompt>
+
+<div id="section-7">
+  ## Dépannage
+</div>
+
+* **Des tâches internes se glissent dans les notes :** indiquez à Agent le dépôt et l&#39;équipe Linear appropriés, puis redemandez-lui d&#39;ignorer les travaux qui ne concernent pas les clients.
+* **Un changement incompatible est passé inaperçu :** précisez à Agent ce que « rupture » signifie pour vous (connexion, facturation, migrations obligatoires, etc.) et demandez-lui de placer ces éléments en tête de liste, accompagnés d&#39;un signalement.
+* **La page Notion n&#39;est pas la bonne :** fournissez le lien exact de la page ou de la base de données, et indiquez s&#39;il faut écraser les notes de la semaine précédente ou créer une nouvelle page à chaque exécution.
+
+<div id="section-8">
+  ## Informations connexes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Sourcer des candidats" href="/fr/ja/use-cases/source-candidates">
+    Utilisez le même connecteur GitHub pour le recrutement plutôt que pour la mise en production.
+  </Card>
+
+  <Card title="Analyser les retours clients" href="/fr/ja/use-cases/analyze-customer-feedback">
+    Pour les chefs de produit qui consultent aussi leurs tickets dans Notion.
+  </Card>
+</CardGroup>

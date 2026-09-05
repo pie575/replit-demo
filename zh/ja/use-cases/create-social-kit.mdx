@@ -1,0 +1,166 @@
+---
+title: "创建社交媒体图标和横幅"
+description: "根据网站和云盘中的素材，为各个社交平台生成尺寸合适的个人资料图标和封面横幅。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                这不是原生 connector。Agent 会要求你提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+根据网站和 Google Drive 中的品牌素材，为 X、LinkedIn、Instagram、Facebook、
+TikTok 及其他指定平台生成头像和封面横幅。
+Agent 会采用各平台当前的尺寸和安全区域，确保实际个人资料中的
+人脸、徽标或文本不会被裁切。保持统一的视觉风格，
+并导出为 PNG。若不同平台需要不同的裁切方式，则创建专用
+画板，避免拉伸图像。
+
+<div id="section">
+  ## 适用场景
+</div>
+
+* 希望一次为多个社交平台准备头像和封面素材的品牌设计师。
+* 希望基于现有徽标和网站获取可导出图标和横幅的营销人员。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "徽标、配色和现有品牌素材",
+},
+]}
+/>
+
+<div id="section-3">
+  ## 开始前
+</div>
+
+请准备好网站 URL，以及云端硬盘中的徽标 (或品牌文件夹) 。请告知所需的
+社交网络。若徽标为文字标志，请指定图标使用符号、
+首字母，还是两者都使用。
+
+<div id="section-4">
+  ## 给 Agent 的指示
+</div>
+
+<AiPrompt>
+  根据此网站[URL]和 Google Drive 中的品牌素材，在 Replit Design 中创建社交媒体
+  素材包。为 X、LinkedIn、Instagram、Facebook 和 TikTok 创建头像和
+  封面横幅。使用各平台当前官方规定的尺寸和安全区域，确保人脸、徽标 和
+  文字不会被裁切。保持统一的视觉体系。导出为 PNG。如果不同平台需要不同的
+  裁切方式，请创建专用画板，不要拉伸。
+</AiPrompt>
+
+<div id="section-5">
+  ## 预期效果
+</div>
+
+Agent 会读取网站和云端硬盘中的素材，并为每项素材创建像素尺寸正确的画板。典型配置：
+
+* **X：** 头像 400×400，页眉 1500×500
+* **LinkedIn：** 头像 400×400，横幅 1584×396
+* **Instagram：** 头像 320×320 (如需帖子封面和快拍封面，还需添加 1080×1080 和 1080×1920)
+* **Facebook：** 头像 320×320，封面 820×312 (或双倍尺寸 1640×624)
+* **TikTok：** 头像 200×200，封面 1080×1920
+
+上传前，请检查圆形头像和横向横幅的裁切效果。
+分别导出一个图标和一个横幅，放入圆形头像和横向页眉中，
+检查小尺寸下的留白。
+
+<div id="section-6">
+  ## 根据你的需求进行自定义
+</div>
+
+<AiPrompt>
+  添加 YouTube (个人资料图片 800×800、横幅 2560×1440，安全区域 1546×423) 和 Pinterest
+  (个人资料图片 165×165、图钉 1000×1500) 。
+</AiPrompt>
+
+<AiPrompt>
+  为每个图标创建浅色版和深色版。横幅保持网站的主色调。
+</AiPrompt>
+
+<div id="section-7">
+  ## 故障排除
+</div>
+
+* **徽标或人脸被裁切：** 请分别在圆形头像和横向横幅中检查素材。注意留出安全区域；如果需要不同的裁切方式，请让 Agent 创建专用画板。避免拉伸。
+* **尺寸与平台不匹配：** 指定所需的平台，并让 Agent 使用各平台当前的官方尺寸。平台规格可能会变更，因此请在上传前再次确认。
+
+<div id="section-8">
+  ## 相关信息
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计落地页" href="/zh/ja/use-cases/design-landing-page">
+    您也可以在候补名单页面和发布页面中使用同一 Google Drive 中的品牌素材。
+  </Card>
+
+  <Card title="创建面向投资者的融资演示文稿" href="/zh/ja/use-cases/pitch-deck-from-website">
+    您也可以在幻灯片中使用同一 Google Drive 中的品牌素材。
+  </Card>
+</CardGroup>

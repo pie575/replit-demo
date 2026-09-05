@@ -1,0 +1,148 @@
+---
+title: "工作流"
+description: "了解如何设置工作流（Workflows）——可运行任意命令的可配置运行按钮。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+可在 Replit 应用中运行的一组可复用、可自定义的步骤。工作流既可以很简单，比如只运行 `python main.py`，也可以很复杂，执行多个步骤的操作流程。
+
+<Frame>
+  <img src="/assets/mirror/workflows-pane-e7d5e4251006.png" alt="工作流窗格的图片" width="525" height="622" data-path="images/workflows/workflows-pane.png" />
+</Frame>
+
+使用示例：
+
+* 并行运行多个服务 (例如：前端 + 后端)
+* 按顺序运行文件或命令 (例如：运行代码检查 → 运行测试；编译 → 运行代码)
+
+要开始[创建工作流](#creating-workflows)，可使用工具侧边栏菜单，或按 `Command + K` 搜索 Workflows 窗格。
+
+<YouTubeEmbed videoId="I5wePXNdPwg" title="Replit 的 Workflows" />
+
+<div id="section">
+  ## 可用的任务类型
+</div>
+
+目前提供三种任务类型：`Execute Shell Command`、`Install Packages` 和 `Run Workflow`。
+
+<div id="execute-shell-command">
+  ### Execute Shell Command
+</div>
+
+`Execute Shell Command` 会保存 Shell 命令，并在与 Shell 窗格相同的环境中运行这些命令。此任务类型用途广泛，例如可用于运行单个文件：
+
+```text theme={null}
+python main.py
+```
+
+到执行复杂的数据库查询命令：
+
+```text theme={null}
+psql -h 0.0.0.0 -U your_username -d your_database -c "SELECT * FROM your_table;"
+```
+
+使用示例：
+
+<Frame>
+  <img src="/assets/mirror/shellExec-task-example-44b117f3fc2d.gif" alt="Shell 执行任务示例" width="908" height="602" data-path="images/workflows/shellExec-task-example.gif" />
+</Frame>
+
+<div id="install-packages">
+  ### Install Packages
+</div>
+
+`Install Packages` 利用 Replit 内置的依赖管理系统，自动检测项目的依赖项并安装项目所需的软件包。有关 UPM 如何推断项目需要安装哪些软件包的详细信息，请参阅[依赖管理](/zh/ja/features/project-setup/dependency-management#the-universal-package-manager)。
+
+使用示例：
+
+<Frame>
+  <img src="/assets/mirror/packager-task-example-0ed4437abfc1.webp" alt="packager 任务示例" width="720" height="429" data-path="images/workflows/packager-task-example.webp" />
+</Frame>
+
+<div id="run-workflow">
+  ### Run Workflow
+</div>
+
+使用 `Run Workflow` 可以从当前工作流中运行另一个工作流，从而复用已有工作流，或将多个工作流组合成更复杂的工作流。
+
+使用示例：
+
+<Frame>
+  <img src="/assets/mirror/example-run-workflow-62f93cd1bf00.webp" alt="运行工作流示例" width="720" height="678" data-path="images/workflows/example-run-workflow.webp" />
+</Frame>
+
+借助这种任务类型在工作流之间建立依赖关系后，只要编辑其中一个工作流，引用它的其他工作流就会自动采用最新的更改。请注意，深度嵌套的工作流调用存在层级深度限制。
+
+<div id="section-2">
+  ## 工作流的执行模式
+</div>
+
+Workflows 提供顺序和并行两种执行模式。
+
+<div id="section-3">
+  ### 顺序执行
+</div>
+
+顺序执行会按照定义的顺序运行任务，等待每个任务完成后再进入下一步；如果工作流中的某个任务失败，则停止执行。
+
+这种模式适用于定义逻辑上前后衔接的命令，例如先从主分支拉取最新更改，再将当前分支变基到主分支的 Git 命令：
+
+<Frame>
+  <img src="/assets/mirror/example-sequential-workflow-62ae8a64038f.png" alt="顺序工作流示例" width="721" height="654" data-path="images/workflows/example-sequential-workflow.png" />
+</Frame>
+
+<div id="section-4">
+  ### 并行
+</div>
+
+并行执行会同时运行所有任务，每个任务启动后都独立于工作流中的其他任务运行。某个任务失败不会中断其他任务的执行。
+
+例如，运行需要同时启动前端和后端服务器的全栈项目时，就适合使用这种模式：
+
+<Frame>
+  <img src="/assets/mirror/example-parallel-workflow-ebda6681ce61.png" alt="并行工作流示例" width="721" height="654" data-path="images/workflows/example-parallel-workflow.png" />
+</Frame>
+
+<div id="section-5">
+  ## 创建工作流
+</div>
+
+在 Workflows 窗格中点击 `+ New Workflow` 按钮即可创建工作流。首先为工作流取一个描述性的名称，选择合适的运行模式，然后开始添加任务。任务可以通过拖放调整为你想要的顺序。
+
+<Frame>
+  <img src="/assets/mirror/example-workflow-setup-c9ffc4fca282.webp" alt="工作流设置示例" width="720" height="414" data-path="images/workflows/example-workflow-setup.webp" />
+</Frame>
+
+<div id="run">
+  ## 将工作流分配给 Run 按钮
+</div>
+
+你可以将工作流分配给 Run 按钮，以替换 Run 按钮的默认行为 (参见 [Replit App 设置](/zh/ja/features/project-setup/configuration)) 。若要保留 `.replit` 中配置的默认运行命令，请在下拉菜单中选择默认的“Run Replit App”选项。
+
+点击 Run 按钮时，将执行你在按钮旁下拉菜单中选中的工作流。若要更改 Run 按钮执行的工作流，请在下拉菜单中点击所需的工作流。
+
+<Frame>
+  <img src="/assets/mirror/configure-run-button-workflow-92b0243e955c.gif" alt="Run 按钮的工作流设置" width="588" height="254" data-path="images/workflows/configure-run-button-workflow.gif" />
+</Frame>
+
+<div id="section-6">
+  ## 查看工作流输出
+</div>
+
+工作流的输出会显示在 `Console` 窗格中。你可以切换为仅显示最新输出，也可以清空整个控制台。
+
+<Frame>
+  <img src="/assets/mirror/workflow-output-view-550fb8b764ff.gif" alt="工作流输出视图" width="706" height="434" data-path="images/workflows/workflow-output-view.gif" />
+</Frame>

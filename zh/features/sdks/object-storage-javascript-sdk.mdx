@@ -1,0 +1,450 @@
+---
+title: "App Storage JavaScript SDK"
+description: "了解如何使用官方 JavaScript SDK 管理 Replit App Storage 中的文件。"
+icon: "js"
+---
+
+本参考指南介绍 `object-storage` 库中的 `Client` 类，并提供各方法的代码示例。
+
+<div id="client">
+  ## Client
+</div>
+
+`Client` 类用于管理与 Replit App Storage 的交互，提供了对存储桶中文件执行各类操作的方法。
+
+若要从库中导入该类，请在 JavaScript 代码中添加以下代码行：
+
+```javascript theme={null}
+import { Client } from "@replit/object-storage";
+```
+
+使用以下代码创建可与 Replit Object Storage 交互的 `Client` 实例：
+
+```javascript theme={null}
+const client = new Client();
+```
+
+<div id="constructors">
+  ## 构造函数
+</div>
+
+**constructor**
+
+* **new Client**(`options?`): `Client`
+
+创建一个新的 Client 实例，用于与 Replit App Storage 交互。
+
+**参数**
+
+| 名称         | 类型              | 说明          |
+| :--------- | :-------------- | :---------- |
+| `options?` | `ClientOptions` | 用于配置客户端的选项。 |
+
+**返回值**
+
+`Client`
+
+<div id="methods">
+  ## 方法
+</div>
+
+<div id="copy">
+  ### copy
+</div>
+
+* **copy**(`objectName`, `destObjectName`): `Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+在同一个存储桶内复制对象。
+该方法会覆盖目标路径上已存在的对象。
+
+**参数**
+
+| 名称               | 类型       | 说明           |
+| :--------------- | :------- | :----------- |
+| `objectName`     | `string` | 要复制的对象的完整路径。 |
+| `destObjectName` | `string` | 复制目标位置的完整路径。 |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+***
+
+<div id="delete">
+  ### delete
+</div>
+
+* **delete**(`objectName`, `options?`): `Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+从存储桶中删除对象。
+
+**参数**
+
+| 名称           | 类型              | 说明          |
+| :----------- | :-------------- | :---------- |
+| `objectName` | `string`        | 待删除对象的完整路径。 |
+| `options?`   | `DeleteOptions` | 删除操作的配置。   |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+***
+
+<div id="downloadasbytes">
+  ### downloadAsBytes
+</div>
+
+* **downloadAsBytes**(`objectName`, `options?`): `Promise`&lt;`Result`&lt;`Buffer`, `RequestError`&gt;&gt;
+
+下载对象，并以缓冲区 (Buffer) 形式返回其原始内容。
+
+**参数**
+
+| 名称           | 类型                | 说明           |
+| :----------- | :---------------- | :----------- |
+| `objectName` | `string`          | 要下载的对象的完整路径。 |
+| `options?`   | `DownloadOptions` | 下载操作的配置。     |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`Buffer`, `RequestError`&gt;&gt;
+
+***
+
+<div id="downloadasstream">
+  ### downloadAsStream
+</div>
+
+* **downloadAsStream**(`objectName`, `options?`): `Readable`
+
+创建对象内容的可读流。
+该流会抛出下载过程中遇到的任何错误。
+
+**参数**
+
+| 名称           | 类型                | 说明           |
+| :----------- | :---------------- | :----------- |
+| `objectName` | `string`          | 要下载的对象的完整路径。 |
+| `options?`   | `DownloadOptions` | 下载操作的配置。     |
+
+**返回值**
+
+`Readable`
+
+<div id="downloadastext">
+  ### downloadAsText
+</div>
+
+* **downloadAsText**(`objectName`, `options?`): `Promise`&lt;`Result`&lt;`string`, `RequestError`&gt;&gt;
+
+下载对象并以字符串形式返回其内容。
+
+**参数**
+
+| 名称           | 类型                | 说明          |
+| :----------- | :---------------- | :---------- |
+| `objectName` | `string`          | 要下载对象的完整路径。 |
+| `options?`   | `DownloadOptions` | 下载操作的配置。    |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`string`, `RequestError`&gt;&gt;
+
+<div id="downloadtofilename">
+  ### downloadToFilename
+</div>
+
+* **downloadToFilename**(`objectName`, `destFilename`, `options?`): `Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+下载对象并将其保存到本地文件系统的指定位置。
+
+**参数**
+
+| 名称             | 类型                | 说明                 |
+| :------------- | :---------------- | :----------------- |
+| `objectName`   | `string`          | 要下载的对象的完整路径。       |
+| `destFilename` | `string`          | 本地文件系统中写入所下载对象的路径。 |
+| `options?`     | `DownloadOptions` | 下载操作的配置。          |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+<div id="exists">
+  ### exists
+</div>
+
+* **exists**(`objectName`): `Promise`&lt;`Result`&lt;`boolean`, `RequestError`&gt;&gt;
+
+检查存储桶中是否存在指定对象。
+
+**参数**
+
+| 名称           | 类型       | 描述           |
+| :----------- | :------- | :----------- |
+| `objectName` | `string` | 要检查的对象的完整路径。 |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`boolean`, `RequestError`&gt;&gt;
+
+<div id="getbucket">
+  ### getBucket
+</div>
+
+* **getBucket**(): `Promise`&lt;`Bucket`&gt;
+
+**返回值**
+
+`Promise`&lt;`Bucket`&gt;
+
+<div id="init">
+  ### init
+</div>
+
+* **init**(`bucketId?`): `Promise`&lt;`Bucket`&gt;
+
+**参数**
+
+| 名称          | 类型       |
+| :---------- | :------- |
+| `bucketId?` | `string` |
+
+**返回值**
+
+`Promise`&lt;`Bucket`&gt;
+
+<div id="list">
+  ### list
+</div>
+
+* **list**(`options?`): `Promise`&lt;`Result`&lt;`StorageObject`[], `RequestError`&gt;&gt;
+
+返回存储桶中所有对象的列表。
+
+**参数**
+
+| 名称         | 类型            | 描述        |
+| :--------- | :------------ | :-------- |
+| `options?` | `ListOptions` | 列表操作的配置。 |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`StorageObject`[], `RequestError`&gt;&gt;
+
+<div id="mapuploadoptions">
+  ### mapUploadOptions
+</div>
+
+* **mapUploadOptions**(`options?`): `undefined` | `UploadOptions`
+
+**参数**
+
+| 名称         | 类型              |
+| :--------- | :-------------- |
+| `options?` | `UploadOptions` |
+
+**返回值**
+
+`undefined` | `UploadOptions`
+
+<div id="uploadfrombytes">
+  ### uploadFromBytes
+</div>
+
+* **uploadFromBytes**(`objectName`, `contents`, `options?`): `Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+使用对象在内存中的字节表示形式上传该对象。
+此方法会覆盖同名的现有对象。
+
+**参数**
+
+| 名称           | 类型              | 说明               |
+| :----------- | :-------------- | :--------------- |
+| `objectName` | `string`        | 对象的完整目标路径。       |
+| `contents`   | `Buffer`        | 对象的原始内容，以字节形式表示。 |
+| `options?`   | `UploadOptions` | 上传操作的配置。         |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+<div id="uploadfromfilename">
+  ### uploadFromFilename
+</div>
+
+* **uploadFromFilename**(`objectName`, `srcFilename`, `options?`): `Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+将本地文件系统中的文件上传到存储桶。
+此方法会覆盖同名的现有对象。
+
+**参数**
+
+| 名称            | 类型              | 说明                |
+| :------------ | :-------------- | :---------------- |
+| `objectName`  | `string`        | 对象的完整目标路径。        |
+| `srcFilename` | `string`        | 待上传文件在本地文件系统中的路径。 |
+| `options?`    | `UploadOptions` | 上传操作的配置。         |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+<div id="uploadfromstream">
+  ### uploadFromStream
+</div>
+
+* **uploadFromStream**(`objectName`, `stream`, `options?`): `Promise`&lt;`void`&gt;
+
+从提供的流中读取内容并上传对象。
+上传过程中遇到的任何错误都会由该流抛出。此方法会覆盖同名的现有对象。
+
+**参数**
+
+| 名称           | 类型              | 描述            |
+| :----------- | :-------------- | :------------ |
+| `objectName` | `string`        | 对象的完整目标路径。    |
+| `stream`     | `Readable`      | 用于读取对象内容的可读流。 |
+| `options?`   | `UploadOptions` | 上传操作的配置。      |
+
+**返回值**
+
+`Promise`&lt;`void`&gt;
+
+<div id="uploadfromtext">
+  ### uploadFromText
+</div>
+
+* **uploadFromText**(`objectName`, `contents`, `options?`): `Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+使用对象在内存中的文本表示形式上传该对象。
+此方法会覆盖任何同名的现有对象。
+
+**参数**
+
+| 名称           | 类型              | 描述         |
+| :----------- | :-------------- | :--------- |
+| `objectName` | `string`        | 对象的完整目标路径。 |
+| `contents`   | `string`        | 对象的文本形式内容。 |
+| `options?`   | `UploadOptions` | 上传操作的配置。  |
+
+**返回值**
+
+`Promise`&lt;`Result`&lt;`null`, `RequestError`&gt;&gt;
+
+<div id="method-examples">
+  ## 方法示例
+</div>
+
+以下各节提供了使用 Replit Object Storage SDK 管理文件的代码示例。
+
+<div id="retrieve-an-object-as-text">
+  ### 以文本形式获取对象
+</div>
+
+```javascript theme={null}
+const { ok, value: textValue, error } = await client.downloadAsText('file.json');
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="retrieve-an-object-as-its-raw-byte-representation">
+  ### 以原始字节形式获取对象
+</div>
+
+```javascript theme={null}
+const { ok, value: bytesValue, error } = await client.downloadAsBytes('file.png');
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="retrieve-an-object-from-a-stream">
+  ### 从流中获取对象
+</div>
+
+```javascript theme={null}
+const { ok, value: stream, error } = await client.downloadAsStream('file.json');
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="download-an-object-to-the-filesystem">
+  ### 将对象下载到文件系统
+</div>
+
+```javascript theme={null}
+const { ok, error } = await client.downloadToFilename('file.json', destFilename);
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="list-objects-in-the-bucket">
+  ### 列出存储桶中的对象
+</div>
+
+```javascript theme={null}
+const { ok, value, error } = await client.list();
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="upload-an-object-from-text">
+  ### 从文本上传对象
+</div>
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromText('file.json', data);
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="upload-an-object-as-bytes">
+  ### 以字节形式上传对象
+</div>
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromBytes('file.png', data);
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="upload-an-object-from-the-filesystem">
+  ### 从文件系统上传对象
+</div>
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromFilename('file.json', srcFilename);
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="upload-an-object-from-a-stream">
+  ### 从流中上传对象
+</div>
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromStream('file.json', stream);
+if (!ok) {
+    // ... 处理错误 ...
+}
+```
+
+<div id="delete-an-object-from-the-bucket">
+  ### 从存储桶中删除对象
+</div>
+
+```javascript theme={null}
+const { ok, error } = await client.delete('file.json');
+if (!ok) {
+    // ... 处理错误 ...
+}
+```

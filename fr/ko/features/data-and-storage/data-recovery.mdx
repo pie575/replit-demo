@@ -1,0 +1,103 @@
+---
+title: "Restauration des données"
+description: "Restaurez votre base de données de développement à partir d'un point de contrôle ou ramenez votre base de données de production à un instant précis."
+---
+
+Les erreurs, ça arrive : modification de schéma erronée, lignes supprimées ou session Agent qui part dans la mauvaise direction. Replit propose une méthode de restauration pour chaque base de données.
+
+| Base de données | Méthode de restauration                                    | Disponibilité                                                                                               |
+| --------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Développement   | Retour à un point de contrôle                              | Tous les plans                                                                                              |
+| Production      | Restauration à un instant précis et sauvegardes planifiées | Core : jusqu&#39;à 7 jours d&#39;historique. Pro et Enterprise : jusqu&#39;à 28 jours (7 jours par défaut). |
+
+<div id="section">
+  ## Restauration de la base de données de développement
+</div>
+
+La [fonctionnalité de rollback](/fr/ko/features/version-control/checkpoints-and-rollbacks/) vous permet de revenir à un état antérieur de votre application et de votre base de données de développement. Vous pouvez ainsi restaurer la base de données à n&#39;importe quel checkpoint créé par Agent.
+
+<Frame>
+  <img src="/assets/mirror/checkpoint-rollback-476fde84864b.png" alt="Interface de rollback de checkpoint affichant les options de rollback" width="3154" height="2366" data-path="images/replitai/checkpoint-rollback.png" />
+</Frame>
+
+<Info>
+  Lorsque vous restaurez l&#39;état d&#39;un checkpoint, veillez à sélectionner « Database » sous « Options de rollback supplémentaires ». La base de données retrouve alors l&#39;état dans lequel elle se trouvait au moment de la création du checkpoint.
+</Info>
+
+<div id="section-2">
+  ## Restauration d&#39;une base de données de production
+</div>
+
+Pour les bases de données de production, vous pouvez utiliser la restauration à un instant précis afin de ramener la base de données à un état antérieur donné.
+
+<Frame>
+  <img src="/assets/mirror/database-rollbacks-f13dd20874ae.jpg" alt="Interface de rollback de base de données présentant les options de rollback" width="1082" height="708" data-path="images/databases/database-rollbacks.jpg" />
+</Frame>
+
+La période de restauration disponible dépend de votre plan. Le plan Core conserve jusqu&#39;à 7 jours d&#39;historique, tandis que les plans Pro et Enterprise en conservent jusqu&#39;à 28. Tous les plans démarrent à 7 jours, et vous pouvez modifier la durée de conservation dans les paramètres de la base de données de production. Une durée de conservation plus longue consomme davantage de stockage : l&#39;augmenter accroît donc vos coûts d&#39;utilisation. Si vous passez de Pro à Core, la durée de conservation est ramenée à 7 jours.
+
+<Warning>
+  Restaurer votre base de données ne restaure pas le code de votre app, et effectuer un rollback de votre app ne restaure pas votre base de données. Pour ramener les deux au même instant, restaurez votre base de données, puis [effectuez un rollback vers le checkpoint correspondant](/fr/ko/features/version-control/checkpoints-and-rollbacks/) et republiez votre app.
+</Warning>
+
+<div id="section-3">
+  ## Planifier les sauvegardes de la base de données de production
+</div>
+
+Les sauvegardes planifiées créent chaque jour un point de restauration complet. Lorsque vous activez ou modifiez la planification, Replit programme la sauvegarde aux alentours de minuit, selon le fuseau horaire actuel de votre navigateur.
+
+1. Ouvrez l&#39;outil **Database** et sélectionnez votre base de données de production.
+2. Ouvrez **Settings**, puis développez **Scheduled backups** sous **Advanced**.
+3. Pour activer les sauvegardes planifiées, choisissez une durée de conservation dans **Keep backups for**.
+
+Les durées de conservation disponibles varient selon le plan. Core prend en charge jusqu&#39;à 7 jours, Pro et Enterprise jusqu&#39;à 28 jours.
+
+<div id="section-4">
+  ### Coûts de stockage
+</div>
+
+Replit comptabilise séparément chaque catégorie de stockage des bases de données de production :
+
+| Catégorie de stockage                               | Tarif mensuel par Gio |
+| --------------------------------------------------- | --------------------: |
+| Stockage logique de la base de données              |                 $0.35 |
+| Stockage de restauration à un instant précis (PITR) |                 $0.20 |
+| Stockage des sauvegardes planifiées                 |                 $0.09 |
+
+<Note>Les coûts de stockage des bases de données bénéficient actuellement d&#39;une remise de 100 %.</Note>
+
+Le tarif de stockage logique de $0.35 s&#39;applique que vous utilisiez le PITR, les sauvegardes planifiées ou les deux. Le stockage des sauvegardes planifiées revient moins cher par Gio que le stockage PITR. Si des points de restauration quotidiens vous suffisent, réduire la période PITR et recourir aux sauvegardes planifiées permet de diminuer les coûts de stockage liés à la restauration. Le coût total des sauvegardes dépend du volume sauvegardé et de la durée de conservation.
+
+Le PITR offre davantage de points de restauration au sein de la période concernée, tandis que les sauvegardes planifiées n&#39;en fournissent qu&#39;un par jour : choisissez la méthode de restauration adaptée à vos besoins.
+
+<Note>
+  Cette planification repose sur le décalage UTC actuel. En raison du passage à l&#39;heure d&#39;été, l&#39;heure de sauvegarde peut se décaler d&#39;une heure tant que vous n&#39;avez pas mis la planification à jour. Les fuseaux horaires dont le décalage comporte des minutes utilisent l&#39;heure la plus proche.
+</Note>
+
+<div id="section-5">
+  ### Restaurer une sauvegarde planifiée
+</div>
+
+1. Dans les paramètres de la base de données de production, ouvrez **Scheduled backups**.
+2. Sélectionnez **View all backups**.
+3. Sélectionnez **Restore** en regard du point de restauration souhaité.
+4. Saisissez `restore`, puis sélectionnez **Continue**.
+
+La restauration remplace le contenu de la base de données par celui de la sauvegarde sélectionnée. Les données actuelles ne sont pas supprimées, mais les services connectés peuvent se reconnecter brièvement.
+
+<div id="section-6">
+  ## Résoudre les échecs de publication
+</div>
+
+Si la publication échoue en raison d&#39;un problème de base de données :
+
+1. **Consultez les journaux de publication** pour repérer les messages d&#39;erreur précis concernant la connexion à la base de données ou les conflits de schéma
+2. **Passez en revue les modifications récentes du schéma** afin d&#39;identifier d&#39;éventuels conflits avec le code existant de l&#39;application
+3. **Testez vos modifications dans l&#39;aperçu du déploiement** avant de publier à nouveau
+
+<div id="section-7">
+  ## Étapes suivantes
+</div>
+
+* [Développement et production](/fr/ko/features/data-and-storage/development-and-production) : découvrez comment les deux bases de données fonctionnent ensemble.
+* [Checkpoints et rollbacks](/fr/ko/features/version-control/checkpoints-and-rollbacks/) : restaurez l&#39;intégralité de votre app.

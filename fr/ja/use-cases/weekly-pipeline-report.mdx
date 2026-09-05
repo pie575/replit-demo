@@ -1,0 +1,155 @@
+---
+title: "Générer un rapport commercial hebdomadaire"
+description: "Chaque semaine, consultez dans HubSpot l’évolution et les tendances de votre pipeline commercial."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Ce n’est pas un connecteur natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Récupérez le pipeline commercial de la semaine dans HubSpot, comparez-le à celui de la semaine dernière et créez un bref rapport : nouvelles opportunités, changements d’étape, opportunités en retard et prévisions. Ajoutez le tableau à Google Sheets et publiez les principaux points dans Slack afin que le stand-up porte sur les évolutions plutôt que sur un instantané statique.
+
+<div id="section">
+  ## À qui cela s’adresse
+</div>
+
+* Les responsables commerciaux qui ont besoin d’un point d’équipe dynamique le lundi, plutôt que de simples instantanés statiques.
+* Les responsables des opérations de revenus qui souhaitent suivre l’évolution hebdomadaire du pipeline en un seul endroit.
+
+<div id="section-2">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{ id: "hubspot", name: "HubSpot", why: "Opportunités, étapes, montants" },
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "Tableau de tendances vérifiable",
+},
+{ id: "slack", name: "Slack", why: "Diffuser des rapports" },
+]}
+/>
+
+<Note>Fonctionne aussi avec Salesforce, Attio, Pipedrive et d’autres CRM.</Note>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Connectez HubSpot, Sheets et Slack. Indiquez les pipelines ou les équipes à inclure.
+
+<div id="agent">
+  ## Prompt pour Agent
+</div>
+
+<AiPrompt>
+  Créez une routine qui s’exécute tous les lundis à 9 h. Récupérez le
+  pipeline de la semaine depuis HubSpot. Créez un rapport hebdomadaire
+  présentant l’évolution et les tendances du pipeline : nouvelles opportunités,
+  changements d’étape, opportunités en retard et prévisions par rapport à la
+  semaine précédente. Placez le tableau dans Google Sheets et publiez les points
+  clés dans Slack.
+</AiPrompt>
+
+<div id="section-4">
+  ## À quoi vous attendre
+</div>
+
+Agent compare cette semaine à la précédente et crée un court résumé ainsi qu&#39;une feuille de calcul. Vérifiez quelques montants d&#39;opportunités en les comparant à ceux de HubSpot. Utilisez les points clés de Slack lors du point quotidien et conservez la feuille de calcul comme piste d&#39;audit. Sélectionnez une nouvelle opportunité et une opportunité en retard, ouvrez-les dans HubSpot, puis vérifiez que leur étape, leur montant et leur date de conclusion prévue correspondent à la feuille de calcul.
+
+<div id="section-5">
+  ## Personnalisez selon vos besoins
+</div>
+
+<AiPrompt>
+  Mettez en évidence les opportunités de plus de [montant] sans activité depuis 14 jours.
+</AiPrompt>
+
+<AiPrompt>
+  Ajoutez une section « À risque » en fonction de la date de clôture prévue et de l’activité
+  récente.
+</AiPrompt>
+
+<div id="section-6">
+  ## Dépannage
+</div>
+
+* **Le montant des opportunités ne correspond pas à celui indiqué dans HubSpot :** précisez les pipelines ou équipes à inclure et le champ de montant à utiliser (montant ou prévision pondérée). Avant de vous fier à la feuille, vérifiez quelques opportunités dans HubSpot.
+* **Les opportunités en retard semblent incorrectes :** vérifiez la date de clôture et l’étape dans HubSpot. Demandez à Agent de ne considérer une opportunité comme en retard que si sa date de clôture a été repoussée ou si son étape a régressé.
+* **Slack publie au mauvais endroit :** indiquez le nom du canal et précisez si vous souhaitez afficher uniquement les points essentiels ou inclure un lien vers la feuille complète.
+
+<div id="section-7">
+  ## Articles associés
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Surveiller les concurrents" href="/fr/ja/use-cases/monitor-competitors">
+    Utilisez les mêmes alertes Slack pour les équipes commerciales avant que les changements de prix n’affectent les opportunités.
+  </Card>
+
+  <Card title="Créer un pitch deck pour les investisseurs" href="/fr/ja/use-cases/pitch-deck-from-website">
+    Utilisez la même source de données Google Sheets pour aider les fondateurs à créer des diapositives financières destinées aux investisseurs.
+  </Card>
+</CardGroup>

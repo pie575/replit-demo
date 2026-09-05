@@ -1,0 +1,162 @@
+---
+title: "Устранение ошибки «Это приложение заблокировано» в Google коннекторах"
+description: "Устранение ошибки «Это приложение заблокировано» при подключении коннекторов Google Drive, Docs, Sheets, Calendar или Gmail в Replit."
+sidebarTitle: "Ошибки Google Suite"
+icon: "bug"
+---
+
+<div id="overview">
+  ## Обзор
+</div>
+
+Если при попытке подключить сервис Google Workspace (Drive, Docs, Sheets, Calendar или Gmail) через [коннекторы](/ru/features/integrations/overview#connectors) вы видите сообщение об ошибке **«Это приложение заблокировано»**, обычно это связано с неверной настройкой параметров OAuth Google в Google Workspace вашей организации.
+
+Это руководство поможет устранить проблему, чтобы вы могли подключать сервисы Google к своим приложениям Replit.
+
+<Frame>
+  <img src="/assets/mirror/app-is-blocked-837b32f44f72.png" alt="Диалоговое окно ошибки Google с сообщением «Это приложение заблокировано», блокирующим OAuth-доступ" width="1279" height="502" data-path="images/replitai/debugging-google-connectors/app-is-blocked.png" />
+</Frame>
+
+<Warning>
+  Эти шаги применимы только к учётным записям **Google Workspace** (учётным записям, управляемым организацией). Если вы используете личную учётную запись Google с адресом `@gmail.com` и коннектор Replit заблокирован, вы не можете самостоятельно изменить политику OAuth — обратитесь к администратору Google Workspace или используйте другую учётную запись.
+</Warning>
+
+<div id="troubleshooting-steps">
+  ## Устранение неполадок
+</div>
+
+<div id="step-1-try-incognito-mode">
+  ### Шаг 1: Попробуйте режим инкогнито
+</div>
+
+Расширения браузера или кэшированные данные могут мешать OAuth-потоку. Режим инкогнито помогает избежать этих проблем.
+
+<Steps>
+  <Step title="Откройте режим инкогнито">
+    Откройте новое окно **инкогнито** (Chrome) или **приватное** окно (Firefox/Safari).
+  </Step>
+
+  <Step title="Войдите в Replit">
+    Войдите в свою учетную запись Replit на [replit.com](https://replit.com).
+  </Step>
+
+  <Step title="Повторите подключение">
+    Откройте приложение в Project Editor, перейдите в раздел **коннекторы** на боковой панели и снова попробуйте подключить сервис Google.
+  </Step>
+</Steps>
+
+Если ошибка сохраняется, перейдите к шагу 2.
+
+<div id="step-2-verify-oauth-settings-in-google-workspace">
+  ### Шаг 2: Проверьте настройки OAuth в Google Workspace
+</div>
+
+<Note>
+  Для выполнения этого шага вам потребуется доступ к **консоли администратора Google** вашей организации. Если у вас нет прав администратора, обратитесь к ИТ-команде.
+</Note>
+
+<Steps>
+  <Step title="Откройте консоль администратора Google">
+    Войдите в [консоль администратора Google](https://admin.google.com) вашей организации.
+  </Step>
+
+  <Step title="Убедитесь, что пользователь существует">
+    Перейдите в раздел **Пользователи** и убедитесь, что учётная запись, с которой выполняется подключение к Replit, есть в списке.
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-users-c21d8fd43f71.png" alt="Раздел «Пользователи» в консоли администратора Google со списком учётных записей" width="1104" height="596" data-path="images/replitai/debugging-google-connectors/google-workspace-users.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Перейдите в раздел управления API">
+    Откройте **Безопасность &gt; Управление доступом и данными &gt; управление API**.
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-api-controls-b811709315cf.png" alt="Консоль администратора Google с путём навигации «Безопасность > управление API»" data-og-width="1140" width="1140" data-og-height="631" height="631" data-path="images/replitai/debugging-google-connectors/google-workspace-api-controls.png" data-optimize="true" data-opv="3" srcset="/assets/mirror/google-workspace-api-controls-a27d4577aee8.png 280w, /assets/mirror/google-workspace-api-controls-d681943c082d.png 560w, /assets/mirror/google-workspace-api-controls-8f1b1659e60a.png 840w, /assets/mirror/google-workspace-api-controls-795bc698b885.png 1100w, /assets/mirror/google-workspace-api-controls-c122b9eb493f.png 1650w, /assets/mirror/google-workspace-api-controls-2415c93b4f41.png 2500w" />
+    </Frame>
+  </Step>
+
+  <Step title="Откройте доступ для сторонних приложений">
+    Выберите **Управление доступом для сторонних приложений**.
+
+    <Frame>
+      <img src="/assets/mirror/third-party-app-access-eb5c94107497.png" alt="Страница управления API в консоли администратора Google с выделенной кнопкой «Управление доступом для сторонних приложений»" width="1686" height="468" data-path="images/replitai/debugging-google-connectors/third-party-app-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Проверьте доступ OAuth">
+    Убедитесь, что для пользователей Google Workspace включён доступ OAuth. Если он ограничен, предоставьте необходимый доступ, чтобы Replit мог завершить OAuth-поток.
+  </Step>
+</Steps>
+
+Если подключение по-прежнему не удаётся, перейдите к шагу 3.
+
+<div id="step-3-add-replit-as-a-trusted-oauth-client">
+  ### Шаг 3: Добавьте Replit в список доверенных OAuth-клиентов
+</div>
+
+Если в вашей организации по умолчанию ограничен доступ сторонних приложений, необходимо явно добавить Replit в список доверенных.
+
+<Steps>
+  <Step title="Откройте консоль администратора Google">
+    Войдите в [консоль администратора Google](https://admin.google.com) вашей организации.
+  </Step>
+
+  <Step title="Перейдите в раздел «Управление API»">
+    Перейдите в раздел **Безопасность &gt; Управление доступом и данными &gt; Управление API**.
+  </Step>
+
+  <Step title="Откройте доступ для сторонних приложений">
+    В разделе **Управление доступом к приложениям** выберите **Управление доступом сторонних приложений**.
+  </Step>
+
+  <Step title="Добавьте новое приложение">
+    Нажмите кнопку **Добавить приложение**, затем в раскрывающемся списке выберите **Название OAuth-приложения или идентификатор клиента**.
+  </Step>
+
+  <Step title="Найдите Replit">
+    Введите идентификатор клиента Replit:
+
+    ```
+    1012035106355-2dhot2e6o0malvog2ofss7akj2nsp8nq.apps.googleusercontent.com
+    ```
+
+    Выберите **Поиск**. Когда приложение Replit появится в результатах, выберите его.
+  </Step>
+
+  <Step title="Установите уровень доступа">
+    Установите уровень доступа **Доверенный**.
+  </Step>
+
+  <Step title="Сохраните изменения">
+    Выберите **Сохранить**.
+  </Step>
+</Steps>
+
+<Tip>
+  Применение изменений в политиках Google Workspace может занять несколько минут. После сохранения подождите 5–10 минут, а затем снова попробуйте подключить сервис Google в Replit.
+</Tip>
+
+<div id="still-blocked">
+  ## Всё ещё заблокировано?
+</div>
+
+Если вы выполнили все три шага, но ошибка не исчезла:
+
+* **Ещё раз проверьте организационное подразделение (OU)**: политики Google Workspace могут применяться к отдельным OU. Убедитесь, что настройки OAuth и доверенных приложений применяются к OU, в котором находится пользователь, пытающийся подключиться.
+* **Проверьте оповещения Google Workspace**: в консоли администратора проверьте **Reporting &gt; Audit and investigation &gt; OAuth log events** на наличие отклонённых запросов, связанных с Replit.
+* **Обратитесь в службу поддержки Replit**: если проблема не на стороне Google Workspace, обратитесь за помощью в [службу поддержки Replit](https://replit.com/support).
+
+<div id="related-documentation">
+  ## Связанная документация
+</div>
+
+* [Обзор коннекторов](/ru/features/integrations/overview) -- Узнайте обо всех типах интеграций, включая коннекторы Google Workspace
+* [Управление коннекторами](/ru/replitai/managing-connectors) -- Настройка коннекторов Workspace и Organization для администраторов
+* [Справка для администраторов Google Workspace: управление доступом сторонних приложений](https://support.google.com/a/answer/7281227) -- Официальное руководство Google по управлению доступом OAuth-приложений
+
+***
+
+<Note>
+  Выражаем особую благодарность команде [Element451](https://element451.com) за [оригинальное руководство по устранению этой ошибки](https://help.element451.com/en/articles/9999308-resolving-this-app-is-blocked-error-for-google-drive-connectors), которое легло в основу этой статьи.
+</Note>

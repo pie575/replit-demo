@@ -1,0 +1,159 @@
+---
+title: "Replit MCP Server"
+description: "通过 ChatGPT、Claude、Slack 或任何 MCP 客户端使用 Replit，创建、更新和发布 Replit Apps。"
+sidebarTitle: "Replit MCP server"
+icon: "server"
+---
+
+Replit MCP 使用 [Model Context Protocol](https://modelcontextprotocol.io/)，让您可通过常用的 AI 工具创建、查找、查看、更新和发布 Replit Apps。
+
+<div id="use-replit-in-chatgpt-claude-or-slack">
+  ## 在 ChatGPT、Claude 或 Slack 中使用 Replit
+</div>
+
+Replit 可原生连接到 ChatGPT、Claude 和 Slack。选择平台，连接 Replit 并开始构建。有关前提条件、套餐可用性和故障排除，请参阅 [在 ChatGPT 中使用 Replit](/zh/features/platforms/chatgpt) 和 [在 Claude 中使用 Replit](/zh/features/platforms/claude)。
+
+<CardGroup cols={3}>
+  <Card title="ChatGPT" icon="/assets/mirror/openai-7cbe4c2eddf6.svg" href="https://chatgpt.com/plugins/plugin_asdk_app_6934801c799081918131791660f02890" width="24" height="24" data-path="images/icons/openai.svg">
+    在 ChatGPT 中打开 Replit，连接账户，然后从对话中开始构建。
+  </Card>
+
+  <Card title="Claude" icon="/assets/mirror/claude-c9811f468bc4.svg" href="https://claude.com/connectors/replit" width="24" height="24" data-path="images/icons/claude.svg">
+    在 Claude 中打开 Replit connector，连接账户，然后开始构建。
+  </Card>
+
+  <Card title="Slack" icon="/assets/mirror/slack-aa5f43de3890.svg" href="/zh/features/platforms/slack" width="24" height="24" data-path="images/icons/slack.svg">
+    将 Replit 添加到你的 workspace，然后让 Slackbot 根据你的想法构建可运行的原型。
+  </Card>
+</CardGroup>
+
+<div id="connect-an-mcp-client-directly">
+  ## 直接连接 MCP 客户端
+</div>
+
+如果你的 MCP 客户端没有 Replit 原生集成，请使用直接连接。
+
+| 属性       | 值                                   |
+| -------- | ----------------------------------- |
+| **URL**  | `https://replit-mcp.com/server/mcp` |
+| **传输方式** | 流式 HTTP                             |
+| **身份验证** | 使用受保护资源发现的 OAuth                    |
+
+将服务器 URL 添加到支持流式 HTTP 和 OAuth 授权的 MCP 客户端。客户端会读取 Replit 的受保护资源元数据，然后提示你登录 Replit。
+
+请勿创建自定义 OAuth 服务器。Replit MCP Server 会提供客户端所需的 OAuth 元数据。
+
+你可以创建 App，也可以使用你有编辑权限的 App，包括他人与你共享的 App。
+
+<div id="set-up-replit-mcp">
+  ### 设置 Replit MCP
+</div>
+
+Codex 和 Claude Code 只是示例。你可以将 Replit MCP 添加到任何兼容的 MCP 客户端。
+
+<Tabs>
+  <Tab title="Codex">
+    <Steps>
+      <Step title="打开 MCP 列表">
+        在 Codex 中，打开 **设置** → **插件** → **MCP**。
+      </Step>
+
+      <Step title="添加 Replit">
+        添加一个自定义 MCP。使用便于识别的名称，例如 `Replit`。选择 **流式 HTTP**。输入 `https://replit-mcp.com/server/mcp` 并保存。不要添加 Bearer token 或自定义标头。
+
+        <Frame>
+          <img src="/assets/mirror/codex-add-replit-mcp-51365d598c24.png" alt="Codex 自定义 MCP 表单，其中包含 Replit、流式 HTTP、Replit 端点，以及留空的 Bearer token 和标头字段" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="验证 Replit">
+        在 MCP 列表中，启用 **Replit** 并选择 **验证**。选择要连接的 Replit workspace，然后选择 **允许**。
+
+        <Frame>
+          <img src="/assets/mirror/codex-authenticate-replit-mcp-38e837424d0f.png" alt="Codex MCP 列表，其中已启用 Replit，并显示“验证”按钮" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-authenticate-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="/assets/mirror/codex-authorize-replit-workspace-b41e707504ae.png" alt="Replit 授权对话框，包含通用账户和 workspace 占位符，以及 workspace 选项和“允许”按钮" width="1588" height="991" data-path="images/replitai/custom-mcp/codex-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="在 Codex 中使用 Replit">
+        请 Codex 创建、检查或更新 Replit project。例如，可以询问：“列出我最近更新的 Replit projects。”
+
+        <Frame>
+          <img src="/assets/mirror/codex-list-replit-projects-bebae6a1dbab.png" alt="Codex 的响应，列出三个最近更新的 Replit projects" width="2000" height="951" data-path="images/replitai/custom-mcp/codex-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Claude Code">
+    <Steps>
+      <Step title="添加 Replit">
+        在终端中，通过 HTTP 传输方式添加服务器。
+
+        ```bash theme={null}
+        claude mcp add replit https://replit-mcp.com/server/mcp --transport http
+        ```
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-add-replit-mcp-12b99cb7ce30.png" alt="使用 HTTP 服务器命令添加 Replit MCP 后的 Claude Code 终端，以及通用的本地配置路径" width="2000" height="1097" data-path="images/replitai/custom-mcp/claude-code-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="选择 Replit">
+        启动或重启 Claude Code。运行 `/mcp`，然后选择 `replit`。
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-select-local-replit-mcp-dd30b45c949b.png" alt="Claude Code 的 MCP 列表，其中选中了本地 replit 服务器，并标记为需要身份验证" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="验证 Replit 身份">
+        对本地 `replit` 服务器，选择 **Authenticate**。完成 Replit 登录，选择要连接的 workspace，然后选择 **Allow**。
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-authenticate-local-replit-mcp-b67f7c27231f.png" alt="Claude Code 的本地 replit 服务器详情，显示直接连接的 Replit 端点且已选中 Authenticate" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-authorize-replit-workspace-dd7b3dca962c.png" alt="Claude 授权对话框，包含通用账户和 workspace 占位符、workspace 选项及 Allow 按钮" width="1588" height="991" data-path="images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="在 Claude Code 中使用 Replit">
+        让 Claude Code 创建、检查或更新 Replit 项目。例如，可以询问：“列出我最近更新的 Replit 项目。”
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-list-replit-projects-c775a3601cb9.png" alt="Claude Code 的回复，列出了通用 Replit 项目和占位 URL" width="2000" height="850" data-path="images/replitai/custom-mcp/claude-code-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<div id="tools">
+  ## 工具
+</div>
+
+| 工具                        | 必填输入                          | 可选输入                                                                      | 用途                                                                                                                                                                                        |
+| ------------------------- | ----------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_app_from_prompt`  | `appDescription`, `app_stack` | `userSpecifiedAppName`, `userQuotes`, `attachmentSummary`, `sourceReplId` | 创建新应用。`app_stack` 可选值为 `react_website`、`mobile_app`、`design`、`slides`、`animation`、`data_visualization`、`3d_game`、`document` 或 `spreadsheet`。设置 `sourceReplId` 后，新应用将以现有应用的私有副本为起点，而非空白项目。 |
+| `search_apps`             | 无                             | `query`, `url`, `updatedAfter`, `updatedBefore`, `limit`                  | 按标题关键词、URL 或最后更新时间查找应用。`limit` 的取值范围为 1 到 50。                                                                                                                                             |
+| `resolve_app_by_name`     | `name`                        | 无                                                                         | 按应用的精确标题查找单个应用。                                                                                                                                                                           |
+| `list_apps`               | 无                             | `query`, `limit`                                                          | 列出你可编辑的应用，并按最近活动时间排序。默认 `limit` 为 25，最大值为 50。                                                                                                                                             |
+| `ask_question`            | `replId`, `question`          | 无                                                                         | 在不更改应用的情况下，就应用相关问题询问 Agent。                                                                                                                                                               |
+| `update_app_using_prompt` | `replId`, `changeDescription` | `userQuotes`, `attachmentSummary`                                         | 使用 Agent 更新现有应用。                                                                                                                                                                          |
+| `publish_app`             | `replId`                      | 无                                                                         | 发布应用，或重新发布其最新更改。                                                                                                                                                                          |
+| `get_publish_status`      | `replId`                      | 无                                                                         | 检查应用是否已发布、当前发布状态及其公开 URL。                                                                                                                                                                 |
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+| 问题               | 处理方法                                                      |
+| ---------------- | --------------------------------------------------------- |
+| Replit 要求你进行身份验证 | 在 MCP 客户端中重新完成 OAuth 登录流程。                                |
+| 找不到 App          | 确认你拥有编辑该 App 的权限。然后按 URL 搜索，或使用 `list_apps` 从匹配的 App 中选择。 |
+| 创建、更新或发布请求仍在进行中  | 请稍候再重试。对于发布，请使用 `get_publish_status` 查看当前状态。              |

@@ -1,0 +1,1009 @@
+---
+title: "创建移动 App"
+description: "使用 Agent 构建以手机为核心的 App，在模拟器和你的手机上进行测试，并分享出去收集 feedback。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const AgentInput = ({defaultPrompt = "", highlightPlan = false, highlightStart = false, showTypewriter = true}) => {
+  const AGENT_INPUT_TYPEWRITER_SCRIPT_ID = "replit-docs-typewriter-core";
+  const AGENT_INPUT_TYPEWRITER_SRC = "https://unpkg.com/typewriter-effect@2.18.2/dist/core.js";
+  const AGENT_INPUT_TYPEWRITER_PROMPTS = ["Build a project tracker for my team", "Design a landing page for my coffee shop", "Add Stripe payments to my app"];
+  const AGENT_INPUT_TYPING_SPEED = 40;
+  const AGENT_INPUT_DELETE_SPEED = 20;
+  const AGENT_INPUT_PAUSE_AFTER = 2000;
+  const AGENT_INPUT_START_DELAY = 500;
+  const getAgentInputTypewriterLoader = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriterLoader) {
+      window.__replitDocsAgentInputTypewriterLoader = {};
+    }
+    return window.__replitDocsAgentInputTypewriterLoader;
+  };
+  const ensureAgentInputTypewriterCore = () => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return Promise.resolve(null);
+    }
+    if (window.Typewriter) {
+      return Promise.resolve(window.Typewriter);
+    }
+    const loader = getAgentInputTypewriterLoader();
+    if (loader.promise) {
+      return loader.promise;
+    }
+    loader.promise = new Promise((resolve, reject) => {
+      const handleLoad = () => {
+        if (window.Typewriter) {
+          resolve(window.Typewriter);
+          return;
+        }
+        loader.promise = null;
+        reject(new Error("Typewriter core loaded without a global Typewriter export."));
+      };
+      const handleError = () => {
+        loader.promise = null;
+        reject(new Error("Failed to load typewriter core."));
+      };
+      const existingScript = document.getElementById(AGENT_INPUT_TYPEWRITER_SCRIPT_ID);
+      if (existingScript) {
+        existingScript.addEventListener("load", handleLoad, {
+          once: true
+        });
+        existingScript.addEventListener("error", handleError, {
+          once: true
+        });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = AGENT_INPUT_TYPEWRITER_SCRIPT_ID;
+      script.src = AGENT_INPUT_TYPEWRITER_SRC;
+      script.async = true;
+      script.addEventListener("load", handleLoad, {
+        once: true
+      });
+      script.addEventListener("error", handleError, {
+        once: true
+      });
+      document.head.appendChild(script);
+    });
+    return loader.promise;
+  };
+  const getAgentInputTypewriterRegistry = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriters) {
+      window.__replitDocsAgentInputTypewriters = new WeakMap();
+    }
+    return window.__replitDocsAgentInputTypewriters;
+  };
+  const findAgentInputContainer = node => node?.closest?.("[data-agent-input-container]") || null;
+  const getAgentInputElements = container => ({
+    textarea: container?.querySelector?.('[data-agent-input-role="textarea"]') || null,
+    startButton: container?.querySelector?.('[data-agent-input-role="start-button"]') || null,
+    pillsContainer: container?.querySelector?.('[data-agent-input-role="pills"]') || null
+  });
+  const getAgentInputPromptValue = container => {
+    const {textarea} = getAgentInputElements(container);
+    return textarea?.value?.trim() || "";
+  };
+  const updateAgentInputButtonState = container => {
+    const {startButton} = getAgentInputElements(container);
+    if (!startButton) {
+      return;
+    }
+    const hasText = getAgentInputPromptValue(container).length > 0;
+    startButton.style.opacity = hasText ? "1" : "0.4";
+    startButton.style.cursor = hasText ? "pointer" : "not-allowed";
+  };
+  const stopAgentInputTypewriter = (textarea, {placeholder, clearDemo = false} = {}) => {
+    if (typeof window === "undefined" || !textarea) {
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const record = registry?.get(textarea);
+    if (!record) {
+      if (placeholder) {
+        textarea.setAttribute("placeholder", placeholder);
+      }
+      return;
+    }
+    record.stopped = true;
+    if (record.startTimer) {
+      window.clearTimeout(record.startTimer);
+    }
+    if (record.writeFrame) {
+      window.cancelAnimationFrame(record.writeFrame);
+    }
+    if (record.typewriter?.stop) {
+      record.typewriter.stop();
+    }
+    textarea.removeEventListener("focus", record.handleFocus);
+    textarea.removeEventListener("pointerdown", record.handlePointerDown);
+    textarea.removeEventListener("input", record.handleInput);
+    if (clearDemo && textarea.value === record.pendingValue) {
+      textarea.value = "";
+    }
+    textarea.setAttribute("placeholder", placeholder || "");
+    updateAgentInputButtonState(record.container);
+    registry.delete(textarea);
+  };
+  const startAgentInputTypewriter = (container, {defaultPrompt, placeholder, showTypewriter}) => {
+    if (typeof window === "undefined" || typeof document === "undefined" || !container) {
+      return;
+    }
+    const {textarea} = getAgentInputElements(container);
+    if (!textarea) {
+      return;
+    }
+    if (!showTypewriter || defaultPrompt) {
+      stopAgentInputTypewriter(textarea, {
+        placeholder
+      });
+      textarea.setAttribute("placeholder", placeholder);
+      updateAgentInputButtonState(container);
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const existingRecord = registry.get(textarea);
+    if (existingRecord && !existingRecord.stopped) {
+      updateAgentInputButtonState(container);
+      return;
+    }
+    textarea.setAttribute("placeholder", "");
+    if (textarea.value) {
+      textarea.value = "";
+    }
+    updateAgentInputButtonState(container);
+    const record = {
+      container,
+      element: textarea,
+      pendingValue: "",
+      renderedValue: "",
+      stopped: false,
+      startTimer: null,
+      writeFrame: null,
+      typewriter: null,
+      handleFocus: null,
+      handlePointerDown: null,
+      handleInput: null
+    };
+    const queueValue = nextValue => {
+      record.pendingValue = nextValue;
+      if (record.writeFrame) {
+        return;
+      }
+      record.writeFrame = window.requestAnimationFrame(() => {
+        record.writeFrame = null;
+        if (record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        if (textarea.value !== record.pendingValue) {
+          textarea.value = record.pendingValue;
+        }
+        updateAgentInputButtonState(container);
+      });
+    };
+    const stopDemo = () => {
+      stopAgentInputTypewriter(textarea, {
+        placeholder,
+        clearDemo: true
+      });
+    };
+    record.handleFocus = stopDemo;
+    record.handlePointerDown = stopDemo;
+    record.handleInput = stopDemo;
+    registry.set(textarea, record);
+    textarea.addEventListener("focus", record.handleFocus, {
+      once: true
+    });
+    textarea.addEventListener("pointerdown", record.handlePointerDown, {
+      once: true
+    });
+    textarea.addEventListener("input", record.handleInput, {
+      once: true
+    });
+    record.startTimer = window.setTimeout(() => {
+      ensureAgentInputTypewriterCore().then(Typewriter => {
+        if (!Typewriter || record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        const typewriter = new Typewriter(null, {
+          loop: true,
+          delay: AGENT_INPUT_TYPING_SPEED,
+          deleteSpeed: AGENT_INPUT_DELETE_SPEED,
+          cursor: "",
+          skipAddStyles: true,
+          wrapperClassName: "",
+          cursorClassName: "",
+          onCreateTextNode: character => {
+            record.renderedValue += character;
+            queueValue(record.renderedValue);
+            return null;
+          },
+          onRemoveNode: () => {
+            record.renderedValue = record.renderedValue.slice(0, -1);
+            queueValue(record.renderedValue);
+          }
+        });
+        AGENT_INPUT_TYPEWRITER_PROMPTS.forEach(prompt => {
+          typewriter.typeString(prompt).pauseFor(AGENT_INPUT_PAUSE_AFTER).deleteAll(AGENT_INPUT_DELETE_SPEED).pauseFor(400);
+        });
+        record.typewriter = typewriter;
+        typewriter.start();
+      }).catch(() => {
+        stopAgentInputTypewriter(textarea, {
+          placeholder
+        });
+      });
+    }, AGENT_INPUT_START_DELAY);
+  };
+  if (typeof document !== "undefined" && !window.LZString) {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+    document.head.appendChild(script);
+  }
+  const placeholder = "Describe your idea, Replit will bring it to life...";
+  const outputTypes = [{
+    name: "Web",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clip-rule="evenodd" /><path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Animation",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Design",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" /><path fill-rule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20.53 5.47a.75.75 0 0 1 0 1.06l-11 11a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 1 1 1.06-1.06L9 15.94 19.47 5.47a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>';
+  if (typeof document !== "undefined" && !document.getElementById("agent-input-styles")) {
+    const style = document.createElement("style");
+    style.id = "agent-input-styles";
+    style.textContent = `
+      /* Theme variables - light mode */
+      [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #F6F6F4);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-border-default: var(--replit-docs-border, #DEDAD5);
+        --ai-border-strong: var(--replit-docs-border-strong, #CAC4BE);
+        --ai-text-secondary: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #858585);
+        --ai-text-primary: var(--replit-docs-text, #1D1D1D);
+        --ai-button-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-button-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-icon-default: var(--replit-docs-text-subtle, #858585);
+        --ai-icon-hover: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-shadow: 0 2px 6px #00000005;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-option-border: var(--replit-docs-border, #DEDAD5);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-pill-bg: #CDDCF1;
+        --ai-pill-text: var(--replit-docs-text-muted, #5C5C5C);
+      }
+
+      /* Theme variables - dark mode */
+      .dark [data-agent-input-container],
+      html.dark [data-agent-input-container],
+      [data-theme="dark"] [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #1E1E1F);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #222223);
+        --ai-border-default: var(--replit-docs-border, #39393D);
+        --ai-border-strong: var(--replit-docs-border-strong, #4A4A50);
+        --ai-text-secondary: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-text-primary: var(--replit-docs-text, #F5F5F5);
+        --ai-button-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-button-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --ai-icon-default: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-icon-hover: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-shadow: 0 2px 6px #00000020;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-option-border: var(--replit-docs-border, #39393D);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-pill-bg: #2A3A4D;
+        --ai-pill-text: #D0D8E4;
+      }
+
+      .agent-input-container {
+        box-sizing: border-box;
+      }
+
+      /* Entry animation */
+      @keyframes agent-input-fade-in-up {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      /* Hover state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:hover) [data-agent-input-role="inner"] {
+        border-color: #85C7FF !important;
+      }
+
+      /* Focus state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:focus-within) [data-agent-input-role="inner"] {
+        border-color: #0079F2 !important;
+      }
+
+      /* Icon button hover */
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-icon-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-icon-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-option-btn:not([data-selected="true"]):hover {
+          background: var(--ai-option-hover-bg);
+        }
+        [data-agent-input-container] .ai-plan-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-nav-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-pill-close:hover {
+          opacity: 0.7;
+        }
+      }
+      @keyframes plan-border-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      [data-agent-input-container] .ai-plan-wrap {
+        position: relative;
+        border-radius: 32px;
+        padding: 2px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-plan-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-plan-wrap .ai-plan-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        color: var(--ai-text-primary);
+        font-weight: 400;
+        border: none;
+        border-radius: 32px;
+        z-index: 1;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off::before {
+        animation: none;
+        background: transparent;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off .ai-plan-btn-highlight {
+        background: var(--ai-button-bg);
+        color: var(--ai-text-secondary);
+      }
+      /* Plan checkbox styles */
+      [data-agent-input-container] .ai-plan-checkbox-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: var(--border-radius-6, 6px);
+        background: var(--ai-button-bg);
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        color: var(--ai-text-secondary);
+        transition: background 120ms ease-out;
+        user-select: none;
+      }
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-plan-checkbox-label:hover {
+          background: var(--ai-button-bg-hover);
+        }
+      }
+      [data-agent-input-container] .ai-plan-checkbox-input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        accent-color: #0079F2;
+        cursor: pointer;
+      }
+      [data-agent-input-container] .ai-start-wrap {
+        position: relative;
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-start-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-start-wrap .ai-start-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        border: none;
+        border-radius: 6px;
+        z-index: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const getLink = (container, promptOverride) => {
+    if (typeof document === "undefined" || !window.LZString) return "";
+    const prompt = promptOverride || getAgentInputPromptValue(container);
+    if (!prompt) return "";
+    const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+    const utm = "utm_source=replit-docs&utm_medium=docs&utm_campaign=docs-intro-agent-input&utm_content=homepage-prompt-box";
+    return `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+  };
+  const handleStartClick = e => {
+    e.preventDefault();
+    const container = findAgentInputContainer(e.currentTarget);
+    const link = getLink(container);
+    if (link) window.open(link, "_blank");
+  };
+  const toggleOutputType = name => {
+    const btn = document.querySelector(`[data-option-name="${name}"]`);
+    const pillsContainer = document.getElementById("agent-input-pills");
+    if (!btn || !pillsContainer) return;
+    const isSelected = btn.dataset.selected === "true";
+    if (isSelected) {
+      btn.dataset.selected = "false";
+      btn.style.background = "var(--ai-option-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      const type = outputTypes.find(t => t.name === name);
+      if (iconEl && type) iconEl.innerHTML = type.iconSvg;
+      const pill = document.getElementById(`pill-${name}`);
+      if (pill) pill.remove();
+    } else {
+      document.querySelectorAll('[data-option-name][data-selected="true"]').forEach(prevBtn => {
+        const prevName = prevBtn.dataset.optionName;
+        prevBtn.dataset.selected = "false";
+        prevBtn.style.background = "var(--ai-option-bg)";
+        const prevIconEl = prevBtn.querySelector(".option-icon");
+        const prevType = outputTypes.find(t => t.name === prevName);
+        if (prevIconEl && prevType) prevIconEl.innerHTML = prevType.iconSvg;
+        const prevPill = document.getElementById(`pill-${prevName}`);
+        if (prevPill) prevPill.remove();
+      });
+      btn.dataset.selected = "true";
+      btn.style.background = "var(--ai-option-selected-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      if (iconEl) iconEl.innerHTML = checkSvg;
+      const type = outputTypes.find(t => t.name === name);
+      if (type) {
+        const pill = document.createElement("span");
+        pill.id = `pill-${name}`;
+        pill.style.cssText = "display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 8px;border-radius:32px;background:var(--ai-pill-bg);color:var(--ai-pill-text);font-size:14px;white-space:nowrap;cursor:default;";
+        pill.innerHTML = `<span style="display:flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">${type.iconSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}</svg></span><span>${name}</span><span class="ai-pill-close" style="display:flex;align-items:center;cursor:pointer;margin-left:2px" data-pill-remove="${name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12 5.7 16.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41Z"/></svg></span>`;
+        pill.querySelector(`[data-pill-remove="${name}"]`).addEventListener("click", () => toggleOutputType(name));
+        pillsContainer.appendChild(pill);
+      }
+    }
+  };
+  const PlusIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.25a.75.75 0 0 1 .75.75v6.25H19a.75.75 0 0 1 0 1.5h-6.25V19a.75.75 0 0 1-1.5 0v-6.25H5a.75.75 0 0 1 0-1.5h6.25V5a.75.75 0 0 1 .75-.75Z" />
+    </svg>;
+  const MicIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 9.25a.75.75 0 0 1 .75.75v2a7.75 7.75 0 0 1-7 7.713V22a.75.75 0 0 1-1.5 0v-2.287a7.75 7.75 0 0 1-6.99-7.328L4.25 12v-2a.75.75 0 0 1 1.5 0v2l.008.31A6.25 6.25 0 0 0 12 18.25l.31-.008a6.249 6.249 0 0 0 5.932-5.932l.008-.31v-2a.75.75 0 0 1 .75-.75Z" />
+      <path fillRule="evenodd" d="M12 1.25A3.75 3.75 0 0 1 15.75 5v7a3.75 3.75 0 1 1-7.5 0V5A3.75 3.75 0 0 1 12 1.25Zm0 1.5A2.25 2.25 0 0 0 9.75 5v7a2.25 2.25 0 0 0 4.5 0V5A2.25 2.25 0 0 0 12 2.75Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowUpIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 1 1-1.06 1.06l-5.72-5.72V19a.75.75 0 0 1-1.5 0V6.81l-5.72 5.72a.75.75 0 0 1-1.06-1.06l7-7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowLeftIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M4.47 11.47a.75.75 0 0 0 0 1.06l7 7a.75.75 0 1 0 1.06-1.06l-5.72-5.72H19a.75.75 0 0 0 0-1.5H6.81l5.72-5.72a.75.75 0 0 0-1.06-1.06l-7 7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowRightIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M19.53 11.47a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 1.06-1.06l7 7Z" clipRule="evenodd" />
+    </svg>;
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "28px",
+    height: "28px",
+    border: "none",
+    borderRadius: "6px",
+    background: "transparent",
+    cursor: "pointer",
+    color: "var(--ai-icon-default)",
+    padding: 0,
+    transition: "background 120ms ease-out"
+  };
+  const optionIconStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ai-option-border)",
+    borderRadius: "12px",
+    background: "var(--ai-option-bg)",
+    cursor: "pointer",
+    color: "var(--ai-text-secondary)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  const initAgentInput = container => {
+    if (!container) {
+      return;
+    }
+    updateAgentInputButtonState(container);
+    startAgentInputTypewriter(container, {
+      defaultPrompt,
+      placeholder,
+      showTypewriter
+    });
+    const ta = container.querySelector('[data-agent-input-role="textarea"]');
+    if (ta && ta.value) {
+      requestAnimationFrame(() => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+    }
+  };
+  return <div ref={initAgentInput} data-agent-input-container className="agent-input-container" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "734px",
+    alignSelf: "center",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "agent-input-fade-in-up 300ms ease-out forwards"
+  }}>
+      <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px"
+  }}>
+        {}
+        <div data-agent-input-role="inner" style={{
+    position: "relative",
+    borderRadius: "6px",
+    border: "1px solid var(--ai-border-strong)",
+    background: "var(--ai-surface-bg)",
+    transition: "border-color 120ms ease-out",
+    boxShadow: "var(--ai-shadow)"
+  }}>
+          {}
+          <div style={{
+    padding: "12px 12px 48px 12px"
+  }}>
+            <textarea data-agent-input-role="textarea" placeholder={placeholder} defaultValue={defaultPrompt} rows={1} onInput={e => {
+    const ta = e.currentTarget;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+    updateAgentInputButtonState(findAgentInputContainer(ta));
+  }} style={{
+    display: "block",
+    width: "100%",
+    minHeight: "21px",
+    maxHeight: "calc(14px * 1.5 * 10)",
+    padding: 0,
+    margin: 0,
+    border: "none",
+    outline: "none",
+    resize: "none",
+    fontSize: "14px",
+    lineHeight: "1.5",
+    color: "var(--ai-text-primary)",
+    background: "transparent",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    overflowY: "auto"
+  }} />
+          </div>
+          {}
+          <div style={{
+    position: "absolute",
+    left: "8px",
+    right: "8px",
+    bottom: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  }}>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    overflow: "hidden",
+    minWidth: 0
+  }}>
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Add attachment" type="button">
+                {PlusIcon}
+              </button>
+              <div id="agent-input-pills" data-agent-input-role="pills" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    overflow: "hidden"
+  }}></div>
+            </div>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flexShrink: 0
+  }}>
+              {highlightPlan ? <div className="ai-plan-wrap" onClick={e => {
+    const wrap = e.currentTarget;
+    wrap.classList.toggle("ai-plan-off");
+  }}>
+                  <label className="ai-plan-btn-highlight" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    height: "32px",
+    padding: "0 8px",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontFamily: "inherit",
+    transition: "background 120ms ease-out"
+  }}>
+                    <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" defaultChecked />
+                    <span>Plan</span>
+                  </label>
+                </div> : <label className="ai-plan-checkbox-label">
+                  <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" />
+                  <span>Plan</span>
+                </label>}
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Start voice input" type="button">
+                {MicIcon}
+              </button>
+              {highlightStart ? <div className="ai-start-wrap">
+                  <button data-agent-input-role="start-button" className="ai-icon-btn ai-start-btn-highlight" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    borderRadius: "6px",
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                    {ArrowUpIcon}
+                  </button>
+                </div> : <button data-agent-input-role="start-button" className="ai-icon-btn" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                  {ArrowUpIcon}
+                </button>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+⏰ *预计用时：15 分钟*
+
+移动 App 在手机上应当用起来自然：启动迅速、易于触控，并且适合单手操作。
+
+你将构建 **Pace Mobile**，这是一款以手机体验为核心的跑步追踪应用，灵感来自[什么是 Replit？](/zh/pt/build/welcome)中的跑步追踪器示例。目标是在投入完整的 App Store 发布流程前，先测试以移动端为中心的移动端流程。
+
+<Frame>
+  <img src="/assets/mirror/mobile-app-4203ff45ecd5.png" alt="一款精致的移动 App 示例，包含专为手机使用设计的健身追踪界面" width="1440" height="850" data-path="images/build-examples/mobile-app.png" />
+</Frame>
+
+<div id="o-que-voc-vai-conquistar">
+  ## 你将实现的目标
+</div>
+
+完成本指南后，你将拥有：
+
+* 一个使用 Agent 创建的移动 App 项目。
+* 一个围绕手机端友好流程构建的初始版本。
+* 可在模拟器或仿真器中运行的 App。
+* 可通过 Expo Go 在手机上运行的 App。
+* 可分享给他人以获取反馈的版本。
+
+<div id="o-que-voc-vai-aprender">
+  ## 您将学到什么
+</div>
+
+您将了解如何：
+
+* 通过提示词创建移动 App。
+* 根据手机的限制确定首个版本的范围。
+* 在模拟器或仿真器中测试 App。
+* 使用 Expo Go 在真实设备上测试 App。
+* 判断何时应在着手 App Store 或 TestFlight 相关工作前继续迭代。
+
+<div id="para-quem-este-guia">
+  ## 本指南适用对象
+</div>
+
+如果你的创意需要在手机上使用，请参考本指南。
+
+它适用于追踪工具、预订流程、现场工具、活动应用、学习工具、习惯养成应用，以及任何需要人们离开电脑后仍能使用的产品。
+
+<Note>
+  TestFlight 和部署到 App Store 不在本指南涵盖范围内。准备好进行这一步时，请参阅[构建并发布移动 App](/zh/pt/build/mobile-app)。
+</Note>
+
+<div id="antes-de-comear">
+  ## 开始前
+</div>
+
+你需要：
+
+* 一个 [Replit 账户](https://replit.com)。
+* 一部已安装 [Expo Go](https://expo.dev/go) 的手机。
+* 一个可在几分钟内完成测试的移动端流程。
+
+有关模拟器、仿真器和设备预览的详细信息，请参阅[原生移动 App](/zh/pt/features/artifact-types/building-mobile-apps)。
+
+<div id="defina-o-fluxo-mobile">
+  ## 定义移动端流程
+</div>
+
+在开始构建之前，先确定用户需要在手机上完成哪些操作。
+
+对于 Pace Mobile：
+
+* **目标用户**：希望快速记录跑步的跑者。
+* **核心流程**：选择跑步类型 → 输入距离和时间 → 保存跑步记录 → 查看今日摘要。
+* **移动端限制**：主要操作应便于用拇指触及。
+* **首个版本**：不包含账户、社交动态或高级分析功能。
+
+这样能让首个移动端功能范围足够小，便于测试。
+
+<div id="construa-a-primeira-verso">
+  ## 构建第一个版本
+</div>
+
+打开 Replit，创建一个新的 App。描述你想构建的内容，然后选择 **移动 App** 作为 App 类型。
+
+<Frame>
+  <img src="/assets/mirror/prompt-5cb144699b45.png" alt="Replit 起始屏幕，已选择移动 App 作为 App 类型" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
+</Frame>
+
+使用以下提示词：
+
+<AiPrompt>
+  构建 Pace Mobile，一款以手机使用为中心的跑步记录 App。<br />
+  跑者应能选择跑步类型、输入距离和时间、保存跑步记录，并查看今日摘要。<br />
+  将其设计为便于单手使用，配备较大的触控目标、简单的导航，并呈现精致的健身 App 体验。<br />
+  保持第一个版本足够精简，以便今天就在模拟器和真实手机上测试。
+</AiPrompt>
+
+如果希望 Agent 在构建前先进行规划，请使用[计划模式](/zh/pt/features/agent/plan-mode)。请 Agent 在开始构建前检查屏幕、导航、触控目标以及手机特有的限制条件。
+
+<Frame>
+  <img src="/assets/mirror/agent-plan-mode-prompt-059fe8d2c277.png" alt="Replit 提示词编辑器，已选择计划模式，Agent 将在确定移动 App 的构建范围前进行规划" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
+</Frame>
+
+<div id="teste-em-um-simulador-ou-emulador">
+  ## 在模拟器或仿真器中测试
+</div>
+
+Agent 完成首次构建后，打开 [Preview](/zh/pt/features/editor/preview)。在设备选择器中，选择 **iOS 模拟器** 或 **Android 仿真器**。
+
+像用户在手机上使用应用一样逐项操作。
+
+<Frame>
+  <img src="/assets/mirror/workspace-dda0f81e6b83.png" alt="Replit 项目编辑器显示移动 App 预览以及在移动设备上预览的选项" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
+</Frame>
+
+确认你可以：
+
+* 正常启动应用。
+* 选择跑步类型。
+* 输入距离和时间。
+* 保存跑步记录。
+* 看到今日摘要更新。
+* 顺畅导航，不会卡住。
+* 无需缩放即可阅读文本。
+
+<div id="teste-no-seu-telefone">
+  ## 在手机上测试
+</div>
+
+在模拟器中测试很有用，但只有在手机上才能判断 App 的体验是否合适。
+
+打开移动设备 Preview 面板，然后用手机扫描二维码。这会在 Expo Go 中打开 App。
+
+<Frame>
+  <img src="/assets/mirror/mobile-screen-e5685fc26793.png" alt="一个移动 App 正在 Replit 项目编辑器的 Preview 中运行，其中显示了设备面板和 Expo Go 二维码" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
+</Frame>
+
+在手机上检查：
+
+* 能否单手完成主要流程？
+* 按钮和输入框是否足够大，便于点击？
+* 是否容易触及主要操作？
+* 键盘是否会遮挡重要字段？
+* App 在小屏幕上是否仍然易于使用？
+
+如果有任何地方看起来不对劲，请让 Agent 修复该具体部分，而不是重新设计整个 App。
+
+<AiPrompt>
+  改进 Pace Mobile，使其更适合在手机上单手使用。<br />
+  让“保存跑步”按钮更容易触及，在需要的地方增大触控目标，并保持跑步表单简洁。<br />
+  不要添加新功能。<br />
+  更改后，测试保存跑步是否仍会更新今日摘要。
+</AiPrompt>
+
+<div id="compartilhe-para-obter-feedback">
+  ## 分享以获取反馈
+</div>
+
+当手机端流程正常后，发布 App，创建可共享的 Expo Go 版本以收集早期反馈。
+
+分享时给出明确的任务：
+
+> 在手机上打开 Pace Mobile，保存一次跑步记录，并告诉我哪些地方在点击、阅读或理解时感觉别扭。
+
+有针对性的反馈比笼统的意见更便于改进。如果反馈指出了明确问题，请 Agent 进行最小范围的修复，然后再次在手机上测试 App。
+
+<div id="publique-na-app-store">
+  ## 发布到 App Store
+</div>
+
+在模拟器和手机上的 Expo Go 中测试 Pace Mobile 后，您可以将同一款 App 提交至 TestFlight 和 App Store。此流程要求您加入 **Apple Developer Program** 并启用双重认证。有关注册、个人账户与组织账户、TestFlight 与 App Store 审核以及外部测试的信息，请参阅[构建并发布移动 App](/zh/pt/build/mobile-app)。
+
+<Steps>
+  <Step title="打开“部署”选项卡，然后开始将应用部署到 App Store">
+    当 Expo Go 中的预览处于活跃状态后，打开 **发布** 标签页。在 **生产环境** 下，你会看到一张 **准备好将 Pace 发布到 App Store 了吗？** 卡片。选择 **开始发布到 App Store**。
+
+    <Frame>
+      <img src="/assets/mirror/app-store-02-start-publishing-190eb7841bcf.png" alt="项目编辑器中的发布标签页，显示生产环境状态以及一张“准备好将 Pace 发布到 App Store 了吗？”卡片，其中包含“开始发布到 App Store”按钮" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-02-start-publishing.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择您的 Expo 项目">
+    Replit 会打开 **Launch**——Replit 内嵌的 Expo 流程。输入或确认 Expo 项目的名称和 slug，然后选择 **继续**。如果您已有 Expo 项目，请选择 **使用现有项目**。
+
+    <Frame>
+      <img src="/assets/mirror/app-store-03-choose-expo-project-4707fafffafe.png" alt="Launch 对话框中“选择 Expo 项目”步骤处于激活状态——项目名称和项目 slug 字段已预填为 Pace，包含“继续”按钮和“使用现有项目”选项" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-03-choose-expo-project.png" />
+    </Frame>
+  </Step>
+
+  <Step title="使用 Apple 登录">
+    连接将作为 App Store 上架条目所有者的 Apple Developer 账户。该账户必须已加入 Apple Developer Program，且 Apple 要求使用双重认证——请准备好在受信任的设备上确认验证码。
+
+    <Frame>
+      <img src="/assets/mirror/app-store-04-sign-in-apple-459dfc9b84ba.png" alt="Launch 对话框中的“使用 Apple 登录”步骤——包含 Apple Developer 电子邮件地址或电话号码及密码字段，并提示密码绝不会离开设备，且账户必须已加入 Apple Developer Program" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-04-sign-in-apple.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择或创建您的 Apple App">
+    输入将在 App Store 中显示的 **App 名称** 和 **Bundle ID** (例如 `app.replit.pace`) 。Bundle ID 在首次构建后无法更改，因此请谨慎选择。
+
+    <Frame>
+      <img src="/assets/mirror/app-store-05-choose-apple-app-3971aea62f14.png" alt="“选择 Apple App”步骤中的 Launch 对话框：App 名称设置为 Pace，Bundle ID 为 app.replit.pace，并提示 Bundle ID 之后无法更改，按钮显示“正在创建 App…”" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-05-choose-apple-app.png" />
+    </Frame>
+  </Step>
+
+  <Step title="发布到 App Store">
+    Replit 会代您配置 Apple 证书。当 **准备发布** 步骤点亮后，选择 **发布到 App Store**。Replit 会在云端构建您的原生 App，并将构建版本上传至 App Store Connect，以便通过 TestFlight 进行 Beta 测试审核。
+
+    <Frame>
+      <img src="/assets/mirror/app-store-06-ready-for-launch-ab02659ee0bb.png" alt="“准备发布”步骤中的 Launch 对话框，其中“选择 Apple App”和“配置 Apple 证书”已标记为完成，并显示“发布到 App Store”按钮和可选发布参数" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-06-ready-for-launch.png" />
+    </Frame>
+
+    Launch 完成后，您会看到一条确认信息，表明该 App 已提交至 App Store。随后，对话框会关闭，您将返回项目编辑器。
+
+    <Frame>
+      <img src="/assets/mirror/app-store-targeting-f8797071c9e0.png" alt="Launch 对话框，其中“正在提交至 App Store”已标记为完成，并显示“正在重定向回 Replit”的消息——这是选择“发布到 App Store”后的确认状态" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-targeting.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Note>
+  某个版本的首个 build 通常需先通过 TestFlight Beta 审核，测试人员才能安装。审核通过后，后续 build 通常能更快地提供给测试人员。若要与外部测试人员共享或提交至 App Store 发布，请完成 **App Store Connect** 中的应用信息设置。完整的 App Store Connect 检查清单，请参阅[构建并发布移动 App](/zh/pt/build/mobile-app)。
+</Note>
+
+<div id="voc-terminou-quando">
+  ## 完成标准
+</div>
+
+* 应用能在 iOS 模拟器或 Android 仿真器中打开。
+* 应用能通过 Expo Go 在你的手机上打开。
+* 你能完整走通主要的移动端流程。
+* 文字、按钮和导航在手机上用起来体验舒适。
+* 你已发布或分享了可供测试的移动版本。
+* 至少有一个人能试用并提供反馈。
+* (可选) 你已通过 App Store 流程将应用提交到 TestFlight。
+
+<div id="melhore-a-seguir">
+  ## 接下来可继续改进
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加登录功能" icon="user-lock" href="/zh/pt/build/add-login">
+    让每位用户查看自己的进度。
+  </Card>
+
+  <Card title="添加数据库" icon="database" href="/zh/pt/build/add-database">
+    保存首次测试后产生的跑步记录。
+  </Card>
+
+  <Card title="添加集成" icon="plug" href="/zh/pt/build/add-integrations">
+    将 App 连接到通知、健康数据或外部服务。
+  </Card>
+
+  <Card title="构建并发布移动 App" icon="mobile-screen" href="/zh/pt/build/mobile-app">
+    将功能齐全的移动 App 发布到 TestFlight 和 App Store。
+  </Card>
+</CardGroup>
+
+<div id="precisa-de-mais-ajuda">
+  ## 需要更多帮助？
+</div>
+
+* **Agent 构建的是 Web App：**重新开始，并在构建前选择 **移动 App** 作为 App 类型。
+* **Expo Go 预览似乎不是最新版本：**摇晃手机，打开开发者菜单，然后选择 **刷新**。
+* **触控目标似乎太小：**请 Agent 增大触控目标，并将主要操作置于拇指可及范围内。
+* **导航似乎过于拥挤：**请 Agent 将 App 精简为主流程所需的最少页面。
+* **模拟器可以运行，但手机无法运行：**请在真实设备上测试硬件特有的行为，并参阅[原生移动 App](/zh/pt/features/artifact-types/building-mobile-apps)。
+* **部署失败：**请参阅[移动 App 故障排除](/zh/pt/features/troubleshooting/mobile-app)。
+
+<div id="experimente-agora">
+  ## 立即体验
+</div>
+
+<AgentInput highlightStart defaultPrompt="构建 Pace Mobile，一款专为手机打造的跑步记录应用。跑者可以选择跑步类型、输入距离和时间、保存本次跑步并查看今日汇总。请按单手操作来设计，触控目标要大、导航要简洁，并具备精致的健身应用质感。首个版本保持精简，以便今天就能在模拟器和真机上完成测试。" showTypewriter={false} />
+
+<div id="relacionado">
+  ## 相关内容
+</div>
+
+* [原生移动 App](/zh/pt/features/artifact-types/building-mobile-apps)
+* [构建并发布移动 App](/zh/pt/build/mobile-app)
+* [Vibe coding 101](/zh/pt/learn/foundations/vibe-coding-101)
+* [移动 App 问题排查](/zh/pt/features/troubleshooting/mobile-app)

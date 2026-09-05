@@ -1,0 +1,104 @@
+---
+title: "数据恢复"
+description: "将开发数据库还原到某个 checkpoint，或将生产数据库回滚到指定时间点。"
+---
+
+出错在所难免：一次失误的架构变更、误删的数据行，或是一次跑偏的 Agent 会话。Replit 为每种数据库都提供了恢复方案。
+
+| 数据库 | 恢复方式          | 可用性                                                 |
+| --- | ------------- | --------------------------------------------------- |
+| 开发  | Checkpoint 回滚 | 所有方案                                                |
+| 生产  | 时间点恢复与定时备份    | Core：最多 7 天历史记录。Pro 和 Enterprise：最多 28 天 (默认 7 天) 。 |
+
+<div id="restaure-seu-banco-de-dados-de-desenvolvimento">
+  ## 恢复开发数据库
+</div>
+
+你可以使用[回滚功能](/zh/pt/features/version-control/checkpoints-and-rollbacks/)将应用和开发数据库还原到之前的状态，即恢复到 Agent 创建的任意一个 checkpoint。
+
+<Frame>
+  <img src="/assets/mirror/checkpoint-rollback-476fde84864b.png" alt="显示回滚选项的 checkpoint 回滚界面" width="3154" height="2366" data-path="images/replitai/checkpoint-rollback.png" />
+</Frame>
+
+<Info>
+  恢复到某个 checkpoint 的状态时，请务必在“Additional rollback options”中勾选“Database”，这样数据库才会还原到创建该 checkpoint 时的状态。
+</Info>
+
+<div id="restaure-seu-banco-de-dados-de-produo">
+  ## 恢复生产数据库
+</div>
+
+对于生产数据库，你可以使用时间点恢复功能将其恢复到某个特定时刻。
+
+<Frame>
+  <img src="/assets/mirror/database-rollbacks-f13dd20874ae.jpg" alt="显示回滚选项的数据库回滚界面" width="1082" height="708" data-path="images/databases/database-rollbacks.jpg" />
+</Frame>
+
+能恢复到多久以前，取决于你的方案和保留设置。Core 方案最多保留 7 天的历史记录，Pro 和 Enterprise 方案最多保留 28 天。所有方案初始都是 7 天，你可以在生产数据库的设置中调整这个时间窗口。时间窗口越长，占用的存储空间越多，因此延长保留期会增加用量费用。如果你从 Pro 降级到 Core，保留窗口会缩短为 7 天。
+
+<Warning>
+  恢复数据库不会恢复应用代码，回滚应用也不会恢复数据库。若要让两者回到同一时刻：先恢复数据库，然后[回滚到对应的 checkpoint](/zh/pt/features/version-control/checkpoints-and-rollbacks/)，再重新发布你的应用。
+</Warning>
+
+<div id="agende-backups-do-banco-de-dados-de-produo">
+  ## 为生产数据库设置定时备份
+</div>
+
+定时备份每天创建一个完整的还原点。启用或更新备份计划时，Replit 会按你浏览器当前所在时区，将备份安排在接近午夜的时间执行。
+
+1. 打开 **Database** 工具，选择生产数据库。
+2. 打开 **Settings**，然后在 **Advanced** 下展开 **Scheduled backups**。
+3. 要启用定时备份，请在 **Keep backups for** 中选择保留期限。
+
+可选的保留期限取决于你的方案。Core 最长支持 7 天，Pro 和 Enterprise 最长支持 28 天。
+
+<div id="custos-de-armazenamento">
+  ### 存储成本
+</div>
+
+Replit 会分别计量生产数据库的各类存储：
+
+| 存储类别            | 每 GiB 每月价格 |
+| --------------- | ---------: |
+| 数据库逻辑存储         |      $0.35 |
+| 时间点恢复 (PITR) 存储 |      $0.20 |
+| 定时备份存储          |      $0.09 |
+
+<Note>数据库存储费用目前享受 100% 折扣。</Note>
+
+无论你使用 PITR、定时备份还是两者并用，逻辑存储的 $0.35 费用都会照常收取。定时备份存储的每 GiB 单价低于 PITR 存储。如果每日一次的恢复点已能满足需求，那么采用定时备份并缩短 PITR 窗口，可以降低恢复类存储的开销。备份总成本取决于所存储的备份量和保留期限。
+
+PITR 可在窗口期内提供更多恢复点，而定时备份每天只提供一个恢复点，请根据需求选择合适的恢复方式。
+
+<Note>
+  备份计划使用你当前的 UTC 偏移量。夏令时切换可能导致备份时间偏移一小时，直到你更新备份计划为止。
+  偏移量非整小时的时区将使用最接近的整点。
+</Note>
+
+<div id="restaure-um-backup-agendado">
+  ### 恢复定时备份
+</div>
+
+1. 在生产数据库设置中打开 **Scheduled backups**。
+2. 选择 **View all backups**。
+3. 在所需的恢复点上选择 **Restore**。
+4. 输入 `restore`，然后选择 **Continue**。
+
+恢复操作会将数据库切换到所选备份中的数据。该操作不会删除当前数据，但已连接的服务可能会出现短暂的重新连接。
+
+<div id="soluo-de-problemas-em-falhas-de-publicao">
+  ## 部署失败排查
+</div>
+
+如果部署因数据库问题而失败：
+
+1. **查看部署日志**，查找与数据库连接或架构冲突相关的具体错误信息
+2. **检查近期的架构变更**，确认是否与现有应用代码存在冲突
+3. **先在部署预览中测试你的更改**，再尝试重新部署
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+* [开发环境与生产环境](/zh/pt/features/data-and-storage/development-and-production)：了解这两个数据库如何协同工作。
+* [Checkpoint 与回滚](/zh/pt/features/version-control/checkpoints-and-rollbacks/)：将整个应用回退到之前的状态。

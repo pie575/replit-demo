@@ -1,0 +1,85 @@
+---
+title: "配置 Google OAuth"
+description: "将 Google 配置为 App 身份验证的社交登录身份提供方"
+---
+
+本指南介绍如何在 Google Cloud Console 中创建 Google OAuth 应用。您将获取 **Client ID** 和 **Client Secret**，并配置 Clerk 所需的 JavaScript 来源和重定向 URI。
+
+<Note>
+  本页仅介绍在 Google Cloud Console 中配置身份提供方。有关 Clerk Auth 的完整流程 (包括启用 Google 并在 **Auth 面板**中输入凭据) ，请参阅 Clerk Auth 文档中的[为 SSO 身份提供方配置 OAuth 凭据](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+</Note>
+
+<div id="pr-requisitos">
+  ## 前提条件
+</div>
+
+* 有权访问 [Google Cloud Console](https://console.cloud.google.com/)
+* 一个[已发布的 Replit 应用](/zh/category/replit-deployments) — 自定义 OAuth 凭据仅在 **Production** 环境中可用
+* 打开 **Google** 身份提供方的编辑设置：**Auth 面板** → **Configure** 标签页 → **SSO providers** 部分 → 选择 **Production** 环境 → 选择 **Google** 旁边的 **Edit**
+
+<div id="passo-1-criar-um-app-oauth-do-google">
+  ## 第 1 步：创建 Google OAuth App
+</div>
+
+前往 [Google Cloud Console](https://console.cloud.google.com/)：
+
+<div id="criar-ou-selecionar-um-projeto">
+  ### 创建或选择项目
+</div>
+
+1. 在项目下拉菜单中选择现有项目，或创建新项目
+2. 系统会将您重定向到项目仪表板
+
+<div id="configurar-a-tela-de-consentimento-oauth">
+  ### 配置 OAuth 同意屏幕
+</div>
+
+1. 在左侧边栏中，点击菜单图标 (≡)，然后选择 **APIs &amp; Services**
+2. 选择 **OAuth consent screen**
+3. 填写所需信息，配置 App 的同意屏幕
+4. 保存更改
+
+<div id="criar-credenciais-oauth">
+  ### 创建 OAuth 凭据
+</div>
+
+1. 在 **APIs &amp; Services** 中选择 **Credentials**
+2. 在顶部选择 **Create Credentials**，然后选择 **OAuth client ID**
+3. 选择 **Web application** 作为应用类型
+4. 将 **Authorized JavaScript origins** 和 **Authorized redirect URIs** 设置为 **Auth 面板**中 **Provider setup** 显示的确切值。添加列出的所有值，包括已发布的域名和所有自定义域名。请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)，了解如何查找这些值。
+5. 选择 **Create**
+6. 保存你的 **Client ID** 和 **Client Secret**
+
+<Warning>
+  请妥善保管 Client Secret，切勿将其提交到版本控制系统。
+</Warning>
+
+<Warning>
+  Google 登录无法在 App 内嵌浏览器或 WebView 中使用。用户必须使用标准网页浏览器。
+</Warning>
+
+<div id="soluo-de-problemas">
+  ## 故障排除
+</div>
+
+<div id="incompatibilidade-de-uri-de-redirecionamento">
+  ### 重定向 URI 不匹配
+</div>
+
+* 检查 Google Cloud Console 中的重定向 URI 是否与 **Provider setup** 中 **Auth 面板**显示的值完全一致
+* 确保没有末尾斜杠或拼写错误
+* 等待几分钟，让 Google 配置生效
+
+<div id="cliente-invlido">
+  ### 无效的客户端
+</div>
+
+* 再次检查 Client ID 和 Client Secret 是否复制正确
+* 确保没有多余空格
+* 检查是否已配置 OAuth 同意屏幕
+
+<div id="no-est-funcionando-no-domnio-personalizado">
+  ### 自定义域名无法正常使用
+</div>
+
+* 将 **Auth 面板**中 **Provider setup** 显示的自定义域名条目同时添加到 Authorized JavaScript origins 和 Authorized redirect URIs 中

@@ -1,0 +1,142 @@
+---
+title: "Restauration après sinistre de Git"
+description: "Découvrez comment restaurer l’historique Git et votre code grâce au système de sauvegarde automatique de Replit."
+---
+
+Replit sauvegarde automatiquement les dépôts Git afin de vous permettre d’effectuer une restauration en cas de problème, par exemple si le dossier `.git` est endommagé ou si l’historique des commits est perdu. Ce système de sauvegarde s’exécute en arrière-plan afin de protéger votre travail sans effort supplémentaire.
+
+<div id="section">
+  ## Fonctionnement
+</div>
+
+Toutes les applications Replit disposent d’une sauvegarde sécurisée de leur dépôt Git. Lorsque Replit Agent modifie le code ou que vous publiez une application, ces modifications sont automatiquement synchronisées avec cette sauvegarde. Si votre dépôt Git local est corrompu ou devient indisponible, vous pouvez restaurer l’intégralité de l’historique des commits à partir de cette sauvegarde.
+
+<Info>
+  Le dépôt distant de sauvegarde s’appelle `gitsafe-backup` et est automatiquement géré par Replit. Il fonctionne déjà en arrière-plan, sans configuration supplémentaire.
+</Info>
+
+<div id="section-2">
+  ## Consulter l’historique des sauvegardes
+</div>
+
+Le moyen le plus simple de consulter l’historique des commits est d’utiliser l’[interface Git](/fr/ko/features/workspace-tools/git-interface). Ouvrez-la depuis la section Tools du Project Editor pour afficher l’historique complet des commits, y compris tous les points de contrôle Agent. Dans la plupart des cas, cette méthode suffit et ne nécessite aucune commande.
+
+Si vous devez vérifier directement le dépôt distant gitsafe-backup, vous pouvez utiliser le Shell :
+
+```bash theme={null}
+git fetch gitsafe-backup main
+git log gitsafe-backup/main
+```
+
+Vous verrez ainsi l’historique complet des commits, y compris tous les points de contrôle d’Agent et les commits manuels. Utilisez-le pour vérifier que votre travail est bien sauvegardé ou pour trouver un commit précis à restaurer.
+
+<div id="git">
+  ## Restauration après des problèmes avec Git
+</div>
+
+En cas d&#39;erreur Git ou de dépôt endommagé, commencez par l&#39;[interface Git](/fr/ko/features/workspace-tools/git-interface). Vous pouvez résoudre la plupart des problèmes courants, comme revenir à un commit précédent ou récupérer depuis le dépôt distant, sans utiliser de commandes Shell.
+
+Si l&#39;interface Git ne suffit pas (par exemple, si le dossier `.git` est complètement endommagé), suivez les étapes ci-dessous dans le Shell.
+
+<div id="section-3">
+  ### Vérifier la disponibilité d’une sauvegarde
+</div>
+
+Vérifiez d’abord qu’un dépôt distant de sauvegarde existe :
+
+```bash theme={null}
+git remote -v
+```
+
+Recherchez `gitsafe-backup` dans la sortie. S’il est présent, vous pouvez procéder à la restauration.
+
+<div id="section-4">
+  ### Restaurer le dépôt
+</div>
+
+<Warning>
+  Cette procédure remplace le dossier `.git` actuel par la version sauvegardée. Vos fichiers de travail ne sont pas modifiés, mais l’historique Git local est remplacé par celui de la sauvegarde.
+</Warning>
+
+<Steps>
+  <Step title="Sauvegarder la configuration Git actuelle">
+    Sauvegardez le fichier de configuration Git au cas où vous auriez des paramètres personnalisés :
+
+    ```bash theme={null}
+    cp .git/config .git_config_backup
+    ```
+  </Step>
+
+  <Step title="Cloner le dépôt de sauvegarde">
+    Créez un clone temporaire à partir de la sauvegarde :
+
+    ```bash theme={null}
+    git clone --bare git://gitsafe:5418/backup.git /tmp/gitsafe-restore
+    ```
+  </Step>
+
+  <Step title="Remplacer le dossier Git">
+    Déplacez le dossier `.git` corrompu, puis remplacez-le par la sauvegarde :
+
+    ```bash theme={null}
+    mv .git .git_corrupted_backup
+    mv /tmp/gitsafe-restore/ .git
+    ```
+  </Step>
+
+  <Step title="Restaurer la configuration">
+    Restaurez la configuration Git :
+
+    ```bash theme={null}
+    mv .git_config_backup .git/config
+    ```
+  </Step>
+</Steps>
+
+Une fois ces étapes terminées, exécutez `git status` pour vérifier que le dépôt fonctionne correctement.
+
+<div id="section-5">
+  ## Résoudre les problèmes courants
+</div>
+
+<div id="fatal-repository-not-found">
+  ### « fatal: repository not found » ou dépôt distant de sauvegarde manquant
+</div>
+
+Il est possible que le système de sauvegarde n’ait pas été activé pour les anciens projets. Contactez l’assistance si vous avez besoin d’aide pour effectuer la restauration d’un ancien projet.
+
+<div id="section-6">
+  ### La restauration n’inclut pas les commits récents
+</div>
+
+Les sauvegardes sont synchronisées après chaque commit effectué par Agent. Si vous avez apporté des modifications sans les valider par un commit, elles ne seront pas incluses dans la sauvegarde. Vérifiez votre répertoire de travail afin de repérer les fichiers non commités.
+
+<div id="git-2">
+  ### Les opérations Git sont lentes ou bloquées
+</div>
+
+Si les opérations Git ne répondent plus, il se peut qu’un ancien fichier de verrouillage soit présent. Vous pouvez le supprimer en toute sécurité :
+
+```bash theme={null}
+rm -f .git/index.lock
+```
+
+<div id="section-7">
+  ## Prévenir la perte de données
+</div>
+
+Le système de sauvegarde protège automatiquement votre historique Git, mais vous pouvez prendre des mesures supplémentaires pour protéger votre travail :
+
+* **Effectuer des commits fréquents** : créez des commits petits et fréquents pour sauvegarder régulièrement votre progression
+* **Utiliser des points de contrôle** : lorsque vous travaillez avec [Replit Agent](/fr/ko/features/agent/overview), les points de contrôle créent automatiquement des commits à chaque étape clé
+* **Connecter GitHub** : pour les projets importants, [connectez votre application à GitHub](/fr/ko/build/import-from-providers) afin d’ajouter une couche de sauvegarde supplémentaire
+
+<div id="section-8">
+  ## Étapes suivantes
+</div>
+
+Pour en savoir plus sur la gestion de versions dans Replit :
+
+* [Présentation de la gestion de versions](/fr/ko/learn/projects-and-artifacts/version-control) : découvrez toutes les options disponibles
+* [Utiliser l’interface Git](/fr/ko/features/workspace-tools/git-interface) : gérez Git visuellement, sans utiliser la ligne de commande
+* [Checkpoints et restaurations](/fr/ko/features/version-control/checkpoints-and-rollbacks) : découvrez le fonctionnement des points de contrôle Agent

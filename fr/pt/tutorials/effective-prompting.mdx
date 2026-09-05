@@ -1,0 +1,218 @@
+---
+title: "Rédiger des prompts efficaces avec Replit AI"
+description: "Découvrez les principes et des exemples pour rédiger des prompts efficaces avec Replit Agent."
+---
+
+export const YouTubeEmbed = ({videoId, title = "Vidéo YouTube", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Créer des prompts efficaces, c&#39;est avant tout donner des instructions claires à un assistant compétent. Guidez bien l&#39;[**Agent**](/fr/pt/core-concepts/agent) et vous passerez du concept à l&#39;application en un rien de temps.
+
+<YouTubeEmbed videoId="7m5SjKZBw6I" title="10 conseils pour mieux programmer avec l'IA" />
+
+<div id="exemplos-rpidos">
+  ## Exemples rapides
+</div>
+
+Voici la différence entre un prompt vague et un prompt efficace :
+
+<AccordionGroup>
+  <Accordion title="Corriger du code" icon="bug">
+    **Vague :** « Corrige mon code. »
+
+    **Efficace :** « Mon script échoue au moment de traiter la saisie utilisateur. L&#39;erreur semble venir de la fonction de validation. Peux-tu m&#39;aider à déboguer la partie `validate_input` ? Voici le message d&#39;erreur : [détails] »
+
+    Le prompt efficace identifie la zone problématique, la fonction suspecte et fournit du contexte.
+  </Accordion>
+
+  <Accordion title="Développer des fonctionnalités" icon="hammer">
+    **Vague :** « Fais un site web. »
+
+    **Efficace :** « Crée un site portfolio simple avec des sections Accueil, À propos de moi et Formulaire de contact. Utilise un thème de design moderne et épuré avec du contenu d&#39;exemple. »
+
+    Le prompt efficace définit l&#39;objectif, les fonctionnalités principales et l&#39;esthétique souhaitée.
+  </Accordion>
+
+  <Accordion title="Améliorations des performances" icon="gauge-high">
+    **Vague :** « Ne le rends pas lent. »
+
+    **Efficace :** « Refactorise la fonction de traitement des données pour gérer plus efficacement des entrées volumineuses. Pourrait-on utiliser un autre algorithme ou une autre structure de données ? »
+
+    Indiquez à l&#39;Agent *comment* améliorer les choses plutôt que de formuler des contraintes négatives.
+  </Accordion>
+
+  <Accordion title="Modifications de l'interface" icon="paintbrush">
+    **Vague :** « Ajoute une animation. »
+
+    **Efficace :** « Anime l&#39;image principale de la page d&#39;accueil pour qu&#39;elle apparaisse en fondu au premier chargement de la page, afin de créer une expérience accueillante. »
+
+    Identifiez l&#39;élément précis, l&#39;effet souhaité, le timing et l&#39;expérience visée.
+  </Accordion>
+
+  <Accordion title="Systèmes complexes" icon="server">
+    **Vague :** « Construis le backend. »
+
+    **Efficace :** « Configure la logique côté serveur. Implémente l&#39;authentification des utilisateurs (inscription/connexion) et crée un endpoint d&#39;API pour récupérer les données de profil utilisateur en toute sécurité. »
+
+    Découpez les grandes tâches en fonctionnalités précises.
+  </Accordion>
+</AccordionGroup>
+
+<div id="princpios-fundamentais">
+  ## Principes fondamentaux
+</div>
+
+<Frame>
+  <img src="/assets/mirror/10-tips-59c524521960.png" alt="Dix conseils pour des prompts efficaces avec Replit Agent" width="1259" height="1101" data-path="images/tutorials/10-tips.png" />
+</Frame>
+
+<div id="planeje-primeiro">
+  ### Planifiez d&#39;abord
+</div>
+
+<Tip>Avant de rédiger vos prompts, décrivez les fonctionnalités et les parcours utilisateur de votre application. Un plan clair donne des prompts plus ciblés.</Tip>
+
+Réfléchissez à la structure de votre application comme le ferait un chef de produit. Décomposez l&#39;objectif global en étapes logiques.
+
+**Au lieu de :** « Crée une application de gestion de tâches. »
+
+**Essayez :** « 1. Crée la structure HTML de base avec un champ de saisie et une liste de tâches. 2. Ajoute du JavaScript pour ajouter des tâches. 3. Utilise une base de données pour stocker les tâches. 4. Ajoute une fonctionnalité permettant de marquer les tâches comme terminées. »
+
+Rédigez ensuite un prompt destiné à Agent pour chaque étape.
+
+<div id="construa-incrementalmente">
+  ### Construisez de façon incrémentale
+</div>
+
+Utilisez les [**checkpoints**](/fr/pt/core-concepts/agent#checkpoints) pour enregistrer votre progression après chaque étape réussie. En cas de problème, vous pouvez revenir à un état fonctionnel et essayer une autre approche.
+
+**Au lieu de :** « Construis une plateforme d&#39;e-commerce complète. »
+
+**Essayez :** « Configure un projet full-stack de base pour un site d&#39;e-commerce avec inscription et connexion des utilisateurs via Replit Auth. » Enchaînez ensuite avec des prompts pour les fiches produits, le panier et le paiement.
+
+<div id="seja-especfico">
+  ### Soyez précis
+</div>
+
+Définissez exactement ce dont vous avez besoin : formats de sortie, contraintes, cas limites.
+
+**Au lieu de :** « Ajoute un formulaire de contact. »
+
+**Essayez :** « Crée une page de formulaire de contact sur `/contact` avec des champs pour :
+
+* Nom (obligatoire)
+* E-mail (obligatoire, doit être dans un format valide)
+* Message (obligatoire, 10 caractères minimum)
+
+À l&#39;envoi, transmets les données du formulaire à `contact@mydomain.com`. »
+
+<div id="use-linguagem-positiva">
+  ### Utilisez un langage positif
+</div>
+
+Dites ce que vous *voulez*, et non ce qu&#39;il faut éviter.
+
+**Au lieu de :** « Ne rendez pas la page de profil de l&#39;utilisateur confuse. »
+
+**Essayez :** « Créez une page de profil utilisateur épurée. Affichez le nom d&#39;utilisateur bien en évidence, suivi de l&#39;e-mail et de la date d&#39;inscription. Ajoutez un bouton “Modifier le profil”. »
+
+<div id="mantenha-a-simplicidade">
+  ### Restez simple
+</div>
+
+Utilisez un langage clair et direct. Découpez les demandes complexes en points distincts.
+
+**Au lieu de :** « Implémentez l&#39;infrastructure côté serveur nécessaire pour permettre la génération dynamique et la récupération d&#39;artefacts de contenu généré par les utilisateurs. »
+
+**Essayez plutôt :** « Crée une fonctionnalité backend permettant aux utilisateurs de publier des articles de blog. Les utilisateurs doivent saisir un titre et le corps du contenu. Enregistre les articles dans la base de données. »
+
+<div id="trabalhando-com-contexto">
+  ## Travailler avec le contexte
+</div>
+
+<div id="fornea-arquivos-relevantes">
+  ### Fournissez les fichiers pertinents
+</div>
+
+Mentionnez des fichiers précis plutôt que de joindre l&#39;intégralité de votre projet.
+
+**Au lieu de :** (Tout joindre) « Implémente la page de profil utilisateur en te basant sur notre système de design. »
+
+**Essayez :** « Crée la page de profil utilisateur. Récupère les données de l&#39;utilisateur depuis le point de terminaison du serveur. Applique le style décrit dans [URL vers la documentation de design] et respecte cette maquette : [joindre `profile_mockup.jpg`]. »
+
+<Tip>Démarrez une nouvelle conversation lorsque vous passez à des tâches sans lien entre elles. Vous éviterez ainsi la confusion due à l&#39;accumulation de contexte.</Tip>
+
+<div id="mostre-exemplos">
+  ### Montrez des exemples
+</div>
+
+Réduisez l&#39;ambiguïté en fournissant des exemples concrets : extraits de code, données d&#39;exemple ou captures d&#39;écran.
+
+**Au lieu de :** « Améliorez l&#39;apparence des cartes produit. »
+
+**Essayez :** « Repensez les cartes produit de la page boutique. Chaque carte doit afficher l&#39;image du produit, son nom, son prix et un bouton &quot;Ajouter au panier&quot;, dans un style proche de cette maquette : [joindre une capture d&#39;écran]. Utilisez une bordure gris clair. »
+
+<div id="depurao-eficaz">
+  ## Débogage efficace
+</div>
+
+Lorsque des erreurs surviennent, fournissez :
+
+* Le message d&#39;erreur **exact**
+* Les extraits de code pertinents
+* Les noms des fichiers où l&#39;erreur se produit
+* Ce que vous cherchiez à accomplir
+* Les solutions que vous avez déjà essayées
+
+**Au lieu de :** « Ma page de connexion ne fonctionne pas. »
+
+**Essayez :** « Lorsque je me connecte avec les bons identifiants sur `/login`, j&#39;obtiens une erreur &quot;User not found&quot; dans la console du navigateur. La vérification dans la base de données ne semble pas fonctionner. Voici le code de gestion de la connexion dans `auth.js`. »
+
+<div id="pea-orientao">
+  ## Demandez conseil
+</div>
+
+<Tip>Passez en mode Plan pour explorer les options avant de vous lancer dans la création. Interrogez Agent sur les bibliothèques, les approches et les compromis.</Tip>
+
+**Au lieu de :** « Ajoute des paiements. »
+
+**Essayez :** « Quelles sont les bonnes options pour accepter les paiements par carte bancaire dans une application web créée sur Replit ? J&#39;ai besoin de quelque chose d&#39;assez simple à intégrer. »
+
+<div id="itere-nos-seus-prompts">
+  ## Itérez sur vos prompts
+</div>
+
+Votre premier prompt ne sera peut-être pas parfait — c&#39;est normal. Si le résultat ne correspond pas à vos attentes :
+
+* Ajoutez des détails
+* Donnez un exemple
+* Simplifiez l&#39;instruction
+* Essayez de formuler les choses autrement
+
+**Prompt initial :** « Crée un en-tête pour mon site. »
+
+**Prompt affiné :** « Crée un composant d&#39;en-tête fixe avec le logo du site à gauche et des liens de navigation (Accueil, À propos, Contact) à droite. »
+
+<div id="resumo">
+  ## Résumé
+</div>
+
+Un prompting efficace repose sur quelques principes :
+
+* **Planifier** avant de rédiger vos prompts
+* **Construire** progressivement avec les Checkpoints
+* **Être précis** sur les exigences
+* **Fournir du contexte** à l&#39;aide d&#39;exemples et de fichiers pertinents
+* **Itérer** lorsque les résultats ne sont pas tout à fait au point
+
+Maîtrisez ces principes et vous créerez des applications plus rapidement avec Agent.

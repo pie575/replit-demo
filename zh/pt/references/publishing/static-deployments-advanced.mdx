@@ -1,0 +1,158 @@
+---
+title: "静态部署配置"
+description: "了解如何为静态部署配置 HTTP 标头、路由规则和 URL 重写规则。"
+---
+
+本指南介绍以下 Web 服务器级别的配置：
+
+* [添加响应标头](#add-response-headers)
+* [创建自定义 404 页面](#create-a-custom-404-page)
+* [定义 URL 路径重写规则](#define-url-path-rewrites)
+
+<div id="adicionar-cabealhos-de-resposta">
+  ## 添加响应标头
+</div>
+
+自定义**响应标头**可让您为与特定路径匹配的请求添加 HTTP 标头指令。
+响应标头是一个名称和值的组合，用于向浏览器说明应如何
+与请求的内容交互。
+
+例如，您可以指定 `Access-Control-Allow-Origin` 标头，以指明允许哪些域名访问该页面。
+要创建此条目，请将以下内容添加到 Replit App 根目录中的 `.replit` 文件：
+
+```
+[[deployment.responseHeaders]]
+path = "/*"
+name = "Access-Control-Allow-Origin"
+value = "origin"
+```
+
+此响应标头包含以下参数：
+
+* **path**：与所请求资源匹配的 URL 路径模式
+* **name**：HTTP 标头名称
+* **value**：HTTP 标头值
+
+您可以在 `.replit` 文件中添加多个 `deployment.responseHeaders` 条目。
+
+要应用配置更新，请重新发布您的 Replit App。
+
+<div id="cabealhos-reservados">
+  #### 保留的标头
+</div>
+
+Replit 会保留以下 HTTP 标头，您无法对其进行配置。
+
+```text [expandable] theme={null}
+Accept-Ranges
+Age
+Allow
+Alt-Svc
+Connection
+Content-Encoding
+Content-Length
+Content-Range
+Date
+Location
+Server
+Set-Cookie
+Trailer
+Transfer-Encoding
+Upgrade
+```
+
+<Tip>
+  如需详细了解 HTTP 标头，请参阅 MDN Web 文档中的
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers" target="_blank">
+    HTTP 标头
+  </a>
+
+  。
+</Tip>
+
+<div id="criar-uma-pgina-404-personalizada">
+  ## 创建自定义 404 页面
+</div>
+
+当用户请求的 URL 路径与已发布 App 中的任何文件或规则均不匹配时，系统会显示自定义 404 页面。
+
+要添加自定义 404 页面，请在 Replit App 的根目录中创建一个名为 `404.html` 的文件，并在其中编写页面内容。
+
+当用户尝试访问不存在的 URL 路径时，将看到自定义 404 页面的 HTML 渲染结果。
+
+<div id="definir-rewrites-de-caminho-de-url">
+  ## 设置 URL 路径重写规则
+</div>
+
+您可以设置 URL 重写规则，在 Replit App 处理请求之前更改请求的 URL 路径。
+原始 URL 仍会显示在浏览器中，但服务器会加载重写规则指定的资源。
+
+例如，您可以指定所有以 `/app` 开头的请求均加载 `/app/index.html` 文件的内容。
+要创建此配置，请将以下内容添加到 Replit App 根目录中的 `.replit` 文件：
+
+```
+[[deployment.rewrites]]
+from = "/app/*"
+to = "/app/index.html"
+```
+
+* **from**：与所请求资源匹配的 URL 路径模式
+* **to**：重写后的路径，对应于静态部署中的某个文件。
+
+您可以在 `.replit` 文件中添加多个 `deployment.rewrites` 条目。
+服务器会按条目列出的顺序处理，并忽略重复项。
+
+要应用配置更新，您必须重新发布 Replit App。
+
+以下各节介绍 URL 重写规则的限制。
+
+<div id="correspondncia-de-caminho">
+  ### 路径匹配
+</div>
+
+以下限制适用于重写规则中的 `from` 和 `to` 参数：
+
+* 除非包含 `*`，否则必须完全匹配
+* `*` 匹配路径的剩余部分
+* `*` 仅可用于路径末尾
+* 如果 `from` 参数中包含 `*`，也可以在 `to` 参数中使用它来表示路径中对应的部分
+
+例如，如果 `.replit` 文件包含以下重写规则：
+
+```
+[[deployment.rewrites]]
+from = "/v1/*"
+to = "/v2/*"
+```
+
+当用户访问路径 `/v1/about-us.html` 时，重写规则会返回位于 `/v2/about-us.html` 的文件。
+
+<div id="shadowing">
+  ### 遮蔽
+</div>
+
+当重写规则匹配的 URL 路径也对应静态部署中的某个文件时，就会发生遮蔽。
+发生这种情况时，云服务器会忽略该重写规则，直接提供该文件。
+
+例如，假设你发布的 App 包含以下文件：
+
+* `index.html`
+* `about.html`
+
+`.replit` 文件包含以下重写规则：
+
+```
+[[deployment.rewrites]]
+from = "/*"
+to = "/index.html"
+```
+
+当用户访问 `/register.html` 时，服务器会将请求重写为 `/index.html`，并返回该文件。
+但是，如果用户访问 `/about.html`，服务器会忽略该重写规则并返回 `about.html` 文件，因为该文件已存在于你的静态部署中。
+
+<div id="restries-de-domnio">
+  ### 域名限制
+</div>
+
+重写规则仅适用于发往静态部署主域名的请求，并且只能重定向到该静态部署中的文件。

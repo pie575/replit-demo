@@ -1,0 +1,91 @@
+---
+title: "网络和 App 错误"
+description: "解答已发布 App 的常见错误，包括 403 Forbidden、Application failed to respond、CORS、502 Bad Gateway 和出站请求问题等。"
+---
+
+本文解答有关已发布 App 可能出现的常见错误。有关更全面的故障排除，请参阅[部署故障排除](/zh/ja/build/troubleshooting)。
+
+<AccordionGroup>
+  <Accordion title="已发布的应用出现 403 Forbidden 错误，如何解决？">
+    已发布的应用出现 403 通常有以下原因：
+
+    * **请求标头过大**—Cookie 过多会使标头过大，从而在边缘节点被拒绝。请清除该域名的浏览器 Cookie，然后再次测试。
+    * **缺少认证信息**—请求未包含所需的登录令牌或会话。
+    * **访问限制**—应用可能被配置为阻止部分流量。请参阅[私有部署](/zh/ja/features/publishing/private-deployments)和[外部访问令牌](/zh/ja/features/deployment-customization/external-access-tokens)。
+
+    如需进一步诊断，请将部署日志粘贴到新的 Agent 聊天中。
+  </Accordion>
+
+  <Accordion title="App 显示“Application failed to respond”——这是什么意思？">
+    应用进程未监听 Replit 预期的端口。Replit 会通过 `PORT` 环境变量提供正确的端口，因此请绑定到该变量，而不要使用硬编码的值：
+
+    ```js theme={null}
+    const PORT = process.env.PORT || 3000;
+    ```
+
+    ```python theme={null}
+    port = int(os.environ.get("PORT", 3000))
+    ```
+
+    应用也可能在完成绑定前崩溃——请在部署日志中查看启动错误。[Autoscale 部署](/zh/ja/features/publishing/deployment-types#autoscale) 在闲置一段时间后，首次请求可能需要几秒钟 (冷启动) ——这属于正常现象。
+  </Accordion>
+
+  <Accordion title="如何修复已发布的 Replit 应用中的 CORS 错误？">
+    出现 CORS 错误意味着前端和后端使用不同的源，而后端未配置为允许该请求。如果它们属于同一个应用，可以使用 `/api/endpoint` 这类相对 URL，完全避开 CORS。
+
+    否则，请将后端配置为允许前端源。例如，使用 Express 时：
+
+    ```js theme={null}
+    const cors = require("cors");
+    app.use(cors({ origin: "https://your-frontend.replit.app" }));
+    ```
+
+    请仅允许发布前所需的来源。请参阅[部署故障排除](/zh/ja/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="应用在本地运行正常，但发布后会出现网络错误">
+    如果生产环境与本地环境不同，已部署的 App 可能会失败。请检查以下 3 项：
+
+    1. **硬编码的 localhost URL**—将 `localhost:3000` 或 `127.0.0.1` 替换为相对路径或基于环境的 URL，然后重新部署。
+    2. **缺少生产环境 Secrets**—请确认部署 Secrets 中已设置所有必需的密钥。请参阅 [Secrets](/zh/ja/core-concepts/project-editor/app-setup/secrets)。
+    3. **生产环境未运行迁移**—请在发布前对生产数据库运行所有待处理的迁移。
+
+    如果问题仍然存在，请[联系 Replit 支持](https://replit.com/support)，并附上错误信息和您已尝试的步骤。
+  </Accordion>
+
+  <Accordion title="如何排查已发布应用的 502 Bad Gateway 错误？">
+    502 通常意味着应用进程崩溃，或服务器返回了无法处理的输出。请在部署日志中查看 502 发生前的崩溃错误——未处理的 Promise 拒绝或未捕获的异常可能会导致 Node.js 进程静默崩溃。
+
+    请添加处理程序，以便暴露崩溃错误：
+
+    ```js theme={null}
+    process.on("uncaughtException", (err) => console.error("Uncaught:", err));
+    ```
+
+    确认日志中的根本错误后，请将其粘贴到新的 Agent 聊天中，寻求修复帮助。
+  </Accordion>
+
+  <Accordion title="应用无法向外部 API 发出请求——该检查什么？">
+    首先，请确认是否是请求被拦截，而不是代码出了问题。打开部署日志，查看是否有提示出站请求被拦截或重定向的消息。
+
+    常见原因及解决方法：
+
+    * **自引用 URL**—如果后端正在调用自身的公开 URL (例如 `fetch("https://myapp.replit.app/api/...")`) ，请改用相对路径，例如 `fetch("/api/...")`。
+    * **构建阶段发起的请求**—请在运行时发起出站调用，而非在构建期间。
+    * **网络限制**—企业或学校网络可能会拦截出站连接。请咨询网络管理员。
+
+    如果以上情况均不适用，但请求仍然被拦截，请附上相关日志行并[联系 Replit 支持](https://replit.com/support)。
+  </Accordion>
+
+  <Accordion title="重新发布后，应用的 URL 变了——还能恢复之前的子域名吗？">
+    `.replit.app` 子域名由项目名称生成，尤其是在项目名称已更改的情况下，将项目设为非公开后再重新发布，不一定能保留相同的子域名。
+
+    永久的解决方案是使用[自定义域名](/zh/ja/features/publishing/custom-domains)。即使重新部署，域名也不会改变。若要尝试恢复之前的子域名，请确认项目名称与原始名称一致 (必要时改回原名) ，然后重新发布。Replit 无法手动重新分配已释放的子域名。请参阅[项目地理位置](/zh/ja/features/publishing/project-geography)。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## 如果仍无法解决怎么办？
+</div>
+
+如果此处未说明该错误，请[联系 Replit 支持团队](https://replit.com/support)。

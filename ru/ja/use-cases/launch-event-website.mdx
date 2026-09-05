@@ -1,0 +1,161 @@
+---
+title: "Опубликуйте сайт платного мероприятия"
+description: "Создайте и опубликуйте на основе Notion сайт с программой, спикерами, местом проведения и платными билетами."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent запросит ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Создайте полноценный платный
+сайт мероприятия с программой, спикерами, местом проведения, схемой проезда и оформлением заказа. Сохраняйте информацию об участниках в Replit Database, принимайте платежи через Stripe,
+отправляйте письма с подтверждением через Resend и экспортируйте списки. Перед публикацией ссылки оформите
+тестовый заказ.
+
+<div id="section">
+  ## Кому подойдёт
+</div>
+
+* Event-маркетологам, которым нужны публичная страница и платные билеты для
+  конференций, митапов и launch-мероприятий.
+* Лидерам сообществ, которые хотят редактировать программу прямо в приложении,
+  без отдельной системы управления контентом.
+
+<div id="section-2">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "Спикеры, программа, время сессий",
+},
+{ id: "resend", name: "Resend", why: "Письма с подтверждением покупки" },
+{ id: "stripe", name: "Stripe", why: "Платные билеты и оформление заказа" },
+]}
+/>
+
+<div id="section-3">
+  ## Перед началом
+</div>
+
+Подготовьте название мероприятия, дату, место проведения, стоимость билета и базу данных Notion для спикеров (имя, фотография,
+сессия). Подключите Notion, Resend и Stripe. Agent добавит
+в приложение возможность оформления заказа.
+
+<div id="section-4">
+  ## Инструкции для агента
+</div>
+
+<AiPrompt>
+  Создай по этой странице Notion[ссылка] полноценный сайт платного мероприятия: программу,
+  информацию о спикерах, месте проведения, способах добраться и оформлении заказа. Используй данные
+  из Notion: имена спикеров, фотографии, должности, биографии и время их сессий. Взимай через Stripe
+  [цену] за билет. Сохраняй информацию об участниках в Replit Database, отправляй письма с
+  подтверждением через Resend и экспортируй список.
+</AiPrompt>
+
+<div id="section-5">
+  ## Чего ожидать
+</div>
+
+Agent создаст публичный сайт и настроит оформление заказов, платежи, письма с подтверждением и список участников.
+Прежде чем делиться ссылкой, оформите тестовый заказ. Используйте тестовый режим Stripe и тестовые карты. Убедитесь, что приходит письмо с подтверждением, участник добавляется в список и включается в экспорт, а затем переходите к реальным платежам.
+
+<div id="section-6">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Добавь страницы спикеров из этой базы данных Notion [ссылка]. Используй имя, фото, должность, биографию
+  и время выступления. Синхронизируй страницы при изменениях в Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Когда число участников достигнет [n], закрой продажу билетов и вместо неё
+  показывай форму записи в список ожидания.
+</AiPrompt>
+
+<div id="section-7">
+  ## Устранение неполадок
+</div>
+
+* **Не приходят письма с подтверждением:** убедитесь, что Resend подключён, а домен отправки подтверждён. Оформите тестовый заказ и проверьте в панели Resend, было ли отправлено письмо.
+* **Неверные спикеры или время:** укажите Agent нужную базу данных Notion (имя, фото, должность, биография, время сессии) и попросите синхронизировать страницу при изменениях в Notion.
+* **При оформлении заказа не списывается оплата:** убедитесь, что Stripe подключён и для начала включён тестовый режим. Оформите тестовый заказ, прежде чем делиться ссылкой.
+
+<div id="section-8">
+  ## Дополнительные материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Дизайн лендинга" href="/ru/ja/use-cases/design-landing-page">
+    Один и тот же источник Notion можно использовать для страницы запуска и списка ожидания.
+  </Card>
+
+  <Card title="Создание иконок и баннеров для соцсетей" href="/ru/ja/use-cases/create-social-kit">
+    Для маркетологов мероприятий, которым также нужны материалы для профиля и обложки.
+  </Card>
+</CardGroup>

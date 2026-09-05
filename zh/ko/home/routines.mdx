@@ -1,0 +1,224 @@
+---
+title: "Routines"
+description: "在 Conversation 中安排重复任务，并在同一会话中接收结果。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const CoffeeShopScreenshotFrame = ({src, alt}) => <div style={{
+  margin: "28px 0",
+  overflow: "hidden",
+  borderRadius: "24px",
+  background: "radial-gradient(circle at 50% -18%, rgba(255,255,255,.82), transparent 42%), radial-gradient(circle at 4% 96%, rgba(255,184,146,.48), transparent 38%), linear-gradient(140deg, #ff764d, #ff3c00 60%, #c92d00)",
+  boxShadow: "0 16px 32px rgba(112,36,13,.18)"
+}}>
+    <div style={{
+  padding: "clamp(10px, 2vw, 18px)",
+  background: "linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 48%, rgba(111,24,0,.2))"
+}}>
+      <a href={src} target="_blank" rel="noreferrer" aria-label={`以完整尺寸打开 ${alt}`} style={{
+  display: "block",
+  overflow: "hidden",
+  border: "1px solid rgba(255,255,255,.62)",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,.96)",
+  boxShadow: "0 12px 28px rgba(55,27,18,.2)",
+  cursor: "zoom-in"
+}}>
+        <img src={src} alt={alt} style={{
+  display: "block",
+  width: "100%",
+  height: "auto"
+}} />
+      </a>
+    </div>
+  </div>;
+
+export const RoutinePlanAvailability = () => <>
+    Routines 适用于{" "}
+    <a href="/billing/plans/replit-core">Core</a> 和{" "}
+    <a href="/billing/plans/replit-pro">Pro</a> 套餐，不适用于
+    Starter 套餐。
+  </>;
+
+<div className="chat-mkt" role="img" aria-label="时钟指针指向 4:00 的 Conversation 气泡，表示已安排的 Routine" style={{ margin: "28px 0 42px", borderTop: 0, paddingTop: 0 }}>
+  <div className="chat-use-case-visual" style={{ aspectRatio: "auto", minHeight: "clamp(220px, 34vw, 320px)" }}>
+    <div
+      aria-hidden="true"
+      style={{
+position: "relative",
+zIndex: 1,
+display: "flex",
+alignItems: "center",
+justifyContent: "center",
+gap: "clamp(18px, 4vw, 28px)",
+color: "#fff",
+filter: "drop-shadow(0 8px 18px rgba(73,18,0,.42))",
+}}
+    >
+      <svg width="96" height="96" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 6.25a.75.75 0 0 1 .75.75v4.932l3.666 2.443a.75.75 0 0 1-.833 1.248l-4-2.666a.75.75 0 0 1-.333-.624V7a.75.75 0 0 1 .75-.75" />
+
+        <path fillRule="evenodd" d="M5.751 3.253a10.75 10.75 0 1 1 9.043 19.128 10.75 10.75 0 0 1-7.302-.623 1.25 1.25 0 0 0-.658-.056l-3.367.985-.018.005a1.753 1.753 0 0 1-2.118-1.165 1.75 1.75 0 0 1-.045-.88 1 1 0 0 1 .022-.08l1.049-3.242a1.25 1.25 0 0 0-.06-.702A10.75 10.75 0 0 1 5.75 3.253m6.984-.473a9.25 9.25 0 0 0-9.046 13.286c.202.51.248 1.069.13 1.604l-.02.07-1.046 3.229a.25.25 0 0 0 .075.213.25.25 0 0 0 .233.06l3.398-.993.065-.015c.442-.088.899-.066 1.329.064l.182.062.051.021A9.252 9.252 0 0 0 18.501 5.42a9.25 9.25 0 0 0-5.766-2.64" clipRule="evenodd" />
+      </svg>
+
+      <span
+        style={{
+  fontSize: "clamp(34px, 7vw, 58px)",
+  fontWeight: 600,
+  letterSpacing: "-0.03em",
+  lineHeight: 1,
+}}
+      >
+        Routines
+      </span>
+    </div>
+  </div>
+</div>
+
+**Routine** 可让 Replit 在 [Conversation](/zh/chat/conversations) 中按计划重复执行任务。结果会返回到同一 Conversation，方便你查看并继续处理。
+
+<div id="whats-a-routine">
+  ## 什么是 Routine？
+</div>
+
+Routine 是附加在 Conversation 上的定时运行任务。它可以调用已连接的工具，在已连接的服务中创建项目或任务，还能发送消息。
+
+例如，你可以让 Replit 每天早上帮你查看 Slack，并整理出当天的优先事项。
+
+<Note>
+  你可以在一个 Conversation 中创建多个 Routine。Routine 始终隶属于该
+  Conversation，无法在项目内创建。
+</Note>
+
+<div id="what-you-can-do">
+  ## 您可以执行的操作
+</div>
+
+使用 Routine，让 Replit 在 Conversation 中定期完成重复性工作。例如，您可以：
+
+* 从[已连接的工具](/zh/features/integrations/overview)收集信息，并总结发生的变更。
+* 在已连接的服务中创建项目或任务。
+* 通过已连接的工具发送消息。
+
+<div id="permissions-and-results">
+  ## 权限与结果
+</div>
+
+Routine 仅归你个人所有，并继承所属 Conversation 的权限及其对已连接工具的访问权限。
+
+每次运行都会将结果返回到该 Conversation。如果 Replit 需要你的协助，或某次运行失败，也会在该 Conversation 中提示你。
+
+如果 Routine 到达执行时间时仍有其他工作正在运行，该 Routine 会等待。Replit 不会为同一个 Routine 再添加一次待执行的运行。
+
+<div id="availability-and-limits">
+  ## 可用性和限制
+</div>
+
+<RoutinePlanAvailability />
+
+* Routine 的运行间隔至少为一小时。
+* Core 套餐每位用户最多可有五个活跃的 Routine。Pro 套餐最多可有 10 个。
+* Routine 在 Power 或 Max Mode 下运行，不能在 Free Mode 下运行。
+
+每个 Routine 的每次运行都需要设置预算。Replit 会在每个步骤后检查预算。如果某个步骤已在进行中，例如 API 调用，Replit 会在停止前完成该步骤。因此，单次运行的费用可能会略微超出预算。
+
+Routine 可以安排 Replit 能在 Conversation 中完成的工作，但不能安排 Publishing。
+
+<div id="create-a-routine">
+  ## 创建 Routine
+</div>
+
+开始之前，请确认提示框下方的模式已设置为 **Power** 或
+**Max**。在 Free Mode 中无法创建或运行 Routine。
+
+<Frame caption="创建 Routine 前请选择 Power 或 Max。">
+  <img src="/assets/mirror/routine-power-mode-57f68b753e60.png" alt="Replit mode selector with Power selected and Free and Max also available" width="1132" height="840" data-path="images/chat/routine-power-mode.png" />
+</Frame>
+
+<Steps>
+  <Step title="编写周期性请求">
+    让 Replit 帮你监控关心的信息。例如：
+
+    <AiPrompt>
+      每周一，查看本地活动、附近的咖啡店，以及可能影响我社区咖啡馆开业的各种变化。
+      总结有哪些变化，说明它们为何重要，并在这个 Conversation 中
+      为我的开业计划提出更新建议。
+    </AiPrompt>
+  </Step>
+
+  <Step title="明确运行计划和关注重点">
+    回答 Replit 的追问，说明 Routine 应在何时运行、
+    应监控哪些内容。例如，选择周一早上，并让它
+    关注选定的社区、同类咖啡馆和本地活动。
+  </Step>
+
+  <Step title="确认并创建 Routine">
+    检查建议的指令、运行计划和单次运行预算。如有需要可进行调整，
+    然后选择 **Create routine**。
+
+    每个 Routine 都需要为每次运行设置预算。Replit 会在每个步骤结束后检查预算。
+    如果某个步骤正在进行中 (例如 API 调用) ，Replit 会先完成该步骤再停止。
+    因此，单次运行可能会略微超出预算。
+
+    <CoffeeShopScreenshotFrame src="/assets/mirror/review-routine-5496b632774b.png" alt="Replit's routine approval screen showing a title, instructions, Monday schedule, per-run budget, and Create routine button" />
+  </Step>
+
+  <Step title="查看结果并优化计划">
+    Replit 会确认该 Routine 的标题、运行计划、预算和监控范围。
+    之后每次运行的结果都会返回到这个 Conversation，你可以在这里决定
+    下一步要做哪些调整。
+
+    <CoffeeShopScreenshotFrame src="/assets/mirror/routine-created-87a7629dfc0d.png" alt="A created routine named Lausanne café launch watch, showing its Monday schedule, per-run budget, and the local changes it monitors" />
+  </Step>
+</Steps>
+
+<div id="find-and-manage-routines">
+  ## 查找和管理 Routine
+</div>
+
+请参阅[安排 Routine](/zh/schedule-a-routine)，了解从日历到 Slack 的完整示例。
+
+<Steps>
+  <Step title="打开 Routines">
+    在 Replit 侧边栏中选择 **Routines**。
+
+    <Frame>
+      <img src="/assets/mirror/open-routines-sidebar-ee93c4f81f44.png" alt="已选中 Routines 的 Replit 侧边栏" width="464" height="646" data-path="images/chat/open-routines-sidebar.png" />
+    </Frame>
+  </Step>
+
+  <Step title="查看你的 Routine">
+    查看已安排的 Routine、其运行计划、启用状态和运行
+    历史记录。
+
+    <Frame>
+      <img src="/assets/mirror/routines-management-page-c8d8f51156d4.png" alt="Routines 页面列出了 Slack 上已启用的每日日历摘要及其运行计划" width="2738" height="782" data-path="images/chat/routines-management-page.png" />
+    </Frame>
+
+    你可以通过两种方式更改 Routine 的单次运行预算：在
+    Conversation 中询问 Replit，或直接在该 Routine 的 Routines
+    侧边栏中编辑 **Budget** 输入框。
+  </Step>
+
+  <Step title="管理 Routine">
+    打开 Routine 的操作菜单，即可立即运行或删除它。
+
+    <Frame>
+      <img src="/assets/mirror/routine-action-menu-7331793cd0de.png" alt="Routine 操作菜单，包含“立即运行”和“删除”选项" width="500" height="348" data-path="images/chat/routine-action-menu.png" />
+    </Frame>
+  </Step>
+</Steps>

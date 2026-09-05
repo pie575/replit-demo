@@ -1,0 +1,136 @@
+---
+title: "配置 Apple OAuth"
+description: "为您的应用配置 Sign in with Apple 身份验证"
+---
+
+本指南将逐步介绍如何创建 Sign in with Apple 所需的 Apple App ID、Services ID 和私钥。您需要获取 **Team ID**、**Services ID**、**Key ID** 和 **私钥**，以便填入 **Auth 面板**。
+
+<Note>
+  本页面仅介绍在 Apple 开发者门户中进行身份提供方端的配置。有关 Clerk Auth 的完整流程——包括启用 Apple 并在 **Auth 面板**中填入凭据——请参阅 Clerk Auth 文档中的[为 SSO 身份提供方配置 OAuth 凭据](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+</Note>
+
+<div id="pr-requisitos">
+  ## 前提条件
+</div>
+
+* [Apple 开发者账户](https://developer.apple.com/account) (需加入 Apple Developer Program)
+* 已发布的 [Replit App](/zh/category/replit-deployments) — 自定义 OAuth 凭据仅在**生产环境**中可用
+* 打开 **Apple** 身份提供方的编辑面板：**Auth 面板** → **Configure** 选项卡 → **SSO providers** 部分 → 选择 **Production** 环境 → 选择 **Apple** 旁边的 **Edit**
+
+<div id="passo-1-criar-um-apple-app-id">
+  ## 步骤 1：创建 Apple App ID
+</div>
+
+1. 访问 [Apple 开发者门户](https://developer.apple.com/account)
+2. 前往 **Certificates, IDs &amp; Profiles**，然后选择 **Identifiers**
+3. 在下拉菜单中选择 **App IDs**
+4. 选择 **+** 图标，注册新的标识符
+5. 选择 **App IDs**，然后选择 **Continue**
+6. 选择 **App**，然后选择 **Continue**
+7. 填写：
+   * **Description**：App ID 的名称
+   * **Bundle ID**：唯一标识符
+8. 在 Capabilities 中启用 **Sign In with Apple**
+9. 选择 **Continue**，然后选择 **Register**
+10. **保存 App ID Prefix** (显示在页面顶部) ——这就是你的 **Team ID**
+
+<div id="passo-2-criar-um-apple-services-id">
+  ## 第 2 步：创建 Apple Services ID
+</div>
+
+1. 在 Identifiers 页面中，从下拉菜单选择 **Services IDs**
+2. 选择 **+** 注册新的标识符
+3. 选择 **Services IDs**，然后选择 **Continue**
+4. 填写：
+   * **Description**：您的 Services ID 名称
+   * **Identifier**：您的唯一标识符 (请保存好——这就是您的 **Services ID**)
+5. 选择 **Continue**，然后选择 **Register**
+
+<div id="configurar-o-services-id">
+  ### 配置 Services ID
+</div>
+
+1. 选择刚创建的 Services ID
+2. 启用 **Sign In with Apple**
+3. 选择 **Configure**
+4. 设置：
+
+   * **Primary App ID**：选择第 1 步中的 App ID
+   * **Domains and Subdomains**：复制 **Auth 面板**中 **Provider setup** 显示的值 (不包括协议前缀 `https://`)
+   * **Return URLs**：复制 **Auth 面板**中 **Provider setup** 显示的值
+
+   如需了解如何找到这些值，请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+5. 依次选择 **Next**、**Done**、**Continue**，最后选择 **Save**
+
+<div id="passo-3-criar-uma-apple-private-key">
+  ## 第 3 步：创建 Apple 私钥
+</div>
+
+1. 在 Apple 开发者门户的侧边栏中，选择 **Keys**
+2. 选择 **+** 注册新密钥
+3. 输入 **Key Name**
+4. 启用 **Sign In with Apple**
+5. 选择 **Configure**，然后选择第 1 步中的 App ID
+6. 依次选择 **Save**、**Continue** 和 **Register**
+7. **保存 Key ID**
+8. **下载**私钥文件 (.p8)
+
+<Warning>
+  私钥只能下载一次。请妥善保管，因为无法再次下载。
+</Warning>
+
+<div id="passo-4-configurar-o-apple-private-email-relay">
+  ## 第 4 步：配置 Apple Private Email Relay
+</div>
+
+Apple 的“隐藏我的邮箱”功能允许用户在不泄露真实邮箱地址的情况下登录。要向这些用户发送电子邮件，请注册您的邮件源。
+
+1. 在 Apple 开发者门户的侧边栏中，选择 **Services**
+2. 在 **Sign in with Apple for Email Communication** 下，选择 **Configure**
+3. 选择 **+** 添加 Email Source
+4. 在 **Auth 面板**的 **Provider setup** 中，输入显示的 Email Source 值
+5. 选择 **Next**，然后选择 **Register**，最后选择 **Done**
+6. 等待 DNS 检查完成 (显示绿色勾选图标)
+
+<Info>
+  在某些地区 (中国、印度) ，Apple ID 可能绑定的是电话号码而非电子邮件。如果您的应用要求所有用户都提供电子邮件，Sign in with Apple 对这些地区的用户可能无法使用。
+</Info>
+
+<div id="soluo-de-problemas">
+  ## 故障排除
+</div>
+
+<div id="cliente-invlido">
+  ### 无效客户端
+</div>
+
+* 检查是否已正确输入所有凭据
+* 确保私钥包含 BEGIN 和 END 两行
+* 检查您的 Services ID 是否配置正确
+
+<div id="uri-de-redirecionamento-invlida">
+  ### 无效的重定向 URI
+</div>
+
+* 确认 Apple Services ID 配置中的 Return URL 与 **Provider setup** 中 **Auth 面板**显示的值完全一致
+* 确认 Domains and Subdomains 中的域名与已发布应用的域名一致 (不含 `https://`)
+
+<div id="e-mail-relay-no-est-funcionando">
+  ### 电子邮件中继无法正常工作
+</div>
+
+* 请确认 Apple 开发者门户中的 Email Source 显示绿色勾号
+* 如果刚刚添加，请等待 DNS 记录传播
+
+<div id="no-est-funcionando-no-domnio-personalizado">
+  ### 自定义域名无法正常使用
+</div>
+
+* 将 **Provider setup** 中显示的自定义域名条目添加到 **Auth 面板** 的 Domains and Subdomains (不含 `https://`) 和 Return URLs 中
+
+<div id="recursos-adicionais">
+  ## 其他资源
+</div>
+
+* [“Sign in with Apple”文档](https://developer.apple.com/sign-in-with-apple/)
+* [Private Email Relay Service 指南](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)

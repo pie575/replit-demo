@@ -1,0 +1,196 @@
+---
+title: "Agent 技能"
+description: "了解何时以及如何使用 Agent 技能——主动式与响应式模式、选择性调用、安全性，以及技能与 MCP 服务器的区别。"
+sidebarTitle: "Agent 技能"
+icon: "puzzle-piece"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+技能可为Agent赋予新能力。通过向Agent分享您的专业知识、常用模式和领域知识，您可以让它产出更优质、更一致的结果。
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="掌握 Agent 技能：变革 AI 辅助开发的框架" />
+
+<div id="section">
+  ## 技能为何重要
+</div>
+
+每次与 Agent 一起构建，都会沉淀出有用的上下文：问题的解决方案、设计决策、框架偏好。但这些上下文会随着对话结束而消失，而技能能把它们保留下来。
+
+GSAP 动画技能可以教会 Agent 如何正确使用特定的库；设计系统技能可以确保精确应用配色与间距规则；修复 Bug 的技能则会记录下解决方案，让 Agent 不再重蹈覆辙。原本难以保持一致的任务，从此变得稳定可靠。
+
+技能同时也是一项[开放标准](https://agentskills.io/specification)。它可以在包括 Replit Agent 在内的任何智能体中运行，因此可以在不同工具之间随身携带。
+
+<div id="vs">
+  ## 主动型与响应型技能
+</div>
+
+用于思考何时以及如何创建技能的框架。了解这两种模式，有助于你更高效地使用技能。
+
+<div id="section-2">
+  ### 主动型技能
+</div>
+
+主动型技能是在你*动手构建之前*就添加的技能。先调研你想使用的库和模式，找到或创建相应的技能，然后再开始编写提示词。
+
+**示例：** 在构建带有手绘风格 SVG 动画的作品集网站之前，你先调研动画库并选定了 GSAP。安装 GSAP React 技能后，再让 Agent 来构建动画。这样 Agent 从一开始就具备所需的专业知识——它了解该库的 API、最佳实践和常见模式。如果没有这项技能，它生成的内容可能会流于泛泛或不够准确。
+
+这种模式适用于以下情况：
+
+* 库很流行，但其中一些细节模式 Agent 单靠自己处理不好
+* 你希望整个项目保持一致的设计选择 (排版、间距、动画风格)
+* 你正在启动项目，并且已经明确了技术方向
+
+<div id="section-3">
+  ### 响应式技能
+</div>
+
+响应式技能是在你解决问题*之后*才创建的。你遇到问题，与 Agent 一起调试、修复，然后把解决方案沉淀下来，避免问题再次出现。
+
+**示例：** 在构建移动应用的画布时，你注意到图像边缘出现锯齿，而且放大后越发明显。与 Agent 一起调试后发现，这是缩小锯齿 (minification aliasing) ——一种反直觉的渲染问题：图像被缩小得越多，问题反而越严重。实施修复后，你可以让 Agent 创建一个技能：
+
+<AiPrompt>
+  Create a skill that captures what we just learned about fixing minification aliasing. Include the root cause, the solution, and when this issue typically occurs so you can prevent it in the future.
+</AiPrompt>
+
+Agent 会根据对话历史编写针对该项目的技能。下次再遇到同样的问题时，你只需把该技能提供给 Agent，无需从头调试。
+
+这种模式适用于以下情况：
+
+* 修复了不易察觉的 bug，并希望防止其再次出现
+* 在调试过程中了解到应用架构的某些特性
+* 想要沉淀那些花费大量精力才找到的解决方案
+
+<div id="section-4">
+  ## 有选择地使用技能
+</div>
+
+技能就像给朋友指路去你的公寓。一份有针对性的指引清单管用；而一整本厚厚的文档则不然——没人有时间通读，关键细节反而会被淹没。
+
+Agent 也是同理。添加过多技能反而可能让 Agent 无所适从。请针对具体项目谨慎选择要启用的技能，并及时移除不再需要的技能。
+
+<Note>
+  相比笼统的指导，技能更适合用来沉淀具体、可复用的模式。请聚焦于明确的工作流程、既定的规范以及经过验证的解决方案。
+</Note>
+
+<div id="section-5">
+  ## 写好技能
+</div>
+
+技能可以非常复杂精巧。以下是保持其有效性的几条原则：
+
+* **描述&quot;理想路径&quot;。** 告诉 Agent 正确的做法。如果你发现自己在罗列一堆&quot;不要做什么&quot;，这就是该重新审视整体思路的信号。
+* **尽量使用脚本。** 确定性的脚本能减轻 Agent 的思考负担，比每次都让它重新推演相同的步骤更可靠。
+* **善用外链。** 把技能写成指向其他 Markdown 文件的入口，让 Agent 只加载当前任务真正需要的内容。
+* **定期做基准测试。** 这是验证技能是否真正奏效的唯一方法。
+* **亲自撰写。** 目标是简洁、有针对性的上下文，这只能靠手写技能来实现，而不是批量生成。你可以让 Agent 帮忙起草，但要亲自打磨，让每一行都有存在的理由。
+* **保持定制化。** 不要为代码整洁或安全性编写通用技能——这些能力 Agent 已经内置。技能应当沉淀你或你的组织所特有的东西。
+
+技能出问题时，往往遵循几种可诊断的模式：
+
+* **技能在不该触发时触发。** 说明写得太宽泛。收窄范围，并明确写出哪些场景不适用——&quot;不要用于博客文章或帮助文档&quot;这类否定式说明，往往比肯定式说明更管用。
+* **技能触发了，但输出不对劲。** 指示太笼统。把&quot;做得专业一些&quot;这类模糊说法换成具体规则：准确的名称、明确的要求、必须避开的事项。
+* **两个技能相互冲突。** 修改说明，避免两者在同一任务上同时触发。冲突几乎总是适用范围的问题，而不是指示本身的问题。
+
+技能会过时。把它当作一份需要持续维护的文档来对待。
+
+<div id="section-6">
+  ## 将技能应用到整个工作区
+</div>
+
+以上内容都适用于单个项目的技能。团队还可以在整个工作区范围内自定义 Agent，让所有人从同一套规范起步。工作区自定义包含两个部分：
+
+* **自定义指令** —— 常驻规则，在所有项目、所有消息中，早在有人输入提示词之前就注入到 Agent 的上下文中。请只保留真正普遍适用的规则，例如&quot;不要以明文存储凭据&quot;。由于每一轮对话都会加载，每个词都会占用 Agent 的上下文预算——请尽量简短。
+* **工作区技能** —— 与上文介绍的技能相同，面向工作区内的所有人开放，并集中管理。在相关任务调用它们之前，几乎不产生任何开销，因此可以提供大量技能而不会降低输出质量。
+
+判断内容归属的简单方法：无论谁在构建什么都必须遵守的规则，放进自定义指令；只与特定类型任务相关的内容，做成技能。
+
+关于如何配置自定义指令和工作区技能，以及谁可以管理它们，请参阅 [Agent 自定义](/zh/ja/features/agent/agent-customization)。
+
+<div id="section-7">
+  ## 关于安全性
+</div>
+
+Replit 的 Skills 面板中的 技能 均已通过安全审核。但 技能 可以从任何地方安装——这些 技能 来自一个人人都可贡献的[开源仓库](https://github.com/vercel-labs/skills)。
+
+由于 技能 本质上是 Agent 会遵循的指令，恶意 技能 可能会指示 Agent 将项目中的敏感数据外传。从外部来源安装 技能 之前，请：
+
+1. **打开文件。** 技能 只是 Markdown 文件。使用前请先阅读 `/.agents/skills/` 中的内容。
+2. **核实来源。** 确认该 技能 来自可信的仓库或作者。
+3. **检查指令内容。** 确认该 技能 没有引用可疑的外部 URL，也没有索取敏感信息。
+
+<Warning>
+  对于来自外部来源的 技能，务必在安装前进行确认。Replit 的 Skills 面板中的 技能 已经过审核，但通过 CLI 安装或从网上复制的 技能 并未经过审核。
+</Warning>
+
+<div id="vs-mcp">
+  ## 技能 vs MCP 服务器
+</div>
+
+技能和 MCP 服务器是扩展 Agent 的两种主要方式，各自服务于不同的目的。
+
+**技能**对上下文的占用很小。在技能被调用之前，只会加载一段简短的说明。适合使用技能的场景：
+
+* 工作流与规范 (“部署方法”“代码审查清单”)
+* 参考资料 (API 模式、样式指南、设计系统)
+* 可复用的提示词与专业知识 (动画库、框架模式)
+
+**MCP 服务器**则会占用大量上下文。所有工具的说明都会在一开始就加载，因此添加过多可能会降低输出质量。适合使用 MCP 服务器的场景：
+
+* 连接外部服务 (Notion、Linear、Figma)
+* 需要 API 访问权限的操作
+* 不只是给出指示，而是真正*执行操作*的工具
+
+关键区别：技能定义 Agent *应该如何*工作，MCP 服务器定义 Agent *能访问什么*。两者既适用于 Replit Agent 这样的编程 Agent，也适用于你自己构建的 Agent。
+
+<div id="section-8">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Agent 自定义" icon="sliders" href="/zh/ja/features/agent/agent-customization">
+    为整个团队配置工作区通用的自定义指令和 技能。
+  </Card>
+
+  <Card title="使用 技能" icon="puzzle-piece" href="/zh/ja/build/use-agent-skills">
+    在消息中附加 技能、将其安装到项目中，或基于 技能 创建新项目。
+  </Card>
+
+  <Card title="Agent 技能 参考" icon="book" href="/zh/ja/features/agent/skills">
+    了解 技能 的结构与运行机制等技术细节。
+  </Card>
+
+  <Card title="Replit 的 MCP 服务器" icon="server" href="/zh/ja/features/mcp/overview">
+    通过 Model Context Protocol 将 Agent 连接到外部服务和工具。
+  </Card>
+
+  <Card title="高效提示词" icon="wand-magic-sparkles" href="/zh/ja/learn/effective-prompting">
+    写出更清晰的指令，让 Agent 一次尝试就能更接近你想要的结果。
+  </Card>
+</CardGroup>

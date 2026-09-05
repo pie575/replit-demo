@@ -1,0 +1,145 @@
+---
+title: "Сервер MCP Replit"
+description: "Подключите MCP-клиент к Replit, чтобы создавать, находить, проверять, обновлять и публиковать Replit App."
+---
+
+Replit MCP использует [Model Context Protocol](https://modelcontextprotocol.io/), позволяя создавать, находить, проверять, обновлять и публиковать проекты Replit из уже используемых вами ИИ-инструментов.
+
+Эта страница служит справочником по прямым MCP-клиентам и их инструментам.
+
+<div id="conectar-um-cliente-mcp-diretamente">
+  ## Подключение клиента MCP напрямую
+</div>
+
+Используйте прямое подключение, если ваш MCP-клиент не поддерживает нативную интеграцию с Replit.
+
+| Свойство           | Значение                                 |
+| ------------------ | ---------------------------------------- |
+| **URL**            | `https://replit-mcp.com/server/mcp`      |
+| **Транспорт**      | Потоковый HTTP                           |
+| **Аутентификация** | OAuth с обнаружением защищённого ресурса |
+
+Добавьте URL сервера в MCP-клиент, поддерживающий потоковый HTTP и авторизацию OAuth. Клиент считывает метаданные защищённого ресурса Replit, а затем предложит вам войти в Replit.
+
+Не создавайте собственный OAuth-сервер. MCP-сервер Replit предоставляет метаданные OAuth, необходимые вашему клиенту.
+
+Вы можете создавать App или работать с App, которые можете редактировать, включая App, к которым вам предоставлен общий доступ.
+
+<div id="configurar-o-replit-mcp">
+  ### Настройка Replit MCP
+</div>
+
+Codex и Claude Code — лишь примеры. Replit MCP можно добавить в любой совместимый MCP-клиент.
+
+<Tabs>
+  <Tab title="Codex">
+    <Steps>
+      <Step title="Откройте список MCP">
+        В Codex откройте **Settings** → **Plugins** → **MCPs**.
+      </Step>
+
+      <Step title="Добавьте Replit">
+        Добавьте пользовательский MCP. Укажите понятное имя, например `Replit`. Выберите **Streamable HTTP**. Введите `https://replit-mcp.com/server/mcp` и сохраните. Не добавляйте bearer-токен или пользовательские заголовки.
+
+        <Frame>
+          <img src="/assets/mirror/codex-add-replit-mcp-51365d598c24.png" alt="Форма добавления пользовательского MCP в Codex: Replit, Streamable HTTP, конечная точка Replit и пустые поля bearer-токена и заголовка" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Аутентифицируйтесь в Replit">
+        В списке MCP включите **Replit** и выберите **Authenticate**. Выберите Workspace Replit, который хотите подключить. Затем выберите **Allow**.
+
+        <Frame>
+          <img src="/assets/mirror/codex-authenticate-replit-mcp-38e837424d0f.png" alt="Список MCP в Codex с включённым Replit и кнопкой Authenticate" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-authenticate-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="/assets/mirror/codex-authorize-replit-workspace-b41e707504ae.png" alt="Диалог авторизации Replit с общими заполнителями для учётной записи и Workspace, параметрами Workspace и кнопкой Allow" width="1588" height="991" data-path="images/replitai/custom-mcp/codex-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Используйте Replit в Codex">
+        Попросите Codex создать, проверить или обновить проект Replit. Например: &quot;Перечисли мои недавно обновлённые проекты Replit.&quot;
+
+        <Frame>
+          <img src="/assets/mirror/codex-list-replit-projects-bebae6a1dbab.png" alt="Ответ Codex со списком трёх недавно обновлённых проектов Replit" width="2000" height="951" data-path="images/replitai/custom-mcp/codex-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Claude Code">
+    <Steps>
+      <Step title="Добавьте Replit">
+        В терминале добавьте сервер с HTTP-транспортом.
+
+        ```bash theme={null}
+        claude mcp add replit https://replit-mcp.com/server/mcp --transport http
+        ```
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-add-replit-mcp-12b99cb7ce30.png" alt="Терминал Claude Code после добавления Replit MCP с помощью команды для HTTP-сервера и типовым путём к локальной конфигурации" width="2000" height="1097" data-path="images/replitai/custom-mcp/claude-code-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Выберите Replit">
+        Запустите или перезапустите Claude Code. Выполните `/mcp` и выберите `replit`.
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-select-local-replit-mcp-dd30b45c949b.png" alt="Список MCP в Claude Code: выбран локальный сервер replit, отмеченный как требующий аутентификации" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Аутентифицируйте Replit">
+        Для локального сервера `replit` выберите **Authenticate**. Войдите в Replit, выберите Workspace для подключения и нажмите **Allow**.
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-authenticate-local-replit-mcp-b67f7c27231f.png" alt="Сведения о локальном сервере replit в Claude Code: прямой эндпоинт Replit и выбранный пункт Authenticate" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-authorize-replit-workspace-dd7b3dca962c.png" alt="Диалог авторизации Claude с типовыми заполнителями для учётной записи и Workspace, вариантами Workspace и кнопкой Allow" width="1588" height="991" data-path="images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Используйте Replit в Claude Code">
+        Попросите Claude Code создать, проверить или обновить проект Replit. Например: &quot;Перечисли мои недавно обновлённые проекты Replit.&quot;
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-list-replit-projects-c775a3601cb9.png" alt="Ответ Claude Code со списком типовых проектов Replit и URL-заполнителями" width="2000" height="850" data-path="images/replitai/custom-mcp/claude-code-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<div id="integraes-nativas">
+  ## Нативные интеграции
+</div>
+
+Replit также доступен в виде нативной интеграции для [ChatGPT](/ru/pt/features/platforms/chatgpt), [Claude](/ru/pt/features/platforms/claude) и [Slack](/ru/pt/features/platforms/slack). Инструкции по подключению для каждой платформы приведены на соответствующих страницах.
+
+<div id="ferramentas">
+  ## Инструменты
+</div>
+
+| Инструмент                | Обязательные параметры        | Необязательные параметры                                  | Назначение                                                                                                                                                                                                |
+| ------------------------- | ----------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_app_from_prompt`  | `appDescription`, `app_stack` | `userSpecifiedAppName`, `userQuotes`, `attachmentSummary` | Создаёт новое App. `app_stack` может принимать одно из следующих значений: `react_website`, `mobile_app`, `design`, `slides`, `animation`, `data_visualization`, `3d_game`, `document` или `spreadsheet`. |
+| `search_apps`             | Нет                           | `query`, `url`, `updatedAfter`, `updatedBefore`, `limit`  | Находит App по ключевым словам в названии, URL или дате последнего обновления. Значение `limit` — от 1 до 50.                                                                                             |
+| `resolve_app_by_name`     | `name`                        | Нет                                                       | Находит App по точному названию.                                                                                                                                                                          |
+| `list_apps`               | Нет                           | `query`, `limit`                                          | Выводит список App, которые вы можете редактировать, отсортированный по недавней активности. Значение `limit` по умолчанию — 25, максимальное — 50.                                                       |
+| `ask_question`            | `replId`, `question`          | Нет                                                       | Задаёт Agent вопрос об App, не изменяя его.                                                                                                                                                               |
+| `update_app_using_prompt` | `replId`, `changeDescription` | `userQuotes`, `attachmentSummary`                         | Запускает обновление существующего App с помощью Agent.                                                                                                                                                   |
+| `publish_app`             | `replId`                      | Нет                                                       | Публикует App или повторно публикует последние изменения.                                                                                                                                                 |
+| `get_publish_status`      | `replId`                      | Нет                                                       | Проверяет, опубликовано ли App, его текущий статус публикации и публичный URL.                                                                                                                            |
+
+<div id="soluo-de-problemas">
+  ## Устранение неполадок
+</div>
+
+| Проблема                                                          | Что делать                                                                                                                                    |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Replit предлагает вам пройти аутентификацию                       | Повторно выполните вход через OAuth в клиенте MCP.                                                                                            |
+| App не найден                                                     | Убедитесь, что у вас есть права на редактирование App. Затем найдите его по URL или используйте `list_apps`, чтобы выбрать из подходящих App. |
+| Запрос на создание, обновление или публикацию всё ещё выполняется | Подождите, прежде чем повторить попытку. Для публикации используйте `get_publish_status`, чтобы проверить текущий статус.                     |

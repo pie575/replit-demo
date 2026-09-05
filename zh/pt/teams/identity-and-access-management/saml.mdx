@@ -1,0 +1,143 @@
+---
+title: "单点登录 (SAML SSO)"
+description: "直接在 workspace 设置中为您的 Replit Enterprise 组织配置 SAML 单点登录，包括 IdP 设置和电子邮件域名声明。"
+---
+
+<div id="introduo">
+  ## 简介
+</div>
+
+<Note>
+  想为您在 Replit 上创建的**应用**添加 SSO 登录流程？请参阅[为您的应用添加 SSO (Clerk)](/zh/pt/features/auth-and-identity/single-sign-on)。本页面介绍如何为您的 **Replit 组织**启用 SSO，也就是您的团队如何登录 replit.com。
+</Note>
+
+<Note>
+  只有 Enterprise 套餐的组织才能使用 SAML SSO。您可以[直接在定价页面购买 Enterprise 套餐](https://replit.com/pricing)，或[联系我们](https://replit.com/teams#inlineForm)获取分步指导。
+</Note>
+
+[SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) SSO 允许您使用身份提供方 (IdP) 对登录 replit.com 的用户进行身份验证。您组织中的用户会被重定向到 IdP 进行身份验证，随后 IdP 会向 Replit 返回响应，验证用户身份并让其登录。
+
+Enterprise 管理员可以直接在 **Enterprise 设置 → 身份验证**中配置 SAML SSO，无需联系 Replit。该向导会生成服务提供方 (SP) 值，接受您的 IdP 凭证，并自动配置 SSO。在线购买 Enterprise 套餐时，注册流程同样会使用这一自助流程，因此系统会在入门过程中引导您完成 SSO 配置。
+
+<div id="configurar-saml-sso">
+  ## 配置 SAML SSO
+</div>
+
+<img src="/assets/mirror/saml-enterprise-settings-d2d44c2de846.png" alt="Enterprise 设置中的 SAML SSO 配置" width="1024" height="613" data-path="images/teams/identity-and-access-management/saml-enterprise-settings.png" />
+
+配置向导将引导您完成五个步骤。您需要同时拥有 Replit 组织和身份提供方的管理员权限。
+
+<Steps>
+  <Step title="打开身份验证设置">
+    打开 workspace 选择器，选择您的 Enterprise workspace，然后打开**设置**。选择**高级**，展开**身份验证**部分，然后在 **SAML 单点登录**卡片中点击**启用 SSO**。
+
+    状态指示器会变为**进行中**，向导会显示您的 IdP 所需的值。
+  </Step>
+
+  <Step title="选择您的身份提供方">
+    在**配置您的身份提供方**中选择您的 IdP：
+
+    * **Microsoft Entra ID**
+    * **Google Workspace**
+    * **Okta**
+    * **其他提供方**
+
+    每个选项都会调整字段标签，并提供前往 IdP 管理控制台的直接链接，以便您在新标签页中创建 SAML 应用。
+  </Step>
+
+  <Step title="在您的 IdP 中创建 SAML 应用">
+    在 IdP 管理控制台中，使用 Replit 显示的值创建新的 SAML 应用：
+
+    | 字段                 | 值                                                              |
+    | ------------------ | -------------------------------------------------------------- |
+    | 受众 URI / SP 实体 ID  | 复制向导中显示的值 (组织专属，格式为 `https://replit.com/<tenant-id>/saml/sp`)  |
+    | SSO URL (ACS URL)  | `https://replit.com/__/auth/handler`                           |
+    | 名称 ID 格式           | 电子邮件地址                                                         |
+    | 应用用户名              | 电子邮件                                                           |
+  </Step>
+
+  <Step title="输入您的 IdP 值">
+    在 IdP 中创建 SAML 应用后，将以下值复制回 Replit 的**输入您的提供方值**部分：
+
+    * **IdP SSO URL** — Replit 在身份验证期间将用户重定向到的 URL。
+    * **IdP 实体 ID** — 用于向 Replit 标识您的 IdP。
+    * **X.509 证书** — PEM 或 base64 格式的 IdP 签名证书。`BEGIN/END` 标记是可选的。
+    * **电子邮件域名** — 用户登录所用域名的逗号分隔列表 (例如 `acme.com, acme.co.uk`) 。请包含 IdP 可能报告的所有别名和子域名。
+
+    点击**提交凭证**。Replit 会同步验证 URL、解析证书 (拒绝已过期或尚未生效的证书) ，并验证所声明的电子邮件域名。每个域名都必须与您组织中至少一名账单管理员的电子邮件地址相匹配，且不能声明公共域名 (例如 `gmail.com`) 。
+  </Step>
+
+  <Step title="等待预配">
+    Replit 创建底层 SAML tenant 时，状态指示器会变为**正在预配…**。这通常需要约一分钟。完成后，状态指示器将变为**进行中**，您的组织即可通过 SSO 登录。
+
+    如果预配失败，状态指示器将变为**配置失败**，Replit 会自动清除所有部分状态。点击**重试**以重新启动向导。
+  </Step>
+</Steps>
+
+<div id="escolha-seus-domnios-de-e-mail">
+  ## 选择电子邮件域名
+</div>
+
+您可以为组织声明多个电子邮件域名和子域名。任何尝试使用与您声明的域名匹配的电子邮件地址注册的用户，都必须使用 SAML SSO。您声明的域名必须与 IdP 为用户提供的域名一致。如果您使用电子邮件域名别名，也请一并声明，以防用户绕过 SSO 注册。
+
+例如，如果您的公司使用 `acmeco.com`、`foo.acmeco.com` 和 `acmebiz.com` 这些电子邮件域名，请在提交凭证时声明这三个域名。
+
+Replit 会根据管理员的电子邮件地址验证每个声明的域名。要在启用后添加或移除域名，请编辑 **身份验证** 卡片中的 **电子邮件域名** 字段。若要声明与现有管理员电子邮件地址不匹配的域名，请联系 [support@replit.com](mailto:support@replit.com)。
+
+<div id="usando-saml-sso">
+  ## 使用 SAML SSO
+</div>
+
+<Note>
+  通过 SAML 注册不会自动邀请用户加入您的组织。若要自动管理用户并执行批量操作，请参阅 [SCIM](/zh/pt/teams/identity-and-access-management/scim)。
+</Note>
+
+SAML SSO **进行中**后，您的用户即可通过 **使用 SSO 继续**按钮登录 [replit.com](https://replit.com)。
+
+<div id="perguntas-frequentes">
+  ## 常见问题
+</div>
+
+<div id="o-que-acontece-com-usurios-que-j-tm-contas-no-replitcom-antes-do-saml-sso-ser-configurado">
+  ### 在配置 SAML SSO 前已拥有 replit.com 帐户的用户会怎样？
+</div>
+
+为你的组织启用 SAML SSO 后，所有使用已声明 SSO 电子邮件域名的用户都必须通过 SSO 登录。如果其电子邮件地址与 SSO 域名匹配，现有用户将无法再使用之前的身份验证方式 (电子邮件或社交登录) 。他们不会自动加入你的组织。
+
+<div id="os-usurios-so-automaticamente-desprovisionados-no-replit-quando-meu-idp-remove-o-acesso">
+  ### 当我的 IdP 移除访问权限后，Replit 会自动取消用户预配吗？
+</div>
+
+不会，SAML SSO 仅负责身份验证。若要自动预配和取消预配用户，您可以使用仅面向 Enterprise 客户提供的 [SCIM](/zh/pt/teams/identity-and-access-management/scim) 集成。SCIM 可让您同步 IdP 目录，自动管理用户角色和预配。
+
+<div id="os-assentos-da-organizao-so-automaticamente-consumidos-quando-os-usurios-recebem-acesso-no-nosso-idp">
+  ### 当用户在我们的 IdP 中获得访问权限后，会自动占用组织席位吗？
+</div>
+
+不会。只有当用户接受加入您组织的邀请后，才会占用席位。
+
+<div id="o-que-acontece-se-a-configurao-do-saml-falhar">
+  ### 如果 SAML 配置失败，会怎样？
+</div>
+
+向导会显示 **配置失败** 提示，Replit 会自动回滚任何已完成的部分预配。点击 **重试** 以重新启动助手，重新检查 IdP 值，然后重新提交凭证。如果错误仍然存在，请联系您的客户经理。
+
+<div id="como-desabilito-o-saml-sso">
+  ### 如何禁用 SAML SSO？
+</div>
+
+目前尚不支持自行停用。请联系您的客户经理，为您的组织停用 SSO。启用后，您仍可在**身份验证**卡片中自行编辑已声明的电子邮件域名。
+
+<div id="recursos-relacionados">
+  ## 相关资源
+</div>
+
+<CardGroup cols={2}>
+  <Card title="SCIM" icon="key" href="/zh/pt/teams/identity-and-access-management/scim">
+    了解如何通过 SCIM 集成实现用户管理自动化
+  </Card>
+
+  <Card title="群组和权限" icon="shield" href="/zh/pt/teams/identity-and-access-management/groups-and-permissions">
+    了解如何管理用户角色和访问权限
+  </Card>
+</CardGroup>

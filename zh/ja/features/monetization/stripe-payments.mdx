@@ -1,0 +1,271 @@
+---
+title: "Stripe 支付集成"
+description: "介绍如何使用 Agent 通过 Stripe 为应用添加支付和订阅功能。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Note>
+  Stripe 集成功能仅适用于付费套餐 ([Core](/zh/ja/billing/plans/replit-core) 和 [Pro](/zh/ja/billing/plans/replit-pro)) 。免费 [Starter](/zh/ja/billing/plans/starter-plan) 套餐不支持此功能；当 Agent 建议使用 连接器 时，会提示你升级。
+</Note>
+
+<div id="section">
+  ## 可构建的功能
+</div>
+
+只需一键，即可使用 Agent 将 Stripe 添加到你的应用中，无需额外设置。你可以构建店面、接受一次性付款或创建订阅。Agent 会为你接入集成、数据模型和测试环境。
+
+<div id="section-2">
+  ## 工作原理
+</div>
+
+Agent 默认从 Stripe 沙盒开始，让您无需动用真实资金即可安全测试支付。您可以立即构建并试用支付流程。准备就绪后，切换到正式 Stripe 账户并发布，即可接受真实付款。
+
+<Info>
+  Stripe 沙盒是一个隔离的测试环境，可用于模拟支付、订阅和事件。有关详细信息，请参阅
+  [Stripe 沙盒文档](https://docs.stripe.com/sandboxes)。
+</Info>
+
+<div id="stripe">
+  ## 在团队中使用 Stripe
+</div>
+
+Stripe 可在协作工作区中使用，因此整个团队都能共同构建、测试应用并实现盈利。工作区中的所有成员都可以使用已连接的 Stripe 账户，无需由一人独自搭建支付功能。
+
+<div id="section-3">
+  ## 开始使用
+</div>
+
+* **请求 Agent 使用 Stripe**
+  * 在首页使用斜杠命令选择 Stripe，或直接输入以下请求：
+    <AiPrompt>构建一个在线商店，并集成 Stripe 接受付款</AiPrompt>
+
+<Note>
+  Stripe 集成需要具备后端功能的应用。请先在首页选择 **App**。
+</Note>
+
+<div id="section-4">
+  ## 在沙盒环境中测试支付
+</div>
+
+1. 在新标签页中打开应用的**Preview**。
+2. 在店面或结账页面完成一笔测试购买。
+3. 使用 Stripe 的标准测试卡：
+
+```text theme={null}
+卡号：4242 4242 4242 4242
+有效期：任意未来日期
+CVC：任意 3 位数字
+姓名、地址：任意虚构信息
+```
+
+<Tip>
+  沙盒中的购买不会通过真实网络处理，也不会产生实际资金流动，可安全用于端到端测试。
+</Tip>
+
+<div id="section-5">
+  ## 管理商品和价格
+</div>
+
+有两种方式：
+
+1. 在应用中选择**Publish**，然后申请 Stripe 沙盒。
+   * 如果您还没有 Stripe 账户，请先创建账户以申请沙盒。
+2. 在 Stripe 控制面板中打开**Products**，添加或编辑商品和价格。
+   您在 Stripe 沙盒中进行的更改会自动同步到 Replit 应用及其数据库。
+
+<div id="stripe-2">
+  ### 查看已同步的 Stripe 数据
+</div>
+
+* 在项目编辑器中打开**Database**。
+* 选择**MyData**。
+* 将架构选择器切换为**Stripe**，查看支付对象及相关记录。
+
+<div id="section-6">
+  ## 发布
+</div>
+
+如需接受真实付款，请从 Stripe Marketplace 安装 [Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments) 应用，并连接正式 Stripe 账户。安装流程会自动连接你的正式账户，无需复制或粘贴 API 密钥。
+
+<Warning>
+  沙盒集成不支持生产环境。在完成以下步骤之前，你无法接受真实付款。
+</Warning>
+
+<Steps>
+  <Step title="打开 Publish 面板">
+    在应用中选择 **Publish**，开始正式环境连接流程。
+  </Step>
+
+  <Step title="安装 Replit Integrated Payments 应用">
+    选择 **安装 Stripe 应用**。随后会打开一个 Stripe 窗口，显示 [Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments) 的页面。
+
+    当 Stripe 要求你选择账户时，请选择**正式** Stripe 账户，而非沙盒或测试账户。
+  </Step>
+
+  <Step>
+    按照 Stripe 的说明安装应用。如果你的正式账户尚未启用，Stripe 会先引导你完成 KYB (了解你的企业) 认证。
+
+    请保持 Stripe 窗口打开，直到安装完成。
+    Stripe 确认安装后，Replit 会在后台完成生产环境连接。
+  </Step>
+
+  <Step title="发布应用">
+    返回 Replit。**Publish** 面板会显示你的正式 Stripe 账户已连接。发布应用以开始接受真实付款。
+  </Step>
+</Steps>
+
+<Note>
+  安装 Replit Integrated Payments 应用可替代以往手动将 Publishable 密钥和 Secret 密钥复制到 Replit 的流程。该应用会设置生产密钥，并保持沙盒与正式环境之间的同步。
+</Note>
+
+<div id="section-7">
+  ## 管理集成
+</div>
+
+* 前往 **集成 &gt; Stripe**，打开 Stripe 连接器。
+* 您可以在此测试连接、查看状态并管理设置。
+
+<div id="section-8">
+  ## 常见问题
+</div>
+
+<div id="section-9">
+  ### 如何更新商品价格？
+</div>
+
+* 请 Agent 更新：说明要更改的内容，Agent 会更新应用和 Stripe 对象。
+* 使用 Stripe 控制面板：打开 **Products**，编辑价格和商品详情。
+  * 在沙盒环境中，所做更改会自动同步到应用和数据库。
+  * 在生产环境中，请先切换到正式账户，再更新价格。如果应用需要获取新设置，请重新发布。
+
+<div id="replit">
+  ### 如何在 Replit 中测试交易？
+</div>
+
+在新标签页中打开应用的 **Preview**。使用标准测试卡 (4242 4242 4242 4242) 、任意未来有效期和任意 CVC 完成 Stripe Checkout 流程。有关详细信息，请参阅上方的[在沙盒中测试支付](#test-payments-in-the-sandbox)。
+
+<div id="stripe-3">
+  ### 什么是 Stripe 正式账户？
+</div>
+
+Stripe 正式账户是已使用企业详细信息完成认证和激活、可处理真实付款的账户。有关创建和激活账户的信息，请参阅 Stripe 指南：[创建和管理您的 Stripe 账户](https://docs.stripe.com/get-started/account)。
+
+<div id="stripe-api">
+  ### 是否需要粘贴 Stripe API 密钥？
+</div>
+
+不需要。Replit Integrated Payments 应用会在连接您的 Stripe 正式账户时安装生产密钥。您无需从 Stripe 控制面板复制生产密钥。
+
+如果您之前通过粘贴生产密钥连接了 Stripe，该连接仍可继续使用。您可以删除 Stripe 连接，然后通过 **Publish** 面板重新连接，以切换到 Stripe 应用安装流程。请参阅下方的[更新或删除 Stripe 连接](#update-or-remove-the-stripe-connection)。
+
+<div id="stripe-4">
+  ## 更新或移除 Stripe 连接
+</div>
+
+如果您尚未准备好通过正式 Stripe 连接发布，可以选择以下两种方式：
+
+<div id="astripe">
+  ### 选项 A：手动删除 Stripe 集成
+</div>
+
+您可以从项目中彻底删除 Stripe 集成。
+
+<Steps>
+  <Step title="打开集成选项卡">
+    打开 Replit 应用，选择顶部的 **集成** 选项卡。在 **Connectors** 下找到 **Stripe**，然后选择 **Manage**。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-disconnect-1-integrations-371e1e7e5609.png" alt="Connectors 的 集成 选项卡，显示 Stripe 集成和 Manage 按钮" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="展开 API 密钥">
+    选择展开箭头以展开 **Sandbox API keys** 和 **Live account API keys**，然后选择 **Edit**。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-disconnect-2-edit-keys-4e9e76c4065f.png" alt="已展开 Stripe 沙盒和正式账户的 API 密钥，并显示 Edit 按钮" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="断开账户连接">
+    选择 **Disconnect account** 删除沙盒连接，选择 **Disconnect live account** 删除正式环境连接。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-disconnect-3-disconnect-f4257f534c5c.png" alt="Stripe 沙盒和正式账户的 API 密钥，显示 Disconnect account 和 Disconnect live account 按钮" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="让 Agent 删除 Stripe 代码">
+    打开 Agent 聊天，请它从应用中删除 Stripe 连接器 代码。这样会删除整个 Stripe 集成。
+  </Step>
+</Steps>
+
+<div id="bstripe">
+  ### 选项 B：回滚到集成 Stripe 前的检查点
+</div>
+
+如果你想完全撤销 Stripe 集成并恢复到之前的状态，可以回滚到之前的检查点。
+
+<Steps>
+  <Step title="打开 集成 标签页">
+    前往你的 Replit 应用，选择顶部的 **集成** 标签页。在 **Connectors** 下找到 **Stripe**，然后选择 **Manage**。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-disconnect-1-integrations-371e1e7e5609.png" alt="集成 标签页中的 Connectors，显示 Stripe 集成及 Manage 按钮" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="展开 API 密钥">
+    选择展开箭头，展开 **Sandbox API keys** 和 **Live account API keys**，然后选择 **Edit**。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-disconnect-2-edit-keys-4e9e76c4065f.png" alt="展开后的 Stripe 沙盒和正式账户 API 密钥，以及 Edit 按钮" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="断开账户连接">
+    选择 **Disconnect account** 以删除沙盒连接，选择 **Disconnect live account** 以删除正式环境连接。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-disconnect-3-disconnect-f4257f534c5c.png" alt="Stripe 沙盒和正式账户 API 密钥，显示 Disconnect account 和 Disconnect live account 按钮" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="找到集成 Stripe 前的检查点">
+    前往 Agent 聊天，查找在集成 Stripe 前创建的检查点。选择聊天窗格左上角的 **时钟图标**，查看较早的聊天记录。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-rollback-5-clock-icon-c54cd19246ea.png" alt="用于查看聊天记录和检查点的时钟图标" width="56" height="50" data-path="images/replitai/stripe-rollback-5-clock-icon.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择“Rollback here”">
+    找到合适的检查点后，选择 **Rollback here**，将项目恢复到该状态。
+
+    <Frame>
+      <img src="/assets/mirror/stripe-rollback-6-checkpoint-2f195b0ea9ce.png" alt="带有“Rollback here”按钮的检查点" width="904" height="202" data-path="images/replitai/stripe-rollback-6-checkpoint.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="section-10">
+  ## 注意事项与限制
+</div>
+
+* 沙盒中的活动不会影响实际余额或客户。
+* 部分 Stripe 功能无法在沙盒中测试 (例如 IC+ 定价或特定的 Connect 流程) 。
+  请参阅 [Stripe 沙盒的限制](https://docs.stripe.com/sandboxes)。

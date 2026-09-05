@@ -1,0 +1,262 @@
+---
+title: "Snowflake 连接器"
+description: "配置 Snowflake 连接器，使用 Replit Agent 创建数据驱动型应用。"
+sidebarTitle: "Snowflake"
+---
+
+<Info>
+  Snowflake 连接器仅适用于 **Enterprise** 套餐。
+</Info>
+
+数据仓库连接器可让 Replit Agent 查询您组织的数据仓库。借助 Snowflake 连接器，开发者无需具备 SQL 知识，即可使用自然语言创建仪表板、报表工具和数据应用。
+
+配置只需进行一次，需要 Snowflake 管理员和 Replit workspace 管理员共同完成。配置完成后，组织中的任何成员都可以登录并开始基于 Snowflake 数据进行开发。
+
+本指南将引导您完成整个配置过程。涉及三个角色：
+
+1. **Snowflake 账户管理员** — 在 Snowflake 中创建 OAuth 集成
+2. **Replit workspace 管理员** — 在 Replit 中配置连接器
+3. **开发者** — 登录并开始开发
+
+<div id="criar-a-integrao-oauth-no-snowflake">
+  ## 在 Snowflake 中创建 OAuth 集成
+</div>
+
+Snowflake 账户管理员需要创建 OAuth 安全集成，以便 Replit 能够向 Snowflake 进行身份验证。
+
+<div id="pr-requisitos">
+  ### 前提条件
+</div>
+
+* 拥有 Snowflake 中的 `ACCOUNTADMIN` 角色
+* 有权在 Snowflake 工作表中执行 SQL
+
+<div id="executar-o-script-de-configurao">
+  ### 运行配置脚本
+</div>
+
+<Steps>
+  <Step title="登录 Snowflake">
+    打开您的 Snowflake 账户，确保当前使用的是 `ACCOUNTADMIN` 角色。您可以在右上角的角色下拉菜单中确认。
+  </Step>
+
+  <Step title="打开 SQL 工作表">
+    点击左侧边栏中的**工作表**，然后新建一个工作表。
+  </Step>
+
+  <Step title="运行 OAuth 集成脚本">
+    复制并粘贴以下 SQL 脚本，然后运行：
+
+    ```sql 创建 OAuth 集成 theme={null}
+    -- 如有需要，删除现有集成
+    DROP INTEGRATION IF EXISTS REPLIT_OAUTH;
+
+    -- 为 Replit 创建 OAuth 集成
+    CREATE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    <Warning>
+      重定向 URI 必须与 `https://replit.com/connectors/oauth/callback` 完全一致。使用其他任何值都会在身份验证期间导致 404 错误。
+    </Warning>
+
+    <Note>
+      设置 `BLOCKED_ROLES_LIST = ()` 可确保没有任何角色被禁止使用该集成。否则，连接时可能会出现“无效的同意请求”或“角色被阻止”错误。
+    </Note>
+  </Step>
+
+  <Step title="获取 OAuth 凭证">
+    运行以下查询以获取 Client ID 和 Client Secret：
+
+    ```sql 获取 OAuth 凭证 theme={null}
+    -- 查看集成详细信息
+    DESCRIBE INTEGRATION REPLIT_OAUTH;
+
+    -- 获取 Client ID 和 Secret
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+
+    从结果中复制 **Client ID** 和 **Client Secret**。下一步需要使用这些值。
+  </Step>
+</Steps>
+
+<div id="configurar-o-conector-no-replit">
+  ## 在 Replit 中配置连接器
+</div>
+
+Replit Workspace 管理员将 Snowflake 凭证添加到 Replit。配置完成后，组织中的任何成员都可以登录。
+
+<Note>
+  此步骤需要 Enterprise 套餐和管理员权限。
+</Note>
+
+<Steps>
+  <Step title="打开集成">
+    前往组织设置，然后选择 **集成** 标签页。
+  </Step>
+
+  <Step title="添加 Snowflake 连接器">
+    点击 **添加新连接器**，然后选择 **Snowflake**。
+  </Step>
+
+  <Step title="输入凭证">
+    输入上一步获取的 **Client ID** 和 **Client Secret**。
+  </Step>
+
+  <Step title="设置作用域">
+    将连接器的作用域设置为 `refresh_token`。
+
+    <Warning>
+      请仅使用 `refresh_token` 作用域。使用其他作用域 (如 `session:role-any` 或 `session:role:PUBLIC`) 可能会导致“作用域无效”错误。
+    </Warning>
+  </Step>
+
+  <Step title="保存">
+    点击 **保存** 以启用连接器。
+  </Step>
+</Steps>
+
+<div id="fazer-login-no-snowflake">
+  ## 登录 Snowflake
+</div>
+
+任何有权访问该连接器的组织成员都可以登录。请先在**集成**页面登录，以便在通过 Agent 使用前验证连接。
+
+<Steps>
+  <Step title="找到 Snowflake 连接器">
+    在 Replit 中打开**集成**。在**连接器**下找到 **Snowflake**。
+  </Step>
+
+  <Step title="点击登录">
+    点击 Snowflake 连接器中的**登录**。
+  </Step>
+
+  <Step title="输入 Snowflake 账户 ID">
+    OAuth 提示会要求你输入 Snowflake 账户 ID。
+
+    要查找账户 ID，请查看 Snowflake URL：
+
+    ```
+    https://app.snowflake.com/minhaorg/minhaconta
+    ```
+
+    获取 `app.snowflake.com/` 后的两部分，并用连字符连接：
+
+    ```
+    minhaorg-minhaconta
+    ```
+
+    <Note>
+      URL 使用 `/` 分隔两部分，而账户 ID 则使用 `-`。
+    </Note>
+  </Step>
+
+  <Step title="进行身份验证">
+    Snowflake 会将你重定向到登录页面。输入 Snowflake 凭证以完成 OAuth 流程。
+  </Step>
+</Steps>
+
+<div id="comear-a-criar-com-seus-dados-do-snowflake">
+  ## 开始使用您的 Snowflake 数据构建应用
+</div>
+
+连接后，您可以通过以下两种方式让 Agent 使用 Snowflake 连接器：
+
+* **斜杠命令** — 在提示词中输入 `/snowflake` 来使用连接器
+* **自然语言** — 直接让 Agent 使用您的 Snowflake 数据
+
+以下是提示词示例：
+
+```
+使用我的 Snowflake 数据创建一个仪表板。按地区以柱状图显示总收入，按季度显示趋势线，并列出前 10 大客户的表格。采用简洁、现代的深色主题。
+```
+
+Agent 会针对您的 Snowflake 数据编写并执行 SQL 查询，并创建一个功能完善的应用。
+
+<div id="soluo-de-problemas">
+  ## 故障排除
+</div>
+
+<AccordionGroup>
+  <Accordion title="同意请求无效或角色被阻止">
+    您的 Snowflake 集成可能默认阻止了某些角色。
+
+    请确认该集成在创建时使用了 `BLOCKED_ROLES_LIST = ()`。如果之前创建时未使用此配置，请执行：
+
+    ```sql 修复被阻止的角色 theme={null}
+    CREATE OR REPLACE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    如果错误仍然存在，请确认您的默认角色未被阻止：
+
+    ```sql 设置默认角色 theme={null}
+    ALTER USER "SEU_NOME_DE_USUARIO" SET DEFAULT_ROLE = 'PUBLIC';
+    ```
+  </Accordion>
+
+  <Accordion title="身份验证时出现 404 错误">
+    请确认 Snowflake 集成中的重定向 URI 与以下地址完全一致：
+
+    ```
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    任何差异都会导致 OAuth 流程中出现 404 错误。
+  </Accordion>
+
+  <Accordion title="作用域无效">
+    请确保 Replit 中连接器的作用域仅设置为 `refresh_token`。移除其他作用域，例如 `session:role-any` 或 `session:role:PUBLIC`。
+  </Accordion>
+
+  <Accordion title="连接失败">
+    请确认 Replit 中的 Client ID 和 Client Secret 与 Snowflake 生成的信息一致。可通过执行以下命令再次验证：
+
+    ```sql 验证凭证 theme={null}
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="documentao-relacionada">
+  ## 相关文档
+</div>
+
+* [数据仓库连接器概览](/zh/pt/connectors/warehouses/overview) — 所有支持的数据仓库连接器概览
+* [连接 Databricks](/zh/pt/connectors/warehouses/databricks) — Databricks 配置分步指南
+* [管理你的连接器](/zh/pt/replitai/managing-connectors) — 管理和配置连接器
+* [Snowflake — 为自定义客户端配置 OAuth](https://docs.snowflake.com/en/user-guide/oauth-custom) — Snowflake OAuth 文档

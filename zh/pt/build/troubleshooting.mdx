@@ -1,0 +1,271 @@
+---
+title: "部署问题排查"
+description: "排查 Replit App 在 Preview 中运行正常、部署失败或在公开 URL 上表现不同的常见问题。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+发布会将您的项目变成公开 App。如果部署失败，或公开 URL 的表现与 Preview 不一致，请按以下顺序排查。
+
+本页既是 Build 恢复指南，也是部署故障排查参考。先从最简单的问题开始：App 能否在 Preview 中正常运行？
+
+<div id="o-que-voc-vai-conquistar">
+  ## 您将了解的内容
+</div>
+
+阅读完本页后，您将能够判断问题是否出在您的 App、部署配置、生产环境 Secrets、部署类型、端口配置，还是网络/DNS 访问方面。
+
+<div id="comece-com-o-preview">
+  ## 从 Preview 开始
+</div>
+
+发布前，请确认应用能在项目编辑器中正常运行。
+
+在项目编辑器顶部选择 **Run**，然后打开 Preview。如果 Preview 未显示带有 `replit.dev` URL 的应用，请先修复应用再发布。
+
+请让 Agent 先诊断 Preview：
+
+<AiPrompt>
+  此应用无法在 Preview 中运行。<br />
+  请检查运行命令、依赖项安装、应用错误、端口以及缺失的 Secrets。<br />
+  请先修复最小的问题，并告诉我如何在发布前验证 Preview 是否正常运行。
+</AiPrompt>
+
+如果 Preview 有问题，发布也无法解决。
+
+<div id="se-o-preview-funciona-mas-a-publicao-falha">
+  ## 如果 Preview 正常运行但部署失败
+</div>
+
+如果 Preview 正常运行但部署失败，请检查部署相关配置。
+
+<div id="verificar-logs">
+  ### 检查日志
+</div>
+
+在**部署**面板中打开 **Logs** 标签页。查找堆栈跟踪、缺少的包、执行失败的命令、缺少的环境变量或启动错误。
+
+将相关错误粘贴到 Agent：
+
+<AiPrompt>
+  部署失败，日志输出如下：[粘贴错误]。<br />
+  说明最可能的原因。<br />
+  告诉我是命令、依赖项、Secret、端口、构建还是应用本身的问题。<br />
+  建议最小的修复方案，并说明应如何验证。
+</AiPrompt>
+
+<div id="verificar-comandos-de-execuo-e-build">
+  ### 检查运行和构建命令
+</div>
+
+常见问题包括拼写错误、错误的标志、错误的输入文件，或只能在本地运行的命令。
+
+请在**部署**面板中检查这些命令。如果应用需要构建命令和启动命令，请确认两者均正确。
+
+<div id="verificar-secrets-de-produo">
+  ### 检查生产环境 Secrets
+</div>
+
+在项目编辑器中设置的 Secrets 不会自动迁移到已部署应用。请在**部署**面板中添加所有生产环境 Secrets 和环境变量。
+
+缺少 Secrets 可能导致未定义值错误、API 调用失败、数据库连接失败、登录错误或支付失败。
+
+请参阅 [Secrets](/zh/pt/core-concepts/project-editor/app-setup/secrets)。
+
+<div id="verificar-comportamento-de-processo-de-longa-durao">
+  ### 检查长时间运行的进程行为
+</div>
+
+已部署 App 要求程序持续运行。如果程序只运行一次便退出，平台会自动重启它。
+
+请确保你的应用启动了长时间运行的进程，例如 Web 服务器。
+
+<div id="verificar-configurao-de-host-e-porta">
+  ### 检查主机和端口配置
+</div>
+
+如果你正在运行 Web 服务器，部署可以自动检测服务器所使用的端口，但服务器必须监听 `0.0.0.0`。仅监听 `localhost` 或 `127.0.0.1` 无法用于已部署 App。
+
+如果你在 [`.replit` 配置中指定了端口](/zh/pt/references/configuration/configuration)，将禁用自动端口检测。你必须指定一个 `externalPort` 设为 `80` 的端口，才能完成发布步骤。请确认服务器正在监听指定的 `localPort`。
+
+请 Agent 仔细检查以下内容：
+
+<AiPrompt>
+  请检查此 App 是否已正确配置以便部署。<br />
+  确认服务器会启动一个长期运行的进程、监听 0.0.0.0、使用预期端口，并与 .replit 中的所有端口配置一致。<br />
+  除部署所需的修复外，请勿更改 App 的行为。
+</AiPrompt>
+
+<div id="verificar-tempo-de-health-check">
+  ### 检查健康检查耗时
+</div>
+
+在将已部署应用标记为进行中之前，Replit 会向应用发送 HTTP 请求。如果首页超过五秒才响应，健康检查可能会超时，导致部署在最后阶段失败。
+
+如果应用启动较慢，请让 Agent 减少启动时的工作量，将耗时操作延后至用户触发后再执行，或酌情缓存数据。
+
+<div id="se-a-publicao-for-bem-sucedida-mas-a-url-pblica-estiver-quebrada">
+  ## 如果部署成功但公开 URL 无法访问
+</div>
+
+如果 Preview 正常运行且部署成功，但公开 URL 无法访问，请对比 Preview 与生产环境的表现。
+
+请检查：
+
+* 生产环境的 Secrets 和环境变量。
+* 数据库连接设置。
+* 登录回调或重定向 URL。
+* Webhook 设置或支付重定向。
+* API 允许列表或 CORS 设置。
+* 写入本地而非存储在数据库或存储服务中的文件。
+* 移动端布局以及不同浏览器之间的差异。
+
+请 Agent 对比这两个环境：
+
+<AiPrompt>
+  App 在 Preview 中正常运行，但在已部署的 URL 上无法运行。<br />
+  请帮我对比 Preview 与生产环境的表现。<br />
+  检查 Secrets、数据库设置、API 调用、登录重定向、支付重定向、构建输出和日志。<br />
+  请告诉我下一步最安全的检查项。
+</AiPrompt>
+
+<div id="problemas-com-implantaes-estticas">
+  ## 静态部署问题
+</div>
+
+静态部署用于提供 HTML、CSS 和 JavaScript 等静态文件。
+
+如果应用包含服务器端功能、API 路由、身份验证回调、服务器端数据库调用或长时间运行的后端逻辑，可能不适合使用静态部署。请在**部署**面板中将部署类型更改为 Autoscale。
+
+静态部署问题通常是由于公共目录配置不正确，或为需要服务器的应用选择了静态类型所致。
+
+<div id="limites-de-arquivo-e-tamanho">
+  ## 文件大小限制
+</div>
+
+预留 VM 部署和 Autoscale 部署支持大小不超过 8 GB 的 Replit App。静态部署支持大小不超过 1 GB 的 App。
+
+要减小 App 体积，请删除不必要的文件，避免提交生成的输出，或将大型资源存储在外部。
+
+<Warning>
+  已部署 App 中的文件系统不具备持久性，每次部署时都会重置。要持久保存数据，请使用数据库，例如 [SQL Database](/zh/pt/features/data-and-storage/sql-database)。
+</Warning>
+
+如果上传的文件或生成的数据在部署后消失，请将其存储在数据库或存储服务中，而不是 App 的文件系统中。
+
+<div id="problemas-de-acesso-com-urls-replitapp-e-replitdev">
+  ## 无法访问 `replit.app` 和 `replit.dev` URL
+</div>
+
+如果你无法访问 `replit.app` 或 `replit.dev` 域名上的 App，可能是受到网页过滤或网络限制。
+
+请尝试使用 Google DNS (`8.8.8.8`) 或 Cloudflare DNS (`1.1.1.1`) 等公共 DNS 解析服务。
+
+<div id="alterar-configuraes-de-dns">
+  ### 更改 DNS 设置
+</div>
+
+<Tabs>
+  <Tab title="Windows">
+    1. 打开**控制面板**。
+    2. 进入**网络和共享中心**。
+    3. 在左侧选择**更改适配器设置**。
+    4. 右键点击当前网络连接，然后选择**属性**。
+    5. 选择**Internet 协议版本 4 (TCP/IPv4)**，然后选择**属性**。
+    6. 选择**使用下面的 DNS 服务器地址**。
+    7. 输入公共 DNS 服务器的 IP 地址，例如 Google DNS 的 `8.8.8.8` 或 Cloudflare DNS 的 `1.1.1.1`。
+    8. 选择**确定**以保存更改。
+
+    如需更详细的说明，请参阅 [Microsoft 的 DNS 配置指南](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace)。
+  </Tab>
+
+  <Tab title="macOS">
+    1. 打开**系统偏好设置**。
+    2. 选择**网络**。
+    3. 在左侧选择当前网络连接。
+    4. 在右下角选择**高级**。
+    5. 打开 **DNS** 标签页。
+    6. 选择 **+** 按钮以添加 DNS 服务器。
+    7. 输入公共 DNS 服务器的 IP 地址，例如 Google DNS 的 `8.8.8.8` 或 Cloudflare DNS 的 `1.1.1.1`。
+    8. 选择**确定**，然后选择**应用**。
+
+    如需更详细的说明，请参阅 [Apple 的 DNS 配置指南](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac)。
+  </Tab>
+
+  <Tab title="Linux">
+    1. 编辑 `/etc/resolv.conf` 文件以添加公共 DNS 服务器。具体方法因发行版而异。
+    2. 添加以下内容：
+
+    ```bash theme={null}
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+
+    有关不同发行版中 DNS 配置的更多信息，请参阅 [Debian Wiki 的网络配置指南](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers)。
+  </Tab>
+</Tabs>
+
+<div id="limpar-cache-de-dns">
+  ### 清除 DNS 缓存
+</div>
+
+更改 DNS 设置后，请清除 DNS 缓存以使新配置生效：
+
+* **Windows**：在命令提示符中运行 `ipconfig /flushdns`。
+* **macOS 和 Linux**：在终端中运行 `sudo systemctl restart NetworkManager`。具体命令可能因所用发行版而异。
+
+<Note>
+  为提升所在区域的性能和稳定性，您的 Replit App 的 `replit.dev` URL
+  可能会在集群迁移期间偶尔变更。迁移完成后，URL 通常会保持稳定约一年，
+  除非您明确要求更改位置。
+</Note>
+
+<div id="publicar-uma-aplicao-streamlit">
+  ## 部署 Streamlit 应用
+</div>
+
+Streamlit 应用支持通过 Replit 部署。最简单的入门方式是使用 [Streamlit 模板](https://replit.com/@replit/Streamlit?v=1)。
+
+或者，将部署的运行命令设置为：
+
+```bash theme={null}
+streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
+```
+
+如果您的应用使用的是其他入口文件，请将 `main.py` 替换为相应的文件名。
+
+<div id="voc-terminou-quando">
+  ## 完成条件
+</div>
+
+* Preview 可正常运行。
+* 部署已完成。
+* 公开 URL 可以正常访问。
+* App 的核心流程可通过公开 URL 正常运行。
+* 已配置 Secrets 和生产环境设置。
+* 日志中未出现隐藏的启动错误。
+
+<div id="relacionado">
+  ## 相关内容
+</div>
+
+* [Replit 部署](/zh/pt/learn/projects-and-artifacts/replit-deployments)
+* [添加自定义域名](/zh/pt/build/add-custom-domain)
+* [自定义域名](/zh/pt/features/publishing/custom-domains)
+* [Secrets](/zh/pt/core-concepts/project-editor/app-setup/secrets)
+* [SQL Database](/zh/pt/features/data-and-storage/sql-database)
+
+如果尝试这些步骤后仍需要帮助，请访问 [Replit Community Hub](https://replit.com/community) 获取更多资源。

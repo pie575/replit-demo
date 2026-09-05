@@ -1,0 +1,1576 @@
+---
+title: "Replit Agent"
+description: "Replit Agent 可将想法转化为应用、设计、幻灯片等，无需编程知识。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AgentCarousel = ({correctChoice = ""}) => {
+  const outputTypes = [{
+    name: "Web",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "Mobile",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "Slides",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clip-rule="evenodd" /><path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" /></svg>'
+  }, {
+    name: "Animation",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "Design",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" /><path fill-rule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "Data Visualization",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 14.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-1.5 0v-6a.75.75 0 0 1 .75-.75ZM12 8.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75ZM19 2.25a.75.75 0 0 1 .75.75v18a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75Z" /></svg>'
+  }, {
+    name: "Automation",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M13.376 1.253c.21-.02.422.012.616.096l.095.046.091.053c.178.115.323.274.423.46l.045.096.038.099a1.25 1.25 0 0 1 .01.755l-1.92 6.02c-.003.011-.007.023-.012.034a.253.253 0 0 0 .03.23.25.25 0 0 0 .206.108H20l.123.004a1.752 1.752 0 0 1 1.24 2.849.73.73 0 0 1-.045.05l-9.9 10.199v-.001a1.25 1.25 0 0 1-2.122-1.18l.01-.03 1.92-6.019.012-.035a.251.251 0 0 0-.12-.309.255.255 0 0 0-.056-.02l-.06-.008H4a1.752 1.752 0 0 1-1.363-2.852l.045-.05 9.9-10.2a1.25 1.25 0 0 1 .689-.38l.104-.015Zm-9.582 11.6a.252.252 0 0 0-.023.255.25.25 0 0 0 .227.142h7.001l.21.013a1.75 1.75 0 0 1 1.53 1.518c.034.269.003.54-.086.795l.002.001-1.591 4.986 9.14-9.418a.249.249 0 0 0 .047-.116.252.252 0 0 0-.115-.24.249.249 0 0 0-.064-.03l-.07-.009H13a1.753 1.753 0 0 1-1.74-1.531 1.752 1.752 0 0 1 .086-.797l1.588-4.985-9.14 9.417Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "3D Game",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M11.25 9.675A3.751 3.751 0 0 1 12 2.25a3.75 3.75 0 0 1 .75 7.425v4.575H19A2.75 2.75 0 0 1 21.75 17v2A2.75 2.75 0 0 1 19 21.75H5A2.75 2.75 0 0 1 2.25 19v-2A2.75 2.75 0 0 1 5 14.25h.25V13a.75.75 0 0 1 1.5 0v1.25h4.5V9.675ZM9.75 6a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0ZM4.116 16.116A1.25 1.25 0 0 1 5 15.75h14A1.25 1.25 0 0 1 20.25 17v2A1.25 1.25 0 0 1 19 20.25H5a1.25 1.25 0 0 1-1.244-1.126L3.75 19v-2c0-.331.132-.65.366-.884Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "Document",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M11.88 11.251a2.873 2.873 0 0 1 2.028 4.904L8.89 21.168a2.75 2.75 0 0 1-1.174.694l-2.867.838a1.255 1.255 0 0 1-1.234-.316 1.251 1.251 0 0 1-.316-1.235l.836-2.868c.13-.443.37-.847.696-1.174l5.017-5.015a2.875 2.875 0 0 1 2.032-.841Zm-.001 1.5c-.319 0-.626.11-.87.31l-.1.091L5.89 18.17a1.251 1.251 0 0 0-.315.532l-.709 2.43 2.43-.708a1.25 1.25 0 0 0 .533-.317l5.019-5.012a1.372 1.372 0 0 0-.97-2.343Z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M14.038 1.251a3.148 3.148 0 0 1 2.198.925l3.587 3.587A3.152 3.152 0 0 1 20.75 8v12A2.75 2.75 0 0 1 18 22.75h-5.341a.75.75 0 0 1 0-1.5h5.34A1.25 1.25 0 0 0 19.25 20V8.75H15A1.75 1.75 0 0 1 13.25 7V2.75H6A1.25 1.25 0 0 0 4.75 4v9.34a.75.75 0 1 1-1.5 0V4A2.75 2.75 0 0 1 6 1.25h8l.039.001ZM14.75 7a.25.25 0 0 0 .25.25h4.071a1.65 1.65 0 0 0-.306-.425l-3.59-3.59a1.655 1.655 0 0 0-.425-.307V7Z" clip-rule="evenodd" /></svg>'
+  }, {
+    name: "Spreadsheet",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M21.75 6A3.75 3.75 0 0 0 18 2.25H6A3.75 3.75 0 0 0 2.25 6v12A3.75 3.75 0 0 0 6 21.75h12A3.75 3.75 0 0 0 21.75 18V6ZM18 3.75A2.25 2.25 0 0 1 20.25 6v2.25H9.75v-4.5H18Zm-9.75 0v4.5h-4.5V6A2.25 2.25 0 0 1 6 3.75h2.25Zm-4.5 6h4.5v4.5h-4.5v-4.5Zm0 6h4.5v4.5H6A2.25 2.25 0 0 1 3.75 18v-2.25Zm6 4.5v-4.5h10.5V18A2.25 2.25 0 0 1 18 20.25H9.75Zm10.5-6H9.75v-4.5h10.5v4.5Z" clip-rule="evenodd" /></svg>'
+  }];
+  const ITEMS_PER_PAGE = 5;
+  const ITEM_WIDTH = 96;
+  const VISIBLE_WIDTH = ITEMS_PER_PAGE * ITEM_WIDTH;
+  const trackId = "ac-carousel-track";
+  const checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20.53 5.47a.75.75 0 0 1 0 1.06l-11 11a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 1 1 1.06-1.06L9 15.94 19.47 5.47a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>';
+  const updateHint = selectedName => {
+    const hintEl = document.getElementById("ac-carousel-hint");
+    if (!hintEl || !correctChoice) return;
+    if (!selectedName) {
+      hintEl.innerHTML = "";
+      return;
+    }
+    if (selectedName === correctChoice) {
+      hintEl.innerHTML = `<span class="ac-hint ac-hint-correct"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M20.53 5.47a.75.75 0 0 1 0 1.06l-11 11a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 1 1 1.06-1.06L9 15.94 19.47 5.47a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>Great choice!</span>`;
+    } else {
+      hintEl.innerHTML = `<span class="ac-hint ac-hint-nudge">You can build anything you want! For this quickstart, try selecting <strong>${correctChoice}</strong>.</span>`;
+    }
+  };
+  const toggleOutputType = name => {
+    const btn = document.querySelector(`.agent-carousel-wrap [data-option-name="${name}"]`);
+    const pillsContainer = document.getElementById("agent-input-pills");
+    if (!btn) return;
+    const isSelected = btn.dataset.selected === "true";
+    const type = outputTypes.find(t => t.name === name);
+    if (isSelected) {
+      btn.dataset.selected = "false";
+      btn.style.background = "var(--ai-option-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      if (iconEl && type) iconEl.innerHTML = type.iconSvg;
+      if (pillsContainer) {
+        const pill = document.getElementById(`pill-${name}`);
+        if (pill) pill.remove();
+      }
+      updateHint(null);
+    } else {
+      document.querySelectorAll('[data-option-name][data-selected="true"]').forEach(prevBtn => {
+        const prevName = prevBtn.dataset.optionName;
+        prevBtn.dataset.selected = "false";
+        prevBtn.style.background = "var(--ai-option-bg)";
+        const prevIconEl = prevBtn.querySelector(".option-icon");
+        const prevType = outputTypes.find(t => t.name === prevName);
+        if (prevIconEl && prevType) prevIconEl.innerHTML = prevType.iconSvg;
+        if (pillsContainer) {
+          const prevPill = document.getElementById(`pill-${prevName}`);
+          if (prevPill) prevPill.remove();
+        }
+      });
+      btn.dataset.selected = "true";
+      btn.style.background = "var(--ai-option-selected-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      if (iconEl) iconEl.innerHTML = checkSvg;
+      if (pillsContainer && type) {
+        const pill = document.createElement("span");
+        pill.id = `pill-${name}`;
+        pill.style.cssText = "display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 8px;border-radius:32px;background:var(--ai-pill-bg);color:var(--ai-pill-text);font-size:14px;white-space:nowrap;cursor:default;";
+        pill.innerHTML = `<span style="display:flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">${type.iconSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}</svg></span><span>${name}</span><span class="ai-pill-close" style="display:flex;align-items:center;cursor:pointer;margin-left:2px" data-pill-remove="${name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12 5.7 16.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41Z"/></svg></span>`;
+        pill.querySelector(`[data-pill-remove="${name}"]`).addEventListener("click", () => toggleOutputType(name));
+        pillsContainer.appendChild(pill);
+      }
+      updateHint(name);
+    }
+  };
+  const slideCarousel = direction => {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    const currentPage = parseInt(track.dataset.page || "0", 10);
+    const totalPages = Math.ceil(outputTypes.length / ITEMS_PER_PAGE);
+    let newPage = currentPage + direction;
+    if (newPage < 0) newPage = totalPages - 1;
+    if (newPage >= totalPages) newPage = 0;
+    track.dataset.page = String(newPage);
+    track.style.transform = `translateX(-${newPage * ITEMS_PER_PAGE * ITEM_WIDTH}px)`;
+  };
+  if (typeof document !== "undefined" && !document.getElementById("agent-carousel-styles")) {
+    const style = document.createElement("style");
+    style.id = "agent-carousel-styles";
+    style.textContent = `
+      .agent-carousel-wrap {
+        --ai-option-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-option-border: var(--replit-docs-border, #DEDAD5);
+        --ai-option-hover-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-option-selected-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-text-secondary: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-icon-default: var(--replit-docs-text-subtle, #858585);
+        --ai-icon-hover: var(--replit-docs-text-muted, #5C5C5C);
+      }
+      .dark .agent-carousel-wrap,
+      html.dark .agent-carousel-wrap,
+      [data-theme="dark"] .agent-carousel-wrap {
+        --ai-option-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-option-border: var(--replit-docs-border, #39393D);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-text-secondary: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-icon-default: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-icon-hover: var(--replit-docs-text-muted, #B8B8BE);
+      }
+      @keyframes agent-carousel-fade-in {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .agent-carousel-wrap .ac-option-btn[data-selected="true"] {
+        background: var(--ai-option-selected-bg) !important;
+      }
+      .agent-carousel-wrap .ac-option-btn[data-correct="true"][data-selected="true"] {
+        border-color: #22c55e !important;
+        background: rgba(34, 197, 94, 0.08) !important;
+      }
+      @keyframes ac-hint-fade-in {
+        from { opacity: 0; transform: translateY(-4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .agent-carousel-wrap .ac-hint {
+        text-align: center;
+        font-size: 13px;
+        margin-top: 12px;
+        animation: ac-hint-fade-in 200ms ease-out;
+      }
+      .agent-carousel-wrap .ac-hint-correct {
+        color: #22c55e;
+      }
+      .agent-carousel-wrap .ac-hint-nudge {
+        color: var(--ai-text-secondary);
+      }
+      @media (hover: hover) {
+        .agent-carousel-wrap .ac-option-btn:not([data-selected="true"]):hover {
+          background: var(--ai-option-hover-bg);
+        }
+        .agent-carousel-wrap .ac-nav-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+      }
+      .agent-carousel-wrap {
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const ArrowLeftIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M4.47 11.47a.75.75 0 0 0 0 1.06l7 7a.75.75 0 1 0 1.06-1.06l-5.72-5.72H19a.75.75 0 0 0 0-1.5H6.81l5.72-5.72a.75.75 0 0 0-1.06-1.06l-7 7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowRightIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M19.53 11.47a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 1.06-1.06l7 7Z" clipRule="evenodd" />
+    </svg>;
+  const optionIconStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ai-option-border)",
+    borderRadius: "12px",
+    background: "var(--ai-option-bg)",
+    cursor: "pointer",
+    color: "var(--ai-text-secondary)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  return <div className="agent-carousel-wrap" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "734px",
+    alignSelf: "center",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "agent-carousel-fade-in 300ms ease-out forwards"
+  }}>
+      <div style={{
+    display: "flex",
+    justifyContent: "center"
+  }}>
+        <div style={{
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "16px",
+    maxWidth: "100%",
+    minWidth: 0
+  }}>
+          <button className="ac-nav-btn" style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "48px",
+    border: "none",
+    background: "none",
+    cursor: "pointer",
+    color: "var(--ai-icon-default)",
+    padding: 0,
+    flexShrink: 0
+  }} aria-label="Previous" type="button" onClick={() => slideCarousel(-1)}>
+            {ArrowLeftIcon}
+          </button>
+          <div style={{
+    display: "flex",
+    overflow: "hidden",
+    width: `${VISIBLE_WIDTH}px`,
+    maxWidth: "calc(100vw - 140px)"
+  }}>
+            <div id={trackId} data-page="0" style={{
+    display: "flex",
+    transition: "transform 300ms ease-out",
+    willChange: "transform"
+  }}>
+              {outputTypes.map(type => <div key={type.name} style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "6px",
+    width: `${ITEM_WIDTH}px`,
+    flexShrink: 0
+  }}>
+                  <button className="ac-option-btn" data-option-name={type.name} data-correct={correctChoice && type.name === correctChoice ? "true" : undefined} style={optionIconStyle} type="button" onClick={() => toggleOutputType(type.name)}>
+                    <span className="option-icon" style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  }} dangerouslySetInnerHTML={{
+    __html: type.iconSvg
+  }} />
+                  </button>
+                  <span style={{
+    fontSize: "12px",
+    color: "var(--ai-text-secondary)",
+    textAlign: "center"
+  }}>
+                    {type.name}
+                  </span>
+                </div>)}
+            </div>
+          </div>
+          <button className="ac-nav-btn" style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "48px",
+    border: "none",
+    background: "none",
+    cursor: "pointer",
+    color: "var(--ai-icon-default)",
+    padding: 0,
+    flexShrink: 0
+  }} aria-label="Next" type="button" onClick={() => slideCarousel(1)}>
+            {ArrowRightIcon}
+          </button>
+        </div>
+      </div>
+      {correctChoice && <div id="ac-carousel-hint" style={{
+    minHeight: "24px"
+  }}></div>}
+    </div>;
+};
+
+export const AgentModes = () => {
+  if (typeof document !== "undefined" && !document.getElementById("agent-modes-styles")) {
+    const style = document.createElement("style");
+    style.id = "agent-modes-styles";
+    style.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&display=swap');
+      #agent-modes-container {
+        --am-surface: var(--replit-docs-bg, #F6F6F4);
+        --am-surface-elevated: var(--replit-docs-bg-elevated, #F1F1EE);
+        --am-surface-muted: var(--replit-docs-bg-muted, #ECE9E4);
+        --am-border: var(--replit-docs-border, #DEDAD5);
+        --am-border-strong: var(--replit-docs-border-strong, #CAC4BE);
+        --am-text: var(--replit-docs-text, #1D1D1D);
+        --am-text-dim: var(--replit-docs-text-muted, #5C5C5C);
+        --am-text-dimmest: var(--replit-docs-text-subtle, #858585);
+        --am-lite-bg: #FFF1C9;
+        --am-lite-border: #F0D57A;
+        --am-power-bg: #E8F2FF;
+        --am-power-border: #8EBEFF;
+        --am-power-turbo-bg: #FFF0E6;
+        --am-power-turbo-border: #F7B16B;
+        --am-switch-off: #CFC8BF;
+        --am-switch-on: #4A90D9;
+        --am-switch-turbo: #E6862E;
+        --am-thumb: #FFFFFF;
+        --am-pill-bg: rgba(74, 144, 217, 0.12);
+        --am-pill-text: #3C6FA8;
+        --am-divider: rgba(0, 0, 0, 0.08);
+        --am-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .dark #agent-modes-container,
+      html.dark #agent-modes-container,
+      [data-theme="dark"] #agent-modes-container {
+        --am-surface: var(--replit-docs-bg, #1E1E1F);
+        --am-surface-elevated: var(--replit-docs-bg-elevated, #222223);
+        --am-surface-muted: #27272A;
+        --am-border: var(--replit-docs-border, #39393D);
+        --am-border-strong: var(--replit-docs-border-strong, #4A4A50);
+        --am-text: var(--replit-docs-text, #F5F5F5);
+        --am-text-dim: var(--replit-docs-text-muted, #B8B8BE);
+        --am-text-dimmest: var(--replit-docs-text-subtle, #8E8F97);
+        --am-lite-bg: #463D20;
+        --am-lite-border: #8A7030;
+        --am-power-bg: #1F3146;
+        --am-power-border: #5C8ED4;
+        --am-power-turbo-bg: #3A2618;
+        --am-power-turbo-border: #D18B49;
+        --am-switch-off: #4A4A50;
+        --am-switch-on: #4A90D9;
+        --am-switch-turbo: #D97A1A;
+        --am-pill-bg: rgba(74, 144, 217, 0.18);
+        --am-pill-text: #B7D5FF;
+        --am-divider: rgba(255, 255, 255, 0.08);
+        --am-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      @keyframes agent-modes-fade-in {
+        from { transform: translateY(8px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      #agent-modes-container button {
+        font-family: inherit;
+      }
+      #agent-modes-container [data-mode-btn][data-selected="true"] {
+        background: var(--am-surface-elevated);
+        border-color: var(--am-border-strong);
+        color: var(--am-text);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+      #agent-modes-container [data-mode-btn="lite"][data-selected="true"] {
+        background: var(--am-lite-bg);
+        border-color: var(--am-lite-border);
+      }
+      #agent-modes-container [data-mode-btn="power"][data-selected="true"] {
+        background: var(--am-power-bg);
+        border-color: var(--am-power-border);
+      }
+      #agent-modes-container [data-mode-btn="power"][data-selected="true"][data-turbo="true"] {
+        background: var(--am-power-turbo-bg);
+        border-color: var(--am-power-turbo-border);
+      }
+      #agent-modes-container [data-advanced-toggle][data-expanded="true"] [data-advanced-icon] {
+        transform: rotate(90deg);
+      }
+      #agent-modes-container [data-feature-row][data-disabled="true"] {
+        opacity: 0.45;
+      }
+      #agent-modes-container [data-switch][data-disabled="true"] {
+        cursor: not-allowed;
+      }
+      #agent-modes-container [data-switch][data-selected="true"] [data-switch-track] {
+        background: var(--am-switch-on);
+      }
+      #agent-modes-container [data-switch][data-selected="true"][data-colorway="turbo"] [data-switch-track] {
+        background: var(--am-switch-turbo);
+      }
+      #agent-modes-container [data-switch][data-selected="true"] [data-switch-thumb] {
+        transform: translateX(14px);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if (typeof document !== "undefined") {
+    window.requestAnimationFrame(() => {
+      const panel = document.getElementById("agent-modes-panel");
+      if (!panel || panel.dataset.init) {
+        return;
+      }
+      panel.dataset.init = "1";
+      let mode = "power";
+      let advancedOpen = false;
+      const toggles = {
+        appTesting: true,
+        codeOptimization: true,
+        turbo: false
+      };
+      const modeDescriptions = {
+        lite: "Fast, lightweight models for quick edits and iterations. Best for small changes and visual tweaks.",
+        economy: "Cost-optimized models for everyday tasks. Best mode for most builds when efficiency matters.",
+        power: "Higher-performance models for more complex work. Best for larger changes, deeper reasoning, and longer builds."
+      };
+      const description = panel.querySelector("[data-mode-description]");
+      const advancedToggle = panel.querySelector("[data-advanced-toggle]");
+      const advancedSection = panel.querySelector("[data-advanced-section]");
+      const setFeatureState = ({key, selected, disabled, descriptionText}) => {
+        const row = panel.querySelector(`[data-feature-row="${key}"]`);
+        const switchButton = panel.querySelector(`[data-switch="${key}"]`);
+        const descriptionNode = panel.querySelector(`[data-feature-description="${key}"]`);
+        if (row) {
+          row.dataset.disabled = disabled ? "true" : "false";
+        }
+        if (switchButton) {
+          switchButton.dataset.selected = selected ? "true" : "false";
+          switchButton.dataset.disabled = disabled ? "true" : "false";
+          switchButton.setAttribute("aria-checked", selected ? "true" : "false");
+        }
+        if (descriptionNode) {
+          descriptionNode.textContent = descriptionText;
+        }
+      };
+      const update = () => {
+        panel.querySelectorAll("[data-mode-btn]").forEach(button => {
+          const selected = button.dataset.modeBtn === mode;
+          button.dataset.selected = selected ? "true" : "false";
+          button.dataset.turbo = selected && mode === "power" && toggles.turbo ? "true" : "false";
+        });
+        if (description) {
+          description.textContent = modeDescriptions[mode];
+        }
+        if (advancedToggle) {
+          advancedToggle.dataset.expanded = advancedOpen ? "true" : "false";
+        }
+        if (advancedSection) {
+          advancedSection.style.display = advancedOpen ? "flex" : "none";
+        }
+        const liteDisabled = mode === "lite";
+        const turboDisabled = mode !== "power";
+        setFeatureState({
+          key: "appTesting",
+          selected: !liteDisabled && toggles.appTesting,
+          disabled: liteDisabled,
+          descriptionText: "Agent tests your app automatically"
+        });
+        setFeatureState({
+          key: "codeOptimization",
+          selected: !liteDisabled && toggles.codeOptimization,
+          disabled: liteDisabled,
+          descriptionText: "Agent reviews code for bugs and improvements"
+        });
+        setFeatureState({
+          key: "turbo",
+          selected: !turboDisabled && toggles.turbo,
+          disabled: turboDisabled,
+          descriptionText: turboDisabled ? "Available when Power mode is selected" : "Fastest models, up to 2.5x speed and 6x cost"
+        });
+      };
+      panel.querySelectorAll("[data-mode-btn]").forEach(button => {
+        button.addEventListener("click", () => {
+          mode = button.dataset.modeBtn;
+          if (mode !== "power") {
+            toggles.turbo = false;
+          }
+          update();
+        });
+      });
+      if (advancedToggle) {
+        advancedToggle.addEventListener("click", () => {
+          advancedOpen = !advancedOpen;
+          update();
+        });
+      }
+      panel.querySelectorAll("[data-switch]").forEach(switchButton => {
+        switchButton.addEventListener("click", () => {
+          const key = switchButton.dataset.switch;
+          if (mode === "lite" && key !== "turbo" || key === "turbo" && mode !== "power") {
+            return;
+          }
+          toggles[key] = !toggles[key];
+          update();
+        });
+      });
+      update();
+    });
+  }
+  const panelButton = {
+    border: "1px solid transparent",
+    borderRadius: "7px",
+    background: "transparent",
+    color: "var(--am-text-dim)",
+    padding: "8px 10px",
+    fontSize: "14px",
+    lineHeight: 1.2,
+    cursor: "pointer",
+    transition: "all 150ms ease"
+  };
+  const featureRow = (key, label, descriptionText, colorway = "default") => <div data-feature-row={key} style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "12px",
+    padding: "8px 0"
+  }}>
+      <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+    flex: 1
+  }}>
+        <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px"
+  }}>
+          <span style={{
+    fontSize: "14px",
+    color: "var(--am-text)"
+  }}>{label}</span>
+          {key === "turbo" ? <span style={{
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "2px 6px",
+    borderRadius: "999px",
+    fontSize: "11px",
+    color: "var(--am-pill-text)",
+    background: "var(--am-pill-bg)"
+  }}>
+              +$$$
+            </span> : null}
+        </div>
+        <span data-feature-description={key} style={{
+    fontSize: "12px",
+    color: "var(--am-text-dimmest)",
+    lineHeight: 1.4
+  }}>
+          {descriptionText}
+        </span>
+      </div>
+      <button type="button" role="switch" aria-checked="false" data-switch={key} data-selected="false" data-disabled="false" data-colorway={colorway} style={{
+    border: 0,
+    background: "transparent",
+    padding: 0,
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0
+  }}>
+        <span data-switch-track style={{
+    width: "38px",
+    height: "24px",
+    borderRadius: "999px",
+    background: "var(--am-switch-off)",
+    position: "relative",
+    transition: "background 150ms ease",
+    display: "block"
+  }}>
+          <span data-switch-thumb style={{
+    width: "16px",
+    height: "16px",
+    borderRadius: "999px",
+    background: "var(--am-thumb)",
+    position: "absolute",
+    top: "4px",
+    left: "4px",
+    transition: "transform 150ms ease",
+    display: "block"
+  }} />
+        </span>
+      </button>
+    </div>;
+  return <div id="agent-modes-container" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "360px",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "agent-modes-fade-in 300ms ease-out forwards"
+  }}>
+      <div id="agent-modes-panel" style={{
+    borderRadius: "12px",
+    background: "var(--am-surface)",
+    boxShadow: "var(--am-shadow)",
+    border: "1px solid var(--am-border)",
+    padding: "12px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px"
+  }}>
+        <div style={{
+    fontSize: "13px",
+    color: "var(--am-text-dim)"
+  }}>Agent modes</div>
+
+        <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    padding: "4px",
+    borderRadius: "10px",
+    background: "var(--am-surface-muted)"
+  }}>
+          <button type="button" data-mode-btn="lite" data-selected="false" style={{
+    ...panelButton,
+    flex: 1
+  }}>
+            Lite
+          </button>
+          <button type="button" data-mode-btn="economy" data-selected="false" style={{
+    ...panelButton,
+    flex: 1
+  }}>
+            Economy
+          </button>
+          <button type="button" data-mode-btn="power" data-selected="true" data-turbo="false" style={{
+    ...panelButton,
+    flex: 1
+  }}>
+            Power
+          </button>
+        </div>
+
+        <div data-mode-description style={{
+    fontSize: "13px",
+    lineHeight: 1.5,
+    color: "var(--am-text-dim)"
+  }}>
+          Higher-performance models for more complex work. Best for larger changes, deeper reasoning, and longer builds.
+        </div>
+
+        <div style={{
+    height: "1px",
+    background: "var(--am-divider)",
+    margin: "2px 0"
+  }} />
+
+        <button type="button" data-advanced-toggle data-expanded="false" style={{
+    border: 0,
+    background: "transparent",
+    padding: 0,
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    color: "var(--am-text-dimmest)",
+    cursor: "pointer",
+    fontSize: "13px"
+  }}>
+          <span data-advanced-icon style={{
+    display: "inline-block",
+    transition: "transform 150ms ease"
+  }}>
+            {">"}
+          </span>
+          <span>Advanced settings</span>
+        </button>
+
+        <div data-advanced-section style={{
+    display: "none",
+    flexDirection: "column",
+    gap: "2px"
+  }}>
+          {featureRow("appTesting", "App testing", "Agent tests your app automatically")}
+          {featureRow("codeOptimization", "Code optimization", "Agent reviews code for bugs and improvements")}
+          <div style={{
+    height: "1px",
+    background: "var(--am-divider)",
+    margin: "2px 0"
+  }} />
+          {featureRow("turbo", "Turbo", "Fastest models, up to 2.5x speed and 6x cost", "turbo")}
+        </div>
+      </div>
+    </div>;
+};
+
+export const AgentInput = ({defaultPrompt = "", highlightPlan = false, highlightStart = false, showTypewriter = true}) => {
+  const AGENT_INPUT_TYPEWRITER_SCRIPT_ID = "replit-docs-typewriter-core";
+  const AGENT_INPUT_TYPEWRITER_SRC = "https://unpkg.com/typewriter-effect@2.18.2/dist/core.js";
+  const AGENT_INPUT_TYPEWRITER_PROMPTS = ["Build a project tracker for my team", "Design a landing page for my coffee shop", "Add Stripe payments to my app"];
+  const AGENT_INPUT_TYPING_SPEED = 40;
+  const AGENT_INPUT_DELETE_SPEED = 20;
+  const AGENT_INPUT_PAUSE_AFTER = 2000;
+  const AGENT_INPUT_START_DELAY = 500;
+  const getAgentInputTypewriterLoader = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriterLoader) {
+      window.__replitDocsAgentInputTypewriterLoader = {};
+    }
+    return window.__replitDocsAgentInputTypewriterLoader;
+  };
+  const ensureAgentInputTypewriterCore = () => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return Promise.resolve(null);
+    }
+    if (window.Typewriter) {
+      return Promise.resolve(window.Typewriter);
+    }
+    const loader = getAgentInputTypewriterLoader();
+    if (loader.promise) {
+      return loader.promise;
+    }
+    loader.promise = new Promise((resolve, reject) => {
+      const handleLoad = () => {
+        if (window.Typewriter) {
+          resolve(window.Typewriter);
+          return;
+        }
+        loader.promise = null;
+        reject(new Error("Typewriter core loaded without a global Typewriter export."));
+      };
+      const handleError = () => {
+        loader.promise = null;
+        reject(new Error("Failed to load typewriter core."));
+      };
+      const existingScript = document.getElementById(AGENT_INPUT_TYPEWRITER_SCRIPT_ID);
+      if (existingScript) {
+        existingScript.addEventListener("load", handleLoad, {
+          once: true
+        });
+        existingScript.addEventListener("error", handleError, {
+          once: true
+        });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = AGENT_INPUT_TYPEWRITER_SCRIPT_ID;
+      script.src = AGENT_INPUT_TYPEWRITER_SRC;
+      script.async = true;
+      script.addEventListener("load", handleLoad, {
+        once: true
+      });
+      script.addEventListener("error", handleError, {
+        once: true
+      });
+      document.head.appendChild(script);
+    });
+    return loader.promise;
+  };
+  const getAgentInputTypewriterRegistry = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriters) {
+      window.__replitDocsAgentInputTypewriters = new WeakMap();
+    }
+    return window.__replitDocsAgentInputTypewriters;
+  };
+  const findAgentInputContainer = node => node?.closest?.("[data-agent-input-container]") || null;
+  const getAgentInputElements = container => ({
+    textarea: container?.querySelector?.('[data-agent-input-role="textarea"]') || null,
+    startButton: container?.querySelector?.('[data-agent-input-role="start-button"]') || null,
+    pillsContainer: container?.querySelector?.('[data-agent-input-role="pills"]') || null
+  });
+  const getAgentInputPromptValue = container => {
+    const {textarea} = getAgentInputElements(container);
+    return textarea?.value?.trim() || "";
+  };
+  const updateAgentInputButtonState = container => {
+    const {startButton} = getAgentInputElements(container);
+    if (!startButton) {
+      return;
+    }
+    const hasText = getAgentInputPromptValue(container).length > 0;
+    startButton.style.opacity = hasText ? "1" : "0.4";
+    startButton.style.cursor = hasText ? "pointer" : "not-allowed";
+  };
+  const stopAgentInputTypewriter = (textarea, {placeholder, clearDemo = false} = {}) => {
+    if (typeof window === "undefined" || !textarea) {
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const record = registry?.get(textarea);
+    if (!record) {
+      if (placeholder) {
+        textarea.setAttribute("placeholder", placeholder);
+      }
+      return;
+    }
+    record.stopped = true;
+    if (record.startTimer) {
+      window.clearTimeout(record.startTimer);
+    }
+    if (record.writeFrame) {
+      window.cancelAnimationFrame(record.writeFrame);
+    }
+    if (record.typewriter?.stop) {
+      record.typewriter.stop();
+    }
+    textarea.removeEventListener("focus", record.handleFocus);
+    textarea.removeEventListener("pointerdown", record.handlePointerDown);
+    textarea.removeEventListener("input", record.handleInput);
+    if (clearDemo && textarea.value === record.pendingValue) {
+      textarea.value = "";
+    }
+    textarea.setAttribute("placeholder", placeholder || "");
+    updateAgentInputButtonState(record.container);
+    registry.delete(textarea);
+  };
+  const startAgentInputTypewriter = (container, {defaultPrompt, placeholder, showTypewriter}) => {
+    if (typeof window === "undefined" || typeof document === "undefined" || !container) {
+      return;
+    }
+    const {textarea} = getAgentInputElements(container);
+    if (!textarea) {
+      return;
+    }
+    if (!showTypewriter || defaultPrompt) {
+      stopAgentInputTypewriter(textarea, {
+        placeholder
+      });
+      textarea.setAttribute("placeholder", placeholder);
+      updateAgentInputButtonState(container);
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const existingRecord = registry.get(textarea);
+    if (existingRecord && !existingRecord.stopped) {
+      updateAgentInputButtonState(container);
+      return;
+    }
+    textarea.setAttribute("placeholder", "");
+    if (textarea.value) {
+      textarea.value = "";
+    }
+    updateAgentInputButtonState(container);
+    const record = {
+      container,
+      element: textarea,
+      pendingValue: "",
+      renderedValue: "",
+      stopped: false,
+      startTimer: null,
+      writeFrame: null,
+      typewriter: null,
+      handleFocus: null,
+      handlePointerDown: null,
+      handleInput: null
+    };
+    const queueValue = nextValue => {
+      record.pendingValue = nextValue;
+      if (record.writeFrame) {
+        return;
+      }
+      record.writeFrame = window.requestAnimationFrame(() => {
+        record.writeFrame = null;
+        if (record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        if (textarea.value !== record.pendingValue) {
+          textarea.value = record.pendingValue;
+        }
+        updateAgentInputButtonState(container);
+      });
+    };
+    const stopDemo = () => {
+      stopAgentInputTypewriter(textarea, {
+        placeholder,
+        clearDemo: true
+      });
+    };
+    record.handleFocus = stopDemo;
+    record.handlePointerDown = stopDemo;
+    record.handleInput = stopDemo;
+    registry.set(textarea, record);
+    textarea.addEventListener("focus", record.handleFocus, {
+      once: true
+    });
+    textarea.addEventListener("pointerdown", record.handlePointerDown, {
+      once: true
+    });
+    textarea.addEventListener("input", record.handleInput, {
+      once: true
+    });
+    record.startTimer = window.setTimeout(() => {
+      ensureAgentInputTypewriterCore().then(Typewriter => {
+        if (!Typewriter || record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        const typewriter = new Typewriter(null, {
+          loop: true,
+          delay: AGENT_INPUT_TYPING_SPEED,
+          deleteSpeed: AGENT_INPUT_DELETE_SPEED,
+          cursor: "",
+          skipAddStyles: true,
+          wrapperClassName: "",
+          cursorClassName: "",
+          onCreateTextNode: character => {
+            record.renderedValue += character;
+            queueValue(record.renderedValue);
+            return null;
+          },
+          onRemoveNode: () => {
+            record.renderedValue = record.renderedValue.slice(0, -1);
+            queueValue(record.renderedValue);
+          }
+        });
+        AGENT_INPUT_TYPEWRITER_PROMPTS.forEach(prompt => {
+          typewriter.typeString(prompt).pauseFor(AGENT_INPUT_PAUSE_AFTER).deleteAll(AGENT_INPUT_DELETE_SPEED).pauseFor(400);
+        });
+        record.typewriter = typewriter;
+        typewriter.start();
+      }).catch(() => {
+        stopAgentInputTypewriter(textarea, {
+          placeholder
+        });
+      });
+    }, AGENT_INPUT_START_DELAY);
+  };
+  if (typeof document !== "undefined" && !window.LZString) {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+    document.head.appendChild(script);
+  }
+  const placeholder = "Describe your idea, Replit will bring it to life...";
+  const outputTypes = [{
+    name: "Web",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clip-rule="evenodd" /><path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Animation",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Design",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" /><path fill-rule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20.53 5.47a.75.75 0 0 1 0 1.06l-11 11a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 1 1 1.06-1.06L9 15.94 19.47 5.47a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>';
+  if (typeof document !== "undefined" && !document.getElementById("agent-input-styles")) {
+    const style = document.createElement("style");
+    style.id = "agent-input-styles";
+    style.textContent = `
+      /* Theme variables - light mode */
+      [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #F6F6F4);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-border-default: var(--replit-docs-border, #DEDAD5);
+        --ai-border-strong: var(--replit-docs-border-strong, #CAC4BE);
+        --ai-text-secondary: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #858585);
+        --ai-text-primary: var(--replit-docs-text, #1D1D1D);
+        --ai-button-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-button-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-icon-default: var(--replit-docs-text-subtle, #858585);
+        --ai-icon-hover: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-shadow: 0 2px 6px #00000005;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-option-border: var(--replit-docs-border, #DEDAD5);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-pill-bg: #CDDCF1;
+        --ai-pill-text: var(--replit-docs-text-muted, #5C5C5C);
+      }
+
+      /* Theme variables - dark mode */
+      .dark [data-agent-input-container],
+      html.dark [data-agent-input-container],
+      [data-theme="dark"] [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #1E1E1F);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #222223);
+        --ai-border-default: var(--replit-docs-border, #39393D);
+        --ai-border-strong: var(--replit-docs-border-strong, #4A4A50);
+        --ai-text-secondary: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-text-primary: var(--replit-docs-text, #F5F5F5);
+        --ai-button-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-button-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --ai-icon-default: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-icon-hover: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-shadow: 0 2px 6px #00000020;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-option-border: var(--replit-docs-border, #39393D);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-pill-bg: #2A3A4D;
+        --ai-pill-text: #D0D8E4;
+      }
+
+      .agent-input-container {
+        box-sizing: border-box;
+      }
+
+      /* Entry animation */
+      @keyframes agent-input-fade-in-up {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      /* Hover state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:hover) [data-agent-input-role="inner"] {
+        border-color: #85C7FF !important;
+      }
+
+      /* Focus state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:focus-within) [data-agent-input-role="inner"] {
+        border-color: #0079F2 !important;
+      }
+
+      /* Icon button hover */
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-icon-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-icon-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-option-btn:not([data-selected="true"]):hover {
+          background: var(--ai-option-hover-bg);
+        }
+        [data-agent-input-container] .ai-plan-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-nav-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-pill-close:hover {
+          opacity: 0.7;
+        }
+      }
+      @keyframes plan-border-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      [data-agent-input-container] .ai-plan-wrap {
+        position: relative;
+        border-radius: 32px;
+        padding: 2px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-plan-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-plan-wrap .ai-plan-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        color: var(--ai-text-primary);
+        font-weight: 400;
+        border: none;
+        border-radius: 32px;
+        z-index: 1;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off::before {
+        animation: none;
+        background: transparent;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off .ai-plan-btn-highlight {
+        background: var(--ai-button-bg);
+        color: var(--ai-text-secondary);
+      }
+      /* Plan checkbox styles */
+      [data-agent-input-container] .ai-plan-checkbox-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: var(--border-radius-6, 6px);
+        background: var(--ai-button-bg);
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        color: var(--ai-text-secondary);
+        transition: background 120ms ease-out;
+        user-select: none;
+      }
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-plan-checkbox-label:hover {
+          background: var(--ai-button-bg-hover);
+        }
+      }
+      [data-agent-input-container] .ai-plan-checkbox-input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        accent-color: #0079F2;
+        cursor: pointer;
+      }
+      [data-agent-input-container] .ai-start-wrap {
+        position: relative;
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-start-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-start-wrap .ai-start-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        border: none;
+        border-radius: 6px;
+        z-index: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const getLink = (container, promptOverride) => {
+    if (typeof document === "undefined" || !window.LZString) return "";
+    const prompt = promptOverride || getAgentInputPromptValue(container);
+    if (!prompt) return "";
+    const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+    const utm = "utm_source=replit-docs&utm_medium=docs&utm_campaign=docs-intro-agent-input&utm_content=homepage-prompt-box";
+    return `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+  };
+  const handleStartClick = e => {
+    e.preventDefault();
+    const container = findAgentInputContainer(e.currentTarget);
+    const link = getLink(container);
+    if (link) window.open(link, "_blank");
+  };
+  const toggleOutputType = name => {
+    const btn = document.querySelector(`[data-option-name="${name}"]`);
+    const pillsContainer = document.getElementById("agent-input-pills");
+    if (!btn || !pillsContainer) return;
+    const isSelected = btn.dataset.selected === "true";
+    if (isSelected) {
+      btn.dataset.selected = "false";
+      btn.style.background = "var(--ai-option-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      const type = outputTypes.find(t => t.name === name);
+      if (iconEl && type) iconEl.innerHTML = type.iconSvg;
+      const pill = document.getElementById(`pill-${name}`);
+      if (pill) pill.remove();
+    } else {
+      document.querySelectorAll('[data-option-name][data-selected="true"]').forEach(prevBtn => {
+        const prevName = prevBtn.dataset.optionName;
+        prevBtn.dataset.selected = "false";
+        prevBtn.style.background = "var(--ai-option-bg)";
+        const prevIconEl = prevBtn.querySelector(".option-icon");
+        const prevType = outputTypes.find(t => t.name === prevName);
+        if (prevIconEl && prevType) prevIconEl.innerHTML = prevType.iconSvg;
+        const prevPill = document.getElementById(`pill-${prevName}`);
+        if (prevPill) prevPill.remove();
+      });
+      btn.dataset.selected = "true";
+      btn.style.background = "var(--ai-option-selected-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      if (iconEl) iconEl.innerHTML = checkSvg;
+      const type = outputTypes.find(t => t.name === name);
+      if (type) {
+        const pill = document.createElement("span");
+        pill.id = `pill-${name}`;
+        pill.style.cssText = "display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 8px;border-radius:32px;background:var(--ai-pill-bg);color:var(--ai-pill-text);font-size:14px;white-space:nowrap;cursor:default;";
+        pill.innerHTML = `<span style="display:flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">${type.iconSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}</svg></span><span>${name}</span><span class="ai-pill-close" style="display:flex;align-items:center;cursor:pointer;margin-left:2px" data-pill-remove="${name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12 5.7 16.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41Z"/></svg></span>`;
+        pill.querySelector(`[data-pill-remove="${name}"]`).addEventListener("click", () => toggleOutputType(name));
+        pillsContainer.appendChild(pill);
+      }
+    }
+  };
+  const PlusIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.25a.75.75 0 0 1 .75.75v6.25H19a.75.75 0 0 1 0 1.5h-6.25V19a.75.75 0 0 1-1.5 0v-6.25H5a.75.75 0 0 1 0-1.5h6.25V5a.75.75 0 0 1 .75-.75Z" />
+    </svg>;
+  const MicIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 9.25a.75.75 0 0 1 .75.75v2a7.75 7.75 0 0 1-7 7.713V22a.75.75 0 0 1-1.5 0v-2.287a7.75 7.75 0 0 1-6.99-7.328L4.25 12v-2a.75.75 0 0 1 1.5 0v2l.008.31A6.25 6.25 0 0 0 12 18.25l.31-.008a6.249 6.249 0 0 0 5.932-5.932l.008-.31v-2a.75.75 0 0 1 .75-.75Z" />
+      <path fillRule="evenodd" d="M12 1.25A3.75 3.75 0 0 1 15.75 5v7a3.75 3.75 0 1 1-7.5 0V5A3.75 3.75 0 0 1 12 1.25Zm0 1.5A2.25 2.25 0 0 0 9.75 5v7a2.25 2.25 0 0 0 4.5 0V5A2.25 2.25 0 0 0 12 2.75Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowUpIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 1 1-1.06 1.06l-5.72-5.72V19a.75.75 0 0 1-1.5 0V6.81l-5.72 5.72a.75.75 0 0 1-1.06-1.06l7-7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowLeftIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M4.47 11.47a.75.75 0 0 0 0 1.06l7 7a.75.75 0 1 0 1.06-1.06l-5.72-5.72H19a.75.75 0 0 0 0-1.5H6.81l5.72-5.72a.75.75 0 0 0-1.06-1.06l-7 7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowRightIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M19.53 11.47a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 1.06-1.06l7 7Z" clipRule="evenodd" />
+    </svg>;
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "28px",
+    height: "28px",
+    border: "none",
+    borderRadius: "6px",
+    background: "transparent",
+    cursor: "pointer",
+    color: "var(--ai-icon-default)",
+    padding: 0,
+    transition: "background 120ms ease-out"
+  };
+  const optionIconStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ai-option-border)",
+    borderRadius: "12px",
+    background: "var(--ai-option-bg)",
+    cursor: "pointer",
+    color: "var(--ai-text-secondary)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  const initAgentInput = container => {
+    if (!container) {
+      return;
+    }
+    updateAgentInputButtonState(container);
+    startAgentInputTypewriter(container, {
+      defaultPrompt,
+      placeholder,
+      showTypewriter
+    });
+    const ta = container.querySelector('[data-agent-input-role="textarea"]');
+    if (ta && ta.value) {
+      requestAnimationFrame(() => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+    }
+  };
+  return <div ref={initAgentInput} data-agent-input-container className="agent-input-container" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "734px",
+    alignSelf: "center",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "agent-input-fade-in-up 300ms ease-out forwards"
+  }}>
+      <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px"
+  }}>
+        {}
+        <div data-agent-input-role="inner" style={{
+    position: "relative",
+    borderRadius: "6px",
+    border: "1px solid var(--ai-border-strong)",
+    background: "var(--ai-surface-bg)",
+    transition: "border-color 120ms ease-out",
+    boxShadow: "var(--ai-shadow)"
+  }}>
+          {}
+          <div style={{
+    padding: "12px 12px 48px 12px"
+  }}>
+            <textarea data-agent-input-role="textarea" placeholder={placeholder} defaultValue={defaultPrompt} rows={1} onInput={e => {
+    const ta = e.currentTarget;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+    updateAgentInputButtonState(findAgentInputContainer(ta));
+  }} style={{
+    display: "block",
+    width: "100%",
+    minHeight: "21px",
+    maxHeight: "calc(14px * 1.5 * 10)",
+    padding: 0,
+    margin: 0,
+    border: "none",
+    outline: "none",
+    resize: "none",
+    fontSize: "14px",
+    lineHeight: "1.5",
+    color: "var(--ai-text-primary)",
+    background: "transparent",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    overflowY: "auto"
+  }} />
+          </div>
+          {}
+          <div style={{
+    position: "absolute",
+    left: "8px",
+    right: "8px",
+    bottom: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  }}>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    overflow: "hidden",
+    minWidth: 0
+  }}>
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Add attachment" type="button">
+                {PlusIcon}
+              </button>
+              <div id="agent-input-pills" data-agent-input-role="pills" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    overflow: "hidden"
+  }}></div>
+            </div>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flexShrink: 0
+  }}>
+              {highlightPlan ? <div className="ai-plan-wrap" onClick={e => {
+    const wrap = e.currentTarget;
+    wrap.classList.toggle("ai-plan-off");
+  }}>
+                  <label className="ai-plan-btn-highlight" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    height: "32px",
+    padding: "0 8px",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontFamily: "inherit",
+    transition: "background 120ms ease-out"
+  }}>
+                    <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" defaultChecked />
+                    <span>Plan</span>
+                  </label>
+                </div> : <label className="ai-plan-checkbox-label">
+                  <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" />
+                  <span>Plan</span>
+                </label>}
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Start voice input" type="button">
+                {MicIcon}
+              </button>
+              {highlightStart ? <div className="ai-start-wrap">
+                  <button data-agent-input-role="start-button" className="ai-icon-btn ai-start-btn-highlight" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    borderRadius: "6px",
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                    {ArrowUpIcon}
+                  </button>
+                </div> : <button data-agent-input-role="start-button" className="ai-icon-btn" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                  {ArrowUpIcon}
+                </button>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+<YouTubeEmbed videoId="bAUVQfz_SIY" title="Replit Agent 4 简介" />
+
+<div id="replit-agent">
+  ## 什么是 Replit Agent？
+</div>
+
+Agent 是您的创意伙伴。它能将您的想法打磨并变为现实。与只会回答问题的聊天机器人不同，Agent 会付诸行动：设置项目、创建应用、检查工作成果，并在过程中解决问题。
+
+只需用日常语言描述您想要的内容，无需编写代码或具备技术知识。Agent 会处理从规划到部署的所有工作。
+
+<div id="replit-agent-2">
+  ## 如何使用 Replit Agent
+</div>
+
+<div id="section">
+  ### 入门
+</div>
+
+<Steps>
+  <Step title="描述你的需求">
+    在[项目编辑器](/zh/ja/learn/projects-and-artifacts/project-editor)中开始对话。你可以描述想构建的应用、提出问题、研究主题，或从 BigQuery、Slack、Notion 等[已连接的服务](/zh/ja/features/agent/general-agent)中提取数据。没有限制，Replit Agent 都能帮你完成。
+
+    <AgentInput />
+  </Step>
+
+  <Step title="选择要构建的内容">
+    你也可以选择项目类型：Web 应用、移动应用、幻灯片、设计、数据可视化等。如果你已在第 1 步描述了需求，Agent 会自动确定合适的设置。
+
+    <AgentCarousel />
+  </Step>
+
+  <Step title="让 Agent 构建">
+    Agent 会编写代码、配置基础设施并测试结果。进入项目后，你可以切换 [Agent 模式](#agent-modes)，控制构建方式。
+  </Step>
+
+  <Step>
+    与 Agent 对话以改进项目，准备就绪后即可发布。所有产物都会一并部署。
+  </Step>
+</Steps>
+
+<Note>你不必局限于一种类型。可以从 Web 应用开始，之后再添加移动应用、幻灯片和视频，全部都在同一个项目中。</Note>
+
+<div id="plan">
+  ### Plan 模式
+</div>
+
+启用 Plan 模式，让 Agent 在修改代码或数据前进行头脑风暴、提出问题并梳理项目。在 Plan 模式下，Agent 会：
+
+* **拆解复杂项目**，创建有序的 task 列表
+* **探索不同方案**，评估各种权衡
+* **在编写代码前进行确认和完善**
+
+点击聊天输入框中的“Plan”，或直接让 Agent 切换到 Plan 模式。例如：“请为构建团队项目跟踪器制定计划”
+
+<AgentInput highlightPlan={true} showTypewriter={false} />
+
+Agent 会创建有序的 task 列表，供你确认和完善。对计划满意后，批准即可让 Agent 开始构建。
+
+<Frame>
+  <img src="/assets/mirror/task-accept-plans-d70b85ce3421.png" alt="显示四个建议 task，以及“批准 task”和“修改计划”选项的任务规划对话框" width="3430" height="1986" data-path="images/replitai/task-accept-plans.png" />
+</Frame>
+
+有关详细信息，请参阅 [Plan 模式指南](/zh/ja/features/agent/plan-mode)。
+
+<div id="agent">
+  ### Agent 模式
+</div>
+
+选择 Agent 构建项目的方式：
+
+<Frame caption="显示 Free、Power 和 Max 模式的 Agent 模式弹出菜单。">
+  <img src="/assets/mirror/model-selector-power-mode-52facbd1e206.png" alt="显示 Free、Power 和 Max 模式的 Agent 模式弹出菜单，其中选中了 Power，并显示主模型列表和 Effort 滑块" width="1452" height="966" data-path="images/replitai/model-selector-power-mode.png" />
+</Frame>
+
+* **Free Mode**：为 Core 和 Pro 订阅者免费提供日常 Agent 使用。额度每 5 小时重置一次，并设有每周上限。Starter 套餐保持现有上限。你可以在**设置 → 使用量**中查看使用情况。
+* **Power**：付费中档模式，以实惠的价格提供强大的模型。
+* **Max**：付费顶级模式，为最具挑战性的任务提供顶尖的前沿模型。在**高级设置**中，你还可以开启 **Turbo**，以获得更快的执行速度。
+
+对于超出 Free Mode 能力范围的请求，Agent 有时会提供付费的**仅此一次允许**选项。Replit 会在付费操作开始前要求你确认，之后 Agent 会返回 Free Mode。
+
+<Note>提示：你还可以启用 **[Plan 模式](/zh/ja/features/agent/plan-mode)**，在开始构建前查看并改进 Agent 的计划。</Note>
+
+<div id="replit-agent-3">
+  ## 可使用 Replit Agent 构建的内容
+</div>
+
+* **Web 应用、移动应用、数据控制台和 AI 驱动的工具**
+* **视觉设计和原型** — 在提交代码前，先在[设计 Canvas](/zh/ja/design/canvas)中探索设计稿
+* **一个项目中的多种输出** — 共享同一后端的 Web 应用、移动应用、幻灯片和视频
+* **文件和文档** — CSV、PDF、PowerPoint 文件和 Markdown 文档
+* **查询已连接的服务** — 直接在聊天中获取 BigQuery、Linear、Slack、Notion 等服务中的数据
+
+<Card title="立即开始构建" icon="arrow-up-right" href="https://replit.com">
+  描述你的想法，让 Agent 为你实现 — 无需设置。
+</Card>
+
+<div id="section-2">
+  ## 常见问题
+</div>
+
+<Accordion title="我需要会写代码吗？">
+  不需要。Agent 会处理所有技术工作：编写代码、配置基础设施和设置数据库。您只需用日常语言描述想要的内容，Agent 就会帮您构建。
+</Accordion>
+
+<Accordion title="Free、Power 和 Max 有什么区别？">
+  **Free Mode** 为 Core 和 Pro 订阅用户提供日常 Agent 工作，可在额度范围内免费使用。**Power** 是价格实惠的付费中档模式，可使用强大的模型。**Max** 是面向要求最严苛任务的付费顶级模式。**Turbo** 是高级设置中的可选开关，仅限 Max 使用。
+
+  付费操作需要在开始前确认。
+</Accordion>
+
+<Accordion title="我可以在一个项目中构建多个内容吗？">
+  可以。您可以将 Web 应用、移动应用、幻灯片、视频和数据可视化添加到[同一个项目](/zh/ja/features/projects-and-artifacts/artifacts#multiple-artifacts-in-one-project)中，它们会共享相同的后端和数据。
+</Accordion>
+
+<Accordion title="如果 Agent 出错了怎么办？">
+  Agent 会定期测试自己的工作。它还会在工作过程中创建检查点，因此您可以回滚到任何之前的状态。您可以与 Agent 聊天并说明问题所在，它会帮您修复。
+</Accordion>
+
+<div id="section-3">
+  ## 可用功能
+</div>
+
+| 功能          | Core | Pro |
+| ----------- | ---- | --- |
+| Agent 对话和构建 | ✅    | ✅   |
+| Free Mode   | ✅    | ✅   |
+| Power 模式    | ✅    | ✅   |
+| Max 模式      | ✅    | ✅   |
+| 设计 Canvas   | ✅    | ✅   |
+| 多产物         | ✅    | ✅   |
+| 同时运行的后台任务   | 1    | 10  |
+| Turbo       | ❌    | ✅   |
+
+Turbo 默认关闭。选择 Max 后，可在需要时针对各个项目启用。Free Mode 在发布时暂不适用于 Enterprise。Enterprise 工作区随后将很快获得专属的 Agent 体验。详情请咨询管理员。
+
+有关详细定价，请参阅 [Agent 计费](/zh/ja/billing/ai-billing#agent-billing)。
+
+<div id="section-4">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Agent 技能" icon="puzzle-piece" href="/zh/ja/features/agent/skills">
+    向 Agent 传授专业知识——使用预构建技能，或创建自己的技能。
+  </Card>
+
+  <Card title="task 系统" icon="list-check" href="/zh/ja/core-concepts/agent/task-system">
+    看板规划、后台 task，以及将更改应用到主版本。
+  </Card>
+
+  <Card title="设计 Canvas" icon="paintbrush" href="/zh/ja/design/canvas">
+    视觉模型和实用的可视化编辑器。
+  </Card>
+
+  <Card title="连接器" icon="plug" href="/zh/ja/features/agent/general-agent">
+    连接 BigQuery、Linear、Slack、Notion 等服务。
+  </Card>
+
+  <Card title="计费" icon="credit-card" href="/zh/ja/billing/ai-billing#agent-billing">
+    Agent 定价、套餐比较和支出管理。
+  </Card>
+
+  <Card title="氛围编程指南" icon="wand-magic-sparkles" href="/zh/ja/learn/build-with-agent">
+    使用 AI 的提示词和构建技巧。
+  </Card>
+</CardGroup>

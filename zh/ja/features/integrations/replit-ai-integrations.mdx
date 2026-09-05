@@ -1,0 +1,332 @@
+---
+title: "Replit AIインテグレーション"
+description: "了解如何无需准备 API 密钥，即可使用 OpenAI、Anthropic、Google 等服务提供的 AI 模型。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+借助 Replit AI 集成，轻松构建 AI 应用。立即使用 OpenAI、Anthropic、Google 和 OpenRouter 的模型，无需设置开发者账户或管理 API 密钥。一切均由 Replit 处理。
+
+<div id="replit-ai">
+  ## 什么是 Replit AI 集成？
+</div>
+
+Replit AI 集成为您提供对主流提供商 AI 模型的托管访问。您无需离开 Replit，即可构建聊天应用、内容生成器和 AI 驱动的工具。无需创建外部开发者账户、查找 API 凭据或管理单独的账单。
+
+使用 Replit AI 集成时，Replit 会管理提供商的 AI 凭据，并按公开 API 价格计费。使用量将从 Replit 积分中扣除，并在[使用情况页面](/zh/ja/billing/managing-spend)中按 Replit App 显示。
+
+<Note>
+  Replit AI 集成需要付费套餐 (Core、Pro 或 Enterprise) 。您可以在 [Starter 套餐](/zh/ja/billing/plans/starter-plan)中使用自己的 API 密钥构建 AI 应用。请参阅[套餐可用性](#plan-availability)。
+</Note>
+
+<div id="section">
+  ## 功能
+</div>
+
+Replit AI 集成通过内置访问和透明计费，简化 AI 开发：
+
+* **无需配置**：无需开发者账户或 API 密钥即可开始使用
+* **托管凭据**：Replit 负责提供商认证和凭据管理
+* **透明计费**：按公开 API 价格付费，费用从 Replit 积分中扣除
+* **使用量跟踪**：在使用情况页面查看每个 Replit App 的使用量
+* **跨技术栈支持**：支持所有编程语言和框架
+* **可选 BYOK**：如果想使用自己的凭据，也可以自带 API 密钥
+
+<div id="section-2">
+  ## 简介
+</div>
+
+<div id="replit">
+  ### 使用 Replit 托管的凭据
+</div>
+
+使用付费套餐时，如果你在提示词中提及 AI 功能或特定提供商 (OpenAI、Anthropic、Google 或 OpenRouter) ，Agent 默认会使用 Replit AI 集成：
+
+<AiPrompt>
+  创建一个使用 OpenAI 总结文章的 Web 应用
+</AiPrompt>
+
+你可以在首次提示词响应中查找**“OpenAI (由 Replit 管理) ”**、**“Anthropic (由 Replit 管理) ”**、**“Google (由 Replit 管理) ”**或**“OpenRouter (由 Replit 管理) ”**，以确认正在使用哪个集成。这表示 Agent 会使用 Replit 的凭据，而不是要求你提供自己的 API 密钥。
+
+**首次构建新应用时**：当你发送首个用于创建包含 AI 功能的新应用的提示词时，系统会自动匹配 Replit AI 集成。Agent 会立即使用托管凭据开始构建。
+
+**对于现有 Replit App**：如果 Agent 检测到你想向现有 Replit App 添加 AI 功能，会明确告知你将在项目编辑器中使用 Replit AI 集成。系统会显示确认提示：
+
+<Frame>
+  <img src="/assets/mirror/replit-ai-integrations-confirmation-msg-9440681ad7d3.png" alt="用于确认添加 OpenAI 集成的对话框，其中显示无需 API 密钥即可使用 Replit 托管服务的消息，以及拒绝和批准按钮" width="924" height="294" data-path="images/replitai/replit-ai-integrations-confirmation-msg.png" />
+</Frame>
+
+要继续使用 Replit 托管的凭据，请点击“批准”；如果要使用自己的 API 密钥，请点击“拒绝”。
+
+系统会自动跟踪使用量，并按公开 API 定价向你的 Replit 账户收费。
+
+<div id="api">
+  ### 使用自己的 API 密钥
+</div>
+
+如果您想使用 OpenAI、Anthropic、Google 或其他提供商的凭据，而不使用 Replit AI 集成，有以下几种方式：
+
+**首次构建新应用时**：在提示词中说明您想使用自己的 API 密钥：
+
+<AiPrompt>
+  创建一个使用 OpenAI 总结文章的 Web 应用。使用我自己的 OpenAI API 密钥。
+</AiPrompt>
+
+回复中会显示提供商名称 (而非“由 Replit 管理”) ，表示 Agent 会请求您的 API 密钥。
+
+**对于现有 Replit App**：当 Agent 提示将使用 Replit AI 集成并显示确认提示词时，请点击“拒绝”，而不是“批准”。
+
+无论哪种情况，Agent 都会先构建至第一个检查点，再请求 API 密钥。这样，Agent 可以先设置项目结构，并暂停以收集凭据，然后再继续。
+
+使用自己的 API 密钥时，费用将由提供商直接向您收取，而不是使用 Replit 积分。
+
+<div id="section-3">
+  ## 查看使用量
+</div>
+
+所有 Replit AI 集成 的使用量都会与其他 Replit 使用量一同显示在[使用情况页面](/zh/ja/billing/managing-spend)中。使用量会按 Replit App 列出明细，方便您准确了解 AI 支出的去向。
+
+<div id="section-4">
+  ## 支持的提供商
+</div>
+
+Replit AI 集成目前支持以下提供商：
+
+* **OpenAI**：支持文本生成、推理和音频的多模态模型。支持聊天补全、响应、图像生成、音频转录 (`gpt-4o-transcribe`、`gpt-4o-mini-transcribe`) 和音频输出 (`gpt-audio`、`gpt-audio-mini`) 。
+* **Anthropic**：支持推理、写作和编程的多模态模型。支持 Messages API 和网页搜索交互。
+* **Google (Gemini)&#x20;**：支持文本生成和推理的多模态模型。支持文本和图像生成。
+* **OpenRouter**：可访问 Microsoft (Phi 系列) 、Meta (Llama 系列) 、Mistral、Qwen、DeepSeek、Nvidia、Amazon 等提供商的模型。
+
+<Note>
+  Replit AI 集成支持**文本、图像和音频输出**，不支持视频输出。如需视频生成功能，你需要使用提供该功能的提供商提供的自有 API 密钥。
+</Note>
+
+<div id="section-5">
+  ## 可用模型
+</div>
+
+以下模型可通过按提供商分组的 Replit AI 集成使用。在应用中配置模型，或要求 Agent 使用特定模型进行构建时，请使用准确的模型名称。
+
+<div id="openai">
+  ### OpenAI
+</div>
+
+**文本与推理**
+
+* `gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.6-luna`
+* `gpt-5.5`
+* `gpt-5.4`、`gpt-5.4-mini`
+* `gpt-5.3-codex`
+* `gpt-5.2`、`gpt-5.2-codex`
+* `gpt-5.1`
+* `gpt-5`、`gpt-5-mini`、`gpt-5-nano`
+* `gpt-4.1`、`gpt-4.1-mini`、`gpt-4.1-nano`
+* `gpt-4o`、`gpt-4o-mini`
+* `o4-mini`
+* `o3`、`o3-mini`
+
+**图像生成**
+
+* `gpt-image-2`
+* `gpt-image-1`
+
+**音频输出**
+
+* `gpt-audio`
+* `gpt-audio-mini`
+
+**语音转文本 (转录)&#x20;**
+
+* `gpt-4o-transcribe`
+* `gpt-4o-mini-transcribe`
+
+<div id="anthropicclaude">
+  ### Anthropic (Claude)
+</div>
+
+* `claude-opus-5`
+* `claude-opus-4-8`
+* `claude-opus-4-7`
+* `claude-opus-4-6`
+* `claude-opus-4-5`
+* `claude-opus-4-1`
+* `claude-sonnet-4-6`
+* `claude-sonnet-4-5`
+* `claude-haiku-4-5`
+
+<div id="googlegemini">
+  ### Google (Gemini)
+</div>
+
+* `gemini-3.1-pro-preview`
+* `gemini-3-pro-preview`
+* `gemini-3-flash-preview`
+* `gemini-3-pro-image`
+* `gemini-3-pro-image-preview`
+* `gemini-2.5-pro`
+* `gemini-2.5-flash`
+* `gemini-2.5-flash-image`
+
+<div id="openrouter">
+  ### OpenRouter
+</div>
+
+OpenRouter 是一个直通网关，可访问 Meta、Mistral、DeepSeek、Qwen、Microsoft、Nvidia 和 Amazon 等提供商提供的 200 多种模型。模型目录会动态变化，请访问 [openrouter.ai/models](https://openrouter.ai/models) 查看最新列表。可用模型可能会因 Replit 针对你的套餐应用的[隐私设置](#openrouter-privacy-and-availability)而有所不同。
+
+<Note>
+  此列表反映发布时可用的模型，并会每两周自动更新一次以核对源配置。模型可用性可能会在两次更新之间发生变化。
+
+  **最后更新：** 2026 年 8 月 1 日
+</Note>
+
+<div id="openrouter-2">
+  ## OpenRouter 的隐私与可用性
+</div>
+
+通过 Replit AI 集成使用 OpenRouter 时，系统会采用特定的隐私设置发送请求，以保护你的数据。这些设置可能会影响可用的模型，因此了解它们非常重要。
+
+<div id="section-6">
+  ### 自助服务用户的隐私设置
+</div>
+
+对于个人和团队用户，Replit 会为 OpenRouter 请求设置以下默认隐私选项：
+
+* **禁用付费端点训练**：数据不会用于训练付费模型提供商的模型
+* **启用免费端点训练**：免费模型提供商可能会使用提示词和补全内容进行训练
+* **启用免费端点公开**：免费提供商可能会将提示词和补全内容发布到公开数据集
+* **禁用输入输出日志记录**：OpenRouter 不会记录请求和响应，因此无法享受 1% 的账单折扣
+* **禁用分析 Cookie**：不会使用分析 Cookie
+
+这些设置在优先保护隐私的同时，让你能够访问最广泛的模型。不过，需要使用与上述不同隐私设置的模型**可能无法使用**。
+
+<div id="enterprise">
+  ### Enterprise 隐私设置
+</div>
+
+对于 Enterprise 组织，Replit 会实施更严格的隐私控制：
+
+* **仅使用零数据保留 (ZDR) 端点**：仅可使用遵循零数据保留政策的模型
+* 同样适用上述面向自助服务用户的所有隐私设置
+* 这确保 Enterprise 请求仅会路由至不保留数据的端点
+
+由于 Enterprise 仅使用 ZDR 端点，与自助服务用户相比，**可选模型较为有限**。这一权衡可为企业工作负载提供最高级别的数据隐私保护。
+
+<div id="section-7">
+  ## 套餐可用性
+</div>
+
+Replit AI 集成需要付费套餐。具体访问方式因套餐而异。
+
+<div id="starter">
+  ### Starter (免费)
+</div>
+
+Starter 套餐不提供 Replit AI 集成。您可以使用自己的 API 密钥构建 AI 应用。请参阅[自带 API 密钥](#bringing-your-own-api-key)。
+
+<div id="core">
+  ### Core
+</div>
+
+使用 Core 套餐，你可以通过 Replit AI 集成，利用由 Replit 管理的凭据构建 AI 应用，无需管理 API 密钥。
+
+<div id="proenterprise">
+  ### Pro 和 Enterprise
+</div>
+
+对于 Pro 和 Enterprise 组织，Replit AI 集成默认处于禁用状态。组织管理员可以在组织设置页面中控制访问权限：
+
+1. 前往组织设置
+2. 找到 Replit AI 集成部分
+3. 开启或关闭组织的访问权限
+
+启用后，组织成员可以在应用中使用 Replit AI 集成。所有使用量都会被跟踪，并向组织账户收费。禁用后，成员需要提供自己的 API 密钥才能使用 AI 模型提供商。
+
+<div id="section-8">
+  ## 使用场景
+</div>
+
+使用任何技术栈构建强大的 AI 应用：
+
+* **内容生成**：文章摘要、描述生成和内容创作
+* **分析与洞察**：提取关键信息、情感分析和文本分类
+* **对话式界面**：构建聊天机器人和 AI 助手
+* **文本转换**：翻译、改写和格式化内容
+* **代码辅助**：生成代码片段、解释算法和审查代码
+
+<div id="section-9">
+  ## 常见问题
+</div>
+
+<AccordionGroup>
+  <Accordion title="与其他 Agent 集成相比，有何不同？">
+    其他 Agent 集成可让你连接外部服务或 API。Replit AI 集成则提供对 OpenAI、Anthropic、Google 和 OpenRouter 等 AI 模型提供商的托管访问，由 Replit 负责处理 AI 凭据和计费，让你可以立即开始构建。
+  </Accordion>
+
+  <Accordion title="我需要付费版 Replit 账户吗？">
+    是的。Replit AIインテグレーション可供付费用户使用。
+  </Accordion>
+
+  <Accordion title="有哪些可用模型？">
+    Replit AIインテグレーション支持来自主流 AI 提供商的模型：
+
+    |                |                                           |
+    | -------------- | ----------------------------------------- |
+    | **OpenAI**     | 用于文本生成、推理和图像生成的 GPT 模型                    |
+    | **Anthropic**  | 用于推理、写作和编程的 Claude 模型                     |
+    | **Google**     | 用于多模态理解的 Gemini 模型                        |
+    | **OpenRouter** | 来自 Meta、Mistral、DeepSeek、Qwen 等的 200 多种模型 |
+
+    <Tip>
+      如需查看按提供商分类的完整模型名称列表，请参阅[可用模型](#available-models)。如需查看 OpenRouter 的完整目录，请参阅 [OpenRouter 模型列表](https://openrouter.ai/models)。
+    </Tip>
+  </Accordion>
+
+  <Accordion title="费用是如何计算的？">
+    您将按提供商为公开 API 设定的价格付费。费用将从 Replit 积分中扣除，并显示在使用情况页面。
+  </Accordion>
+
+  <Accordion title="我可以使用自己的 API 密钥吗？">
+    是的，您可以使用 Replit 的 Secrets 提供自己的 API 密钥。使用自己的密钥时，费用将由服务提供商直接向您收取，而不是通过 Replit。
+  </Accordion>
+
+  <Accordion title="支持所有编程语言吗？">
+    是的。Replit AIインテグレーション支持 Replit 上的所有技术栈和编程语言。
+  </Accordion>
+
+  <Accordion title="为什么我的账户或组织无法使用此功能？">
+    Starter 方案不支持 Replit AI 集成——请升级到 Core 方案后使用，或使用自己的 API 密钥进行构建。Pro 和 Enterprise 方案出于安全与管理考虑，默认禁用此访问权限；组织管理员可在组织设置页面中启用。
+  </Accordion>
+
+  <Accordion title="如何判断是否正在使用 Replit AIインテグレーション？">
+    在 Agent 的回复中查找“OpenAI (由 Replit 管理) ”、“Anthropic (由 Replit 管理) ”、“Google (由 Replit 管理) ”或“OpenRouter (由 Replit 管理) ”。这表示您正在使用 Replit AI 集成。如果只显示提供商名称，没有“由 Replit 管理”，则 Agent 会要求您提供自己的 API 密钥。
+  </Accordion>
+
+  <Accordion title="使用 Replit AIインテグレーション 后会怎样？">
+    当您提及 AI 功能或特定提供商 (OpenAI、Anthropic、Google 或 OpenRouter) 时，Agent 默认会使用 Replit AI 集成。对于新 App，Agent 会立即使用 Replit 的凭据开始构建。对于现有 Replit App，Agent 会告知您它希望在项目编辑器中使用 Replit AI 集成，并显示确认提示。在这两种情况下，App 都可以向提供商发起 API 调用，使用量会被跟踪并计入您的 Replit 账户。
+  </Accordion>
+
+  <Accordion title="确认提示词会在何时显示？">
+    向现有 Replit App 添加 Replit AIインテグレーション时，会显示确认提示。Agent 会明确说明其请求使用的是 Replit AIインテグレーション，而不是你自己的 API 密钥。首次构建新 App 时，系统会自动匹配 Replit AIインテグレーション，无需弹出提示。
+  </Accordion>
+
+  <Accordion title="如果我想使用自己的 API 密钥，Agent 会在何时要求提供？">
+    Agent 会先构建到第一个检查点，再请求 API 密钥。这样，Agent 可以先设置项目结构，并暂停以收集凭据，然后再继续。
+  </Accordion>
+
+  <Accordion title="支持哪些类型的模型和输出？">
+    Replit AIインテグレーション 支持文本、图像和音频输出。音频功能包括使用 `gpt-4o-transcribe` 和 `gpt-4o-mini-transcribe` 进行转录 (语音转文本) ，以及使用 `gpt-audio` 和 `gpt-audio-mini` 生成音频。不支持视频输出。如果你的应用需要视频生成功能，Agent 会引导你使用提供此类功能的服务商的自有 API 密钥。
+  </Accordion>
+</AccordionGroup>

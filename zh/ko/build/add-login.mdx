@@ -1,0 +1,108 @@
+---
+title: "添加登录功能"
+description: "添加登录功能，让 Velocity 的每位客户只能查看自己的预订和已保存的车辆。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+完成后，每位 Velocity 客户都可以登录，并且只能查看自己的预订和已保存的车辆。
+
+<Frame>
+  <img src="/assets/mirror/home-signed-in-f795a14fee54.png" alt="登录后的 Velocity 首页——右上角页眉显示客户姓名，My bookings 部分显示一项即将到来的预订，下方显示一行已保存的车辆" width="100%" data-path="images/velocity/add-login/home-signed-in.png" />
+</Frame>
+
+您可能在[欢迎来到 Replit](/zh/ko/welcome)中见过 Velocity——一款高端超级跑车租赁应用。目前，任何访问公开 URL 的人都可以查看所有预订。没人会匿名预订兰博基尼。添加登录功能后，每位客户都会拥有自己的预订和已保存的车辆。
+
+<div id="agent">
+  ## 请求 Agent 添加登录功能
+</div>
+
+Velocity 使用 Clerk。Replit 的 Clerk 集成为应用提供品牌化登录页面、Velocity 内的客户账户 (而非 Replit 账户) ，并可完全掌控外观——非常适合高端租车品牌。Agent 会自动完成所有预配，无需注册 Clerk 控制台或粘贴密钥。
+
+<AiPrompt>
+  为 Velocity 添加登录功能，让每位客户都能查看自己的预订和已保存的车辆。<br />
+  使用 Clerk Auth。<br />
+  保持车辆浏览页面公开，让访客无需账户也能浏览车辆。<br />
+  预订车辆或保存收藏前，要求用户登录。<br />
+  登录后，在页眉显示客户姓名，并展示仅包含该客户预订的“My bookings”部分。<br />
+  添加退出登录按钮。<br />
+  请提供一份使用两位不同客户进行测试的检查清单。
+</AiPrompt>
+
+Agent 会为 Velocity 预配 Clerk 租户、添加登录组件、将身份验证应用于预订流程、将每项预订关联到已登录的客户，并添加退出登录功能。请在 Agent 聊天中查看构建过程。
+
+<Frame>
+  <img src="/assets/mirror/auth-modal-65f82eb6fafb.png" width="100%" data-path="images/velocity/add-login/auth-modal.png" />
+</Frame>
+
+<div id="section">
+  ## 使用两个客户账号进行测试
+</div>
+
+仅用一个账号还不够——需要两个账号才能证明预订数据彼此隔离。
+
+1. 在 Preview 中打开 Velocity，无需登录即可浏览车辆。你应该仍能看到车辆列表。
+2. 点击车辆上的 Reserve。你应该会进入 Clerk 登录页面。
+3. 使用自己的电子邮箱注册并完成预订 (例如预订一辆 911 过周末) 。
+4. 退出登录。“My bookings”部分应消失，预订流程也应再次要求你登录。
+5. 在无痕窗口中打开 Preview，并使用另一个电子邮箱注册。预订另一辆车。
+6. 返回第一个窗口并登录，确认你只能看到自己的预订，而看不到第二位客户的预订。
+
+如果两位客户可以看到彼此的预订，说明预订尚未关联到已登录的客户。请向 Agent 准确描述症状。
+
+<AiPrompt>
+  Velocity 中两位客户可以看到彼此的预订。<br />
+  请将每项预订和已保存的车辆关联到当前已登录的客户，让每个人只能看到自己的内容。<br />
+  请告诉我如何使用两个测试账号进行验证。
+</AiPrompt>
+
+<div id="url">
+  ## 重新部署并通过公开 URL 登录
+</div>
+
+在 Agent 聊天或 Publishing 磁贴中重新部署 Velocity，然后在新标签页中打开公开 URL 并登录。Clerk 会分别为开发环境和生产环境预配资源——Agent 会自动将生产凭据连接到已部署的应用，因此你可以直接通过公开 URL 登录。
+
+现在，Velocity 已有真实客户。每位客户都能登录自己的预订车库——其他人无法查看。
+
+<div id="section-2">
+  ## 后续改进
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加数据库" icon="database" href="/zh/ko/build/add-database">
+    让车辆、可用时间和预订信息在不同会话之间保留。
+  </Card>
+
+  <Card title="添加支付功能" icon="credit-card" href="/zh/ko/build/add-payments">
+    在客户预订车辆时收取可退还的押金。
+  </Card>
+</CardGroup>
+
+<div id="section-3">
+  ## 还需要帮助吗？
+</div>
+
+* **整个应用都被隐藏：**让 Agent 保持车辆浏览页面公开，仅保护预订和账户页面。
+* **客户可以看到彼此的预订：**让 Agent 将每笔预订和已保存的车辆与已登录的客户关联。
+* **登录在 Preview 中正常，但部署后无法使用：**在新标签页中打开公开 URL，并将具体错误告知 Agent。确认 Agent 是否已预配生产环境的 Clerk 环境。
+* **想为原型快速实现登录，无需配置：**Replit Auth 使用客户的 Replit 账户，无需 Clerk 租户 — 请参阅 [Replit Auth](/zh/ko/features/auth-and-identity/authentication)。
+
+<div id="section-4">
+  ## 相关文档
+</div>
+
+* [Clerk Auth](/zh/ko/features/auth-and-identity/clerk-auth)
+* [Replit Auth](/zh/ko/features/auth-and-identity/authentication)

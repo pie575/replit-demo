@@ -1,0 +1,218 @@
+---
+title: "Comment utiliser les Compétences Agent dans vos projets"
+description: "Découvrez comment les Compétences Agent élargissent les possibilités de création avec Replit Agent : ce qu’elles sont, comment les utiliser et comment les structurer pour obtenir de meilleurs résultats."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "Vidéo YouTube", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Les compétences permettent à Agent d’acquérir de nouvelles capacités. Elles vous permettent de partager avec lui votre expertise, vos pratiques privilégiées et vos connaissances spécialisées afin qu’il produise des résultats plus pertinents et cohérents.
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="Maîtrisez les compétences Agent : le cadre révolutionnaire pour le développement assisté par l’IA" />
+
+<div id="por-que-as-skills-importam">
+  ## Pourquoi les compétences sont importantes
+</div>
+
+Chaque fois que vous créez avec Agent, vous générez un contexte utile, comme des solutions à des problèmes, des décisions de design ou des préférences en matière de frameworks. Mais ce contexte disparaît lorsque le Chat se termine. Les compétences le préservent.
+
+Une compétence d’animation GSAP indique à Agent comment utiliser correctement une bibliothèque spécifique. Une compétence de système de design garantit qu’il applique vos couleurs et vos règles d’espacement précises. Une compétence de correction de bugs consigne une solution afin qu’Agent ne répète pas la même erreur. Des tâches auparavant incohérentes deviennent fiables.
+
+Les compétences constituent également un [standard ouvert](https://agentskills.io/specification). Elles fonctionnent avec n’importe quel agent, y compris Replit Agent, afin que vous puissiez les utiliser d’un outil à l’autre.
+
+<div id="incio-rpido-use-uma-skill-no-chat">
+  ## Démarrage rapide : utiliser une compétence dans le Chat
+</div>
+
+Le moyen le plus rapide d&#39;essayer les compétences est d&#39;en joindre une à un message :
+
+<Steps>
+  <Step title="Ouvrez le sélecteur de compétences">
+    Cliquez sur le bouton **+** à côté du champ de saisie du Chat, puis sélectionnez **Utiliser une compétence**.
+  </Step>
+
+  <Step title="Parcourez et sélectionnez une compétence">
+    Parcourez les compétences par catégorie : Affaires et finance, Créatif, Recherche et analyse, et bien d&#39;autres. Sélectionnez une ou plusieurs compétences à joindre à votre message.
+  </Step>
+
+  <Step title="Envoyez votre message">
+    Saisissez votre demande, puis envoyez-la. Agent utilise la compétence sélectionnée uniquement pour ce message. La pastille de la compétence s&#39;affiche dans votre message pour vous indiquer quelles compétences sont actives.
+  </Step>
+</Steps>
+
+Par exemple, sélectionnez **Analyseur d&#39;actions** et demandez à Agent de créer un rapport de recherche boursière, ou choisissez **Recherche approfondie** pour qu&#39;Agent explore un sujet complexe et en restitue les conclusions de façon structurée.
+
+<Tip>
+  Vous n&#39;avez rien à installer pour utiliser les compétences du sélecteur du Chat. Elles sont disponibles instantanément dans tous les projets.
+</Tip>
+
+<div id="instale-skills-no-seu-projeto">
+  ## Installez des compétences dans votre projet
+</div>
+
+Pour que l’Agent applique systématiquement une compétence dans toutes les conversations d’un projet, installez-la. Les compétences installées sont stockées dans le répertoire `/.agents/skills` de votre projet et sont conservées d’une session de chat à l’autre.
+
+<div id="descubra-e-instale-pelo-painel-de-skills">
+  ### Découvrez et installez des compétences depuis le panneau Skills
+</div>
+
+Ouvrez le **panneau Skills** dans l&#39;Éditeur de projets et sélectionnez l&#39;onglet **Découvrir** pour parcourir les compétences proposées par la communauté. Trouvez une compétence qui vous intéresse, cliquez sur **Installer** et elle sera automatiquement ajoutée à votre projet.
+
+<Frame>
+  <img src="/assets/mirror/agent-skills-discover-732b2b0c488a.png" alt="Onglet de découverte des compétences affichant les compétences proposées par la communauté avec des boutons d'installation" width="2542" height="1850" data-path="images/replitai/agent-skills-discover.png" />
+</Frame>
+
+Par exemple, si vous créez un [site portfolio](https://palmer.gg) avec des animations avancées, vous pouvez installer :
+
+* **GSAP React** — Apprend à Agent les animations déclenchées au défilement, les révélations de texte et le tracé de chemins SVG
+* **Tailwind design system** — Donne à Agent la maîtrise des motifs Tailwind CSS pour la typographie, l&#39;espacement et les transitions de vue
+* **Find skills** — Apprend à Agent à découvrir et installer de nouvelles compétences en votre nom
+
+<Tip>
+  Vous pouvez également installer des compétences via le [CLI npx skills](https://github.com/vercel-labs/skills) :
+
+  ```bash theme={null}
+  npx skills <skill> -a replit
+  ```
+</Tip>
+
+<div id="crie-skills-por-meio-de-conversas">
+  ### Créez des compétences au fil des conversations
+</div>
+
+Le moyen le plus naturel de créer une compétence est d’échanger avec l’Agent. Après avoir résolu un problème ensemble ou exploré une nouvelle bibliothèque, demandez à l’Agent de consigner ce qu’il a appris :
+
+<AiPrompt>
+  Recherchez les bonnes pratiques d’intégration de GSAP avec React et créez une compétence pour ce projet.
+</AiPrompt>
+
+L’Agent s’appuie sur l’ensemble du contexte de la conversation pour rédiger un fichier de compétence détaillé. Cette approche est particulièrement efficace après des sessions de débogage qui vous ont permis de mieux comprendre ensemble un problème.
+
+<div id="escreva-skills-personalizadas">
+  ### Rédiger des compétences personnalisées
+</div>
+
+Pour les cas d&#39;usage avancés, rédigez vos compétences directement en suivant la [spécification Compétences Agent](https://agentskills.io/specification). Activez **Afficher les fichiers cachés** dans la barre latérale des fichiers, ouvrez `/.agents/skills/` et créez un fichier Markdown. Vous gardez ainsi un contrôle total sur ce que sait Agent et sur la façon dont il se comporte.
+
+<div id="skills-proativas-vs-reativas">
+  ## Compétences proactives ou réactives
+</div>
+
+Voici un cadre de réflexion pour déterminer quand et comment créer des compétences. Comprendre ces deux approches vous rendra plus efficace.
+
+<div id="skills-proativas">
+  ### Compétences proactives
+</div>
+
+Les compétences proactives sont celles que vous ajoutez *avant* de commencer à développer. Vous vous renseignez sur les bibliothèques ou les patterns que vous souhaitez utiliser, vous trouvez ou créez les compétences correspondantes, puis vous commencez à rédiger vos prompts.
+
+**Exemple concret :** avant de créer un site portfolio avec des animations SVG dessinées à la main, vous explorez les bibliothèques d&#39;animation et vous trouvez GSAP. Vous installez une compétence GSAP React, puis vous demandez à Agent de créer les animations. Agent dispose dès le départ des connaissances spécialisées dont il a besoin : il comprend l&#39;API de la bibliothèque, les bonnes pratiques et les patterns courants. Sans cette compétence, il risque de produire quelque chose de générique ou d&#39;incorrect.
+
+Cette approche fonctionne bien lorsque :
+
+* Vous utilisez une bibliothèque populaire, mais dont les subtilités échappent parfois à Agent
+* Vous souhaitez des choix de design cohérents dans tout le projet (typographie, espacement, style d&#39;animation)
+* Vous démarrez un projet et connaissez déjà la direction technique
+
+<div id="skills-reativas">
+  ### Compétences réactives
+</div>
+
+Les compétences réactives sont celles que vous créez *après* avoir résolu un problème. Vous rencontrez un problème, vous le déboguez avec Agent, vous le corrigez, puis vous consignez la solution pour qu&#39;il ne se reproduise plus.
+
+**Exemple concret :** en créant un Canvas pour une application mobile, vous remarquez des contours irréguliers sur les images, qui s&#39;aggravent lorsque vous zoomez. Le débogage avec Agent révèle qu&#39;il s&#39;agit d&#39;un crénelage de minification — un problème de rendu où, de manière contre-intuitive, les images se dégradent à mesure qu&#39;elles rétrécissent. Après avoir implémenté un correctif, vous demandez à Agent de créer une compétence :
+
+<AiPrompt>
+  Create a skill that captures what we just learned about fixing minification aliasing. Include the root cause, the solution, and when this issue typically occurs so you can prevent it in the future.
+</AiPrompt>
+
+Agent s&#39;appuie sur l&#39;historique de la conversation pour rédiger une compétence propre au projet. La prochaine fois que le problème surviendra, vous pourrez renvoyer Agent à cette compétence au lieu de tout déboguer depuis le début.
+
+Ce modèle fonctionne bien lorsque :
+
+* Vous avez corrigé un bug peu évident et souhaitez éviter qu&#39;il se reproduise
+* Vous avez appris quelque chose sur l&#39;architecture de votre application au cours d&#39;une session de débogage
+* Vous voulez consigner une solution qui vous a demandé beaucoup d&#39;efforts à trouver
+
+<div id="seja-seletivo-com-as-skills">
+  ## Soyez sélectif avec les compétences
+</div>
+
+Considérez les compétences comme les indications que vous donneriez à un ami pour trouver votre appartement. Une liste d&#39;instructions ciblée est efficace. Un dossier rempli de documentation ne l&#39;est pas : personne n&#39;a le temps de tout lire, et les détails importants se perdent.
+
+Il en va de même pour Agent. Si vous ajoutez trop de compétences, Agent risque de s&#39;y perdre. Choisissez avec soin les compétences à activer pour un projet donné et supprimez celles qui ne sont plus nécessaires.
+
+<Note>
+  Les compétences sont plus efficaces lorsqu&#39;elles décrivent des modèles spécifiques et reproductibles plutôt que des recommandations générales. Concentrez-vous sur des flux de travail concrets, des conventions établies et des solutions éprouvées.
+</Note>
+
+<div id="consideraes-de-segurana">
+  ## Considérations de sécurité
+</div>
+
+Les compétences du panneau Skills de Replit font l&#39;objet d&#39;un audit de sécurité. Mais les compétences peuvent être installées depuis n&#39;importe où : elles proviennent d&#39;un [dépôt open source](https://github.com/vercel-labs/skills) auquel tout le monde peut contribuer.
+
+Comme les compétences sont des instructions que l&#39;Agent suit, une compétence malveillante pourrait lui faire exfiltrer des données sensibles de votre projet. Avant d&#39;installer une compétence issue d&#39;une source externe :
+
+1. **Ouvrez le fichier** — Les compétences ne sont que du markdown. Lisez le contenu dans `/.agents/skills/` avant de les utiliser.
+2. **Vérifiez la source** — Assurez-vous que la compétence provient d&#39;un dépôt ou d&#39;un auteur fiable.
+3. **Examinez ses instructions** — Vérifiez que la compétence ne renvoie pas vers des URL externes suspectes et ne demande pas d&#39;informations sensibles.
+
+<Warning>
+  Examinez toujours les compétences provenant de sources externes avant de les installer. Les compétences du panneau Skills de Replit ont été auditées, ce qui n&#39;est pas le cas de celles installées via la CLI ou copiées depuis internet.
+</Warning>
+
+<div id="skills-vs-servidores-mcp">
+  ## Compétences et serveurs MCP
+</div>
+
+Ce sont les deux principales façons d&#39;étendre les agents en 2026, et elles répondent à des besoins différents.
+
+**Les compétences** sont économes en contexte. Seule une brève description est chargée tant que la compétence n&#39;est pas invoquée. Utilisez les compétences pour :
+
+* Les flux de travail et les conventions (« comment déployer », « checklist de revue de code »)
+* Les documents de référence (normes d&#39;API, guides de style, systèmes de design)
+* Les prompts réutilisables et les connaissances spécialisées (bibliothèques d&#39;animation, modèles de frameworks)
+
+**Les serveurs MCP** sont gourmands en contexte. Toutes les descriptions d&#39;outils sont chargées d&#39;emblée, ce qui peut dégrader la qualité du résultat si vous en ajoutez trop. Utilisez les serveurs MCP pour :
+
+* La connexion à des services externes (Notion, Linear, Figma)
+* Les actions nécessitant un accès à une API
+* Les outils qui *font* des choses, et pas seulement qui donnent des instructions
+
+La distinction essentielle : les compétences définissent *comment* votre agent doit travailler. Les serveurs MCP définissent *ce à quoi* votre agent peut accéder. Les deux fonctionnent aussi bien pour les agents de codage comme Replit Agent que pour les agents que vous créez vous-même avec des outils tels que le [Claude Agent SDK](/fr/pt/tutorials/claude-agent-sdk).
+
+<div id="prximos-passos">
+  ## Prochaines étapes
+</div>
+
+* Consultez la [référence des Compétences Agent](/fr/pt/features/agent/skills) pour les détails techniques sur la structure et la gestion des compétences
+* Parcourez les compétences de la communauté sur [skills.sh](https://skills.sh)
+* Consultez la [spécification des Compétences Agent](https://agentskills.io/specification) pour rédiger les vôtres
+* Apprenez-en plus sur l&#39;[Agent](/fr/pt/features/agent/overview) et sur sa façon de créer des applications
+* Explorez les [serveurs MCP sur Replit](/fr/pt/features/mcp/overview) pour connecter l&#39;Agent à des services externes

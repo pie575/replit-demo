@@ -1,0 +1,220 @@
+---
+title: "外部访问令牌"
+description: "允许 CI 流水线、webhook 和其他自动化服务无需登录即可访问您的私有 Replit App。"
+---
+
+外部访问令牌是为特定 Replit App 创建的持有者令牌。
+它们允许 CI 流水线、webhook、运行时间状态检查器、Slack 机器人和内部脚本等自动化服务在您的 URL 受
+[私有开发 URL](/zh/pt/cloud-services/deployments/private-deployments)
+或 [Private Deployment](/zh/pt/cloud-services/deployments/private-deployments) 保护时访问该 App。
+
+请将每个令牌视为密码：任何持有该令牌的人都可以访问您的 App，直到令牌过期或被撤销。
+
+<Note>
+  外部访问令牌适用于 Replit Core 和 Pro 套餐。
+  Enterprise 客户必须先向 Replit 申请开通，才能为其
+  workspace 启用此功能。只有将 deployment 设为私有后，
+  令牌才会显示在部署设置中。
+</Note>
+
+<div id="quando-usar-um-token">
+  ## 何时使用令牌
+</div>
+
+当浏览器*之外*的某些程序需要调用你的私有 Replit App 时，请使用外部访问令牌。常见场景包括：
+
+* GitHub Actions 工作流在每次提交时对你的开发 URL 执行冒烟测试。
+* uptime 监控服务 (Better Stack、Pingdom、UptimeRobot) 访问已发布应用的健康检查端点。
+* webhook 接收方——Stripe、Slack、GitHub——向 Private Deployment 发送 POST 请求。
+* 调试时，团队成员从自己的机器发起的 `curl` 或 `fetch` 调用。
+
+外部访问令牌专为 **API 流量**设计，并非用于在浏览器中打开界面页面。单页应用 (Vite、Next.js 等) 会在后续请求中加载 JavaScript 包，而这些请求不会携带你的令牌，因此会失败。若需要交互式浏览，请正常登录。
+
+<div id="ambientes-de-tokens">
+  ## 令牌环境
+</div>
+
+每个令牌都与一个环境绑定：
+
+| 环境            | 生效范围                                       | 用途                         |
+| :------------ | :----------------------------------------- | :------------------------- |
+| `Development` | 应用 workspace 的开发 URL (`*.replit.dev`)      | 在开发过程中访问正在运行的 Repl         |
+| `Production`  | 应用已发布的 deployment (`*.replit.app` 及自定义域名)  | 从外部服务访问 Private Deployment |
+
+`Production` 令牌与*当前已发布的* deployment 绑定。如果你将应用重新发布到新的
+deployment，现有的生产环境令牌将失效，需要重新创建。
+
+<div id="criar-um-token-de-acesso-externo">
+  ## 创建外部访问令牌
+</div>
+
+<Steps>
+  <Step>
+    打开要公开访问的应用，然后打开 **Publishing** 工具。
+  </Step>
+
+  <Step>
+    选择 **Adjust settings**，展开重新发布选项。
+  </Step>
+
+  <Step>
+    在 **Security** 部分中，找到 **External access tokens**。
+  </Step>
+
+  <Step>
+    选择 **Create access token**，然后填写：
+
+    * **Label** (可选) ：用于日后识别令牌的简短名称，
+      例如 `CI` 或 `Stripe webhook`。最多 120 个字符。
+    * **Environment**：根据调用服务需要访问应用的环境，选择 `Development` 或 `Production`。
+    * **Expires after**：选择有效期：`1 hour`、`24 hours`、`7 days`、
+      `30 days`、`3 months`、`1 year` 或 `5 years`。请选择满足需求的最短
+      有效期。没有“永不过期”选项。
+  </Step>
+
+  <Step>
+    选择 **Create**。
+  </Step>
+</Steps>
+
+Replit **只会显示一次**令牌。请立即复制 — 关闭对话框后，便无法再次查看该令牌。如果丢失令牌，请撤销该令牌并创建新的令牌。
+
+显示页面提供两种复制方式：
+
+* **Copy query parameter** — 复制 `?project-protection-bypass=<token>`，
+  以便添加到 URL 中。适用于使用 `curl` 进行快速检查。
+* **Copy token only** — 复制原始令牌，适合在
+  `Authorization: Bearer` 标头中发送。
+
+<Info>
+  创建第一个令牌会自动为应用启用外部访问 (如果尚未启用) 。没有保护机制时，
+  令牌也就没有可绕过的内容。
+</Info>
+
+<div id="usar-um-token">
+  ## 使用令牌
+</div>
+
+可通过以下两种方式之一提供令牌：
+
+<div id="cabealho-authorization-recomendado">
+  ### Authorization 请求头 (推荐)
+</div>
+
+```bash theme={null}
+curl -H "Authorization: Bearer <token>" https://your-app.replit.app/health
+```
+
+几乎所有场景下，这都是正确的选择——Webhook、CI 脚本、后端到后端的调用。令牌绝不会出现在记录 URL 的日志中，也不会留在浏览器历史记录里。
+
+<div id="parmetro-de-consulta">
+  ### 查询参数
+</div>
+
+```bash theme={null}
+curl "https://your-app.replit.app/health?project-protection-bypass=<token>"
+```
+
+仅当无法设置请求头时才使用查询参数方式——例如某个服务只接受一个 URL。包含令牌的 URL 往往会残留在代理日志、Shell 历史记录和屏幕截图中，因此请尽可能优先使用请求头。
+
+<div id="gerenciar-tokens-existentes">
+  ## 管理现有令牌
+</div>
+
+**External access tokens** 部分会列出你为
+该 App 创建的所有令牌，按创建时间从新到旧排列，并显示其标签、环境、创建日期、
+有效期和撤销状态。每行都会显示令牌的最后几个字符，
+以便于区分，因为完整值仅在
+创建时显示。
+
+你只能看到由*你*创建的令牌。其他协作者创建的令牌仅对其本人可见，
+即使你是该 App 的所有者也不例外。
+
+<div id="revogar-um-token">
+  ## 撤销令牌
+</div>
+
+令牌不再需要时，或一旦怀疑其可能已泄露，请立即撤销。撤销步骤如下：
+
+<Steps>
+  <Step>
+    在应用的部署设置中打开 **External access tokens** 部分。
+  </Step>
+
+  <Step>
+    在列表中找到该令牌，然后点击垃圾桶图标。
+  </Step>
+
+  <Step>
+    确认撤销。
+  </Step>
+</Steps>
+
+撤销**立即生效且不可逆**。仍在使用该令牌的任何流量都会在数秒内开始被拒绝。如需重新获得访问权限，请创建新的令牌。
+
+你只能撤销自己创建的令牌。将协作者从 workspace 中移除后，其为该应用创建的令牌会被自动撤销。
+
+<div id="mantenha-seus-tokens-seguros">
+  ## 妥善保管你的令牌
+</div>
+
+外部访问令牌属于凭据，请像对待 API 密钥或密码一样谨慎处理。
+
+<div id="o-que-fazer">
+  ### 应该做什么
+</div>
+
+* **将令牌存储在 secrets 管理器中** —— GitHub Actions 的 secrets、你的 CI
+  厂商提供的保险库、云服务商的 secrets 存储，或者密码管理器。
+  切勿将它们提交到仓库中。
+* 尽可能**使用较短的有效期**。为一次性集成签发的 7 天令牌，
+  比一个长期搁置的 5 年期令牌安全得多。
+* **为每个令牌加上标签**，这样你才清楚它的用途以及是否仍在使用。没有标签的令牌往往最先泄露、最晚被撤销。
+* **为每个使用方单独创建一个令牌。** CI 作业一个、
+  webhook 来源一个、uptime 检查一个。一旦某处被攻破——或者
+  某个厂商不再需要时——你只需撤销对应的那一个。
+* **优先使用 `Authorization` 请求头**，而不是查询参数，以免令牌
+  通过 URL 日志、浏览器历史记录或引荐来源请求头泄露。
+* 一旦令牌可能已经暴露，就要**立即撤销**——泄露的日志、
+  提交到公开仓库、屏幕录制、离职员工的笔记本电脑，都属于此类情况。
+  撤销会立即生效；之后再创建替代令牌。
+
+<div id="o-que-no-fazer">
+  ### 不要这样做
+</div>
+
+* **不要在团队成员或服务之间共用同一个令牌。** 如果两个系统共用一个令牌，你就无法在撤销其中一个的同时不影响另一个。
+* **不要把令牌粘贴到聊天、电子邮件、截图或问题跟踪器中。**
+  这些渠道会被归档、索引，并以你无法预料的方式被分享。
+* **不要把令牌嵌入客户端代码中** —— 包括浏览器应用、移动应用、桌面二进制文件。任何分发到用户设备上的内容都应视为公开信息。
+* **不要依赖令牌来维持浏览器会话。** 令牌适用于 API 调用，
+  而不适用于在浏览器标签页中加载单页应用 (SPA) 。这种情况请使用正常的 Replit 登录。
+* **不要默认选择 5 年有效期。** 请按使用方实际需要访问的时长来设置令牌的有效期。
+
+<div id="soluo-de-problemas">
+  ## 故障排除
+</div>
+
+<Accordion title="我的生产环境令牌突然失效了">
+  生产环境令牌与特定已发布的 deployment 绑定。如果您重新发布了应用——例如更改 deployment 类型，或
+  删除并重新创建 deployment——现有的生产环境令牌将会
+  失效。请在新 deployment 的设置中创建新令牌。
+</Accordion>
+
+<Accordion title="我的令牌可用于 `curl`，但浏览器仍显示登录页面">
+  外部访问令牌适用于 API 流量，而非浏览器会话。单页应用在浏览器中加载时，初始 HTML 请求可能会通过查询参数传入令牌，但后续对 JavaScript 包、CSS 和 API 的请求不会包含该令牌，因此会被拒绝。要以交互方式使用应用，请照常登录 Replit。
+</Accordion>
+
+<Accordion title="我丢失了令牌——还能再次查看吗？">
+  不能。Replit 仅在创建令牌时显示一次。列表视图会显示
+  元数据 (标签、环境、有效期、末尾字符) ，但绝不会显示完整的令牌值。如果您丢失了令牌，请撤销该令牌并创建一个新令牌。
+</Accordion>
+
+<div id="prximas-etapas">
+  ## 后续步骤
+</div>
+
+* [Private Deployments](/zh/pt/cloud-services/deployments/private-deployments)：
+  这些令牌所绕过的底层访问控制功能。
+* [Replit App 访问管理](/zh/pt/teams/identity-and-access-management/repl-access-management)：
+  管理哪些 Replit 用户可以登录你的私有应用。

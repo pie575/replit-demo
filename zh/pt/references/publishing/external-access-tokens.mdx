@@ -1,0 +1,224 @@
+---
+title: "外部访问 token"
+description: "允许 CI 流水线、webhook 和其他自动化服务无需登录即可访问您的私有 Replit App。"
+---
+
+外部访问 token是为特定 Replit App 创建的持有者令牌。
+它们允许 CI 流水线、webhook、状态检查程序、Slack 机器人和内部脚本等自动化服务，即使应用的 URL 受到
+[私有开发 URL](/zh/pt/features/publishing/private-deployments)
+或[私有 deployment](/zh/pt/features/publishing/private-deployments)保护，也能访问该应用。
+
+请将每个令牌视为密码：任何持有令牌的人都可以访问您的应用，直至令牌过期或被撤销。
+
+<Note>
+  外部访问 token适用于 Replit Core 和 Pro 计划。
+  Enterprise 客户必须先向 Replit 申请启用此功能，才能在其 workspace 中使用。
+  只有将 deployment 设为私有后，令牌才会显示在发布设置中。
+</Note>
+
+<div id="quando-usar-um-token">
+  ## 何时使用 token
+</div>
+
+当浏览器*之外*的程序需要调用你的私有 Replit App 时，请使用外部访问 token。常见场景包括：
+
+* GitHub Actions 工作流在每次提交时对开发 URL 执行冒烟测试。
+* uptime 监控服务 (Better Stack、Pingdom、UptimeRobot) 访问已发布应用的健康检查端点。
+* webhook 接收方——Stripe、Slack、GitHub——向私有 Deployment 发送 POST 请求。
+* 调试时从队友的机器上发起的 `curl` 或 `fetch` 调用。
+
+外部访问 token 是为 **API 流量**设计的，并非用于在浏览器中打开界面页面。单页应用 (Vite、Next.js 等) 会在后续请求中加载 JavaScript 包，而这些请求不会携带你的 token，因此会失败。若需交互式浏览，请正常登录。
+
+<div id="ambientes-de-token">
+  ## token 环境
+</div>
+
+每个 token 都与一个环境绑定：
+
+| 环境            | 适用范围                                         | 用途                   |
+| :------------ | :------------------------------------------- | :------------------- |
+| `Development` | App Workspace 的开发 URL (`*.replit.dev`)       | 在开发期间访问正在运行的 Repl    |
+| `Production`  | App 已发布的 deployment (`*.replit.app` 和自定义域名)  | 从外部服务访问私有 Deployment |
+
+`Production` token 与*当前已发布的* deployment 绑定。如果您
+重新发布到新的 deployment，现有的生产 token 将失效，
+您需要创建新的 token。
+
+<div id="criar-um-token-de-acesso-externo">
+  ## 创建外部访问 token
+</div>
+
+<Steps>
+  <Step>
+    打开要开放访问的 app，然后打开 **Publishing** 工具。
+  </Step>
+
+  <Step>
+    选择 **Adjust settings**，展开重新部署选项。
+  </Step>
+
+  <Step>
+    在 **Security** 部分找到 **External access tokens**。
+  </Step>
+
+  <Step>
+    选择 **Create access token** 并填写：
+
+    * **Label** (可选) ：便于日后识别该 token 的简短名称，
+      例如 `CI` 或 `Stripe webhook`。最多 120 个字符。
+    * **Environment**：根据调用方服务需要访问 app 的环境，选择 `Development` 或 `Production`。
+    * **Expires after**：选择有效期——`1 hour`、`24 hours`、`7 days`、
+      `30 days`、`3 months`、`1 year` 或 `5 years`。请选择能满足需求的最短有效期。没有“永不过期”选项。
+  </Step>
+
+  <Step>
+    选择 **Create**。
+  </Step>
+</Steps>
+
+Replit 只会显示 token **一次**。请立即复制——关闭对话框后，
+就无法再次查看该 token。如果丢失，请撤销该 token 并重新创建一个。
+
+显示界面提供两种复制方式：
+
+* **Copy query parameter** —— 复制 `?project-protection-bypass=<token>`，
+  可直接附加到 URL 后面。适合用 `curl` 做快速验证。
+* **Copy token only** —— 复制原始 token，适合放在
+  `Authorization: Bearer` 请求头中发送。
+
+<Info>
+  如果 app 尚未启用外部访问，创建第一个 token 会自动为其启用。若没有保护，token 也就无从绕过。
+</Info>
+
+<div id="usar-um-token">
+  ## 使用 token
+</div>
+
+可通过以下两种方式之一提供 token：
+
+<div id="cabealho-authorization-recomendado">
+  ### Authorization 请求头 (推荐)
+</div>
+
+```bash theme={null}
+curl -H "Authorization: Bearer <token>" https://your-app.replit.app/health
+```
+
+对于几乎所有场景，这都是正确的选择——webhook、CI 脚本、后端之间的调用。token 永远不会出现在记录 URL 的日志中，也不会留在浏览器的历史记录里。
+
+<div id="query-parameter">
+  ### 查询参数
+</div>
+
+```bash theme={null}
+curl "https://your-app.replit.app/health?project-protection-bypass=<token>"
+```
+
+仅当无法设置请求头时才使用查询参数格式，例如某项服务仅接受 URL。带有 token 的 URL 往往会出现在代理 logs、Shell 历史记录和截图中，因此应尽可能优先使用请求头格式。
+
+<div id="gerenciar-tokens-existentes">
+  ## 管理现有 token
+</div>
+
+**External access tokens** 部分会按创建时间从新到旧列出你为该 App 创建的所有 token，并显示各自的标签、环境、创建日期、过期时间和吊销状态。每一行都会显示 token 的末尾几位字符，方便你区分不同的 token，因为完整值仅在创建时显示一次。
+
+你只能看到*自己*创建的 token。其他协作者的 token 仅对其本人可见，即使你是该 App 的所有者也无法查看。
+
+<div id="revogar-um-token">
+  ## 撤销 token
+</div>
+
+当某个 token 不再需要,或一旦怀疑它可能已泄露,请立即撤销。撤销步骤:
+
+<Steps>
+  <Step>
+    在 App 的部署设置中打开 **External access tokens** 部分。
+  </Step>
+
+  <Step>
+    在列表中找到该 token,然后点击垃圾桶图标。
+  </Step>
+
+  <Step>
+    确认撤销。
+  </Step>
+</Steps>
+
+撤销**立即生效且不可撤回**。仍在使用该 token 的流量会在几秒内被拒绝。如需重新获得访问权限,请创建新的 token。
+
+你只能撤销自己创建的 token。将某位协作者移出 workspace 后,系统会自动撤销其为该 App 创建的 token。
+
+<div id="mantenha-seus-tokens-seguros">
+  ## 妥善保管你的 token
+</div>
+
+外部访问 token 属于凭证，请像对待 API 密钥或密码一样谨慎处理。
+
+<div id="faa">
+  ### 应该做
+</div>
+
+* **将 token 存放在密钥管理工具中** —— GitHub Actions 的密钥、CI
+  厂商提供的保险库、云服务商的密钥存储库，或者密码管理器。
+  切勿将它们提交到代码仓库中。
+* **尽可能使用较短的有效期。** 一次性集成用 7 天有效期的 token，
+  远比一个长期闲置的 5 年期 token 安全。
+* **为每个 token 添加标签**，这样日后你才清楚它的用途，以及它是否仍在
+  使用中。没有标签的 token 往往最先泄露，也最晚被撤销。
+* **为每个使用方单独创建一个 token。** 每个 CI 任务一个，每个 webhook
+  来源一个，每项 uptime 检查一个。这样当某处被攻破——或者不再需要某个
+  厂商时——你只需撤销对应的那一个。
+* **优先使用 `Authorization` 请求头**，而不是查询参数，以免 token
+  通过 URL 日志、浏览器历史记录或引荐来源请求头泄露。
+* **一旦 token 可能已泄露，立即撤销** —— 比如日志外泄、
+  提交到公开仓库、屏幕共享，或是离职员工的笔记本电脑。
+  撤销立即生效；之后再创建替代的 token。
+
+<div id="no-faa">
+  ### 不要这样做
+</div>
+
+* **不要在同事或服务之间共用同一个 token。** 如果两个系统共用
+  一个 token，撤销其中一个必然会影响另一个。
+* **不要把 token 粘贴到 Chat、电子邮件、截图或问题追踪系统中。**
+  这些渠道会被归档、索引，并以难以预料的方式被传播。
+* **不要把 token 嵌入客户端代码** —— 浏览器 App、移动 App、
+  桌面二进制文件。凡是下发到用户设备上的内容,都应视为
+  公开信息。
+* **不要依赖 token 来维持浏览器会话。** token 适用于 API 调用,
+  而不是在浏览器标签页中加载单页应用;这类场景请使用常规的 Replit 登录。
+* **不要默认设置 5 年有效期。** 应根据使用方实际所需的访问
+  周期来设定有效期。
+
+<div id="soluo-de-problemas">
+  ## 故障排查
+</div>
+
+<Accordion title="我的生产 token 突然失效了">
+  生产 token 与特定的已发布 deployment 绑定。如果你重新发布了
+  app——例如更改了 deployment 类型，或者销毁并重建了 deployment——原有的生产 token 就会
+  失效。请在新 deployment 的设置中创建新的 token。
+</Accordion>
+
+<Accordion title="我的 token 在 `curl` 中可用，但浏览器仍然显示登录页面">
+  外部访问 token 面向的是 API 流量，而非
+  浏览器会话。当单页应用在浏览器中加载时，初始的 HTML 请求
+  可以通过 query parameter 携带 token，但后续加载
+  JavaScript 包、CSS 以及调用 API 的请求不会带上它，因而会被
+  拒绝。若要以交互方式浏览该 app，请照常登录 Replit。
+</Accordion>
+
+<Accordion title="我弄丢了 token——还能再查看吗？">
+  不能。Replit 只在创建时显示一次 token。列表中只会显示
+  元数据 (label、环境、过期时间、末尾几位字符) ，绝不会显示
+  完整的 token 值。如果你弄丢了它，请撤销该 token 并创建一个新的。
+</Accordion>
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+* [私有 Deployments](/zh/pt/features/publishing/private-deployments)：
+  这些 token 所绕过的底层访问控制功能。
+* [Replit App 访问管理](/zh/pt/teams/identity-and-access-management/repl-access-management)：
+  管理哪些 Replit 用户可以登录你的私有 App。

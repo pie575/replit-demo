@@ -1,0 +1,461 @@
+---
+title: "Databricks 连接器"
+description: "选择并设置 Databricks 连接器，让 Replit Agent 能够构建基于你的 Databricks 工作区的应用程序。"
+sidebarTitle: "Databricks"
+icon: "database"
+---
+
+<Info>
+  Databricks 连接器仅在 Enterprise 套餐中提供。
+</Info>
+
+<Frame>
+  <img src="/assets/mirror/templates-dropdown-zoom-9e06ca94568a.png" alt="Replit 主页的提示词输入框，Templates 下拉菜单已展开并显示 Databricks App 组织模板" width="1680" height="300" data-path="images/connectors/databricks/templates-dropdown-zoom.png" />
+</Frame>
+
+借助 Databricks 连接器，Replit Agent 可以查询你的 Databricks 工作区。构建者无需具备 SQL 专业知识，只需使用自然语言即可创建控制台、报表工具和数据应用。
+
+Replit 支持两种 Databricks 连接类型。请根据查询需要以哪个身份执行来选择。
+
+<div id="section">
+  ## 选择连接类型
+</div>
+
+|                | **User-to-machine (U2M)**            | **Service principal (M2M)**    |
+| -------------- | ------------------------------------ | ------------------------------ |
+| Replit 中的连接器名称 | Databricks for Databricks Apps (U2M) | Databricks (Service Principal) |
+| 执行查询的身份        | 各个构建者                                | 共享服务主体                         |
+| Databricks 权限  | 各构建者自身的 Unity Catalog 权限             | 服务主体的权限                        |
+| 审计归属           | 执行查询的构建者                             | 服务主体                           |
+| 构建者登录          | 每位构建者使用自己的 Databricks 账户登录           | 无需单独登录 Databricks              |
+| 最适用于           | 按用户区分权限与审计归属                         | 共享访问和非交互式工作流                   |
+
+<CardGroup cols={2}>
+  <Card title="设置用户到机器（U2M）" icon="user" href="#set-up-the-u2m-connector">
+    使用各构建者自身的 Databricks 身份、权限和审计归属。
+  </Card>
+
+  <Card title="设置服务主体（M2M）" icon="server" href="#set-up-the-service-principal-connector">
+    为已授权的构建者使用单一共享的 Databricks
+    身份和权限集。
+  </Card>
+</CardGroup>
+
+<div id="u2m">
+  ## 设置 U2M 连接器
+</div>
+
+U2M 的设置涉及三个角色：
+
+1. **Databricks 账户管理员**：创建 OAuth 应用连接，并提供 SQL 仓库的详细信息。
+2. **Replit 组织管理员**：使用 OAuth 凭据配置连接器。
+3. **构建者**：使用自己的 Databricks 账户登录，开始构建。
+
+<div id="u2m-2">
+  ### U2M 前提条件
+</div>
+
+开始之前，请确认以下事项：
+
+* 你是 Databricks 的**账户管理员**。应用连接需在账户控制台中配置，而不是在工作区管理设置中配置。
+* 你是 Replit 组织管理员。
+* 所有要使用该连接器的构建者均拥有 Databricks 账户。
+* 所有构建者均具备工作区访问权限，包括 SQL 仓库的 **Can use** 权限和所需的 Unity Catalog 权限。
+
+<div id="1oauth">
+  ### 步骤 1：创建 OAuth 应用连接
+</div>
+
+<Note>您必须是 Databricks 账户管理员才能完成此步骤。</Note>
+
+由 Databricks 账户管理员将 Replit 注册为 OAuth 应用程序。该应用连接会提供客户端 ID 和客户端 Secrets，用于配置 Replit。
+
+<Steps>
+  <Step title="打开 Databricks 账户控制台">
+    在 Databricks 工作区中，打开右上角的工作区选择器，然后选择 **Manage account**。
+
+    <Frame>
+      <img src="/assets/mirror/manage-account-6374ed6bf0f2.png" alt="显示 Manage account 的 Databricks 工作区选择器" width="2000" height="1144" data-path="images/connectors/databricks/u2m/manage-account.png" />
+    </Frame>
+  </Step>
+
+  <Step title="打开 App connections">
+    在账户控制台中选择 **Settings**，然后打开 **App connections** 标签页。
+
+    <Frame>
+      <img src="/assets/mirror/app-connections-96228e7f0f2e.png" alt="已选中 App connections 标签页并显示 Add connection 按钮的 Databricks 账户 Settings 页面" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-connections.png" />
+    </Frame>
+  </Step>
+
+  <Step title="配置 Replit 连接">
+    选择 **Add connection**。输入一个便于识别 Replit 的应用程序名称 (例如 `replit-u2m`) 。
+
+    在 **Redirect URLs** 中输入以下内容：
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    在 **Access scopes** 中选择 **All APIs**，这样 Agent 才能使用构建和管理 Databricks Apps 所需的 Databricks SQL 和 Databricks API。
+
+    选择 **Generate a client secret**。请注意，Databricks 不允许在连接创建后再添加 Secrets。
+
+    请按照组织的安全策略设置令牌有效期。本示例使用 Databricks 允许的最大值：**Access token TTL** 为 `1440` 分钟 (24 小时) ，**Refresh token TTL** 为 `129600` 分钟 (90 天) 。刷新令牌有效期越短，构建者需要登录的频率就越高。
+
+    选择 **Add**。
+
+    <Warning>
+      **All APIs** 授予的访问范围比单独的 SQL 更广。请通过各构建者自身的 Databricks 权限来控制连接器的实际访问范围。
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/app-configuration-6799b5769326.png" alt="已配置 Replit 应用程序名称、重定向 URL、All APIs 访问权限、生成客户端密钥和令牌有效期的 Databricks Add connection 表单" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-configuration.png" />
+    </Frame>
+  </Step>
+
+  <Step title="保存 OAuth 凭据">
+    复制 **Client ID** 和 **Client Secret**，并保存到组织的 Secrets 管理器中。
+
+    <Warning>
+      Databricks 只会显示一次客户端密钥。请记录其有效期，并在 Secrets 过期前轮换应用连接。
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/oauth-credentials-15b2e6c67309.png" alt="客户端 ID 和客户端密钥已被隐藏，并显示一次性 Secrets 警告和有效期的 Databricks Connection created 对话框" width="2000" height="1144" data-path="images/connectors/databricks/u2m/oauth-credentials.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Note>
+  新建或更新的 OAuth 应用连接最多可能需要 30 分钟才能生效。
+</Note>
+
+<div id="2sql">
+  ### 步骤 2：共享 SQL 仓库详情
+</div>
+
+每位构建者在授权 U2M 连接器时都需要填写 SQL 仓库的详情。请将这些值发布到构建者能够访问的位置，例如内部入门指引页面。
+
+<Steps>
+  <Step title="打开 SQL Warehouses">
+    在 Databricks 工作区中选择 **SQL Warehouses**，然后打开构建者要使用的仓库。
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="显示可用仓库的 Databricks SQL 仓库页面" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="复制连接详情">
+    选择 **Connection details**，复制 **Server hostname** 和 **HTTP path**。
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="显示服务器主机名和 HTTP 路径的 Databricks SQL 仓库连接详情页面" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="3replitu2m">
+  ### 步骤 3：在 Replit 中启用 U2M
+</div>
+
+<Note>配置连接器需要具备 Replit 组织管理员权限。</Note>
+
+<Steps>
+  <Step title="打开并启用 U2M 连接器">
+    在 Replit 账户主页依次打开 **Settings** 和 **Integrations**。搜索 `Databricks U2M`，找到 **Databricks for Databricks Apps (U2M)** 并选择 **Enable**。
+
+    输入 Databricks 应用连接的 **Client ID** 和 **Client Secret**。
+
+    确认 Replit 中显示的重定向 URL 与在 Databricks 中配置的 URL 一致。
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    在 **Connector Scopes** 中启用 `all-apis` 和 `offline_access`。借助 `offline_access` 作用域，Replit 可以获取用于长期会话的刷新令牌。
+
+    选择 **Configure**。
+
+    <Frame>
+      <img src="/assets/mirror/enable-connector-39c1eeebd230.png" alt="Replit 的 Integrations 设置中按 Databricks U2M 筛选后的启用面板，显示重定向 URL、OAuth 凭据字段和连接器作用域" width="2000" height="1144" data-path="images/connectors/databricks/u2m/enable-connector.png" />
+    </Frame>
+  </Step>
+
+  <Step title="确认连接器已启用">
+    确认 **Your integrations** 下显示 **Databricks for Databricks Apps (U2M)**。
+  </Step>
+</Steps>
+
+<div id="4">
+  ### 步骤 4：以构建者身份登录
+</div>
+
+每位构建者在使用连接器之前，都需要使用自己的 Databricks 账户登录。在刷新令牌过期之前，Replit 可以持续续订会话。
+
+<Steps>
+  <Step title="登录连接器">
+    在 **Integrations** 页面找到 **Databricks for Databricks Apps (U2M)**，然后选择 **Sign in**。确认连接详情后，选择 **Continue to Databricks for Databricks Apps**。
+
+    <Frame>
+      <img src="/assets/mirror/connect-modal-8ae2c2569658.png" alt="说明重定向、隐私和权限控制的 Connect Databricks for Databricks Apps 弹窗" width="2000" height="1144" data-path="images/connectors/databricks/u2m/connect-modal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="输入 SQL 仓库详情">
+    输入 Databricks 管理员提供的 SQL 仓库 **HTTP path**，然后选择 **Next**。
+
+    <Frame>
+      <img src="/assets/mirror/http-path-9e8a8a14b6ab.png" alt="共两步中的第一步，要求填写 SQL 仓库 HTTP 路径的 Connect Databricks for Databricks Apps 对话框" width="2000" height="1144" data-path="images/connectors/databricks/u2m/http-path.png" />
+    </Frame>
+
+    接下来，Replit 会要求填写 SQL 仓库的 **Server hostname**。填写后继续前往 Databricks。出现提示时登录，确认所请求的访问权限，然后批准该请求。
+
+    Agent 通过此连接执行的所有查询都会使用您的 Databricks 权限，并在 Databricks 审计日志中记录为您的操作。
+
+    批准后，Databricks 会跳转回 Replit，此时连接器即可使用。
+  </Step>
+</Steps>
+
+<div id="section-2">
+  ## 设置服务主体连接器
+</div>
+
+设置服务主体涉及三个角色：
+
+1. **Databricks 管理员**：在 Databricks 中创建服务主体并授予权限。
+2. **Replit 组织管理员**：在 Replit 中配置连接器和访问权限。
+3. **构建者**：使用共享的 Databricks 身份开始构建。
+
+<div id="section-3">
+  ### 服务主体的前提条件
+</div>
+
+开始之前，请确认以下事项：
+
+* 拥有 Databricks 账户管理员或工作区管理员权限。
+* 拥有 Replit 组织管理员权限。
+
+<div id="1databricks">
+  ### 步骤 1：在 Databricks 中创建服务主体
+</div>
+
+<Note>
+  要完成此步骤，你必须是 Databricks 账户管理员或工作区管理员。
+</Note>
+
+Databricks 管理员需创建一个机器对机器身份 (称为[服务主体](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)) ，Replit 将使用它连接到 Databricks。
+
+<Steps>
+  <Step title="打开设置">
+    在 Databricks 中，选择右上角的头像，然后选择 **Settings**。
+
+    <Frame>
+      <img src="/assets/mirror/settings-menu-8f2dcd4dbee3.png" alt="已选中 Settings 的 Databricks 工作区菜单" width="3438" height="1984" data-path="images/connectors/databricks/settings-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择身份与访问">
+    在 Settings 侧边栏中选择 **Identity and access**。
+
+    <Frame>
+      <img src="/assets/mirror/settings-page-2a8bcd7c22a4.png" alt="侧边栏中显示 Identity and access 的 Databricks 设置页面" width="3438" height="1984" data-path="images/connectors/databricks/settings-page.png" />
+    </Frame>
+  </Step>
+
+  <Step title="管理服务主体">
+    在 **Management and permissions** 下找到 **Service principals**，然后选择 **Manage**。
+
+    <Frame>
+      <img src="/assets/mirror/identity-and-access-0e79404ed30f.png" alt="显示 Service principals 的 Manage 按钮的身份与访问设置页面" width="3438" height="1984" data-path="images/connectors/databricks/identity-and-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="添加新的服务主体">
+    选择 **Add service principal**，然后选择 **Add new**。
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-ac5b52f21f4c.png" alt="带有 Add new 按钮的添加服务主体对话框" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="为服务主体命名">
+    为服务主体输入一个清晰易辨的名称，然后选择 **Add**。
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-name-897df9e5f7ac.png" alt="已输入服务主体名称的添加服务主体对话框" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal-name.png" />
+    </Frame>
+  </Step>
+
+  <Step title="确认服务主体的详细信息">
+    Databricks 创建服务主体后，确认其处于活动状态。如果在配置 Replit connector 时需要用到服务主体的详细信息，请让此页面保持打开。
+
+    <Frame>
+      <img src="/assets/mirror/service-principal-details-15a381d388bc.png" alt="Databricks 服务主体详情页面" width="3438" height="1984" data-path="images/connectors/databricks/service-principal-details.png" />
+    </Frame>
+  </Step>
+
+  <Step title="授予访问权限">
+    打开 **Permissions** 选项卡，选择 **Grant access**，选择该服务主体，将权限设置为 **Manage**，然后选择 **Save**。
+
+    <Frame>
+      <img src="/assets/mirror/grant-access-edbaa2541a7d.png" alt="已选择 Manage 权限的 Databricks 服务主体授予访问权限对话框" width="3438" height="1984" data-path="images/connectors/databricks/grant-access.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="2sql-2">
+  ### 步骤 2：获取 SQL 仓库的连接详情
+</div>
+
+Replit 连接器需要 Databricks SQL 仓库的连接详情，才能将查询路由到正确的计算资源。
+
+<Steps>
+  <Step title="打开 SQL 仓库">
+    在 Databricks 侧边栏中选择 **SQL Warehouses**。
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="显示可用仓库的 Databricks SQL 仓库页面" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择或创建仓库">
+    选择要让 Replit Agent 使用的 SQL 仓库。如果还没有仓库，请选择 **Create SQL warehouse** 新建一个。
+  </Step>
+
+  <Step title="复制连接详情">
+    打开该仓库并选择 **Connection details**，找到 **Server hostname** 和 **HTTP path** 的值。在 Replit 中创建 Databricks 连接器时需要用到这些值。
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="显示服务器主机名和 HTTP 路径的 Databricks SQL 仓库连接详情页面" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="3replitdatabricks">
+  ### 步骤 3：在 Replit 中创建 Databricks 连接器
+</div>
+
+<Note>配置连接器需要具备 Replit 组织管理员权限。</Note>
+
+Replit 管理员将 Databricks 的连接详情添加到 Replit 后，构建者即可使用该连接器。
+
+<Steps>
+  <Step title="前往 Integrations">
+    在 Replit 账户主页打开 **Integrations** 页面。在 **Connectors** 下找到 **Databricks (Service Principal)**，然后选择 **Sign in**。
+
+    <Frame>
+      <img src="/assets/mirror/integrations-databricks-signin-75d3367013da.png" alt="按 Databricks 筛选后的 Replit Integrations 页面，显示带有 Sign in 按钮的 Databricks (Service Principal) 连接器" width="3436" height="1978" data-path="images/connectors/databricks/integrations-databricks-signin.png" />
+    </Frame>
+  </Step>
+
+  <Step title="确认连接">
+    在重定向到 Databricks 进行认证之前，Replit 会显示一个确认对话框。确认相关信息后，选择 **Continue to Databricks**。
+
+    <Frame>
+      <img src="/assets/mirror/connect-databricks-intro-e842722d93ea.png" alt="说明 OAuth 重定向、数据使用和权限的 Databricks 连接对话框" width="3436" height="1978" data-path="images/connectors/databricks/connect-databricks-intro.png" />
+    </Frame>
+  </Step>
+
+  <Step title="输入 SQL 仓库的 HTTP 路径">
+    粘贴 Databricks SQL 仓库连接详情中的 **HTTP path** (例如 `/sql/1.0/warehouses/abcdef1234567890`) ，然后选择 **Next**。
+
+    <Frame>
+      <img src="/assets/mirror/connector-http-path-5c8ae35516f8.png" alt="要求填写 SQL 仓库 HTTP 路径的 Databricks 连接对话框第 1/2 步" width="3436" height="1978" data-path="images/connectors/databricks/connector-http-path.png" />
+    </Frame>
+  </Step>
+
+  <Step title="输入 SQL 仓库的服务器主机名">
+    粘贴同一连接详情中的 **Server hostname** (例如 `abc-12345678-wxyz.cloud.databricks.com`) ，然后选择 **Continue to Databricks** 完成认证。
+
+    <Frame>
+      <img src="/assets/mirror/connector-server-hostname-b97fb74713f1.png" alt="要求填写 SQL 仓库服务器主机名的 Databricks 连接对话框第 2/2 步" width="3436" height="1978" data-path="images/connectors/databricks/connector-server-hostname.png" />
+    </Frame>
+  </Step>
+
+  <Step title="配置访问权限">
+    使用基于角色的访问控制，选择组织内哪些成员或群组可以使用此连接器。
+  </Step>
+
+  <Step title="确认连接器处于活动状态">
+    返回 **Integrations** 页面，确认 **Databricks (Service Principal)** 显示在 **Connectors** 下，且连接状态为 **Active**。
+
+    <Frame>
+      <img src="/assets/mirror/integrations-page-d3e1d6b88376.png" alt="Replit Integrations 页面显示连接状态为 Active 的 Databricks (Service Principal) 连接器" width="1680" height="1199" data-path="images/connectors/databricks/integrations-page.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="agent">
+  ## 使用 Agent 构建
+</div>
+
+无论采用哪种方式完成连接，构建者都可以使用 Agent 创建基于 Databricks 数据的应用程序。
+
+<Steps>
+  <Step title="选择用于部署的 Databricks App 模板">
+    如果你希望将完成的应用部署到 Databricks 环境，请选择 **Databricks App** 模板。如果只是通过已配置的连接器访问 Databricks 的数据或资源，则无需使用此模板。
+
+    在 Replit 首页打开模板选择器，然后选择 **Databricks App**。
+
+    <Frame>
+      <img src="/assets/mirror/databricks-template-cdfbbba1a2ab.png" alt="Replit 首页，提示词输入框上方已选中 Databricks App 模板" width="1200" height="400" data-path="images/connectors/databricks/u2m/databricks-template.png" />
+    </Frame>
+  </Step>
+
+  <Step title="描述你的应用程序">
+    在预填的说明之后补充你的提示词。如需灵感，可参考 [Databricks Dev Hub 模板](https://www.databricks.com/devhub/templates)。
+  </Step>
+
+  <Step title="审查与迭代">
+    审查 Agent 生成的 SQL、查询的表以及应用程序结构。你可以用自然语言提出修改要求。
+  </Step>
+</Steps>
+
+<div id="section-4">
+  ## 故障排查
+</div>
+
+<AccordionGroup>
+  <Accordion title="查询返回空结果">
+    请检查执行查询的身份在 Databricks 中的权限：U2M 方式下是各个构建者，服务主体连接器方式下是共享的服务主体。该身份可能有权访问元数据，但没有读取数据的权限。请授予所需的目录、架构或表权限后重试。
+  </Accordion>
+
+  <Accordion title="连接器无法访问 SQL 仓库">
+    请确认 **Server hostname** 和 **HTTP path** 的值与 Databricks 中 SQL 仓库的
+    连接详情一致。若使用 U2M，请检查相应构建者
+    填写的值。同时确认仓库处于运行状态，且执行查询的
+    身份有权使用该仓库。
+  </Accordion>
+
+  <Accordion title="认证失败">
+    若使用 U2M，请确认 Databricks 应用连接的 **Redirect URLs** 中包含结尾不带斜杠的
+    `https://replit.com/connectors/oauth/callback`。
+    如果所有构建者都认证失败，请检查共享的 Client ID 和
+    Client Secret，确认 Secrets 未过期，
+    并确认 Replit 中的作用域与
+    Databricks 应用连接保持一致。
+
+    若使用服务主体连接器，请确认在 Replit 中填写的服务主体
+    信息与在 Databricks 中创建的服务主体一致。
+    如果凭据已轮换，请更新 Replit 中的连接器。
+  </Accordion>
+
+  <Accordion title="连接器反复要求重新登录">
+    当 U2M 的刷新令牌过期或被吊销时，可能会出现这种情况。
+    请重新完成 Databricks 的授权流程。如果构建者重新连接的频率
+    高于安全策略的要求，请检查
+    应用连接的令牌有效期设置。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-5">
+  ## 相关文档
+</div>
+
+* [数据仓库连接器概述](/zh/ja/connectors/warehouses/overview)：所有受支持的数据仓库连接器。
+* [连接到 Snowflake](/zh/ja/connectors/warehouses/snowflake)：Snowflake 的分步设置指南。
+* [管理连接器](/zh/ja/replitai/managing-connectors)：连接器的管理与配置。
+* [Databricks OAuth 用户到计算机 (U2M) 授权](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-u2m)：关于 U2M OAuth 的 Databricks 文档。
+* [在 Databricks 中启用自定义应用程序授权 (OAuth) ](https://docs.databricks.com/aws/en/integrations/enable-disable-oauth)：关于应用连接的 Databricks 文档。
+* [Databricks 服务主体](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)：关于服务主体的 Databricks 文档。
+* [Databricks SQL 仓库](https://docs.databricks.com/aws/en/compute/sql-warehouse/)：关于 SQL 仓库计算资源的 Databricks 文档。

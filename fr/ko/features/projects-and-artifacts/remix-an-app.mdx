@@ -1,0 +1,233 @@
+---
+title: "Remixer une application"
+description: "Créez votre propre copie d'une application Replit publique ou d'un modèle pour l'explorer, la personnaliser et développer dessus dans votre espace de travail."
+---
+
+export const RemixButton = ({replUrl = "https://replit.com/@sarahxli/Digital-Piano-Keys?v=1", label = "Remix this app", count = null}) => {
+  if (typeof document !== 'undefined' && !document.getElementById('remix-button-styles')) {
+    const style = document.createElement('style');
+    style.id = 'remix-button-styles';
+    style.textContent = `
+      /* Button container */
+      .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --btn-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --btn-text: var(--replit-docs-text, #1D1D1D);
+        --btn-border: var(--replit-docs-border, #DEDAD5);
+        --transition-duration: 120ms;
+        display: flex;
+        justify-content: center;
+      }
+
+      .dark .remix-btn-container,
+      html.dark .remix-btn-container,
+      [data-theme="dark"] .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-elevated, #222223);
+        --btn-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --btn-text: var(--replit-docs-text, #F5F5F5);
+        --btn-border: var(--replit-docs-border, #39393D);
+      }
+
+      /* Button base styles - matching template page exactly */
+      .remix-btn {
+        /* Layout */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        max-width: 400px;
+        min-width: 200px;
+        height: 36px;
+        padding: 0 16px;
+        gap: 8px;
+
+        /* Typography */
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5;
+        text-decoration: none;
+        white-space: nowrap;
+
+        /* Visual */
+        border-radius: 8px;
+        border: none;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        box-shadow: inset 0 0 0 1px var(--btn-border);
+
+        /* Interaction */
+        cursor: pointer;
+        user-select: none;
+        transition-property: background-color;
+        transition-duration: var(--transition-duration);
+        transition-timing-function: ease-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      /* Content (icon + label) - centered */
+      .remix-btn-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      /* Hover state */
+      @media (hover: hover) {
+        .remix-btn:hover {
+          background: var(--btn-bg-hover);
+        }
+      }
+
+      /* Active/pressed state */
+      .remix-btn:active {
+        background: var(--btn-bg-hover);
+        transform: scale(0.99);
+      }
+
+      /* Focus visible state */
+      .remix-btn:focus-visible {
+        outline: 2px solid #0079F2;
+        outline-offset: 2px;
+      }
+
+      /* Icon styles */
+      .remix-btn svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Label styles */
+      .remix-btn span {
+        font-weight: 600;
+      }
+
+      /* Animation */
+      @keyframes remix-btn-fade-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .remix-btn-container {
+        animation: remix-btn-fade-in 300ms ease-out;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleClick = e => {
+    e.preventDefault();
+    const url = replUrl.includes('replit.com') ? replUrl : `https://replit.com${replUrl}`;
+    window.open(url, '_blank');
+  };
+  const RemixIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMin">
+      <path d="M17.47 13.47a.75.75 0 0 1 1.06 0l4 4a.745.745 0 0 1 .118.16c.016.027.032.054.044.083.007.016.01.032.016.049a.744.744 0 0 1 .042.238.743.743 0 0 1-.037.223c-.007.02-.012.042-.02.062a.748.748 0 0 1-.163.245l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H15.95a4.753 4.753 0 0 1-3.886-2.09l-.351-.442a.75.75 0 0 1 1.172-.936l.36.45.04.055a3.251 3.251 0 0 0 2.68 1.463h4.224l-2.72-2.72a.75.75 0 0 1 0-1.06ZM17.47 1.47a.75.75 0 0 1 1.06 0l4 4a.756.756 0 0 1 .162.816.749.749 0 0 1-.162.244l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H16.02a3.25 3.25 0 0 0-2.674 1.372l-5.44 8.58a4.75 4.75 0 0 1-3.934 2.047L2 18.75a.75.75 0 0 1 0-1.5h1.979a3.25 3.25 0 0 0 2.673-1.373l5.442-8.578.02-.03a4.751 4.751 0 0 1 3.913-2.018l4.162-.001-2.72-2.72a.75.75 0 0 1 0-1.06ZM3.972 5.25a4.75 4.75 0 0 1 4.27 2.612.751.751 0 0 1-1.34.675 3.252 3.252 0 0 0-2.698-1.781l-.226-.006H2a.75.75 0 0 1 0-1.5h1.972Z" />
+    </svg>;
+  return <div className="remix-btn-container" style={{
+    margin: '16px 0'
+  }}>
+      <button onClick={handleClick} className="remix-btn" type="button" tabIndex={0}>
+        <RemixIcon />
+        <span>{label}</span>
+      </button>
+    </div>;
+};
+
+Les remixes vous permettent de partir d&#39;applications existantes créées par la communauté. C&#39;est plus rapide que de créer une application de A à Z et c&#39;est aussi un excellent moyen d&#39;apprendre à partir de code fonctionnel.
+
+<Tip>
+  Vous découvrez Replit ? Découvrez comment Agent fonctionne de A à Z avec [Créer votre première application](/fr/ko/build/your-first-app).
+</Tip>
+
+<div id="section">
+  ## Qu’est-ce qu’un remix ?
+</div>
+
+Un **remix** est une nouvelle application Replit créée à partir d’une application à laquelle vous avez accès. Lorsque vous remixez une application publique ou un modèle, vous obtenez votre propre copie, que vous pouvez modifier et améliorer de manière itérative. Les modifications apportées à un remix n’affectent pas l’application d’origine.
+
+Les remix indiquent leur source. Un lien **Remixed from** renvoie vers l’original, et le prompt de création d’origine apparaît sur la page de couverture.
+
+<div id="section-2">
+  ## Ce qu’inclut un remix
+</div>
+
+Un remix est une copie complète et fonctionnelle, clairement distincte de l’original :
+
+* **Tous les fichiers et toutes les configurations** sont copiés tels quels, afin que l’App fonctionne exactement comme l’originale.
+* **L’historique des points de contrôle de l’original** est également copié et s’affiche comme l’historique de l’App d’origine. Vous pouvez revenir à ces points de contrôle, mais la conversation qui les a créés reste dans l’original.
+* **Un Agent entièrement nouveau.** Un remix démarre avec un nouvel Agent qui n’hérite pas de l’historique des discussions précédentes.
+* **Les noms des secrets, mais pas leurs valeurs.** Si l’App utilise des secrets (par exemple, des clés API), le remix répertorie uniquement leurs noms afin que vous sachiez quelles valeurs renseigner, et les valeurs restent vides. Les valeurs sont copiées uniquement lorsque vous remixez une App qui vous appartient.
+* **Une nouvelle base de données.** Un remix n’est pas connecté à la base de données de l’original. Si l’original le permet, vous pouvez copier les données avec l’option **Copy data from original App**, mais même dans ce cas, les modifications n’affecteront pas l’original.
+* Pour les Apps utilisant Replit Auth, **de nouveaux paramètres de connexion**.
+
+Les déploiements, les domaines et les configurations de connecteurs ne sont pas copiés : vous devez les configurer directement dans votre propre copie. Les remixes sont également privés au départ ; rien n’est donc partagé tant que vous ne les publiez pas.
+
+<div id="section-3">
+  ## Comment remixer une application
+</div>
+
+<Steps>
+  <Step title="Ouvrir la page de couverture de l’application">
+    Trouvez l’application que vous souhaitez remixer. Vous pouvez également choisir une application dans la [communauté](https://replit.com/community/all). La page de couverture affiche un aperçu en direct et des options de partage.
+  </Step>
+
+  <Step title="Remixer l’application">
+    Sélectionnez **Remix this App** pour créer votre propre version.
+  </Step>
+
+  <Step title="Renseigner les informations de l’application">
+    Dans la boîte de dialogue **Remix App**, saisissez le nom de votre copie et, si vous le souhaitez, une description, puis sélectionnez **Remix App**. Vous pourrez modifier ces informations ultérieurement.
+
+    <Frame>
+      <img src="/assets/mirror/quickstart_remix_dialog-39c49a3d7bb7.png" alt="Boîte de dialogue Remix App affichant le nom de l’application, la description et les paramètres de confidentialité" width="1222" height="1202" data-path="images/getting-started/quickstart_remix_dialog.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Explorer votre copie">
+    Votre copie s’ouvre dans votre espace de travail et démarre automatiquement. Accédez à l’onglet **Preview** pour la voir s’exécuter.
+  </Step>
+</Steps>
+
+<div id="section-4">
+  ## Essayez vous-même
+</div>
+
+Créez un remix du modèle **Supercar showcase**, l’un des principaux modèles présentés dans [Commencer avec un modèle](/fr/ko/design/start-from-a-template) :
+
+<Frame>
+  <img src="/assets/mirror/supercar-showcase-0dac55fd5243.webp" alt="Couverture du modèle Supercar showcase — landing page sombre avec une supercar argentée en vedette" width="1920" height="1080" data-path="images/design/replit-design/templates/supercar-showcase.webp" />
+</Frame>
+
+<RemixButton replUrl="https://replit.com/t/replit-gallery/repls/Apex-01/view" label="Remixer cette app" />
+
+<div id="section-5">
+  ## Développer à partir de Remix
+</div>
+
+Lorsque Remix s’ouvre dans votre espace de travail, utilisez Agent pour le modifier et l’enrichir. Dans l’onglet **Agent**, saisissez un prompt décrivant les fonctionnalités que vous souhaitez ajouter.
+
+Pour annuler les modifications apportées par Agent, sélectionnez **Rollback to here** dans le checkpoint créé après ces modifications. Pour en savoir plus, consultez [Checkpoints et restaurations](/fr/ko/features/version-control/checkpoints-and-rollbacks).
+
+<div id="section-6">
+  ## Remixer ou créer avec un prompt ?
+</div>
+
+Les deux approches mènent au même résultat : votre propre application, que vous ferez évoluer avec l’aide d’Agent. Seule la manière de commencer diffère :
+
+|                         | Remixer                                            | Créer avec un prompt                                       |
+| ----------------------- | -------------------------------------------------- | ---------------------------------------------------------- |
+| Point de départ         | Une application fonctionnelle, copiée telle quelle | Une application créée par Agent à partir d’une description |
+| Premier résultat        | Immédiat et identique à l’original                 | Prend plus de temps et le résultat diffère                 |
+| Première action d’Agent | Attend vos instructions                            | Planifie et crée à partir du prompt                        |
+
+S’il existe déjà une application semblable à celle que vous souhaitez, remixez-la. La première tâche d’Agent portera ainsi sur une application qui fonctionne réellement, plutôt que sur une page vierge. Si votre idée n’existe nulle part ailleurs, créez-la avec un prompt.
+
+<div id="section-7">
+  ## Prochaines étapes
+</div>
+
+* **Découvrir d&#39;autres remixes** : parcourez la [communauté](https://replit.com/community/all) pour trouver des apps à remixer et sources d&#39;inspiration
+* **Créer à partir de zéro** : essayez de [créer votre propre app](/fr/ko/build/your-first-app) avec Agent pour comparer les deux expériences
+* **Publier pour autoriser le remix** : partagez votre version améliorée afin que d&#39;autres puissent continuer à développer à partir de votre travail

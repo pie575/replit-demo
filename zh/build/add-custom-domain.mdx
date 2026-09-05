@@ -1,0 +1,115 @@
+---
+title: "添加自定义域名"
+description: "将 Velocity 从 velocity.replit.app 迁移至 velocityrentals.com。"
+sidebarTitle: "添加自定义域名"
+icon: "globe"
+---
+
+import { YouTubeEmbed } from "/snippets/zh/shared-components.mdx";
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+完成后，Velocity 将使用 `velocityrentals.com`，而不再使用 `velocity.replit.app`。
+
+<YouTubeEmbed videoId="rGYdyb58wJY" />
+
+你已为 Velocity 添加了登录、数据库、支付和日历集成。现在，为它配置一个看起来像真实租赁品牌的网址。本指南将 Velocity 迁移到 `velocityrentals.com`——请将其替换为你拥有的任意域名。
+
+<div id="confirm-velocity-works-on-the-replit-url-first">
+  ## 先确认 Velocity 在 Replit URL 上正常运行
+</div>
+
+在公开的 `velocity.replit.app` URL 稳定可用之前，请勿更改任何内容。在新的浏览器标签页中打开该 URL，并确认：
+
+* 车队页面能正常加载。
+* 客户可以登录、预订车辆，并在刷新页面后看到预订信息。
+* Stripe 押金结账能正常打开，且使用测试卡可确认预订。
+* Google Calendar 事件会添加到预订客户的日历中。
+
+如果其中任何一项无法正常运行，请先修复，再修改 DNS。请参阅[排查发布问题](/zh/build/troubleshooting)。
+
+<div id="connect-velocityrentalscom-in-replit">
+  ## 在 Replit 中连接 velocityrentals.com
+</div>
+
+打开 Velocity 的 Publishing 设置，将 `velocityrentals.com` 添加为自定义域名。Replit 会显示两条 DNS 记录——请原样复制。
+
+<Frame>
+  <img src="/assets/mirror/dns-records-d64f183fa655.png" alt="Velocity 的 Publishing 设置中的 Replit 自定义域名对话框，已输入 velocityrentals.com，并显示可复制的两条 DNS 记录（一条 A 记录和一条 TXT 验证记录）" width="1280" height="720" data-path="images/velocity/add-custom-domain/dns-records.png" />
+</Frame>
+
+然后打开你的域名提供商 (Namecheap、Cloudflare、Google Domains、GoDaddy 等) 的控制面板，原样添加这些记录。如果你希望 Agent 针对你所用的具体提供商逐步指导：
+
+<AiPrompt>
+  我要把 Velocity 从 velocity.replit.app 迁移到 velocityrentals.com。我的域名注册在 [填写你的域名提供商]。<br />
+  请准确告诉我需要添加哪些 DNS 记录，以及添加的先后顺序。<br />
+  请使用 Replit 中显示的值——不要编造记录值。<br />
+  另外告诉我，在等待它生效之前，如何确认域名是否已连接成功。
+</AiPrompt>
+
+DNS 更改可能需要几分钟到几小时才能生效。一旦 Replit 检测到这些记录，就会在 `velocityrentals.com` 旁显示“Verified”。
+
+<div id="test-velocity-on-velocityrentalscom">
+  ## 在 velocityrentals.com 上测试 Velocity
+</div>
+
+当 Replit 显示域名已验证后：
+
+1. 在新的浏览器标签页中打开 `https://velocityrentals.com`。应该会出现绿色锁形图标——HTTPS 会自动配置。
+2. 以客户身份登录。登录应该依然正常 (Replit Auth 会自动处理新域名) 。
+3. 预订一辆车，刷新页面，确认预订记录仍然保留。
+4. 打开 Stripe 押金结账页面。页面现在应显示 `velocityrentals.com` 作为商家网址。
+5. 确认预订，并检查 Google Calendar 事件是否仍会出现在客户的日历中。
+
+如果登录、结账或日历集成仅在 `velocityrentals.com` 上出现异常，请把具体现象告诉 Agent：
+
+<AiPrompt>
+  Velocity 在 velocity.replit.app 上一切正常，但在 velocityrentals.com 上 [描述哪里出了问题]。<br />
+  告诉我问题出在 DNS、Replit 的设置，还是第三方身份提供方的设置里 (比如 Stripe 或 Google) 。<br />
+  给我最稳妥的下一步排查方法。
+</AiPrompt>
+
+现在 Velocity 已经跑在真正的租车品牌网址上了。把 `velocityrentals.com` 分享给客户吧——他们在任何地方都不会看到 &quot;replit.app&quot;。
+
+<div id="improve-it-next">
+  ## 下一步优化
+</div>
+
+<CardGroup cols={2}>
+  <Card title="排查发布问题" icon="triangle-exclamation" href="/zh/build/troubleshooting">
+    公开 URL 无法访问时，修复相关问题。
+  </Card>
+
+  <Card title="购买域名" icon="cart-shopping" href="/zh/build/domain-purchasing">
+    如果还没有 velocityrentals.com，可以通过 Replit 购买。
+  </Card>
+</CardGroup>
+
+<div id="need-further-help">
+  ## 需要进一步帮助？
+</div>
+
+* **`velocityrentals.com` 无法立即加载：** DNS 更改可能需要几个小时才能生效。请先等待一段时间再重新检查，之后再调整其他设置。
+* **Replit URL 可以访问，但自定义域名不行：** 仔细核对 DNS 记录是否与 Replit 显示的内容完全一致——常见错误包括末尾多了一个点、多加了一级子域名，或记录已过期。
+* **Stripe 结账 仍显示 `velocity.replit.app`：** 让 Agent 将 Stripe 重定向 URL 更新为 `velocityrentals.com`。
+* **你还没有域名：** 可以通过 Replit 购买一个——参见[购买域名](/zh/build/domain-purchasing)。
+
+<div id="related">
+  ## 相关内容
+</div>
+
+* [自定义域名](/zh/features/publishing/custom-domains)
+* [购买域名](/zh/build/domain-purchasing)

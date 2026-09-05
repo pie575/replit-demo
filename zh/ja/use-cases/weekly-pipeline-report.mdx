@@ -1,0 +1,152 @@
+---
+title: "生成每周销售报告"
+description: "每周查看 HubSpot 中销售管道的变化和趋势。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求你提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+从 HubSpot 获取本周销售管道数据，与上周对比后生成一份简短报告：新增商机、阶段变动、延迟商机和预测。将表格放入 Google Sheets，并将要点发布到 Slack，让站会围绕变化展开讨论，而非只是查看静态快照。
+
+<div id="section">
+  ## 推荐对象
+</div>
+
+* 需要了解实时动态，而非查看静态快照的销售经理。
+* 希望在一处掌握每周销售管道变化的营收运营人员。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{ id: "hubspot", name: "HubSpot", why: "商机、阶段和金额" },
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "可审计的趋势表",
+},
+{ id: "slack", name: "Slack", why: "推送报告" },
+]}
+/>
+
+<Note>同样适用于 Salesforce、Attio、Pipedrive 和其他 CRM。</Note>
+
+<div id="section-3">
+  ## 开始前
+</div>
+
+请连接 HubSpot、Sheets 和 Slack，并告知要包含哪些销售管道或团队。
+
+<div id="agent">
+  ## 给 Agent 的提示词
+</div>
+
+<AiPrompt>
+  请创建一个每周一上午 9 点运行的例行任务。从 HubSpot 获取本周的
+  销售管道数据。创建一份展示销售管道变化和趋势的每周
+  报告：新增商机、阶段变更、延迟商机，以及与上
+  周预测的对比。将表格放入 Google Sheets，并将要点发布到 Slack。
+</AiPrompt>
+
+<div id="section-4">
+  ## 您可以期待什么
+</div>
+
+Agent 会比较本周与上周的数据，并生成简短摘要和表格。请在 HubSpot 中核对几笔商机的金额。将 Slack 中的要点用于站会，并将表格留存作为审计记录。分别选择一笔新商机和一笔延期商机，在 HubSpot 中打开，确认其阶段、金额和预计成交日期与表格一致。
+
+<div id="section-5">
+  ## 自定义以满足您的需求
+</div>
+
+<AiPrompt>
+  突出显示金额超过 [金额] 且 14 天未开展活动的案件。
+</AiPrompt>
+
+<AiPrompt>
+  根据预计成交日期和近期活动添加“存在风险”部分。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排除
+</div>
+
+* **商机金额与 HubSpot 不一致：** 请说明要纳入哪些销售管道或团队，以及使用哪个金额字段 (金额还是加权预测) 。在以表格为准之前，请抽查几笔商机并与 HubSpot 核对。
+* **延迟商机看起来不对：** 请在 HubSpot 中检查预计成交日期和阶段。让 Agent 仅在预计成交日期推迟或阶段倒退时，将该商机标记为延迟。
+* **Slack 发布到了错误的位置：** 请指定频道名称，并说明是只显示要点，还是附上完整表格的链接。
+
+<div id="section-7">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="监控竞争对手" href="/zh/ja/use-cases/monitor-competitors">
+    在价格变动影响销售商机之前，向销售团队发送相同的 Slack 提醒。
+  </Card>
+
+  <Card title="创建投资者推介材料" href="/zh/ja/use-cases/pitch-deck-from-website">
+    面向需要制作投资者财务幻灯片的创始人，使用相同的 Google Sheets 数据源。
+  </Card>
+</CardGroup>

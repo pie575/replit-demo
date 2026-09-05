@@ -1,0 +1,180 @@
+---
+title: "Agent skills"
+description: "了解如何使用可复用的 skills 扩展 Agent，实现任务自动化并添加专门的功能。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+教会 Agent 按你的方式来构建。无论是开启新项目，还是继续推进已有的工作，skills 都能让你把自己的偏好、规范和专业经验传达给 Agent。
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="Agent Skills 概览" />
+
+<Frame>
+  <img src="/assets/mirror/agent-skills-pane-5a6e711bae55.png" alt="Agent 的 Skills 面板，显示已安装的 skills" width="3306" height="1994" data-path="images/replitai/agent-skills-pane.png" />
+</Frame>
+
+<div id="o-que-so-skills">
+  ## 什么是 skills
+</div>
+
+Skills 可让 Agent 了解您的工作方式。您与 Agent 共同构建时，会积累与项目相关的实用上下文，但这些上下文通常会在 Chat 结束后消失。Skills 会保留您学到的内容，让 Agent 能够持续一致地加以应用。原本表现不稳定的任务会变得更加可靠，每次都能取得更好的结果。
+
+例如，设计系统 skill 可确保 Agent 严格遵循您定义的颜色和间距规则。错误修复 skill 会记录解决方案，以便 Agent 下次还能记住这些解决方案。
+
+<div id="duas-formas-de-usar-skills">
+  ## 使用 skill 的两种方式
+</div>
+
+在 Agent 中使用 skill 有两种方式，取决于你希望 skill 仅对单条消息生效，还是对整个项目生效。
+
+<div id="usar-uma-skill-no-chat">
+  ### 在 Chat 中使用 skill
+</div>
+
+使用 skill 最快的方式是直接将其附加到消息中。点击 Chat 输入框旁的 **+** 按钮，选择 **Use a skill**，然后浏览可用类别。选择 skill 后，它会以标签形式附加到你的消息中。Agent 仅会在当前任务中使用该 skill，不会将其安装到你的项目中。
+
+当你希望 Agent 利用专业知识完成某项特定任务时，这种方式非常适合。例如，你可以选择 **股票分析器** skill，让 Agent 研究某项投资；或选择 **简历创建器** skill，创建一份精美的简历。
+
+skill 分为以下类别：
+
+| 类别        | skill 示例                         |
+| --------- | ---------------------------- |
+| **销售与营销** | 广告创意、AI SDR、SEO 审核员、内容机器     |
+| **职业发展**  | AI 招聘人员、简历创建器、面试准备           |
+| **研究与分析** | 竞争分析、深度研究、供应商研究              |
+| **商业与金融** | 股票分析器、发票生成器、房地产分析器           |
+| **文档与工具** | Excel 生成器、网站克隆器、文件转换器、抽认卡生成器 |
+| **创意**    | 照片编辑器、播客生成器、品牌创建器            |
+| **效率**    | AI 秘书、产品经理、设计思维者             |
+| **个人**    | 旅行助手、食谱创建器、膳食计划器、私人采购助手      |
+
+<Tip>
+  你也可以直接在消息中输入“use a skill 股票分析器” (或任何 skill 名称) ，无需打开 skill 选择器，Agent 也能理解你的请求。
+</Tip>
+
+<div id="instalar-uma-skill-no-seu-projeto">
+  ### 在项目中安装 skill
+</div>
+
+如果你希望 Agent 在某个项目的所有对话中都始终遵循某个 skill，可以将它安装到项目的 `/.agents/skills` 目录中。已安装的 skill 会在多次聊天会话之间持续保留，Agent 处理你的项目时随时都能使用。
+
+这种方式最适合项目专属的知识，例如你的设计系统、编码规范，或针对反复出现问题的解决方案。
+
+<div id="adicionando-skills-ao-seu-projeto">
+  ## 向项目添加 skills
+</div>
+
+有多种方式可以将 skill 永久添加到你的项目中。
+
+<div id="criar-com-o-agent">
+  ### 使用 Agent 创建
+</div>
+
+创建 skill 最自然的方式就是通过对话。当你和 Agent 一起解决完某个问题后，让它把学到的内容记录下来。skill 便会基于你们共享的上下文自动成形。
+
+```
+使用这些配色方案和间距规则，为我的设计系统创建一个 skill
+```
+
+你也可以让 Agent 针对新领域进行调研并创建 skill：
+
+```
+研究使用 Remotion 生成视频的最佳实践，并创建一个 skill
+```
+
+<div id="descobrir-e-instalar-no-painel-de-skills">
+  ### 在 Skills 面板中发现并安装
+</div>
+
+在项目编辑器中打开 **Skills 面板**，选择 **发现** 标签页以查找社区贡献的 skills。你可以按名称浏览、按关键词搜索，并只需点击一下即可将任意 skill 直接安装到项目中。
+
+<Frame>
+  <img src="/assets/mirror/agent-skills-discover-732b2b0c488a.png" alt="Skills 发现标签页，显示可搜索的社区贡献 skills 及安装按钮" width="2542" height="1850" data-path="images/replitai/agent-skills-discover.png" />
+</Frame>
+
+Skills 面板还会显示当前已安装在项目中的所有 skills。你可以在此启用或禁用单个 skill，并移除不再需要的 skill。
+
+<Frame>
+  <img src="/assets/mirror/agent-skills-pane-5a6e711bae55.png" alt="显示已安装 skills 的 Agent Skills 面板" width="3306" height="1994" data-path="images/replitai/agent-skills-pane.png" />
+</Frame>
+
+<div id="instalar-pelo-diretrio-de-skills">
+  ### 从 skill 目录安装
+</div>
+
+[Agent Skills 目录](https://skills.sh)收录了由社区贡献的 skills，你可以直接安装。Replit 支持通过 [npx skills CLI](https://github.com/vercel-labs/skills) 安装：
+
+```bash theme={null}
+npx skills <skill> -a replit
+```
+
+这会将该 skill 安装到项目的 `/.agents/skills` 目录中。
+
+<Warning>
+  skills 可能包含任意内容和代码。从外部来源安装 skill 之前，请务必先审查其源代码。
+</Warning>
+
+<div id="como-as-skills-funcionam">
+  ## skills 的工作方式
+</div>
+
+skills 存储在项目的 `/.agents/skills` 目录中。每个 skill 都遵循 [Agent Skills 规范](https://agentskills.io/specification)，该规范定义了 skill 文件的结构和格式。
+
+Agent 可以看到每个已安装 skill 的名称和描述，但仅当 skill 与当前任务相关时才会加载其完整内容。这样可保持轻量——你可以安装许多 skills，而不会拖慢 Agent。
+
+已安装的 skills 会保留在项目中，因此在不同的 Agent 会话之间仍可使用，也可以提交到版本控制系统中与团队共享。
+
+skills 可以有不同的作用范围：
+
+* **项目级**：专用于某个项目，并与项目文件一起在 `/.agents/skills` 中进行版本控制
+* **用户级**：可在所有项目中使用的个人工具集
+* **Enterprise**：嵌入[自定义模板](/zh/pt/teams/custom-templates)中的全公司标准，这些模板会固定在组织的 Agent 入口处
+
+<Note>
+  skills 最适合用于沉淀具体且可重复的模式，而非
+  通用指南。请专注于项目中具体的工作流程、既定约定和
+  经验证的解决方案。
+</Note>
+
+<div id="trabalhando-com-outras-ferramentas-de-codificao-com-ia">
+  ## 与其他 AI 编程工具配合使用
+</div>
+
+<Accordion title="从其他 AI 编程工具导入 skills">
+  如果你同时使用多种 AI 编程工具，[rulesync](https://github.com/dyoshikawa/rulesync) 支持 Replit，可以帮助你保持配置一致。
+
+  你可以从其他 AI 编程助手导入 skills：
+
+  ```bash theme={null}
+  npx rulesync init
+  npx rulesync import --targets claudecode --features skills
+  npx rulesync generate --targets replit --features skills
+  ```
+
+  这样你只需维护一套 skills，即可在不同的开发环境中通用。
+</Accordion>
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+Skills 可通过添加项目专属知识来扩展 Agent 的核心能力：
+
+* 阅读 [Agent Skills 教程](/zh/pt/tutorials/agent-skills)，获取包含示例的实用指南
+* 详细了解 [Agent](/zh/pt/core-concepts/agent) 及其构建应用的方式
+* 探索 Replit 提供的其他 [AI 功能](/zh/pt/build/welcome)
+* 查阅 [Agent Skills 规范](https://agentskills.io/specification)，了解 skills 的结构
+* 如需查看自定义 skills 示例，请参阅 [Anthropic skills 仓库](https://github.com/anthropics/skills)
+* 在 [skills.sh](https://skills.sh) 浏览社区 skills
+* **Enterprise**：了解如何在组织的[自定义模板](/zh/pt/teams/custom-templates)和[设计系统](/zh/pt/teams/custom-design-system)中加入 skills

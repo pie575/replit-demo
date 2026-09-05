@@ -1,0 +1,101 @@
+---
+title: "Ajouter la connexion"
+description: "Permettez aux joueurs de se connecter à PixelGames avec Clerk."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const loginPrompt = "Ajoutez la connexion à PixelGames avec Clerk. Tout le monde peut toujours jouer sans compte ; la connexion est réservée aux joueurs qui souhaitent en avoir un.";
+export const appleSignInPrompt = "Ajoutez la connexion avec Apple à PixelGames, mais affichez-la uniquement sur iOS. Conservez la version Android avec l'e-mail et Google uniquement.";
+
+Même s’il n’y a encore rien à enregistrer, ajoutez dès maintenant une fonctionnalité de connexion à PixelGames. Lorsque les joueurs disposent d’un compte, vous pourrez y associer ultérieurement les meilleurs scores, les jeux déverrouillés et tout ce que vous créerez ensuite.
+
+Pour la connexion, utilisez l’intégration native de Replit, [Clerk Auth](/fr/features/auth-and-identity/clerk-auth). Agent la provisionne automatiquement et fournit un écran de connexion personnalisé aux couleurs de PixelGames.
+
+<AiPrompt>
+  {loginPrompt}
+</AiPrompt>
+
+<Frame caption="Écran de connexion Clerk de PixelGames, avec e-mail ou Google.">
+  <img src="/assets/mirror/mobile-signin-2b3700144e02.png" alt="Fenêtre modale de connexion PixelGames avec « Continue with email » et « Continue with Google »" data-path="images/pixelgames/mobile/mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/mobile-signin.png" />
+</Frame>
+
+<div id="sign-in-with-apple">
+  ## Ajouter Sign in with Apple
+</div>
+
+Lors de la validation sur l&#39;App Store, Apple exige que **Sign in with Apple** soit proposé comme
+option équivalente dès lors que d&#39;autres connexions sociales, comme Google, sont disponibles — mais
+uniquement sur iOS. Android n&#39;impose pas cette exigence.
+
+<AiPrompt>
+  {appleSignInPrompt}
+</AiPrompt>
+
+<Frame caption="Sign in with Apple ajouté aux côtés de l'e-mail et de Google, sur iOS uniquement.">
+  <img src="/assets/mirror/apple-mobile-signin-2eee321f670f.png" alt="Modale de connexion PixelGames avec Continue with Apple ajouté au-dessus de Continue with Google" data-path="images/pixelgames/mobile/apple-mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/apple-mobile-signin.png" />
+</Frame>
+
+<div id="section">
+  ## Activer les fournisseurs
+</div>
+
+Ajouter des fournisseurs dans le code ne suffit pas : vous devez également les activer dans les paramètres d’authentification de l’application. Ouvrez **Users &amp; Auth → Configure → SSO providers → Production** et vérifiez que **Google** et **Apple** sont tous deux indiqués comme Enabled.
+
+<Frame caption="Google et Apple sont activés dans les fournisseurs SSO de l’environnement Production.">
+  <img src="/assets/mirror/sso-provider-0547c43ad601.png" alt="Panneau Replit Users and Auth affichant les fournisseurs SSO Google et Apple activés" data-path="images/pixelgames/mobile/sso-provider.png" width="1266" height="502" data-path="images/pixelgames/mobile/sso-provider.png" />
+</Frame>
+
+<Note>
+  **Development** et **Production** disposent chacun d’une liste distincte de fournisseurs. Activer l’un n’active pas l’autre ; vérifiez donc Production avant de publier.
+</Note>
+
+<div id="section-2">
+  ## Tester
+</div>
+
+Un seul compte ne suffit pas. Pour prouver que PixelGames distingue bien les joueurs, il vous
+en faut deux.
+
+1. Jouez une partie sans être connecté. PixelGames doit continuer à fonctionner.
+2. Connectez-vous avec votre propre compte.
+3. Déconnectez-vous, puis connectez-vous avec un autre compte et vérifiez que vous vous trouvez
+   dans une session distincte de celle du premier compte.
+4. Reconnectez-vous avec le premier compte et vérifiez que vous y revenez bien.
+5. Sur iOS, vérifiez que **Continue with Apple** s&#39;affiche au-dessus de Google. Sur Android,
+   vérifiez que l&#39;option n&#39;apparaît pas du tout.
+
+<div id="section-3">
+  ## Prochaines étapes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Enregistrer des images dans une application mobile" icon="image" href="/fr/ko/build/mobile-store-images">
+    Enregistrez la photo de profil des joueurs lorsqu’ils se connectent.
+  </Card>
+
+  <Card title="Ajouter des fonctionnalités natives de l’appareil" icon="camera" href="/fr/ko/build/mobile-camera">
+    Ajoutez davantage de fonctionnalités à PixelGames.
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ## Voir aussi
+</div>
+
+* [Enregistrer des images dans une application mobile](/fr/ko/build/mobile-store-images)
+* [Ajouter des paiements intégrés à l&#39;application](/fr/ko/build/mobile-payments)
+* [Configurer les providers de connexion](/fr/features/auth-and-identity/sign-in-providers)

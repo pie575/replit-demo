@@ -1,0 +1,154 @@
+---
+title: "Управление зависимостями"
+description: "Узнайте, как устанавливать пакеты и управлять зависимостями в Replit App на разных языках."
+---
+
+Replit предлагает несколько способов устанавливать пакеты и управлять ими в вашем Replit App. Вы можете установить пакеты с помощью [Shell](/ru/pt/references/editor/shell), попросить [Agent](/ru/pt/features/agent/overview/) сделать это за вас или разрешить Replit автоматически обнаруживать и устанавливать недостающие зависимости при запуске Replit App.
+
+<div id="instalar-pacotes-usando-o-shell">
+  ## Установка пакетов через Shell
+</div>
+
+Откройте инструмент **Shell** в Project Editor и выполните команду для менеджера пакетов, используемого в вашем языке:
+
+<CodeGroup>
+  ```bash Node.js (npm) theme={null}
+  npm install <package-name>
+  ```
+
+  ```bash Node.js (pnpm) theme={null}
+  pnpm add <package-name>
+  ```
+
+  ```bash Python (poetry) theme={null}
+  poetry add <package-name>
+  ```
+
+  ```bash Python (pip) theme={null}
+  pip install <package-name>
+  ```
+
+  ```bash Ruby theme={null}
+  bundle add <gem-name>
+  ```
+</CodeGroup>
+
+Вы также можете использовать [Universal Package Manager (UPM)](https://github.com/replit/upm/) от Replit для установки пакетов в поддерживаемых языках:
+
+```bash theme={null}
+upm add <package-name>
+```
+
+Чтобы установить определённую версию:
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+Полный список поддерживаемых языков и менеджеров пакетов см. в разделе [UPM: поддерживаемые языки](https://github.com/replit/upm/#supported-languages).
+
+<div id="instalar-pacotes-usando-o-agent">
+  ## Установка пакетов с помощью Agent
+</div>
+
+Попросите [Agent](/ru/pt/features/agent/overview/) установить пакеты прямо в чате. Например:
+
+* &quot;Установи пакет axios&quot;
+* &quot;Добавь Flask и SQLAlchemy в мой проект&quot;
+* &quot;Настрой TailwindCSS&quot;
+
+Agent установит пакет с помощью подходящего для вашего проекта менеджера пакетов и обновит соответствующие файлы конфигурации.
+
+<div id="deteco-automtica-de-imports">
+  ## Автоматическое определение импортов
+</div>
+
+Replit автоматически проверяет код на наличие отсутствующих зависимостей при каждом нажатии **Run**. Если код импортирует ещё не установленный пакет, Replit обнаружит его и автоматически установит последнюю версию.
+
+Например, если добавить `import flask` в `main.py`, при следующем нажатии **Run** в **Console** появится сообщение об установке **Flask**.
+
+<Note>
+  Автоматическое определение импортов можно настроить в файле [.replit](/ru/pt/references/configuration/configuration#replit-file) с помощью параметра `packager.features.guessImports`.
+</Note>
+
+<div id="substituir-a-deteco-automtica">
+  ### Переопределение автоматического определения
+</div>
+
+Если автоматически определён неверный пакет или вам нужна определённая версия, выполните в Shell нужную команду установки. Например:
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+Вы также можете исключить определённые пакеты или пути из автоматического определения в файле [.replit](/ru/pt/references/configuration/configuration#replit-file):
+
+<div id="gerenciadores-de-pacotes-python">
+  ## Менеджеры пакетов Python
+</div>
+
+При создании Replit App на Python по умолчанию используется менеджер пакетов **poetry**. Это означает, что `pip install` не управляет зависимостями. Вместо этого используйте в Shell `poetry add <package>` или `upm add <package>`.
+
+<div id="mudar-de-poetry-para-pip">
+  ### Переход с poetry на pip
+</div>
+
+Если вы предпочитаете использовать `pip`, выполните следующие действия:
+
+<Steps>
+  <Step>
+    Откройте Shell и выполните следующее:
+
+    Удалите файл блокировки, чтобы система управления пакетами переключилась на pip:
+
+    ```bash theme={null}
+    rm poetry.lock
+    ```
+  </Step>
+
+  <Step title="Перенесите зависимости">
+    Перенесите зависимости из раздела `[tool.poetry.dependencies]` файла `pyproject.toml` в `requirements.txt`. Например, `flask = "^3.0.2"` станет `flask>=3.0.2,<4`.
+  </Step>
+
+  <Step title="Очистите pyproject.toml">
+    Удалите из `pyproject.toml` разделы `[tool.poetry...]`.
+  </Step>
+</Steps>
+
+После этих изменений система управления пакетами будет использовать `pip` для всех последующих операций, а автоматическое определение импортов продолжит работать как обычно.
+
+<div id="dependncias-de-sistema-com-nix">
+  ## Системные зависимости с Nix
+</div>
+
+Replit поддерживает все языки программирования благодаря интеграции с [Nix](https://nixos.org/). Если помимо стандартных пакетов языка вам нужны системные зависимости, добавьте их в файл [replit.nix](/ru/pt/references/configuration/configuration#replit-nix-file).
+
+<div id="pacotes-nix">
+  ### Пакеты Nix
+</div>
+
+Добавляйте системные зависимости, напрямую редактируя `replit.nix`. Доступные пакеты можно найти на [search.nixos.org](https://search.nixos.org/packages).
+
+<div id="mdulos">
+  ### Модули
+</div>
+
+Модули обеспечивают поддержку языков программирования, форматтеров и менеджеров пакетов. Они служат основой для вашего Replit App. Если вы создаёте Replit App из template или репозитория GitHub, Replit автоматически устанавливает необходимые модули.
+
+Вы можете настраивать модули и другие параметры Nix с помощью файла [.replit](/ru/pt/references/configuration/configuration#replit-file).
+
+<div id="configurao-do-gerenciador-de-pacotes">
+  ## Настройка менеджера пакетов
+</div>
+
+Настроить управление пакетами можно в файле [.replit](/ru/pt/references/configuration/configuration#replit-file):
+
+| Настройка                             | Описание                                                                    | По умолчанию               |
+| ------------------------------------- | --------------------------------------------------------------------------- | -------------------------- |
+| `packager.language`                   | Язык для работы с пакетами                                                  | Определяется автоматически |
+| `packager.features.guessImports`      | Автоматически обнаруживать и устанавливать отсутствующие пакеты при запуске | `true`                     |
+| `packager.features.packageSearch`     | Включить поиск пакетов                                                      | `true`                     |
+| `packager.features.enabledForHosting` | Требовать установки пакетов при публикации                                  | `false`                    |
+| `packager.afterInstall`               | Команда, выполняемая после установки пакета                                 | —                          |
+| `packager.ignoredPaths`               | Пути, игнорируемые при обнаружении импортов                                 | `[]`                       |
+| `packager.ignoredPackages`            | Пакеты, исключаемые из автоматического обнаружения                          | `[]`                       |

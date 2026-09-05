@@ -1,0 +1,96 @@
+---
+title: "项目 和文件"
+description: "解答常见的 项目 问题，包括恢复已删除的 项目、导出、共享、连接 GitHub、Secrets 以及通过 checkpoint 回滚。"
+---
+
+本文解答有关 项目 和文件操作的常见问题。相关内容请参阅 [Secrets](/zh/ko/core-concepts/project-editor/app-setup/secrets)、[checkpoint 和回滚](/zh/ko/features/version-control/checkpoints-and-rollbacks)及[集成概览](/zh/ko/features/integrations/overview)。
+
+<AccordionGroup>
+  <Accordion title="如何将 Resend 或其他电子邮件服务连接到 Replit 应用？">
+    打开项目，前往**工具 → 连接器**，找到并连接服务 (如 Resend) 。完成身份验证后，API 密钥会作为项目的机密信息保存。若要设置自定义电子邮件域名，请将服务提供的 DNS 记录添加到您的 DNS 提供商处。
+
+    有关可用的连接器，请参阅[集成概述](/zh/ko/features/integrations/overview)和[添加集成](/zh/ko/build/add-integrations)。
+  </Accordion>
+
+  <Accordion title="我不小心删除了项目，还能恢复吗？">
+    已删除的项目可在限定时间内恢复。打开项目的 Shell，然后运行：
+
+    ```bash theme={null}
+    trash view
+    trash restore your-project-name
+    ```
+
+    超过保留期限后，已删除的项目将被永久删除。若已超过该期限，请[联系 Replit 支持团队](https://replit.com/support)。
+  </Accordion>
+
+  <Accordion title="如何下载或导出 Replit 项目？">
+    选择文件树顶部的三点菜单，然后选择**下载为 zip**。对于较大的项目，下载可能需要一点时间。如果下载失败，请打开 Shell 并运行 `zip -r project.zip .`，然后在文件树中下载 `project.zip`。
+  </Accordion>
+
+  <Accordion title="如何共享项目或添加协作者？">
+    有三种选项：
+
+    * **只读**—将项目隐私设置为公开后，任何获得链接的人都可以查看。
+    * **通过邀请授予编辑权限**—选择**邀请**，然后输入用户名或电子邮箱并设置权限级别。
+    * **加入链接**—在**邀请**中创建加入链接后，任何获得链接的人都可以加入并编辑。
+
+    Core 最多支持 5 名协作者，Pro 最多支持 15 名协作者。协作者无需订阅付费套餐即可编辑项目。请参阅[工作区](/zh/ko/features/collaboration/workspaces)。
+  </Accordion>
+
+  <Accordion title="如何将 GitHub 仓库关联到 Replit？">
+    在账户的已连接服务中连接 GitHub 账户，然后在项目中打开 [Git 工具](/zh/ko/features/workspace-tools/git-interface)并连接仓库。要启用双向同步，请在 Git 窗口中开启自动同步。要导入现有仓库，请参阅[从提供商导入](/zh/ko/build/import-from-providers)。
+
+    如果 Git 同步中断，请在已连接服务中重新连接 GitHub。使用细粒度个人访问令牌可获得更稳定的连接。
+  </Accordion>
+
+  <Accordion title="Repl 运行缓慢或编辑器卡顿，该如何解决？">
+    如果编辑器卡顿，请尝试以下操作：
+
+    * 在 Mac 上按 `Cmd+Shift+R`，在 Windows 上按 `Ctrl+Shift+R` 强制刷新。
+    * 关闭未使用的文件标签页。
+    * 按 `Cmd+K` (Mac) 或 `Ctrl+K` (Windows) 打开命令面板，搜索并选择 **Restart compute**。
+    * 尝试使用其他浏览器，以排除扩展程序的影响。
+
+    如果是代码运行缓慢而非编辑器卡顿，请检查是否存在高负载循环或内存限制。您可以在编辑器底部的资源面板中查看 CPU 和内存使用情况。
+  </Accordion>
+
+  <Accordion title="如何在项目中使用环境变量和密钥？">
+    打开 **Secrets** 工具 (锁形图标) ，选择 **+ 新建 Secret**，然后输入密钥和值。在代码中通过 `process.env.API_KEY` (Node.js) 或 `os.environ["API_KEY"]` (Python) 读取。
+
+    开发 [Secrets](/zh/ko/core-concepts/project-editor/app-setup/secrets) 窗口中的 Secret 仅可在编辑器中使用。对于已部署的应用，请将相同的密钥添加到部署 Secrets 中——两者在设计上是分开保存的。
+  </Accordion>
+
+  <Accordion title="如何使用账户密钥（Vault）？">
+    [账户 Secrets](/zh/ko/core-concepts/project-editor/app-setup/secrets)可供所有项目使用，适合存储需要重复使用的密钥。您可以在账户设置中添加，之后便可在所有项目中使用。如果账户 Secrets 和项目 Secrets 中存在相同的密钥，则以项目级的值为准。
+  </Accordion>
+
+  <Accordion title="如何从 Git 合并冲突或损坏的 Git 状态中恢复？">
+    打开 Shell 并运行 `git status` 检查冲突。
+
+    <Warning>以下两条命令会删除未提交的更改，且无法撤销。请先保存想要保留的内容——例如，将已编辑的文件复制到项目外。</Warning>
+
+    要丢弃本地更改并恢复到最近一次干净状态，请运行 `git checkout -- .`；要重置为上一次提交，请运行 `git reset --hard HEAD`。
+
+    如果 `.git` 文件夹损坏，导致 Git 命令失败，请打开新的 Agent 聊天并粘贴错误信息——Agent 通常可以恢复仓库。请参阅[灾难恢复](/zh/ko/features/version-control/disaster-recovery)。
+  </Accordion>
+
+  <Accordion title="如何将项目回滚到之前的检查点？">
+    Replit 会在 Agent 工作期间保存 [checkpoint](/zh/ko/features/version-control/checkpoints-and-rollbacks)。在 Agent 面板中，找到要撤销的更改之前的消息，选择其旁边的回滚选项，然后确认。
+
+    <Note>
+      Replit 不再支持将已发布的应用回滚到历史版本。若要还原已发布的应用，请先按上述方法将项目回滚到之前的 checkpoint，然后重新发布，以部署该状态。若要恢复单个文件，请打开文件，选择文件名，然后使用**查看历史记录**还原历史版本。请参阅[文件历史记录](/zh/ko/features/version-control/file-history)。
+    </Note>
+  </Accordion>
+
+  <Accordion title="如何将项目转移到另一个 Replit 账户？">
+    项目无法直接转移，但可以复制。最简单的方法是将项目共享给目标账户，然后在该账户中将其 fork。或者，也可以将项目下载为 zip 文件，再上传到另一个账户中的新 Repl。
+
+    复制后，请在新项目中重新配置密钥、数据库和部署设置——这些内容不会包含在副本中。有关分步说明 (包括如何迁移数据库数据) ，请参阅[手动将项目复制到其他工作区](/zh/ko/teams/identity-and-access-management/manually-copy-projects)。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## 需要更多帮助吗？
+</div>
+
+如果您在这里找不到有关项目的问题的答案，请[联系 Replit 支持团队](https://replit.com/support)。

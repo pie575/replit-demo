@@ -1,0 +1,125 @@
+---
+title: "Migrer de Replit Auth vers Clerk"
+description: "Utilisez Agent pour faire passer une app existante de Replit Auth à Clerk Auth tout en préservant les données utilisateur de votre app."
+---
+
+Suivez ce guide pour faire passer une app existante de [Replit Auth](/fr/pt/features/auth-and-identity/authentication) à [Clerk Auth](/fr/pt/features/auth-and-identity/clerk-auth). Agent se charge de la migration pour les apps éligibles, afin que les utilisateurs de retour conservent l&#39;accès à leurs données existantes.
+
+<Note>
+  Cette migration automatisée s&#39;adresse aux apps qui utilisent Replit Auth. Si votre app utilise un autre système d&#39;authentification, n&#39;utilisez pas ce flux.
+</Note>
+
+<div id="inicie-a-migrao">
+  ## Lancez la migration
+</div>
+
+Les migrations Agent doivent toujours être exécutées dans une nouvelle tâche.
+
+Vous pouvez lancer la migration de l&#39;une des façons suivantes :
+
+<div id="iniciar-a-partir-do-agent">
+  ### Démarrer depuis l&#39;Agent
+</div>
+
+<Steps>
+  <Step title="Créez une nouvelle tâche">
+    Sélectionnez **+** dans la barre latérale ou appuyez sur **Cmd+Shift+P** (Mac) ou **Ctrl+Shift+P** (Windows) pour créer une nouvelle tâche.
+
+    <Frame caption="Planifiez une nouvelle tâche : décrivez ce que vous souhaitez et l'Agent élabore un plan pour vous.">
+      <img src="/assets/mirror/replit-auth-to-clerk-new-task-090bed68b68c.png" alt="La vue de nouvelle tâche avec le bouton de création de nouvelle tâche mis en évidence dans la barre latérale, une infobulle affichant le raccourci Cmd Shift P, et l'état vide Plan a new task au-dessus du compositeur Message Agent" width="1750" height="1948" data-path="images/workspace/auth/replit-auth-to-clerk-new-task.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Utilisez l'Agent pour migrer">
+    Dans la nouvelle tâche, demandez à l&#39;Agent de migrer votre app de Replit Auth vers Clerk.
+  </Step>
+</Steps>
+
+<div id="iniciar-a-partir-do-painel-auth">
+  ### Démarrer depuis le panneau Auth
+</div>
+
+<Steps>
+  <Step title="Ouvrez Tools">
+    Dans l&#39;éditeur de projet, ouvrez **Tools**.
+
+    <Frame caption="L'onglet Tools affiche la liste des outils à côté de l'outil actif.">
+      <img src="/assets/mirror/replit-auth-to-clerk-open-tools-6eeea4995d4f.png" alt="L'onglet Tools de l'éditeur de projet ouvert, affichant la liste des outils avec Publishing, Domains, Monitoring, Users & Auth et d'autres à côté de la vue d'ensemble de Publishing" width="1500" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-open-tools.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Sélectionnez Users & Auth">
+    <Frame caption="Users & Auth dans la liste des outils.">
+      <img src="/assets/mirror/replit-auth-to-clerk-users-auth-684bf872c3b2.png" alt="La liste des outils avec Users & Auth mis en évidence et une info-bulle indiquant « Let users log in to your App using a prebuilt login page »" width="1154" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-users-auth.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Sélectionnez Update now">
+    Dans la bannière **Introducing a new Replit Auth**, sélectionnez **Update now**.
+
+    <Frame caption="L'outil Users & Auth affiche la bannière Introducing a new Replit Auth et son action Update now.">
+      <img src="/assets/mirror/replit-auth-to-clerk-banner-64d3b381da86.png" alt="Éditeur de projet avec Users & Auth sélectionné et la bannière Introducing a new Replit Auth affichant un bouton Update now" width="1220" height="764" data-path="images/workspace/auth/replit-auth-to-clerk-banner.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ask agent to migrate">
+    Sélectionnez **Ask agent to migrate** dans la boîte de dialogue.
+
+    <Frame caption="La boîte de dialogue de présentation de la migration explique la mise à jour vers Clerk Auth et propose l'action Ask agent to migrate.">
+      <img src="/assets/mirror/replit-auth-to-clerk-dialog-c485c7e997bc.png" alt="Boîte de dialogue Introducing a new Replit Auth avec un bouton Ask agent to migrate" width="1259" height="790" data-path="images/workspace/auth/replit-auth-to-clerk-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="revise-o-plano-de-migrao">
+  ### Vérifiez le plan de migration
+</div>
+
+Quelle que soit la méthode utilisée pour démarrer, Agent crée la tâche **Migrate from Replit Auth to Clerk** et prépare le plan de migration. Sélectionnez **View plan** et vérifiez le plan avant que la tâche ne se poursuive.
+
+<Frame caption="La tâche Migrate from Replit Auth to Clerk commence par une action View plan afin que vous puissiez vérifier le guide de migration.">
+  <img src="/assets/mirror/replit-auth-to-clerk-task-998d61b55c3d.png" alt="Tâche Agent nommée Migrate from Replit Auth to Clerk avec un bouton View plan et l'activité de vérification du guide de migration" width="575" height="900" data-path="images/workspace/auth/replit-auth-to-clerk-task.png" />
+</Frame>
+
+Ne modifiez ni le code d&#39;authentification de votre app ni les identifiants Clerk pendant qu&#39;Agent travaille.
+
+<div id="o-que-o-agent-faz">
+  ## Ce que fait Agent
+</div>
+
+Agent réalise la migration dans cet ordre :
+
+1. Il transfère les données utilisateur de Replit Auth vers Clerk, y compris les informations d&#39;identité du compte et les identifiants de connexion pris en charge.
+2. Il attend la fin de la migration des données avant de modifier votre app.
+3. Il met à jour la logique de connexion et de session de votre app, redémarre l&#39;app et exécute les vérifications automatisées disponibles.
+
+<div id="os-dados-do-seu-app-permanecem-no-lugar">
+  ## Les données de votre app restent en place
+</div>
+
+Agent modifie uniquement le code d&#39;authentification de votre app. Il ne touche ni aux données existantes ni au schéma de la base de données de votre app. Vos tables et leurs relations restent intactes.
+
+Vos utilisateurs existants restent liés aux enregistrements qui leur appartiennent déjà, comme les profils, le travail enregistré et les autorisations.
+
+<div id="quanto-tempo-leva">
+  ## Durée de l&#39;opération
+</div>
+
+Comptez entre 10 minutes et une heure de travail pour l&#39;Agent. La migration des données elle-même peut prendre quelques minutes pour les apps de petite taille, et jusqu&#39;à quelques heures pour celles comptant de nombreux utilisateurs. L&#39;Agent ne commence à modifier le code de votre app qu&#39;une fois cette migration terminée.
+
+<div id="depois-da-migrao">
+  ## Après la migration
+</div>
+
+Avant de publier, testez l&#39;app mise à jour en environnement de développement :
+
+1. Connectez-vous avec un compte existant et vérifiez que vos données enregistrées sont bien disponibles.
+2. Déconnectez-vous, puis reconnectez-vous.
+3. Créez un nouveau compte de test et vérifiez qu&#39;il permet d&#39;utiliser l&#39;app comme prévu.
+
+<div id="recursos-adicionais">
+  ## Ressources supplémentaires
+</div>
+
+* [Présentation de Clerk Auth](/fr/pt/features/auth-and-identity/clerk-auth) — Le fonctionnement de Clerk Auth sur Replit
+* [Planifier une migration d&#39;authentification personnalisée](/fr/pt/features/auth-and-identity/custom-auth-migration) — Planifiez la migration depuis un système d&#39;authentification personnalisé

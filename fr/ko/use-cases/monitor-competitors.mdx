@@ -1,0 +1,157 @@
+---
+title: "Surveiller vos concurrents"
+description: "Détectez les changements de prix et de fonctionnalités, et gardez votre page de veille concurrentielle toujours à jour."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Ce n’est pas un connector natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Surveillez les pages de tarifs, les journal des modifications et les pages de fonctionnalités de vos concurrents. Dès qu&#39;une modification importante survient, résumez ce qui a changé, envoyez une alerte sur Slack et tenez à jour votre page de veille concurrentielle dans Notion. Vérifiez les changements directement sur le site avant de les transmettre à l&#39;équipe commerciale.
+
+<div id="section">
+  ## Idéal dans les cas suivants
+</div>
+
+* Les chefs de produit qui ont besoin d&#39;une page concurrents toujours à jour.
+* Les chargés de comptes qui doivent être informés des changements de prix avant qu&#39;une affaire ne leur échappe.
+
+<div id="section-2">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{
+id: "slack",
+name: "Slack",
+why: "Alerte en cas de changement important",
+},
+{ id: "notion", name: "Notion", why: "Pages de veille concurrentielle" },
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Indiquez à Agent la liste de vos concurrents et les pages à surveiller (tarifs, journal des modifications, fonctionnalités).
+Connectez Slack et Notion.
+
+<div id="agent">
+  ## Demander à Agent
+</div>
+
+<AiPrompt>
+  Crée une routine qui s&#39;exécute tous les matins à 8 h. Surveille les concurrents
+  suivants : [liste d&#39;URL]. Détecte les changements de prix ou de fonctionnalités,
+  résume ce qui a changé, préviens-moi sur Slack si c&#39;est important et tiens
+  à jour la page de veille concurrentielle dans Notion.
+</AiPrompt>
+
+<div id="section-4">
+  ## Résultats attendus
+</div>
+
+Agent compare chaque page à sa version précédente, rédige un bref récapitulatif
+« ce qui a changé » et met à jour Notion. Vérifiez les modifications directement
+sur le site avant de les transmettre à l&#39;équipe commerciale. Lorsqu&#39;une page est
+refondue, les premiers jours peuvent générer beaucoup de bruit : précisez donc
+ce qui compte vraiment. Quand vous recevez une notification Slack, ouvrez l&#39;URL
+concernée pour constater les changements par vous-même avant de les transmettre.
+
+<div id="section-5">
+  ## Adapter à mes besoins
+</div>
+
+<AiPrompt>
+  Préviens-moi sur Slack uniquement en cas de changement de tarifs ou d&#39;offres. Consigne les autres
+  modifications de page dans Notion, sans notification.
+</AiPrompt>
+
+<AiPrompt>
+  En cas de changement de tarifs, rédige dans Notion un brief commercial de 5 lignes précisant ce qui a changé, qui est concerné et
+  comment cela se situe par rapport à notre offre.
+</AiPrompt>
+
+<div id="section-6">
+  ## Dépannage
+</div>
+
+* **Chaque refonte ressemble à un changement de tarifs :** indiquez à Agent les pages à surveiller (tarifs, journal des modifications, fonctionnalités) et ce qui compte vraiment. Vérifiez les changements sur le site réel avant de les transmettre à l&#39;équipe commerciale.
+* **Aucune alerte :** les pages sont peut-être inaccessibles, ou votre liste de concurrents est trop restreinte. Fournissez des URL complètes et demandez à Agent de vous prévenir lorsqu&#39;il ne parvient pas à charger une page.
+* **Notion devient un amas de notes ponctuelles :** indiquez à Agent une seule page de veille concurrentielle et demandez-lui de la mettre à jour sur place plutôt que d&#39;en créer une nouvelle chaque matin.
+
+<div id="section-7">
+  ## Documents connexes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Surveiller les mentions de votre marque" href="/fr/ko/use-cases/monitor-brand-mentions">
+    Réutilisez la même configuration Slack et Notion, non seulement pour les sites concurrents, mais aussi pour ce que les gens disent de vous.
+  </Card>
+
+  <Card title="Générer un rapport de ventes hebdomadaire" href="/fr/ko/use-cases/weekly-pipeline-report">
+    Un document destiné aux chargés de comptes et aux responsables commerciaux qui doivent suivre l&#39;évolution du pipeline.
+  </Card>
+</CardGroup>

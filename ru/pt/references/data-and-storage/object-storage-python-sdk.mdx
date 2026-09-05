@@ -1,0 +1,320 @@
+---
+title: "Python SDK для App Storage"
+description: "Узнайте, как использовать официальный Python SDK для управления файлами в Replit App Storage."
+---
+
+В этом справочном руководстве описывается класс `Client` из пакета `replit-object-storage-python` и приводятся примеры кода для его методов.
+
+<div id="client">
+  ## Client
+</div>
+
+Класс `Client` используется для взаимодействия с Replit App Storage. Он предоставляет методы для операций с объектами в bucket.
+
+Чтобы импортировать класс из пакета `replit.object_storage`, добавьте в код Python следующую строку:
+
+```python theme={null}
+from replit.object_storage import Client
+```
+
+Используйте следующий код, чтобы создать экземпляр `Client` для работы с Replit App Storage:
+
+```python theme={null}
+client = Client()
+```
+
+<Tip>
+  Если ваш App использует несколько bucket, создайте отдельный экземпляр `Client` для каждого bucket.
+</Tip>
+
+<div id="__init__">
+  ### **init**
+</div>
+
+Метод `init` инициализирует экземпляр класса Client.
+
+```python theme={null}
+def __init__(bucket_id: Optional[str] = None)
+```
+
+**Аргумент**:
+
+* `bucket_id` (Optional[str]): ID бакета, которым управляет клиент. Если не указан, Client использует бакет по умолчанию, связанный с Replit App или deployment.
+
+<div id="copy">
+  ### copy
+</div>
+
+Метод `copy` копирует объект в пределах одного bucket. Если объект уже существует в этом расположении, он перезаписывает оригинал.
+
+```python theme={null}
+def copy(object_name: str, dest_object_name: str) -> None
+```
+
+**Аргументы**:
+
+* `object_name` (str) — Полный путь к исходному объекту.
+* `dest_object_name` (str) — Полный путь к объекту назначения.
+
+**Исключения**:
+
+* `ObjectNotFoundError` — Указывает, что исходный объект не существует по указанному пути.
+
+<div id="delete">
+  ### delete
+</div>
+
+Метод `delete` безвозвратно удаляет файл из App Storage.
+
+```python theme={null}
+def delete(object_name: str, ignore_not_found: bool = False) -> None
+```
+
+**Аргументы**:
+
+* `object_name` (str) — имя удаляемого объекта.
+* `ignore_not_found` (bool) — если `True`, подавляет ошибку при отсутствии объекта.
+
+**Исключения**:
+
+* `ObjectNotFoundError` — объект не существует.
+
+<div id="download_as_bytes">
+  ### download_as_bytes
+</div>
+
+Метод `download_as_bytes` возвращает содержимое файла в виде `bytes`.
+
+```python theme={null}
+def download_as_bytes(object_name: str) -> bytes
+```
+
+**Аргумент**:
+
+* `object_name` (str) — Имя объекта для скачивания.
+
+**Возвращает**:
+
+* `bytes` — Необработанное содержимое объекта в виде байтов.
+
+**Исключения**:
+
+* `ObjectNotFoundError` — Объект не существует.
+
+<div id="download_as_text">
+  ### download_as_text
+</div>
+
+Метод `download_as_text` скачивает содержимое файла как значение типа `str`.
+
+```python theme={null}
+def download_as_text(object_name: str) -> str
+```
+
+**Аргумент**:
+
+* `object_name` (str) — имя исходного объекта, который необходимо получить.
+
+**Возвращает**:
+
+* str: содержимое объекта в виде строки в кодировке UTF-8.
+
+**Исключения**:
+
+* `ObjectNotFoundError` — объект не существует.
+
+<div id="download_to_filename">
+  ### download_to_filename
+</div>
+
+Скачивает содержимое объекта в файл на локальном диске.
+
+```python theme={null}
+def download_to_filename(object_name: str, dest_filename: str) -> None
+```
+
+**Аргументы**:
+
+* `object_name` (str) — Имя исходного объекта в App Storage, который требуется получить.
+* `dest_filename` (str) — Имя целевого файла на локальном диске.
+
+**Исключения**:
+
+* `ObjectNotFoundError` — Объект не существует.
+
+<div id="exists">
+  ### exists
+</div>
+
+Метод `exists` проверяет, существует ли объект.
+
+```python theme={null}
+def exists(object_name: str) -> bool
+```
+
+**Аргумент**:
+
+* `object_name` (str) — имя проверяемого объекта.
+
+**Возвращает**:
+
+* `bool`: `True`, если объект существует, иначе `False`.
+
+<div id="list">
+  ### list
+</div>
+
+Метод `list` выводит список объектов в bucket.
+
+```python theme={null}
+def list(end_offset: Optional[str] = None,
+         match_glob: Optional[str] = None,
+         max_results: Optional[int] = None,
+         prefix: Optional[str] = None,
+         start_offset: Optional[str] = None) -> List[Object]
+```
+
+**Аргументы**:
+
+* `end_offset` (Optional[str]) — Фильтрует результаты, оставляя объекты с именами, лексикографически предшествующими `end_offset`. Если задан `start_offset`, перечисленные объекты
+  имеют имена между `start_offset` (включительно) и `end_offset` (исключительно).
+* `match_glob` (Optional[str]) — Используйте glob-шаблон для фильтрации результатов. Например, &quot;foo*bar&quot; соответствует &quot;footbar&quot;, &quot;foo baz bar&quot; и &quot;foobar&quot;.
+* `max_results` (Optional[int]) — Максимальное количество результатов, возвращаемых в ответе.
+* `prefix` (Optional[str]) — Фильтрует результаты, оставляя объекты, имена которых начинаются с указанного префикса.
+* `start_offset` (Optional[str]) — Фильтрует результаты, оставляя объекты с именами, лексикографически равными `start_offset` или следующими за ним.
+  Если задан `end_offset`, перечисленные объекты имеют имена между `start_offset` (включительно) и `end_offset` (исключительно).
+
+**Возвращает**:
+
+* `List`(Object): Список объектов, соответствующих указанным параметрам запроса.
+
+<div id="upload_from_filename">
+  ### upload_from_filename
+</div>
+
+Используйте `upload_from_filename()`, чтобы загрузить объект из файла на локальном диске в App Storage.
+
+```python theme={null}
+def upload_from_filename(dest_object_name: str, src_filename: str) -> None
+```
+
+**Аргументы**:
+
+* `dest_object_name` (str) — имя загружаемого файла.
+* `src_filename` (str) — исходный файл для загрузки.
+
+<div id="upload_from_bytes">
+  ### upload_from_bytes
+</div>
+
+Метод `upload_from_bytes` загружает объект из данных типа `bytes`.
+
+```python theme={null}
+def upload_from_bytes(dest_object_name: str, src_data: bytes) -> None
+```
+
+**Аргументы**:
+
+* `dest_object_name` (str) — имя загружаемого объекта.
+* `src_data` (str) — данные в виде `bytes` для загрузки.
+
+<div id="upload_from_text">
+  ### upload_from_text
+</div>
+
+Метод `upload_from_text` загружает объект из строки.
+
+```python theme={null}
+def upload_from_text(dest_object_name: str, src_data: Union[bytes, str]) -> None
+```
+
+**Аргументы**:
+
+* `dest_object_name` (str) — имя отправляемого объекта.
+* `src_data` (str) — отправляемые текстовые данные.
+
+<div id="tipos-de-exceo">
+  ### Типы исключений
+</div>
+
+* При работе с Replit App Storage через `Client` любой метод может вернуть одну из следующих ошибок:
+
+  * `BucketNotFoundError`: Указывает, что настроенное имя bucket не соответствует ни одному bucket в App Storage.
+
+  * `DefaultBucketError`: Указывает на отсутствие настройки bucket по умолчанию.
+
+  * `ForbiddenError`: Указывает на недостаточные разрешения для доступа к bucket.
+
+  * `TooManyRequestsError`: Указывает, что операция ограничена из-за слишком большого количества запросов.
+
+  * `UnauthorizedError`: Указывает, что доступ к операции ограничен авторизацией.
+
+<div id="exemplos-de-mtodos-de-classe">
+  ## Примеры методов класса
+</div>
+
+В следующих разделах приведены примеры кода для управления вашими объектами с помощью SDK Replit App Storage.
+
+<div id="recuperar-um-arquivo-como-texto">
+  ### Получение файла в виде текста
+</div>
+
+```python theme={null}
+client.download_as_text("file.json")
+```
+
+<div id="recuperar-os-bytes-brutos-de-um-arquivo">
+  ### Получение необработанных байтов файла
+</div>
+
+```python theme={null}
+client.download_as_bytes("file.png")
+```
+
+<div id="baixar-um-arquivo-para-o-sistema-de-arquivos-local">
+  ### Скачивание файла в локальную файловую систему
+</div>
+
+```python theme={null}
+client.download_to_filename("file.json", dest_filename)
+```
+
+<div id="listar-objetos-no-bucket">
+  ### Список объектов в bucket
+</div>
+
+```python theme={null}
+client.list()
+```
+
+<div id="fazer-upload-de-um-arquivo-a-partir-de-texto">
+  ### Загрузка файла из текста
+</div>
+
+```python theme={null}
+client.upload_from_text("file.json", data)
+```
+
+<div id="fazer-upload-de-um-arquivo-como-bytes">
+  ### Загрузка файла в виде байтов
+</div>
+
+```python theme={null}
+client.upload_from_bytes("file.png", data)
+```
+
+<div id="fazer-upload-de-objetos-a-partir-do-sistema-de-arquivos">
+  ### Загрузка объектов из файловой системы
+</div>
+
+```python theme={null}
+client.upload_from_filename("file.json", src_filename)
+```
+
+<div id="excluir-um-objeto-do-bucket">
+  ### Удаление объекта из bucket
+</div>
+
+```python theme={null}
+client.delete("file.json")
+```

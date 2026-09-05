@@ -1,0 +1,397 @@
+---
+title: "Configuration d’une application Replit"
+description: "Découvrez comment configurer votre application Replit à l’aide des fichiers .replit et replit.nix."
+---
+
+Les applications Replit sont configurées à l’aide de deux fichiers : `.replit` et `replit.nix`. Ils déterminent le comportement de votre application Replit, de l’exécution du code aux outils et langages de développement.
+
+Ces fichiers de configuration sont masqués par défaut. Affichez-les dans votre application Replit en sélectionnant « Afficher les fichiers masqués » dans le menu de l’arborescence des fichiers.
+
+<Frame>
+  <img src="/assets/mirror/show-hidden-files-914df3399078.png" alt="image" width="530" height="488" data-path="images/getting-started/show-hidden-files.png" />
+</Frame>
+
+<div id="arquivo-replitnix">
+  ## Fichier `replit.nix`
+</div>
+
+Replit utilise `Nix` pour gérer les paquets et les environnements. Le fichier `replit.nix` permet de :
+
+**Spécifier les dépendances système :** définissez précisément les paquets logiciels nécessaires à votre application Replit. Ils sont gérés par Nix, un gestionnaire de paquets.
+
+**Créer des environnements reproductibles :** assurez-vous que votre environnement de développement est cohérent et reproductible, ce qui est idéal pour les projets collaboratifs et les tests sur plusieurs systèmes.
+
+Vous pouvez gérer visuellement les paquets Nix à l’aide de l’outil `Dependencies`. Consultez le guide des [Dépendances système](/fr/pt/core-concepts/project-editor/app-setup/dependency-management#system-dependencies) pour en savoir plus.
+
+Pour configurer des paquets avec le fichier `replit.nix`, vous pouvez répertorier des [paquets Nix](https://search.nixos.org/packages) dans le tableau `deps`, préfixés par `pkgs.`. Toutes les modifications seront synchronisées après le rechargement de votre Shell.
+
+```nix theme={null}
+{ pkgs }: {
+  deps = [
+    pkgs.nodejs-19_x
+    pkgs.nodePackages.typescript-language-server
+    pkgs.yarn
+    pkgs.replitPackages.jest
+  ];
+}
+```
+
+<div id="arquivo-replit">
+  ## Fichier `.replit`
+</div>
+
+Le fichier `.replit` contrôle le comportement de votre application Replit. Il utilise le [format de configuration](https://toml.io/en/) `toml`. Voici quelques-uns des principaux éléments configurables :
+
+**Commande d&#39;exécution :** Spécifiez la commande exécutée lorsque vous sélectionnez le bouton Run. Chaque template dispose d&#39;une commande d&#39;exécution par défaut qui permet d&#39;exécuter le code immédiatement. Pour des apps plus personnalisées et complexes, utilisez les [Workflows](/fr/pt/core-concepts/project-editor/app-setup/workflows).
+
+**Language Server Protocol (LSP)** : Offre des fonctionnalités telles que l&#39;autocomplétion, la navigation dans le code, la coloration syntaxique, l&#39;analyse statique et les erreurs en temps réel.
+
+**Variables d&#39;environnement :** Définissez et gérez les variables d&#39;environnement essentielles au bon fonctionnement de vos applications.
+
+**Dépendances et paquets :** Gérez les installations et les configurations de paquets directement dans le fichier `.replit`, afin de garantir que votre application Replit dispose de tous les outils nécessaires au démarrage. Vous pouvez gérer les dépendances visuellement à l&#39;aide de l&#39;outil `Dependencies`. Consultez le guide des [modules système](/fr/pt/core-concepts/project-editor/app-setup/dependency-management#advanced-configuration).
+
+Pour les applications Python, le fichier `.replit` par défaut est :
+
+```toml theme={null}
+entrypoint = "main.py"
+modules = ["python-3.10:v18-20230807-322e88b"]
+
+[nix]
+channel = "stable-23_05"
+
+[unitTest]
+language = "python3"
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+[deployment]
+run = ["python3", "main.py"]
+deploymentTarget = "cloudrun"
+```
+
+Le tableau suivant présente chaque configuration du fichier `.replit`, explique son rôle et son impact sur l’environnement de l’application Replit.
+
+| **Clé de configuration**                        | **Valeur/Exemple**                          | **Description**                                                                                                                                                                                                                                                         |
+| ----------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a name="entrypoint" />`entrypoint`             | `main.py`                                   | Spécifie le fichier principal à exécuter et à afficher par défaut à l’ouverture de l’éditeur. Vous pouvez renommer ce fichier en fonction de votre application.                                                                                                         |
+| <a name="modules" />`modules`                   | `["python-3.10:v18-20230807-322e88b"]`      | Définit des versions précises de langages de programmation ou d’autres dépendances principales prises en charge par Replit.                                                                                                                                             |
+| <a name="nix" />`[nix]`                         |                                             | Spécifie la configuration permettant d’utiliser Nix, un gestionnaire de paquets, pour gérer les dépendances système. Consultez la documentation sur la [gestion des dépendances](/fr/pt/core-concepts/project-editor/app-setup/dependency-management) pour en savoir plus. |
+| <a name="channel" />`channel`                   | `stable-23_05`                              | Indique le canal Nix à utiliser, ce qui détermine les versions disponibles des dépendances système.                                                                                                                                                                     |
+| <a name="packages" />`packages`                 | &#96;[&quot;cowsay&quot;, &quot;htop&quot;] | Spécifie les paquets Nix à installer. Pour un contrôle plus précis, vous pouvez également utiliser `replit.nix`.                                                                                                                                                        |
+| <a name="unitTest" />`[unitTest]`               |                                             | Définit la configuration liée aux tests unitaires dans l’application Replit.                                                                                                                                                                                                   |
+| <a name="language" />`language`                 | `python3`                                   | Spécifie le langage utilisé pour les tests unitaires, indiquant que Python 3 sert à écrire les tests.                                                                                                                                                                   |
+| <a name="gitHubImport" />`[gitHubImport]`       |                                             | Définit la configuration qui régit l’importation des projets depuis GitHub, notamment les fichiers devant être présents.                                                                                                                                                |
+| <a name="requiredFiles" />`requiredFiles`       | `[".replit", "replit.nix"]`                 | Répertorie les fichiers qui doivent être présents lors de l’importation du projet afin d’en garantir le bon fonctionnement.                                                                                                                                             |
+| <a name="deployment" />`[deployment]`           |                                             | Contient la configuration permettant de déployer l’application application Replit dans un environnement de production.                                                                                                                                                          |
+| <a name="run" />`run`                           | `["python3", "main.py"]`                    | Commande exécutée pour démarrer l’application lors du déploiement.                                                                                                                                                                                                      |
+| <a name="deploymentTarget" />`deploymentTarget` | `cloudrun`                                  | Spécifie la plateforme cible du déploiement qui héberge l’application.                                                                                                                                                                                                  |
+
+Maintenant que vous connaissez les configurations par défaut du fichier `.replit`, consultez les sections suivantes pour savoir comment configurer les paramètres de base et avancés de votre application Replit.
+
+<div id="configurando-definies-bsicas">
+  ## Configuration des paramètres de base
+</div>
+
+<div id="entrypoint">
+  ### Entrypoint
+</div>
+
+Il s’agit du fichier principal de votre projet. Si vous ne définissez pas de propriété `run`, l’`entrypoint` correspond au fichier exécuté par le runtime.
+
+```toml theme={null}
+entrypoint = "<file-name>.py"
+```
+
+<div id="comando-run">
+  ### Commande `Run`
+</div>
+
+La propriété `run` du fichier `.replit` est un paramètre essentiel qui définit la commande initiale ou la série de commandes exécutées lorsque vous cliquez sur le bouton `Run` dans un environnement Replit. La commande `Run` peut être indiquée sous forme de chaîne correspondant à la commande à exécuter, ou sous forme de tableau de chaînes correspondant à la commande et à chacun de ses arguments.
+
+Voici quelques façons courantes de configurer la commande `Run` :
+
+* **Commande unique :**
+  Cet exemple montre comment exécuter une seule commande directement dans l’application Replit. Si vous ajoutez ceci à votre fichier `.replit`, un clic sur le bouton `Run` affichera un message de bienvenue dans le panneau `Console` :
+  **Exemple :** `run = "echo 'Hello, Replit!'"`
+
+* **Arguments explicites :**
+  Dans certaines situations, il peut être utile d&#39;être plus explicite afin d&#39;éviter d&#39;avoir à gérer les guillemets ou les règles d&#39;interpolation du Shell. Vous pouvez réécrire l&#39;exemple ci-dessus en séparant les arguments.
+  Notez que vous n&#39;avez plus besoin d&#39;utiliser `'` et `"` en même temps, car vous passez explicitement le message de bienvenue comme premier et unique argument à `echo` :
+  **Exemple :** `run = ["echo", "Hello, Replit!"]`
+
+* **Commandes multiples :**
+  Cet exemple montre comment exécuter plusieurs processus simultanément, par exemple un frontend et un backend. Cela peut être utile lorsque vous développez un backend en Python et un frontend en TypeScript, chaque serveur écoutant sur un port différent :
+  **Exemple :** `run = "python -m app & npm run start & wait"`
+
+<div id="gerenciamento-de-processos">
+  #### Gestion des processus
+</div>
+
+Bien que plusieurs commandes puissent être exécutées simultanément avec `&`, vous souhaiterez peut-être mieux distinguer les logs des différents services. Vous pouvez [ajouter des dépendances système](/fr/pt/core-concepts/project-editor/app-setup/dependency-management#system-dependencies), telles que [`process-compose`](https://github.com/F1bonacc1/process-compose), pour mieux orchestrer plusieurs processus.
+
+<div id="fase-de-build">
+  #### Phase de `Build`
+</div>
+
+Pour certains langages ou environnements d’exécution, une phase de compilation distincte est nécessaire avant de pouvoir exécuter le code avec `run`. Cela s’applique aux langages compilés tels que TypeScript, Golang ou Java, mais permet également de fournir un paramètre pour réinitialiser votre environnement, vos données ou votre configuration avant l’exécution suivante de `run`.
+
+* **Compilation :**
+  Dans un dépôt TypeScript, vous devrez peut-être exécuter `tsc` avant d’exécuter votre code.
+  **Exemple :**
+
+```toml theme={null}
+build = "tsc app.ts"
+run = "node app.js"
+```
+
+<div id="incluindo-variveis-de-ambiente">
+  #### Ajouter des variables d&#39;environnement
+</div>
+
+Pour fournir des variables d&#39;environnement à votre service avant son exécution, vous pouvez développer la propriété `run` sous forme de [table](https://toml.io/en/v1.0.0#table).
+
+Cette modification est plus complexe et nécessite probablement de déplacer la propriété `run = "..."` dans votre fichier `.replit`.
+
+Le diff suivant montre comment fournir la commande via les `args` de `[run]`, ainsi que la variable `NAME` définie dans `[run.env]` :
+
+```diff theme={null}
+-run = ["bash", "-c", "echo \"Hello, $NAME!\""]
+
+ modules = ["nodejs-20"]
+
+ hidden = [".pythonlibs"]
+
++# Nous devons déplacer notre nouveau [run] sous toutes les
++# propriétés de niveau supérieur qui ne commencent pas par `[` !
++[run]
++args = ["bash", "-c", "echo \"Hello, $NAME!\""]
++
++[run.env]
++NAME="Replit"
+
+ [nix]
+ channel = "stable-23_11"
+```
+
+<div id="interatividade">
+  #### Interactivité
+</div>
+
+Les programmes interactifs peuvent également être lancés à l’aide du bouton `Run`, ce qui permet de différencier votre environnement de développement du terminal dans lequel le programme s’exécute.
+Prenez l’exemple du script de comptage suivant :
+
+**Exemple**
+
+```toml theme={null}
+[run]
+args = ["bash", "-c", """
+count=0
+while read -p "$PROMPT" -r next && [ -n "$next" ]; do
+    count=$((count+next))
+done
+echo "The numbers you entered sum to $count!"
+"""]
+
+[run.env]
+PROMPT = "Next number ([Enter] to end): "
+```
+
+<div id="opes-de-configurao-avanada">
+  ## Options de configuration avancées
+</div>
+
+Explorez les options de configuration détaillées disponibles pour votre application Replit. Vous pouvez personnaliser votre environnement de développement, gérer les commandes d&#39;exécution, intégrer des services de langage et gérer les dépendances.
+
+| **Configuration** | **Clé**                             | **Valeur/Exemple**                          | **Description**                                                                                    |
+| ----------------- | ----------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| onBoot            | <a name="onBoot" />`onBoot`         | `onBoot = "npm install"`                    | Commande exécutée au démarrage de l&#39;application Replit.                                                |
+| compile           | <a name="compile" />`compile`       | (Aucun exemple par défaut)                  | Commande exécutée avant la commande `run`, utilisée pour les langages compilés comme C++.          |
+| language          | <a name="language" />`language`     | `language = "javascript"`                   | Indique le langage lors de l&#39;importation depuis GitHub ou de la création d&#39;une application Replit. |
+| entrypoint        | <a name="entrypoint" />`entrypoint` | `entrypoint = "index.js"`                   | Fichier principal à exécuter et à afficher à l&#39;ouverture de l&#39;éditeur.                     |
+| hidden            | <a name="hidden" />`hidden`         | `hidden = [".config", "package-lock.json"]` | Fichiers ou dossiers à masquer par défaut dans l&#39;arborescence latérale.                        |
+| audio             | <a name="audio" />`audio`           | `audio = true`                              | Active l&#39;audio à l&#39;échelle du système lorsqu&#39;il est défini sur `true`.                 |
+
+<div id="notas-sobre-o-udio-em-todo-o-sistema">
+  ### Remarques sur l’audio à l’échelle du système
+</div>
+
+Lorsque vous définissez `audio = true` dans votre fichier `.replit`, vous devrez peut-être exécuter `kill 1` dans un Shell pour que la nouvelle configuration soit prise en compte.
+
+Lorsque vous exécutez une application graphique, une icône de casque accompagnée d’une case à cocher s’affiche dans le coin inférieur droit du panneau `Output`.
+En raison des restrictions du navigateur, vous devrez l’activer à chaque actualisation de la page.
+
+```toml theme={null}
+# Assurez-vous que cette ligne se trouve en haut de votre fichier `.replit`, en dehors de toute section délimitée par des crochets `[`
+audio = true
+```
+
+<div id="configurao-do-gerenciador-de-pacotes">
+  ## Configuration du gestionnaire de paquets
+</div>
+
+| **Configuration**                          | **Clé**                                           | **Valeur/Exemple**                            | **Description**                                                                                    |
+| ------------------------------------------ | ------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| gestionnaire de paquets                    | <a name="language" />`language`                   | `packager.language = "python3"`               | Langage utilisé pour les opérations sur les paquets.                                               |
+| fonctionnalités du gestionnaire de paquets | <a name="guessImports" />`guessImports`           | `packager.features.guessImports = true`       | Détecte automatiquement les paquets à installer avant d&#39;exécuter l&#39;application Replit.     |
+| fonctionnalités du gestionnaire de paquets | <a name="packageSearch" />`packageSearch`         | `packager.features.packageSearch = true`      | Active la prise en charge du gestionnaire de paquets lorsque défini sur `true`.                    |
+| fonctionnalités du gestionnaire de paquets | <a name="enabledForHosting" />`enabledForHosting` | `packager.features.enabledForHosting = false` | Indique si l&#39;hébergement de l&#39;application Replit nécessite l&#39;installation de paquets.  |
+| gestionnaire de paquets                    | <a name="afterInstall" />`afterInstall`           | `afterInstall = "echo 'package installed'"`   | Commande exécutée après l&#39;installation d&#39;un nouveau paquet via le gestionnaire de paquets. |
+| gestionnaire de paquets                    | <a name="ignoredPaths" />`ignoredPaths`           | `ignoredPaths = [".git"]`                     | Chemins à ignorer lors de la détection des paquets.                                                |
+| gestionnaire de paquets                    | <a name="ignoredPackages" />`ignoredPackages`     | `ignoredPackages = ["twitter", "discord"]`    | Modules pour lesquels aucun paquet ne doit être détecté lors de l&#39;installation.                |
+
+<div id="exemplo-de-configurao-replit-para-o-gerenciador-de-pacotes">
+  ### Exemple de configuration `.replit` pour le gestionnaire de paquets
+</div>
+
+```toml theme={null}
+# Définit le langage de l’app Replit
+packager.language = "python3"
+
+# Active les fonctionnalités de gestion automatique des paquets
+[packager.features]
+guessImports = true
+packageSearch = true
+enabledForHosting = false
+
+# Commande à exécuter après chaque installation de paquet
+packager.afterInstall = "echo 'Package installed successfully'"
+
+# Définit les chemins et les paquets à ignorer par le gestionnaire de paquets
+packager.ignoredPaths = [".git", "node_modules"]
+packager.ignoredPackages = ["twitter", "discord"]
+
+# Paramètres de déploiement supplémentaires
+[deployment]
+run = ["python3", "app.py"]
+```
+
+<div id="configurao-de-implantao">
+  ## Configuration du déploiement
+</div>
+
+| **Configuration** | **Clé**                               | **Valeur/Exemple**                   | **Description**                                                                           |
+| ----------------- | ------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------- |
+| deployment        | <a name="run" />`run`                 | `deployment.run = "npm start"`       | Commande exécutée au démarrage d’un conteneur de déploiement.                              |
+| deployment        | <a name="build" />`build`             | `deployment.build = "npm run build"` | Commande exécutée avant le lancement d’un déploiement.                                     |
+| deployment        | <a name="ignorePorts" />`ignorePorts` | `deployment.ignorePorts = true`      | Si `true`, la réussite du déploiement ne nécessite pas de vérifier qu’un port est ouvert. |
+
+<div id="exemplo-de-configurao-replit-para-implantao">
+  ### Exemple de configuration `.replit` pour le déploiement
+</div>
+
+```toml theme={null}
+
+# Indique le point d’entrée principal du projet
+entrypoint = "app.js"
+
+# Paramètres de déploiement de l’application
+[deployment]
+run = "npm start"
+build = "npm run build"
+ignorePorts = true
+```
+
+<Note>
+  **La configuration de l’interpréteur** est obsolète et n’est plus disponible dans Replit. Utilisez plutôt les commandes `Run` pour définir la façon dont les scripts et les applications s’exécutent dans l’environnement de votre application Replit.
+</Note>
+
+<div id="configurao-de-portas">
+  ## Configuration des ports
+</div>
+
+| **Configuration** | **Clé**                                 | **Valeur/Exemple**  | **Description**                                     |
+| ----------------- | --------------------------------------- | ------------------- | --------------------------------------------------- |
+| ports             | <a name="localPort" />`localPort`       | `localPort = 3000`  | Port que Replit associe à un port externe.          |
+| ports             | <a name="externalPort" />`externalPort` | `externalPort = 80` | Port accessible publiquement associé à `localPort`. |
+
+<div id="exemplo-de-arquivo-de-configurao-replit-para-gerenciamento-de-portas">
+  ### Exemple de fichier de configuration `.replit` pour la gestion des ports
+</div>
+
+```toml theme={null}
+# Configuration réseau pour exposer votre application sur des ports spécifiques
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+<div id="acessando-metadados-do-ambiente-do-replit-app">
+  ## Accéder aux métadonnées de l’environnement de l’application Replit
+</div>
+
+<div id="nodejs">
+  ### Node.js
+</div>
+
+Pour accéder à toutes les variables d’environnement :
+
+`console.log(process.env);`
+
+Pour accéder à une variable spécifique (REPL&#95;SLUG) :
+
+`console.log(process.env.REPL_SLUG);`
+
+<div id="python">
+  ### Python
+</div>
+
+Pour accéder à toutes les variables d’environnement :
+
+```python theme={null}
+import os
+print(os.environ)
+```
+
+Pour accéder à une variable unique (REPL&#95;SLUG) :
+
+```python theme={null}
+import os
+variable = os.environ.get('REPL_SLUG')
+print(variable)
+```
+
+<div id="rust">
+  ### Rust
+</div>
+
+Pour accéder à toutes les variables d’environnement :
+
+```rust theme={null}
+use std::env;
+fn main() {
+    for (key, value) in env::vars() {
+        println!("{}: {}", key, value);
+    }
+}
+```
+
+Pour accéder à une variable unique (REPL&#95;SLUG) :
+
+```rust theme={null}
+use std::env;
+fn main() {
+    let variable = env::var("REPL_SLUG").unwrap();
+    println!("{}", variable);
+}
+```
+
+<div id="variveis-de-ambiente">
+  ## Variables d&#39;environnement
+</div>
+
+Voici les variables d&#39;environnement accessibles dans votre application Replit :
+
+| clé                                               | description                                                                                                                                                                                            |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| <a name="REPL_OWNER" />`REPL_OWNER`               | Le nom d&#39;utilisateur du propriétaire de l’application Replit. Si votre application Replit est une application textuelle sans serveur web, `REPL_OWNER` reflète la valeur de l&#39;utilisateur actuel qui y accède |
+| <a name="REPL_ID" />`REPL_ID`                     | La chaîne UUID unique de votre application Replit                                                                                                                                                              |
+| <a name="HOME" />`HOME`                           | Le chemin d&#39;accès au répertoire personnel de votre application Replit                                                                                                                                      |
+| <a name="system" />`system`                       | Le système d&#39;exploitation exécuté dans votre application Replit                                                                                                                                            |
+| <a name="LANG" />`LANG`                           | Définit la langue et l&#39;encodage des caractères de votre application Replit, ce qui affecte la manière dont le texte est traité et affiché                                                                  |
+| <a name="REPL_IMAGE" />`REPL_IMAGE`               | L&#39;image Docker correspondant à votre application Replit                                                                                                                                                    |
+| <a name="REPL_LANGUAGE" />`REPL_LANGUAGE`         | Le langage de programmation configuré pour votre application Replit, utilisé pour déterminer l&#39;environnement d&#39;exécution et les outils                                                                 |
+| <a name="REPL_PUBKEYS" />`REPL_PUBKEYS`           | Un objet JSON sous forme de chaîne contenant différentes clés API publiques                                                                                                                            |
+| <a name="REPL_SLUG" />`REPL_SLUG`                 | Une version simplifiée et lisible par machine du nom de l’application Replit, adaptée à une utilisation dans les URL et les noms de fichiers                                                                  |
+| <a name="PRYBAR_FILE" />`PRYBAR_FILE`             | Le fichier principal ou point d&#39;entrée de votre application Replit                                                                                                                                         |
+| <a name="REPLIT_DEV_DOMAIN" />`REPLIT_DEV_DOMAIN` | Fournit l&#39;URL `replit.dev` de votre application Replit dans l&#39;Éditeur de projet. Notez que cette variable d&#39;environnement n&#39;est pas disponible dans les déploiements                           |

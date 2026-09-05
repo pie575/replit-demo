@@ -1,0 +1,151 @@
+---
+title: "跟踪订阅"
+description: "从邮件中找出定期扣款项目，并计算每月的支出。"
+sidebarTitle: "跟踪订阅"
+icon: "receipt"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+扫描 Gmail 中的订阅和收据邮件，识别定期付款，并在 Google Sheets 中计算每月费用。Agent 会提取商家、金额和计费周期，并在续订前标记出可能被遗忘的试用订阅。
+
+<div id="best-for">
+  ## 适用场景
+</div>
+
+* 需要掌握工具和服务真实月度支出的创始人与运营负责人。
+* 需要在试用到期自动续费前发现被遗忘订阅的财务和行政经理。
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "收据和续订邮件" },
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "实时更新的订阅清单及每月费用",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 开始之前
+</div>
+
+连接 Gmail 和一个 Google 表格 (也可以让 Agent 新建一个) ，并告诉 Agent 需要搜索哪个收件箱或标签。
+
+<div id="prompt-the-agent">
+  ## 向 Agent 发出 prompt
+</div>
+
+<AiPrompt>
+  创建一个 Routine，每周一 9:00 运行。扫描 Gmail 中的订阅和收据邮件，识别定期付款，
+  提取商家、金额和计费周期，并生成一份计算每月费用的 Google 表格。
+  标记出所有看起来像是被遗忘的试用订阅。
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 预期效果
+</div>
+
+Agent 会生成一张表格，包含商家、金额、计费周期和每月总额。请抽查其中几行，与原始邮件核对。首次运行时，主题中不含 &quot;subscription&quot; 字样的商家会被遗漏；补上相应标签后重新运行即可。挑选三个你熟悉的商家，打开 Gmail 中的收据，确认金额和计费周期无误后，再采信每月总额。
+
+<div id="make-it-work-for-you">
+  ## 打造专属于你的用法
+</div>
+
+<AiPrompt>
+  按类别 (开发工具、设计、AI、个人) 对订阅进行分组，并
+  突出显示每月超过 $[amount] 的项目。
+</AiPrompt>
+
+<AiPrompt>
+  在任何金额超过 $[amount] 的年度续订到期前 3 天发送 Slack 提醒。
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 疑难排解
+</div>
+
+* **表格中缺少你已知的订阅：** 告诉 Agent 使用哪个 Gmail 标签或搜索条件，并把主题中不含 “subscription” 字样的商家也包含进来。抽查几行，与原始邮件逐一核对。
+* **金额或计费周期不对：** 收据中往往包含税费、抵扣或其他币种。让 Agent 沿用邮件中的单项金额和计费周期，并标注出属于推断得出的行。
+* **同一商家出现两次：** 让 Agent 按商家名称合并、保留最新的收据，然后重新计算每月总额。
+
+<div id="related">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="离开期间的进度追赶" href="/zh/use-cases/catch-up-while-away">
+    创始人和运维人员休假归来后，同样可使用 Gmail connector。
+  </Card>
+
+  <Card title="构建实时 API 仪表板" href="/zh/use-cases/live-api-dashboard">
+    用实时仪表板取代每周汇总表格。
+  </Card>
+</CardGroup>

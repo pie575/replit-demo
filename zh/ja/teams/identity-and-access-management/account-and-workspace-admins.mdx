@@ -1,0 +1,157 @@
+---
+title: "账户管理员与工作区管理员"
+description: "账户管理员和工作区管理员是两种不同的角色。账户管理员负责管理账单以及账户下的所有工作区，工作区管理员则只管理自己所属的工作区。"
+sidebarTitle: "账户管理员与工作区管理员"
+icon: "user-shield"
+---
+
+<Info>
+  **本页面仅适用于 Enterprise 计划。** 只有 Enterprise 才将账户管理员和工作区管理员区分为两种角色。
+
+  在 **Core** 和 **Pro** 计划中，每个账户只有一位**账户管理员** (通常是账户所有者) ，没有单独的工作区管理员角色。如果您使用的是 Core 或 Pro，请改为参阅[管理成员](/zh/ja/teams/identity-and-access-management/managing-members)和[角色、群组与访问权限](/zh/ja/teams/identity-and-access-management/groups-and-permissions)——其中介绍的 **Admin** 角色即为您的账户管理员。
+</Info>
+
+在 Enterprise 计划中，Replit 将管理职责拆分为两种不同的角色：**账户管理员**和**工作区管理员**。有了这种角色划分，您可以把某个工作区的完全控制权授予他人，而不必一并交出账单和账户级的整体控制权。本页面将介绍这两种角色各自的功能、彼此的区别以及配置方法。
+
+<div id="2">
+  ## 两种角色的关系
+</div>
+
+Replit 的**账户**是计费实体，拥有订阅、席位以及一个或多个**工作区** (组织) ——你可以拥有多个 Enterprise 账户。两种管理员角色分别对应这两个范围：
+
+* **账户管理员**管理整个账户，掌控计费，并对账户下的所有工作区拥有管理访问权限。
+* **工作区管理员**仅管理自己所属的特定工作区 (可以是多个) ，没有计费访问权限，也无法管理其他工作区。
+
+所有账户管理员会自动成为账户下所有工作区的管理员，因此账户管理员是工作区管理员的超集。而工作区管理员并不是账户管理员，无法管理计费或其他工作区。
+
+<CardGroup cols={2}>
+  <Card title="账户管理员" icon="building-shield">
+    覆盖整个账户。管理计费、席位、安全设置以及账户下的所有工作区。
+  </Card>
+
+  <Card title="工作区管理员" icon="user-shield">
+    仅限工作区范围。只管理自己工作区内的成员和资源。
+  </Card>
+</CardGroup>
+
+<div id="section">
+  ## 各角色的权限
+</div>
+
+两种角色都负责管理工作区——区别在于管理*哪些*工作区。账户管理员管理账户下的所有工作区，而工作区管理员仅管理自己所属的工作区。
+
+| 功能                      | 账户管理员 | 工作区管理员 |
+| ----------------------- | :---: | :----: |
+| 管理所辖工作区的成员              |   是   |    是   |
+| 管理所辖工作区的应用、群组和资源        |   是   |    是   |
+| 查看和编辑账单、支付方式与发票         |   是   |    否   |
+| 编辑、取消或恢复订阅              |   是   |    否   |
+| 添加、删除和分配席位              |   是   |    否   |
+| 设置支出与用量上限               |   是   |    否   |
+| 创建新工作区                  |   是   |    否   |
+| 管理其他账户管理员               |   是   |    否   |
+| 管理账户下的所有工作区             |   是   |    否   |
+| 配置 SAML、SCIM、审计日志和安全联系人 |   是   |    否   |
+
+工作区管理员的管理权限仅限于自己的工作区，而账户管理员拥有覆盖整个账户的全部管理权限。
+
+<Note>
+  账单、席位管理、订阅变更以及账户级安全控制均需要账户管理员权限。工作区管理员即使在自己的工作区内也无法执行这些操作。
+</Note>
+
+<div id="section-2">
+  ## 设置账户管理员
+</div>
+
+账户管理员在 Settings 的 **Seats** 标签页中管理。添加账户管理员后，该用户将获得整个账户的管理访问权限，并自动成为该账户下所有工作区的管理员。
+
+<div id="section-3">
+  ### 将成员提升为账户管理员
+</div>
+
+<Steps>
+  <Step title="打开 Seats 标签页">
+    在 Settings 中打开 **Seats** 标签页。该标签页会列出账户中的所有人员及其当前角色。
+  </Step>
+
+  <Step title="提升成员">
+    找到要提升的成员，打开操作菜单并选择 **Promote to account admin**。更改立即生效。
+  </Step>
+</Steps>
+
+<div id="section-4">
+  ### 降级账户管理员
+</div>
+
+降级账户管理员后，该用户将失去对整个账户和账单的访问权限。默认情况下，降级不会将其从工作区中移除——工作区访问权限独立于账户管理员身份保留。
+
+<Steps>
+  <Step title="打开 Seats 选项卡">
+    在 Settings 中打开 **Seats** 选项卡。
+  </Step>
+
+  <Step title="降级账户管理员">
+    找到该账户管理员，打开操作菜单并选择 **Demote from account admin**。更改会立即生效。
+  </Step>
+</Steps>
+
+为避免账户失去管理访问权限，系统设有以下规则：
+
+* 无法降级你自己。
+* 无法移除最后一位账户管理员，账户中必须始终至少保留一位。
+* 无法降级个人账户的所有者。
+
+<div id="scim">
+  ### 通过 SCIM 预配的管理员
+</div>
+
+如果通过 [SCIM](/zh/ja/teams/identity-and-access-management/scim) 预配用户，则在身份提供商中被分配 **Admin** 角色的用户将成为**账户管理员**。若要创建工作区级别的管理员，请在 Replit 中分配 **Workspace admin** 角色，而不要通过身份提供商分配。
+
+<div id="section-5">
+  ## 设置工作区管理员
+</div>
+
+分配工作区管理员角色，可以在不授予账户级权限或账单访问权限的前提下，让某人获得特定工作区的完整管理控制权。如果团队负责人需要管理自己的工作区，但不应管理订阅或其他团队，这一角色就非常适用。
+
+<Steps>
+  <Step title="打开工作区成员列表">
+    打开要分配管理员的工作区，然后前往 **Members** 页面。
+  </Step>
+
+  <Step title="将成员角色设置为 Workspace admin">
+    找到该成员，打开角色选择器并选择 **Workspace admin**。该成员将获得仅限于该工作区的管理访问权限。
+  </Step>
+</Steps>
+
+<Note>
+  工作区管理员的权限范围仅限于其所属的工作区，无法访问账单、管理席位或管理其他工作区 —— 这些操作需要账户管理员来完成。
+</Note>
+
+<div id="section-6">
+  ## 如何选择合适的角色
+</div>
+
+* 将**账户管理员**分配给需要负责账单、管理订阅与席位、配置安全设置并监管所有工作区的人员。
+* 将**工作区管理员**分配给负责运营单个团队或工作区的人员：他们管理成员和资源，但不涉及账单或其他工作区。
+
+<div id="section-7">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="角色、群组与访问权限" icon="user-group" href="/zh/ja/teams/identity-and-access-management/groups-and-permissions">
+    了解角色和自定义群组如何控制整个组织范围内的访问权限。
+  </Card>
+
+  <Card title="管理成员" icon="users" href="/zh/ja/teams/identity-and-access-management/managing-members">
+    添加或移除组织成员，并为其分配角色。
+  </Card>
+
+  <Card title="SCIM" icon="arrows-rotate" href="/zh/ja/teams/identity-and-access-management/scim">
+    自动完成来自身份提供商的用户预配和角色分配。
+  </Card>
+
+  <Card title="管理席位" icon="chair" href="/zh/ja/billing/teams-billing/managing-seats">
+    掌控计费容量和付费席位数量。
+  </Card>
+</CardGroup>

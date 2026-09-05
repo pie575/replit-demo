@@ -1,0 +1,223 @@
+---
+title: "Dépannage des applications mobiles"
+description: "Résolvez les problèmes courants liés à la création d'applications mobiles avec Expo et React Native sur Replit."
+---
+
+Lorsque vous créez des applications mobiles sur Replit, vous pouvez rencontrer des problèmes d&#39;aperçu, de bundling ou de dépendances de paquets. Ce guide explique comment résoudre les problèmes les plus courants, des correctifs rapides aux procédures de débogage détaillées.
+
+<div id="section">
+  ## Correctifs rapides
+</div>
+
+Commencez par ces solutions : elles résolvent la plupart des problèmes.
+
+| Problème                                                   | À essayer                                                                      |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Les modifications n&#39;apparaissent pas sur le smartphone | Secouez votre smartphone pour ouvrir le menu Expo, puis appuyez sur **Reload** |
+| Les modifications n&#39;apparaissent pas dans l&#39;aperçu | Appuyez sur **R** dans la console pour relancer le bundle                      |
+| L&#39;application se fige ou ne répond plus                | Arrêtez l&#39;application depuis la console, puis redémarrez-la                |
+
+<div id="section-2">
+  ## Problèmes courants
+</div>
+
+<AccordionGroup>
+  <Accordion title="Les modifications ne sont pas répercutées sur l’appareil">
+    Si vos modifications n&#39;apparaissent pas sur votre smartphone :
+
+    1. **Secouez votre smartphone** pour ouvrir le menu développeur Expo
+    2. Appuyez sur **Reload** pour retélécharger le bundle
+
+    Dans l&#39;aperçu web, appuyez sur **R** dans la console pour relancer le bundling.
+
+    Si les modifications ne s&#39;affichent toujours pas, essayez de vider le cache (voir [Vider le cache Metro](#clear-the-metro-cache) ci-dessous).
+  </Accordion>
+
+  <Accordion title="Un écran d’erreur rouge s’affiche dans Expo Go">
+    Un écran d&#39;erreur rouge indique généralement une erreur JavaScript ou un module manquant. Lisez le message d&#39;erreur — il précise souvent le fichier et la ligne concernés.
+
+    **Causes fréquentes :**
+
+    * Un paquet n&#39;est pas installé ou sa version est incorrecte
+    * Un module qui fonctionne sur le web mais pas en natif (ou l&#39;inverse)
+    * Une erreur de syntaxe dans le code
+
+    **À essayer :**
+
+    1. Lisez attentivement le message d&#39;erreur — il indique souvent précisément ce qui ne va pas
+    2. Partagez le message et demandez à Agent de vous aider à corriger le problème
+    3. Si l&#39;erreur mentionne un paquet précis, essayez de réinstaller les dépendances (voir [Réinstaller les paquets](#reinstall-packages))
+  </Accordion>
+
+  <Accordion title="Fonctionne sur le Web, mais plante sur smartphone (ou inversement)">
+    Certains paquets et fonctionnalités se comportent différemment selon la plateforme. React Native compile vers trois cibles : iOS, Android et le Web. Il arrive qu&#39;une bibliothèque fonctionnant sur le Web ne prenne pas en charge le natif ou nécessite une configuration différente.
+
+    **À essayer :**
+
+    1. Vérifiez la prise en charge des plateformes dans la documentation du paquet
+    2. Demandez à Agent : « Ce paquet est-il compatible avec Expo Go ? »
+    3. Si le mobile n&#39;est pas pris en charge, envisagez de déplacer la fonctionnalité côté serveur
+
+    <Tip>
+      Lorsque vous examinez un paquet, cherchez la mention « Expo compatible » ou consultez la liste des modules pris en charge dans la [documentation du SDK Expo](https://docs.expo.dev/versions/latest/).
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Impossible de scanner le code QR ou de connecter l’application">
+    **Vérifiez votre réseau :**
+
+    * Votre smartphone et votre ordinateur doivent être connectés au même réseau Wi-Fi
+    * Les réseaux d&#39;entreprise ou publics peuvent bloquer la connexion
+
+    **Essayez le mode tunnel :**
+    Si vous utilisez un réseau restreint, le mode tunnel achemine le trafic via les serveurs d&#39;Expo. Demandez à Agent de lancer l&#39;application en mode tunnel, ou exécutez `npx expo start --tunnel` dans le Shell.
+
+    **Redémarrez Expo Go :**
+    Fermez complètement Expo Go, puis rouvrez-le avant de scanner.
+  </Accordion>
+
+  <Accordion title="La compilation est longue">
+    La première compilation est toujours plus longue, faute de cache. Les compilations suivantes devraient être plus rapides.
+
+    **Facteurs qui influent sur la durée de compilation :**
+
+    * Le nombre de paquets dans votre projet
+    * La première exécution après avoir vidé le cache
+    * La vitesse du réseau lors du téléchargement des paquets
+
+    Si vos compilations sont systématiquement lentes, vérifiez qu&#39;aucun paquet inutile n&#39;est installé.
+  </Accordion>
+
+  <Accordion title="Erreur « Module introuvable »">
+    Si le message « Unable to resolve module » ou « Module not found » s&#39;affiche :
+
+    1. Le paquet n&#39;est peut-être pas installé — demandez à Agent de l&#39;installer
+    2. Le paquet est installé, mais le cache est peut-être obsolète — videz le cache
+    3. Le paquet n&#39;existe peut-être pas ou son nom est mal orthographié — vérifiez le nom du paquet
+
+    Si le module est censé exister, essayez de [réinstaller les paquets](#reinstall-packages).
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-3">
+  ## Commandes de débogage
+</div>
+
+Si les correctifs rapides ne suffisent pas, ces commandes permettent de réinitialiser différents caches et états. Exécutez-les dans le Shell.
+
+<div id="metro">
+  ### Vider le cache de Metro
+</div>
+
+Metro est le bundler qui compile le code React Native. Vider son cache force la création d&#39;un nouveau build.
+
+Exécutez la commande suivante dans le Shell :
+
+```bash theme={null}
+npx expo start --clear
+```
+
+Cela vide le cache du bundler et redémarre le serveur de développement. La sortie affiche « Bundler cache is empty. Rebuilding. »
+
+<Tip>
+  Si vous rencontrez fréquemment des problèmes de cache, vous pouvez ajouter `-c` à votre commande de démarrage. Demandez à Agent d&#39;ajouter l&#39;option de nettoyage du cache à votre commande de développement.
+</Tip>
+
+<div id="section-4">
+  ### Réinstaller les paquets
+</div>
+
+Si vous rencontrez des erreurs de module ou des incompatibilités de version, réinstaller les paquets suffit souvent à résoudre le problème.
+
+Exécutez la commande suivante dans le Shell :
+
+```bash theme={null}
+rm -rf node_modules && npm install
+```
+
+Cette opération supprime tous les paquets installés et les réinstalle entièrement à partir du fichier `package.json`.
+
+<Note>
+  Si votre projet utilise un autre gestionnaire de paquets (par exemple `bun` ou `pnpm`), utilisez la commande d&#39;installation correspondante : `bun install` ou `pnpm install`.
+</Note>
+
+<div id="section-5">
+  ### Vérifier les incompatibilités de versions
+</div>
+
+Expo Doctor analyse votre projet afin de détecter les problèmes courants, comme les incompatibilités de versions entre les paquets.
+
+Exécutez la commande suivante dans le Shell :
+
+```bash theme={null}
+npx expo-doctor
+```
+
+Vérifiez les avertissements affichés dans la sortie. Si des correctifs vous sont proposés, évaluez-les avec prudence : mettre à jour des paquets à l&#39;aveugle peut créer de nouveaux problèmes si les nouvelles versions introduisent des changements incompatibles.
+
+<Warning>
+  Ne mettez à jour un paquet que si vous avez une raison précise de le faire. Une mise à jour effectuée « au cas où » risque de casser votre application si la nouvelle version comporte des changements incompatibles.
+</Warning>
+
+<div id="section-6">
+  ## Réinitialisation complète
+</div>
+
+Si aucune autre méthode ne fonctionne, une réinitialisation complète vide tous les caches et réinstalle tout.
+
+<Accordion title="Option radicale : commande de réinitialisation complète">
+  Cette commande supprime tous les caches et réinstalle les paquets depuis zéro. À utiliser en dernier recours.
+
+  ```bash theme={null}
+  rm -rf node_modules .expo && npm cache clean --force && npm install && npx expo start --clear
+  ```
+
+  **Ce que fait la commande :**
+
+  1. `rm -rf node_modules` — supprime les paquets installés
+  2. `rm -rf .expo` — supprime le cache local d&#39;Expo
+  3. `npm cache clean --force` — vide le cache global de npm
+  4. `npm install` — réinstalle tous les paquets
+  5. `npx expo start --clear` — démarre avec le cache Metro vidé
+
+  Après l&#39;exécution de cette commande, la build suivante prendra plus de temps, car tout est reconstruit depuis zéro.
+</Accordion>
+
+<div id="section-7">
+  ### Vider le cache de l&#39;appareil
+</div>
+
+Si l&#39;application sur votre smartphone affiche toujours l&#39;ancien code après un rechargement :
+
+* **iOS** : dans Expo Go, ouvrez **Settings**, puis appuyez sur **Clear Cache**
+* **Android** : accédez à **Settings &gt; Apps &gt; Expo Go &gt; Storage &gt; Clear Cache**
+
+<div id="section-8">
+  ## Référence rapide
+</div>
+
+| Problème                                 | À essayer en premier              | À essayer ensuite               |
+| ---------------------------------------- | --------------------------------- | ------------------------------- |
+| Les modifications ne s&#39;affichent pas | Secouez votre smartphone → Reload | Videz le cache Metro            |
+| Erreur du bundler                        | `npx expo start --clear`          | Supprimez node&#95;modules      |
+| Module introuvable                       | Réinstallez les dépendances       | Réinitialisation complète       |
+| Avertissement de version incompatible    | Exécutez `npx expo-doctor`        | Évaluez les correctifs proposés |
+| Un nouveau paquet ne fonctionne pas      | Redémarrez le serveur             | Videz le cache Metro            |
+| Vous avez modifié app.json               | Redémarrez le serveur             | —                               |
+
+<div id="section-9">
+  ## Si vous avez besoin d&#39;aide supplémentaire
+</div>
+
+Si le problème persiste :
+
+* **Demandez à Agent** : décrivez l&#39;erreur et ce que vous avez déjà essayé. Agent parvient souvent à diagnostiquer et à corriger le problème.
+* **Consultez la documentation Expo** : le [guide de dépannage d&#39;Expo](https://docs.expo.dev/troubleshooting/overview/) couvre d&#39;autres scénarios.
+* **Recherchez l&#39;erreur** : copiez le message d&#39;erreur exact et lancez une recherche — il y a de fortes chances que quelqu&#39;un ait déjà rencontré le même problème.
+
+<div id="section-10">
+  ## Étapes suivantes
+</div>
+
+* Revenir aux [applications mobiles natives](/fr/ja/features/artifact-types/building-mobile-apps)
+* Découvrir le processus de publication : [Créer et publier une application mobile](/fr/ja/build/mobile-app)

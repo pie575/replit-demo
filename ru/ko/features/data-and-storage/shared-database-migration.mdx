@@ -1,0 +1,254 @@
+---
+title: "Обновление опубликованного App, использующего общую базу данных"
+description: "Пошаговое руководство по обновлению опубликованного App, который всё ещё использует базу данных, изначально созданную для другого App."
+---
+
+Некоторые старые опубликованные App могут по-прежнему быть подключены к базе данных для разработки, изначально созданной для другого App.
+
+Это может относиться к старым App, созданным в Replit путём форка или ремикса. В устаревшей конфигурации Neon форк мог продолжать использовать подключение к базе данных исходного App. Поскольку Replit переходит к полному разделению баз данных для разработки и продакшн-баз данных, старые общие базы данных для разработки будут удалены, а опубликованные App необходимо перенести на собственные продакшн-базы данных.
+
+Воспользуйтесь этим руководством, если в опубликованном App возникают ошибки подключения к базе данных или если `DATABASE_URL` в панели Secrets по-прежнему указывает на `neon.tech`.
+
+<Warning>
+  Работа старых общих баз данных будет прекращена **8 июня 2026 года**. Чтобы избежать простоя или
+  безвозвратной потери данных, обновите опубликованный App до этой даты.
+</Warning>
+
+<div id="section">
+  ## Перед началом работы
+</div>
+
+Опубликованному App необходима собственная **продакшн-база данных**. Базу данных для разработки, отображаемую на панели **Database**, не следует напрямую использовать в опубликованном App.
+
+<Frame>
+  <img src="/assets/mirror/dev-database-5c024a6c134e.png" alt="Панель баз данных с базой данных для разработки" width="955" height="767" data-path="images/databases/shared-database-migration/dev-database.png" />
+</Frame>
+
+Чтобы решить эту проблему, сначала определите, какой случай относится к вам.
+
+* **Случай 1:** Нужные данные уже есть на панели **Database** App.
+* **Случай 2:** Опубликованное App по-прежнему использует прежнюю общую базу данных для разработки, поэтому нужные данные не отображаются на панели **Database**.
+
+<div id="section-2">
+  ## Как узнать, использует ли опубликованное App общую базу данных?
+</div>
+
+Опубликованное App затронуто, если выполняется хотя бы одно из следующих условий:
+
+* После обновления базы данных в опубликованном App появляется ошибка подключения к базе данных
+* App было ремикшировано из другого App с базой данных **до 9 января 2026 года**
+
+<div id="section-3">
+  ## Как проверить, использует ли опубликованное App общую базу данных исходного App
+</div>
+
+<div id="1-database">
+  ### Шаг 1. Откройте панель Database в исходном App
+</div>
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-showing-secrets-763dd4c4845f.png" alt="Панель Secrets с DATABASE_URL" width="792" height="418" data-path="images/databases/shared-database-migration/secret-pane-showing-secrets.png" />
+</Frame>
+
+Скопируйте значение `NEON_DATABASE_URL`, а если оно отсутствует — значение `DATABASE_URL`.
+
+<Info>
+  `NEON_DATABASE_URL` есть не во всех затронутых App. Если этого значения
+  нет, обычно нужно проверить в Secrets опубликованного App, по-прежнему ли
+  текущий `DATABASE_URL` указывает на `neon.tech`.
+</Info>
+
+<div id="2-publish">
+  ### Шаг 2. Откройте панель Publishing в опубликованном App
+</div>
+
+<Frame>
+  <img src="/assets/mirror/production-app-secrets-e4da45c53e36.png" alt="Secrets опубликованного App с DATABASE_URL" width="1385" height="1225" data-path="images/databases/shared-database-migration/production-app-secrets.png" />
+</Frame>
+
+Чтобы узнать URL базы данных опубликованного App:
+
+1. Откройте App в Replit
+2. Откройте панель **Publishing**
+3. Выберите **Adjust Settings**
+4. Откройте **Secrets**
+5. Найдите `DATABASE_URL`
+
+<div id="3-1-url-2">
+  ### Шаг 3. Сравните URL базы данных исходного App из шага 1 и ремикс-App из шага 2
+</div>
+
+Если URL совпадают, опубликованное App использует общую Neon-базу данных для разработки исходного App.
+
+<div id="section-4">
+  ## Как скопировать данные из исходного App в опубликованный App
+</div>
+
+Убедившись, что опубликованный App использует общую базу данных для разработки исходного App, перенесите в него необходимые данные. Возможны два сценария:
+
+* Сценарий 1: необходимые данные уже есть на панели Database опубликованного App.
+* Сценарий 2: необходимых данных нет на панели Database опубликованного App.
+
+<div id="1-database-2">
+  ### Случай 1: нужные данные уже отображаются на панели Database
+</div>
+
+Это самый простой способ, если нужные данные уже видны на панели **Database** App.
+
+<div id="1">
+  #### Шаг 1. Проверьте наличие данных
+</div>
+
+<Frame>
+  <img src="/assets/mirror/my-data-12834f2ebfd6.png" alt="панель базы данных со строкой my data" width="865" height="454" data-path="images/databases/shared-database-migration/my-data.png" />
+</Frame>
+
+Откройте панель **Database** в опубликованном App и убедитесь, что в ней есть нужные таблицы и данные.
+
+Если на панели Database не отображаются нужные данные, остановитесь на этом шаге. Чтобы правильно выполнить миграцию данных, следуйте инструкциям для [случая 2](#case-2-the-database-panel-does-not-show-the-data-you-need).
+
+<div id="2">
+  #### Шаг 2. Опубликуйте или переопубликуйте App с продакшн-базой данных
+</div>
+
+1. Откройте App в Project Editor
+2. Выберите **Publish** или **Republish**
+3. Включите **Create production database**
+4. Включите **Set up your production database with your current development data**
+5. Завершите публикацию
+
+После публикации будет создана новая версия App, а `DATABASE_URL` автоматически будет настроен для новой продакшн-базы данных. Вручную обновлять этот секрет не нужно.
+
+<Frame>
+  <img src="/assets/mirror/production-database-settings-8855bf453da9.png" alt="Настройки публикации с параметром Create production database" width="1406" height="1207" data-path="images/databases/shared-database-migration/production-database-settings.png" />
+</Frame>
+
+<Warning>
+  При копировании в продакшн существующие продакшн-данные будут перезаписаны. Подробнее о восстановлении и управлении продакшн-базой данных см. в разделе [Продакшн-база данных](/ru/ko/features/data-and-storage/development-and-production).
+</Warning>
+
+<div id="3">
+  #### Шаг 3. Проверьте опубликованное App
+</div>
+
+Откройте опубликованное App и убедитесь, что у него есть доступ к данным и оно работает корректно.
+
+<div id="2-database">
+  ### Случай 2: на панели Database опубликованного App не отображаются нужные данные
+</div>
+
+Если на панели **Database** опубликованного App не отображаются нужные данные, экспортируйте их, выполнив следующие действия.
+
+Если опубликованное App по-прежнему подключено к базе данных другого App, на панели Database отображается предупреждение &quot;external database detected&quot;.
+
+<Frame>
+  <img src="/assets/mirror/external-database-detected-489d99632e74.png" alt="панель базы данных с предупреждением external database detected" width="1403" height="1208" data-path="images/databases/shared-database-migration/external-database-detected.png" />
+</Frame>
+
+<Warning>
+  Если пользователи всё ещё используют App и сохраняют новые данные, запланируйте
+  короткое окно обслуживания перед экспортом данных.
+</Warning>
+
+<div id="1-2">
+  #### Шаг 1: Экспорт данных из предыдущей базы данных
+</div>
+
+<Frame>
+  <img src="/assets/mirror/pg-dump-example-54c6c790ccb1.png" alt="Пример pg_dump" width="1252" height="450" data-path="images/databases/shared-database-migration/pg-dump-example.png" />
+</Frame>
+
+Откройте **Shell** в Project Editor и выполните следующую команду.
+
+```bash theme={null}
+pg_dump -Fc "database_url" --no-owner --no-privileges -f backup.dump
+```
+
+`database_url` — это URL базы данных, полученный на [шаге 1: откройте панель Database в исходном App](#step-1-open-the-database-panel-in-the-source-app).
+
+<div id="2-secrets-database_url">
+  ### Шаг 2: Удалите прежний `DATABASE_URL` из Secrets App
+</div>
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-eb253120f8a6.png" alt="пример панели Secrets" width="1410" height="1184" data-path="images/databases/shared-database-migration/secret-pane.png" />
+</Frame>
+
+1. Откройте инструмент **Secrets** в Project Editor
+2. Найдите прежний `DATABASE_URL`
+3. Удалите его
+4. Обновите страницу или заново откройте панель **Database**
+
+После этого App больше не будет обращаться к прежней общей базе данных и снова начнёт использовать текущую базу данных для разработки.
+
+<div id="3-2">
+  ### Шаг 3. Импортируйте данные в текущую базу данных для разработки App
+</div>
+
+<Frame>
+  <img src="/assets/mirror/pg-restore-example-409ae4d7bf09.png" alt="Пример pg_restore" width="802" height="426" data-path="images/databases/shared-database-migration/pg-restore-example.png" />
+</Frame>
+
+После удаления прежнего секрета `DATABASE_URL` текущая база данных для разработки App вновь будет доступна в Project Editor как `$DATABASE_URL`.
+
+Вернитесь в **Shell** в Project Editor и выполните следующую команду.
+
+```bash theme={null}
+pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+```
+
+После этого экспортированные данные будут загружены в текущую базу данных для разработки вашего App.
+
+<div id="5-1">
+  ### Шаг 5. Опубликуйте или переопубликуйте App с продакшн-базой данных, следуя случаю 1
+</div>
+
+Если на панели **Database** отображаются нужные данные, следуйте [случаю 1](#case-1-the-database-panel-already-shows-the-data-you-need): опубликуйте или переопубликуйте App, выбрав **Create production database**, чтобы скопировать эти данные в продакшн.
+
+<div id="6">
+  ### Шаг 6: Проверьте опубликованное App
+</div>
+
+<Frame>
+  <img src="/assets/mirror/successful-export-bfb997304cc1.png" alt="Успешный экспорт" width="965" height="554" data-path="images/databases/shared-database-migration/successful-export.png" />
+</Frame>
+
+Откройте опубликованное App и убедитесь, что у вас есть доступ к данным и оно работает корректно.
+
+<div id="section-5">
+  ## Устранение неполадок
+</div>
+
+<div id="section-6">
+  ### Импорт завершается ошибкой, так как таблица уже существует
+</div>
+
+Указанная выше команда `pg_restore --clean --if-exists` перед восстановлением удаляет соответствующие объекты из дампа, а затем создаёт их заново.
+
+<div id="role-policy">
+  ### Сбой импорта из-за ошибок ролей или политик
+</div>
+
+Если в базе данных используются пользовательские роли PostgreSQL или политики на основе ролей, импорт может завершиться ошибкой, так как этих ролей ещё нет в новой базе данных.
+
+Автоматическая миграция Helium в Replit пытается повторно создать заглушки ролей перед восстановлением, но описанный выше ручной процесс этого не делает. Если при выполнении `pg_restore` возникают ошибки, связанные с ролями, [обратитесь в службу поддержки](https://replit.com/support).
+
+<div id="section-7">
+  ### Я уже обновил App
+</div>
+
+Если у опубликованного App уже есть собственная продакшн-база данных и он работает корректно, ничего делать не нужно.
+
+<div id="section-8">
+  ## Нужна дополнительная помощь?
+</div>
+
+Если вы не уверены, какой вариант подходит для вашего App, или у вас возникли проблемы при миграции, [обратитесь в службу поддержки](https://replit.com/support).
+
+<div id="section-9">
+  ## Связанные материалы
+</div>
+
+* [Обновление базы данных](/ru/ko/features/data-and-storage/development-and-production#database-infrastructure-upgrade)
+* [Продакшн-база данных](/ru/ko/features/data-and-storage/development-and-production)
+* [База данных](/ru/ko/features/data-and-storage/sql-database)

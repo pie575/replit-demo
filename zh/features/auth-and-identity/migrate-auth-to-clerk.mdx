@@ -1,0 +1,127 @@
+---
+title: "从 Replit Auth 迁移到 Clerk"
+description: "使用 Agent 将现有的 Replit Auth 应用迁移到 Clerk Auth，同时保留应用的用户数据。"
+sidebarTitle: "迁移到 Clerk"
+icon: "right-left"
+---
+
+参照本指南，将现有的 [Replit Auth](/zh/features/auth-and-identity/authentication) 应用迁移到 [Clerk Auth](/zh/features/auth-and-identity/clerk-auth)。对于符合条件的应用，Agent 会自动完成迁移，老用户仍可访问自己原有的数据。
+
+<Note>
+  此自动迁移仅适用于使用 Replit Auth 的应用。如果你的应用使用其他身份验证系统，请勿使用此流程。
+</Note>
+
+<div id="start-the-migration">
+  ## 开始迁移
+</div>
+
+Agent 迁移应始终在新任务中运行。
+
+你可以通过以下任一方式开始迁移：
+
+<div id="start-from-agent">
+  ### 从 Agent 开始
+</div>
+
+<Steps>
+  <Step title="创建新任务">
+    在侧边栏中选择 **+**，或按 **Cmd+Shift+P** (Mac) / **Ctrl+Shift+P** (Windows) ，创建一个新任务。
+
+    <Frame caption="规划新任务：描述你的需求，Agent 会为你制定计划。">
+      <img src="/assets/mirror/replit-auth-to-clerk-new-task-090bed68b68c.png" alt="新任务视图：侧边栏中高亮显示创建新任务按钮，工具提示显示 Cmd Shift P 快捷键，Message Agent 输入框上方是“规划新任务”空状态" width="1750" height="1948" data-path="images/workspace/auth/replit-auth-to-clerk-new-task.png" />
+    </Frame>
+  </Step>
+
+  <Step title="使用 Agent 进行迁移">
+    在新任务中，让 Agent 把你的应用从 Replit Auth 迁移到 Clerk。
+  </Step>
+</Steps>
+
+<div id="start-from-the-auth-pane">
+  ### 从 Auth 面板开始
+</div>
+
+<Steps>
+  <Step title="打开 Tools">
+    在 Project Editor 中打开 **Tools**。
+
+    <Frame caption="Tools 标签页会在当前工具旁打开工具列表。">
+      <img src="/assets/mirror/replit-auth-to-clerk-open-tools-6eeea4995d4f.png" alt="已打开的 Project Editor Tools 标签页，在 Publishing 概览旁显示包含 Publishing、Domains、Monitoring、Users & Auth 等项的工具列表" width="1500" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-open-tools.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择 Users & Auth">
+    <Frame caption="工具列表中的 Users & Auth。">
+      <img src="/assets/mirror/replit-auth-to-clerk-users-auth-684bf872c3b2.png" alt="工具列表中高亮显示 Users & Auth，并带有提示文字“Let users log in to your App using a prebuilt login page”" width="1154" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-users-auth.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择 Update now">
+    在 **Introducing a new Replit Auth** 横幅中选择 **Update now**。
+
+    <Frame caption="Users & Auth 工具中显示 Introducing a new Replit Auth 横幅及其 Update now 操作。">
+      <img src="/assets/mirror/replit-auth-to-clerk-banner-64d3b381da86.png" alt="选中 Users & Auth 的 Project Editor，显示带有 Update now 按钮的 Introducing a new Replit Auth 横幅" width="1220" height="764" data-path="images/workspace/auth/replit-auth-to-clerk-banner.png" />
+    </Frame>
+  </Step>
+
+  <Step title="请 Agent 执行迁移">
+    在对话框中选择 **Ask agent to migrate**。
+
+    <Frame caption="迁移概览对话框会说明 Clerk Auth 更新内容，并提供 Ask agent to migrate 操作。">
+      <img src="/assets/mirror/replit-auth-to-clerk-dialog-c485c7e997bc.png" alt="带有 Ask agent to migrate 按钮的 Introducing a new Replit Auth 对话框" width="1259" height="790" data-path="images/workspace/auth/replit-auth-to-clerk-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="review-the-migration-plan">
+  ### 查看迁移计划
+</div>
+
+无论以哪种方式开始，Agent 都会创建 **Migrate from Replit Auth to Clerk** 任务并生成迁移计划。请选择 **View plan**，在任务继续执行前查看该计划。
+
+<Frame caption="Migrate from Replit Auth to Clerk 任务以 View plan 操作开始，便于你查看迁移方案。">
+  <img src="/assets/mirror/replit-auth-to-clerk-task-998d61b55c3d.png" alt="名为 Migrate from Replit Auth to Clerk 的 Agent 任务，带有 View plan 按钮和迁移方案查看活动" width="575" height="900" data-path="images/workspace/auth/replit-auth-to-clerk-task.png" />
+</Frame>
+
+在 Agent 执行期间，请勿更改应用的身份验证代码或 Clerk 凭据。
+
+<div id="what-agent-does">
+  ## Agent 会做什么
+</div>
+
+Agent 按以下顺序完成迁移：
+
+1. 将你的 Replit Auth 用户数据迁移到 Clerk，包括账户身份信息和受支持的登录凭据。
+2. 等待数据迁移完成后，再对你的应用进行改动。
+3. 更新应用的登录与会话逻辑，重启应用，并运行可用的自动化检查。
+
+<div id="your-app-data-stays-in-place">
+  ## 应用数据保持不变
+</div>
+
+Agent 只会修改应用的身份验证代码，不会改动应用现有的数据库数据或表结构。你的数据表和关联关系将保持完整。
+
+现有用户与其已有记录 (如个人资料、已保存的成果和权限) 之间的关联也会保持不变。
+
+<div id="how-long-it-takes">
+  ## 需要多长时间
+</div>
+
+Agent 的工作时间预计在 10 分钟到 1 小时之间。数据迁移本身，小型应用需要几分钟，用户量较大的应用则可能长达数小时。迁移完成前，Agent 不会开始修改应用代码。
+
+<div id="after-the-migration">
+  ## 迁移之后
+</div>
+
+发布前，请在开发环境中测试更新后的应用：
+
+1. 使用现有账号登录，确认已保存的数据仍然可用。
+2. 退出登录，然后重新登录。
+3. 创建一个新的测试账号，确认它能按预期使用该应用。
+
+<div id="additional-resources">
+  ## 其他资源
+</div>
+
+* [Clerk Auth 概览](/zh/features/auth-and-identity/clerk-auth) — 了解 Clerk Auth 在 Replit 上的工作原理
+* [规划自定义认证迁移](/zh/features/auth-and-identity/custom-auth-migration) — 规划从自定义认证系统迁移

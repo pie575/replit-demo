@@ -1,0 +1,154 @@
+---
+title: "端口"
+description: "了解如何在 Replit 应用中配置和管理网络端口。"
+---
+
+由于 Replit 在云环境中运行你的项目，端口的行为与本地计算机上有所不同。 (如果你需要先了解 TCP 端口的基础知识，可以[从这里开始](https://www.reddit.com/r/explainlikeimfive/comments/1t9s5a/eli5_what_are_ports_ex_tcp_port/)。) 
+
+在你的计算机上，端口管理只有一层：程序指定要监听的端口，当来自互联网的流量到达计算机的该端口时，就会被路由到对应的进程。
+
+<Frame>
+  <img src="/assets/mirror/computer-2bc67ea92696.png" alt="计算机" width="1323" height="786" data-path="images/ports/computer.png" />
+</Frame>
+
+其中 `0.0.0.0` 是地址或主机。进程在 `0.0.0.0` 上监听，意味着它会监听所有网络接口。也就是说，当互联网上的另一台计算机向你计算机的 IP 地址发送请求时，该进程能够接收到。因此，在 0.0.0.0 上监听意味着这些进程可以从公共互联网访问 (前提是你的计算机已联网) 。
+
+大多数编程框架在开发过程中&#95;不会&#95;在 `0.0.0.0` 上监听，因为出于隐私和安全考虑，你在开发过程中往往不希望公开自己的成果。它们会改为监听另一个地址 (`127.0.0.1`，也称为 `localhost`) ，这意味着只有本机才能向该端口发起请求。
+
+<Frame>
+  <img src="/assets/mirror/computer-localhost-564f03349bfb.png" alt="Localhost 端口只有承载它的计算机才能看到。" width="1467" height="786" data-path="images/ports/computer-localhost.png" />
+</Frame>
+
+在 Replit 上，若要让运行中的进程能通过 Web 视图或外部请求访问，你需要定义一个**外部端口**。这是因为进程通常使用的“内部端口”只在 Replit 提供的沙盒化云环境内部可见。该内部端口需要连接到一个可从外部访问的端口，才能把正确的流量送达你的程序。即使进程在 0.0.0.0 这类可公开访问的地址上监听，仍然需要绑定到一个外部端口。
+
+<Frame>
+  <img src="/assets/mirror/replit-de4de1b9386f.png" alt="外部端口将流量转发到程序监听的内部端口。" width="1641" height="870" data-path="images/ports/replit.png" />
+</Frame>
+
+Replit 通过将外部端口绑定到特定的内部端口来实现这一点。例如在上图中，外部端口 `:80` 绑定到了内部端口 `:3000`。这意味着 Replit 应用在端口 80 上收到的流量会被转发到内部端口 3000。
+
+该配置记录在 .replit 配置文件的 [[ports]] 部分中。
+
+默认情况下，Replit 会将第一个打开的端口绑定到默认的外部端口 80。这样，该进程即可通过不带端口号的域名访问 (例如 customdomain.com/，而非 customdomain.com:3000/) 。之后打开的其他内部端口则会绑定到其他可用的外部端口 (完整列表见下文) 。
+
+<div id="section">
+  ## Preview
+</div>
+
+在 Preview 工具中，点击域名并选择其他端口，即可更改 Web 视图所渲染的外部端口 (External Port) 。你还可以点击「齿轮」图标打开网络工具，查看更多详细信息。
+
+<Frame>
+  <img src="/assets/mirror/webview_dropdown-f953862d9654.png" alt="点击 Web 视图的域名即可选择要显示的端口。" width="862" height="534" data-path="images/ports/webview_dropdown.png" />
+</Frame>
+
+<div id="section-2">
+  ## 默认端口
+</div>
+
+端口 80 是 http 流量的“默认端口”，因此发送到根域名的 http 流量会自动路由到端口 80。也正因如此，端口 80 的 URL 中不会显示端口部分。而 `:80` 以外的端口则会显示在域名路径中 (例如：customdomain.com:4200/) 。 (由于 Replit 默认提供 TLS，技术上使用的是 https 的默认端口 443。在实际使用中，两者可以视为等同。)
+
+<div id="section-3">
+  ## 网络工具
+</div>
+
+如需查看端口配置和网络的详细信息，可以打开网络工具。在这里可以查看 Replit 应用中已打开端口的状态和绑定的外部端口，也可以添加或删除配置。
+
+<Frame>
+  <img src="/assets/mirror/networking_tool-647f3928cd38.png" alt="网络工具中显示的端口配置。" width="1412" height="558" data-path="images/ports/networking_tool.png" />
+</Frame>
+
+<div id="section-4">
+  ## 公开
+</div>
+
+Autoscale 和 Reserved VM 部署仅支持公开单个外部端口，且对应的内部端口不能使用 `localhost`。如果公开多个端口，或使用 localhost 公开单个端口，已发布的应用将无法正常运行。要确保 Autoscale 部署按预期运行，一个简单的方法是：仅保留需要从互联网访问的服务端口，删除配置中其余所有 `externalPort` 条目。
+
+<div id="section-5">
+  ## 调试
+</div>
+
+一个常见的问题原因是：端口配置看起来没问题，但程序实际监听的却是另一个端口。例如，配置如下时：
+
+```
+[[ports]]
+internalPort = 3000
+externalPort = 80
+```
+
+互联网上发往 80 端口的流量会被转发到内部的 3000 端口。但如果程序实际监听的并不是 3000 端口，而是其他端口 (例如 8080) ，看起来就会像是流量没有通过。如果你修改了代码中的端口，却没有同步修改配置中对应的端口，或者把某个项目的配置复制粘贴到了另一个项目，就可能出现这种情况。
+
+<Frame>
+  <img src="/assets/mirror/replit-wrong_port-cbef0be60e43.png" alt="程序可以更改所监听的端口。" width="1641" height="870" data-path="images/ports/replit-wrong_port.png" />
+</Frame>
+
+各个框架的默认端口各不相同。例如，Flask 是 5000，react 是 3000，laravel 是 8000。请确认配置的端口是否正确！
+
+<div id="section-6">
+  ## 设置
+</div>
+
+当端口被打开时，Replit 会自动将 Replit 应用中打开的端口绑定到一个可用的外部端口，并将该绑定记录到 .replit 配置文件中。
+
+但对于在 localhost 上打开的内部端口，默认不会这样处理。这是因为在 localhost 上运行的服务通常假定只能从运行该进程的同一台计算机访问 (localhost 端口仅在本机可见) ，因此这类服务的安全性往往不如那些一开始就按可从公网访问来构建的服务。
+
+你可以将需要公开的端口的 `exposeLocalhost` 配置选项设置为 `true`，从而始终覆盖这一默认行为。
+
+如果你希望默认&#95;始终&#95;公开 localhost 端口，可以在 User Settings 工具中将「端口自动转发」设置为「所有端口」。
+
+如果你想手动控制所有 Replit 应用的端口设置，&#95;完全不&#95;为已打开的端口生成任何配置，可以将其设置为「否」。
+
+<div id="section-7">
+  ## 支持的端口
+</div>
+
+Replit 应用在首次打开端口时，默认将外部端口设为 80。此外，Replit 应用还可以将 3000、3001、3002、3003、4200、5000、5173、6000、6800、8000、8008、8080、8081 公开为额外的外部端口。
+
+端口 22 和 8283 为内部使用，无法转发。
+
+<div id="ports-replit">
+  ## `[[ports]]` .replit 配置
+</div>
+
+类型：`{localPort, externalPort, exposeLocalhost}`
+
+`[[ports]]` 配置用于指定要在 Web 输出中公开的 HTTP 端口。默认情况下，绑定到主机 0.0.0.0 的 HTTP 端口会作为 Replit 应用的 Web 输出对外公开。
+
+若要在不覆盖默认端口的情况下提供额外端口，请在 .replit 文件中新增 [[ports]] 条目，并且必须同时指定 localPort 和 externalPort。按照下面的定义在 .replit 文件中添加多个 [[ports]] 条目，即可添加多个额外端口。
+
+<div id="localport">
+  ### localPort
+</div>
+
+指定 Replit 绑定到外部端口的本地端口。
+
+<div id="externalport">
+  ### externalPort
+</div>
+
+指定将该本地端口对外公开时所使用的可公开访问端口。
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+如果你&#95;完全&#95;不想公开某个端口，只需保留 `localPort` 配置、不添加 `externalPort` 即可：
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+```
+
+<div id="exposelocalhost">
+  ### exposeLocalhost
+</div>
+
+决定使用 `localhost` 的内部端口是否可以绑定到外部端口。可设置为 `true`、`false` 或 null。
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+exposeLocalhost = true
+```

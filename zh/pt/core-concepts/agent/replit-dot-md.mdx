@@ -1,0 +1,366 @@
+---
+title: "replit.md"
+description: "了解如何使用 replit.md 自定义 Agent 的行为、编程风格和项目背景。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Agent 会根据经过验证的最佳实践，在您项目的根目录中自动创建此文件。Agent 会将其内容纳入上下文，以便了解您的偏好、项目结构和编程风格。
+
+<Frame>
+  <img src="/assets/mirror/replitmd-65360844a148.jpg" alt="Agent 使用 replit.md 构建项目" width="1920" height="1080" data-path="images/replitai/replitmd.jpg" />
+</Frame>
+
+<div id="como-o-replitmd-funciona">
+  ## `replit.md` 的工作原理
+</div>
+
+Agent 会先根据经过验证的最佳实践，在项目根目录中创建 `replit.md` 文件。该文件包括：
+
+* 项目的基本信息
+* 推荐的编程规范
+* 适用于此类项目的常见偏好设置
+
+<YouTubeEmbed videoId="kYv525W-vaU" title="自定义 Replit Agent 的响应方式" />
+
+Agent 处理你的请求时，会自动读取 `replit.md` 文件，并利用其中的内容：
+
+* 了解项目的架构和约定
+* 遵循你偏好的编程规范和风格
+* 使用你指定的包管理器和依赖项
+
+随着 Agent 对项目了解得更深入并对应用进行更改，它还可以更新 `replit.md` 文件。
+
+<Note>
+  你可以编辑 `replit.md` 文件来自定义 Agent 的行为。
+</Note>
+
+<div id="configurando-o-replitmd">
+  ## 配置 `replit.md`
+</div>
+
+<div id="gerao-automtica">
+  ### 自动生成
+</div>
+
+使用 Agent 创建新项目时，系统会根据经过验证的最佳实践自动生成 `replit.md` 文件。该文件位于项目根目录，包含：
+
+* 项目基本信息
+* 推荐的编程规范
+* 该类项目的常见偏好设置
+
+<div id="criao-manual">
+  ### 手动创建
+</div>
+
+您可以在项目根目录中创建一个名为 `replit.md` 的新文件，以创建自己的 `replit.md` 文件。Agent 会自动检测该文件，并在后续对话中使用它。
+
+<Note>
+  `replit.md` 必须位于项目根目录中才能正常工作。
+</Note>
+
+<div id="regenerando-o-replitmd">
+  ### 重新生成 `replit.md`
+</div>
+
+如果您的 `replit.md` 文件损坏，或想要重新开始：
+
+1. 删除项目根目录中现有的 `replit.md` 文件
+2. 与 Agent 开启新对话
+3. Agent 会根据您当前的项目自动生成新的 `replit.md` 文件
+
+<div id="melhores-prticas">
+  ## 最佳实践
+</div>
+
+<div id="seja-especfico-e-claro">
+  ### 具体明确
+</div>
+
+编写清晰、具体的指令，帮助 Agent 准确理解你的需求：
+
+```markdown theme={null}
+## 编程风格
+
+- 所有新建的 JavaScript 文件均使用 TypeScript
+- 优先使用带 Hooks 的函数组件，而非类组件
+- 使用 Tailwind CSS 设置样式，避免使用内联样式
+- 始终为函数参数和返回值添加 TypeScript 类型
+```
+
+如需了解提示词格式的详细说明，请参阅 [Anthropic 提示词工程指南](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags)。
+
+<div id="use-exemplos">
+  ### 使用示例
+</div>
+
+相比抽象的描述，示例更能帮助 Agent 理解你的偏好：
+
+````markdown theme={null}
+## API 错误处理
+
+在创建 API 端点时，始终使用以下错误处理模式：
+
+```javascript
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await getUsersFromDatabase();
+    res.json({ success: true, data: users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch users' 
+    });
+  }
+});
+````
+
+<div id="defina-preferncias-de-comunicao">
+  ### 设置沟通偏好
+</div>
+
+告诉 Agent 您希望如何接收信息和更新：
+
+```markdown theme={null}
+## 沟通风格
+
+- 在实施更改前，说明你将要做什么以及为什么
+- 将复杂任务拆分为清晰的步骤
+- 如果需求不明确，请提出澄清请求
+- 简要说明技术决策的理由
+```
+
+<div id="especifique-o-contexto-do-projeto">
+  ### 明确项目背景
+</div>
+
+帮助 Agent 了解项目的目标和限制：
+
+```markdown theme={null}
+## 项目背景
+
+这是一个面向图书爱好者的社交应用，用户可以：
+- 创建阅读清单并分享图书推荐
+- 关注其他读者并查看他们的动态
+- 为读过的书评分并撰写书评
+
+目标受众：25 至 45 岁的休闲读者
+技术栈：React 前端、Node.js 后端和 PostgreSQL 数据库
+```
+
+<div id="exemplos-de-configuraes-do-replitmd">
+  ## `replit.md` 配置示例
+</div>
+
+<div id="projeto-de-aplicativo-web">
+  ### Web 应用项目
+</div>
+
+```markdown theme={null}
+# MyApp 项目指南
+
+## 项目概览
+使用 React 和 Express.js 构建的任务管理 Web 应用。
+
+## 技术偏好
+- 前端：React + TypeScript、Tailwind CSS
+- 后端：Express.js + TypeScript
+- 数据库：Neon PostgreSQL + Drizzle ORM
+- 包管理器：npm（不使用 yarn 或 pnpm）
+
+## 编码规范
+- 使用函数式组件和 hooks
+- 实现合适的错误边界
+- 端点遵循 REST API 约定
+- 变量和函数使用具有描述性的命名
+
+## 沟通风格
+- 在改动前先说明你的思路
+- 为复杂逻辑添加代码注释
+- 如果需求含糊不清，请提出疑问
+```
+
+<div id="projeto-de-anlise-de-dados">
+  ### 数据分析项目
+</div>
+
+```markdown theme={null}
+# 数据分析项目指南
+
+## 项目背景
+分析客户行为数据，以识别趋势并获取洞察。
+
+## 技术偏好
+- 使用 Python 和 Streamlit 构建交互式 Web 应用
+- 使用 pandas、numpy 和 matplotlib 进行数据分析
+
+## 分析规范
+- 为每个分析步骤提供清晰的文档说明
+- 使用 Streamlit 组件创建交互式可视化
+- 在分析前验证数据质量
+- 将结果导出为 CSV 格式，并在 Streamlit 表格中显示
+
+## 沟通风格
+- 说明统计方法和假设
+- 为发现和建议提供背景信息
+- 使用清晰、易懂的非技术语言阐述业务洞察
+- 创建交互式仪表板，用于向利益相关者演示
+```
+
+<div id="projeto-de-desenvolvimento-de-api">
+  ### API 开发项目
+</div>
+
+```markdown theme={null}
+# API 开发指南
+
+## 项目概述
+为移动应用后端构建 RESTful API。
+
+## 技术栈
+- Node.js 与 Express.js
+- MongoDB 与 Mongoose
+- 使用 JWT 进行身份验证
+- 包管理器：npm
+
+## API 规范
+- 使用语义明确的 HTTP 状态码
+- 实施适当的输入验证
+- 为公开端点实施速率限制
+- 遵循 OpenAPI 规范编写文档
+
+## 安全要求
+- 验证所有用户输入
+- 使用环境变量存储敏感数据
+- 实施适当的 CORS 策略
+- 记录请求日志以便调试
+
+## 测试策略
+- 为所有端点编写单元测试
+- 为关键流程添加集成测试
+- 使用 Jest 作为测试框架
+```
+
+<div id="uso-avanado">
+  ## 高级用法
+</div>
+
+<div id="orientao-dinmica-do-projeto">
+  ### 动态项目指引
+</div>
+
+随着项目不断发展，更新 `replit.md` 文件以提供最新上下文：
+
+```markdown theme={null}
+## 当前开发阶段
+团队目前正专注于实现用户身份验证。
+优先功能：
+1. 用户注册和登录
+2. 密码重置功能
+3. 电子邮件验证
+
+## 近期决策
+- 我们已将本地身份验证改为使用 Google OAuth。
+- 我们添加了 Redux 用于状态管理。
+- 我们决定使用 Material-UI，以保持样式一致。
+```
+
+<div id="integrao-com-ferramentas-externas">
+  ### 集成外部工具
+</div>
+
+在 `replit.md` 中引用外部文档和工具：
+
+```markdown theme={null}
+## 外部资源
+- 设计系统：遵循 [link] 中的 Figma 设计系统
+- API 文档：查阅内部 API 文档
+- 编程规范：遵循团队 Wiki 中的代码风格指南
+
+## 部署流程
+- 先在开发环境中测试更改
+- 对部署到 staging 环境的应用使用 CI/CD 流水线
+- 在发布到生产环境前要求进行代码审查
+```
+
+<div id="combinando-pesquisa-na-web-com-o-replitmd">
+  ## 将网络搜索与 `replit.md` 结合使用
+</div>
+
+Agent 可以搜索网络，查找最新信息、库和解决方案。结合使用 `replit.md` 文件后，您可以获得最新知识和针对项目的指导。
+
+<div id="melhores-prticas-para-integrao-de-pesquisa-na-web">
+  ### 集成网页搜索的最佳实践
+</div>
+
+**请明确告知 Agent 您希望搜索的内容：**
+
+```markdown theme={null}
+## 调研偏好
+- 在建议更新前，始终确认依赖项的最新版本
+- 查找当前安全实现的最佳实践
+- 查找适用于我们技术栈的最新性能优化技术
+```
+
+**指导 Agent 如何运用外部知识：**
+
+```markdown theme={null}
+## 外部研究指南
+- 建议使用新库时，确保其与现有技术栈兼容
+- 调整外部示例，使其符合我们的编程规范和项目结构
+- 确认建议的解决方案可在我们的部署环境中运行
+```
+
+**同时利用两者的示例提示：**
+&quot;研究 React 18 最新的性能优化技术，并按照 `replit.md` 中定义的组件模式加以实现&quot;
+
+这种方法既能提供与时俱进的解决方案，又能满足项目的具体需求。
+
+<div id="limitaes">
+  ## 限制
+</div>
+
+<div id="limites-de-tamanho-e-contedo-do-arquivo">
+  ### 文件大小和内容限制
+</div>
+
+虽然 `replit.md` 没有严格的字符数限制，但过大的文件可能无法被完全处理。请保持 `replit.md` 内容重点明确且简洁，以获得最佳效果。
+
+<div id="requisito-de-diretrio-raiz">
+  ### 根目录要求
+</div>
+
+`replit.md` 必须位于项目的根目录中。Agent 不会自动检测子目录中的文件。
+
+<div id="escopo-do-contexto">
+  ### 上下文适用范围
+</div>
+
+`replit.md` 会为 Agent 对话提供上下文，但不会自动应用到其他 AI 工具。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+准备好为你的项目定制 Agent 了吗？
+
+1. **从简单开始**：创建一个包含主要偏好设置的基础 `replit.md`
+2. **迭代改进**：在与 Agent 协作的过程中持续更新 `replit.md`
+3. **共享模式**：把行之有效的 `replit.md` 配置复用到类似项目中
+4. **关注效果**：留意 Agent 对你所定规则的遵循情况，并按需调整
+
+进一步了解[如何与 Agent 协作](/zh/pt/core-concepts/agent)，或探索其他 [AI 工具](/zh/pt/build/welcome)。
+
+**Enterprise**：在[自定义模板](/zh/pt/teams/custom-templates)中预先配置 `replit.md`，让组织中的所有开发者都拥有一致的初始上下文。如需设计方面的具体指导，请参阅[如何配置设计系统](/zh/pt/teams/custom-design-system)。

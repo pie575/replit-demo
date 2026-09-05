@@ -1,0 +1,717 @@
+---
+title: "原生移动应用"
+description: "了解如何使用 Agent 构建原生移动应用、在智能手机上测试，并提交应用审核以发布到 App Store。"
+---
+
+export const MobileArchitectureDiagram = () => {
+  if (typeof document !== 'undefined' && !document.getElementById('mobile-arch-styles-v3')) {
+    const style = document.createElement('style');
+    style.id = 'mobile-arch-styles-v3';
+    style.textContent = `
+      .mobile-arch-v3 {
+        --arch-bg: var(--replit-docs-bg, #F6F6F4);
+        --arch-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --arch-border: var(--replit-docs-border, #DEDAD5);
+        --arch-text: var(--replit-docs-text, #1D1D1D);
+        --arch-muted: var(--replit-docs-text-subtle, #858585);
+        --arch-accent: #F26522;
+        --arch-accent-soft: #FEF3EE;
+      }
+      
+      .dark .mobile-arch-v3,
+      html.dark .mobile-arch-v3,
+      [data-theme="dark"] .mobile-arch-v3 {
+        --arch-bg: var(--replit-docs-bg, #1E1E1F);
+        --arch-surface: var(--replit-docs-bg-elevated, #222223);
+        --arch-border: var(--replit-docs-border, #39393D);
+        --arch-text: var(--replit-docs-text, #F5F5F5);
+        --arch-muted: var(--replit-docs-text-subtle, #8E8F97);
+        --arch-accent: #F26522;
+        --arch-accent-soft: #1F1A17;
+      }
+
+      .arch-panel {
+        transition: all 0.25s ease;
+      }
+      .arch-panel:hover {
+        border-color: var(--arch-accent) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const serverItems = [{
+    label: 'Database',
+    detail: 'PostgreSQL for structured data'
+  }, {
+    label: 'Object Storage',
+    detail: 'Files, images, and media'
+  }, {
+    label: 'Secrets',
+    detail: 'API keys stored securely'
+  }, {
+    label: 'API routes',
+    detail: 'Server-side logic and endpoints'
+  }];
+  const clientItems = [{
+    label: 'Native UI',
+    detail: 'Real iOS and Android components'
+  }, {
+    label: 'Local state',
+    detail: 'Fast, offline-capable data'
+  }, {
+    label: 'Device APIs',
+    detail: 'Camera, location, notifications'
+  }, {
+    label: 'Live reload',
+    detail: 'Instant preview via Expo Go'
+  }];
+  return <div className="mobile-arch-v3" style={{
+    padding: '24px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-bg)'
+  }}>
+      {}
+      <div style={{
+    marginBottom: '20px'
+  }}>
+        <div style={{
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--arch-text)'
+  }}>
+          Architecture
+        </div>
+        <div style={{
+    fontSize: '14px',
+    color: 'var(--arch-muted)',
+    marginTop: '4px'
+  }}>
+          Your server runs on Replit. The app runs natively on devices.
+        </div>
+      </div>
+
+      {}
+      <div style={{
+    display: 'flex',
+    alignItems: 'stretch',
+    gap: '16px'
+  }}>
+        
+        {}
+        <div className="arch-panel" style={{
+    flex: 1,
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-surface)'
+  }}>
+          <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-accent)',
+    fontWeight: '600',
+    marginBottom: '6px'
+  }}>
+            Replit Cloud
+          </div>
+          <div style={{
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--arch-text)',
+    marginBottom: '16px'
+  }}>
+            Server
+          </div>
+          
+          <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  }}>
+            {serverItems.map(item => <div key={item.label}>
+                <div style={{
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--arch-text)'
+  }}>
+                  {item.label}
+                </div>
+                <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-muted)',
+    marginTop: '2px'
+  }}>
+                  {item.detail}
+                </div>
+              </div>)}
+          </div>
+        </div>
+
+        {}
+        <div className="arch-panel" style={{
+    flex: 1,
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-surface)'
+  }}>
+          <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-accent)',
+    fontWeight: '600',
+    marginBottom: '6px'
+  }}>
+            User device
+          </div>
+          <div style={{
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--arch-text)',
+    marginBottom: '16px'
+  }}>
+            Native app
+          </div>
+          
+          <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  }}>
+            {clientItems.map(item => <div key={item.label}>
+                <div style={{
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--arch-text)'
+  }}>
+                  {item.label}
+                </div>
+                <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-muted)',
+    marginTop: '2px'
+  }}>
+                  {item.detail}
+                </div>
+              </div>)}
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+export const MobileStackDiagram = () => {
+  if (typeof document !== 'undefined' && !document.getElementById('mobile-stack-styles-v3')) {
+    const style = document.createElement('style');
+    style.id = 'mobile-stack-styles-v3';
+    style.textContent = `
+      .mobile-stack-v3 {
+        --stack-bg: var(--replit-docs-bg, #F6F6F4);
+        --stack-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --stack-border: var(--replit-docs-border, #DEDAD5);
+        --stack-text: var(--replit-docs-text, #1D1D1D);
+        --stack-muted: var(--replit-docs-text-subtle, #858585);
+        --stack-accent: #F26522;
+        --stack-accent-soft: #FEF3EE;
+      }
+      
+      .dark .mobile-stack-v3,
+      html.dark .mobile-stack-v3,
+      [data-theme="dark"] .mobile-stack-v3 {
+        --stack-bg: var(--replit-docs-bg, #1E1E1F);
+        --stack-surface: var(--replit-docs-bg-elevated, #222223);
+        --stack-border: var(--replit-docs-border, #39393D);
+        --stack-text: var(--replit-docs-text, #F5F5F5);
+        --stack-muted: var(--replit-docs-text-subtle, #8E8F97);
+        --stack-accent: #F26522;
+        --stack-accent-soft: #1F1A17;
+      }
+
+      .stack-layer {
+        transition: all 0.25s ease;
+        cursor: pointer;
+      }
+      .stack-layer:hover,
+      .stack-layer.active {
+        background: var(--stack-accent-soft) !important;
+        border-color: var(--stack-accent) !important;
+      }
+      .stack-layer .layer-detail {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+        margin-top: 0;
+      }
+      .stack-layer.active .layer-detail {
+        max-height: 80px;
+        opacity: 1;
+        margin-top: 8px;
+      }
+      
+      .platform-item {
+        transition: all 0.2s ease;
+      }
+      .platform-item:hover {
+        border-color: var(--stack-accent) !important;
+        background: var(--stack-accent-soft) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleLayerClick = e => {
+    const layer = e.currentTarget;
+    const allLayers = document.querySelectorAll('.stack-layer');
+    const wasActive = layer.classList.contains('active');
+    allLayers.forEach(l => l.classList.remove('active'));
+    if (!wasActive) {
+      layer.classList.add('active');
+    }
+  };
+  const runAnimation = () => {
+    const btn = document.getElementById('stack-animate-btn');
+    if (!btn || btn.dataset.running === 'true') return;
+    btn.dataset.running = 'true';
+    btn.textContent = 'Running...';
+    btn.style.opacity = '0.6';
+    const layers = document.querySelectorAll('.stack-layer');
+    const platforms = document.getElementById('stack-platforms-container');
+    let step = 0;
+    const totalSteps = layers.length + 1;
+    const animate = () => {
+      layers.forEach(l => l.classList.remove('active'));
+      if (platforms) platforms.style.borderColor = 'var(--stack-border)';
+      if (step < layers.length) {
+        layers[step].classList.add('active');
+        step++;
+        setTimeout(animate, 4000);
+      } else if (step === layers.length) {
+        if (platforms) platforms.style.borderColor = 'var(--stack-accent)';
+        step++;
+        setTimeout(animate, 4000);
+      } else {
+        layers.forEach(l => l.classList.remove('active'));
+        if (platforms) platforms.style.borderColor = 'var(--stack-border)';
+        btn.dataset.running = 'false';
+        btn.textContent = 'See the flow';
+        btn.style.opacity = '1';
+      }
+    };
+    animate();
+  };
+  const layers = [{
+    title: 'Replit Agent',
+    summary: 'Builds your app from a prompt',
+    detail: 'Describe what you want in natural language. Agent writes TypeScript code, configures dependencies, and sets up your project.',
+    verb: 'writes'
+  }, {
+    title: 'Your code',
+    summary: 'TypeScript + React components',
+    detail: 'Your app is standard React code that you own and can customize. No vendor lock-in.',
+    verb: 'using'
+  }, {
+    title: 'Expo',
+    summary: 'Development framework',
+    detail: 'Expo simplifies React Native development with managed builds, over-the-air updates, and easy access to device APIs.',
+    verb: 'simplifies'
+  }, {
+    title: 'React Native',
+    summary: 'Cross-platform UI',
+    detail: 'React Native compiles your JavaScript to real native code, not a web view. True native performance.',
+    verb: 'compiles to'
+  }];
+  const platforms = ['iOS', 'Android', 'Web'];
+  return <div className="mobile-stack-v3" style={{
+    padding: '24px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-bg)'
+  }}>
+      {}
+      <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '20px'
+  }}>
+        <div>
+          <div style={{
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--stack-text)'
+  }}>
+            Technology stack
+          </div>
+          <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    marginTop: '4px'
+  }}>
+            Tap any layer to learn more
+          </div>
+        </div>
+        <button id="stack-animate-btn" onClick={runAnimation} data-running="false" style={{
+    padding: '8px 14px',
+    fontSize: '13px',
+    color: 'var(--stack-accent)',
+    background: 'transparent',
+    border: '1px solid var(--stack-accent)',
+    borderRadius: '4px',
+    cursor: 'pointer'
+  }}>
+          See the flow
+        </button>
+      </div>
+
+      {}
+      <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  }}>
+        {layers.map(layer => <div key={layer.title}>
+            <div className="stack-layer" onClick={handleLayerClick} style={{
+    padding: '16px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-surface)'
+  }}>
+              <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }}>
+                <div>
+                  <div style={{
+    fontSize: '16px',
+    fontWeight: '500',
+    color: 'var(--stack-text)'
+  }}>
+                    {layer.title}
+                  </div>
+                  <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    marginTop: '4px'
+  }}>
+                    {layer.summary}
+                  </div>
+                </div>
+                <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-accent)',
+    fontWeight: '500'
+  }}>
+                  {layer.verb}
+                </div>
+              </div>
+              <div className="layer-detail" style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    lineHeight: '1.5'
+  }}>
+                {layer.detail}
+              </div>
+            </div>
+          </div>)}
+      </div>
+
+      {}
+      <div id="stack-platforms-container" style={{
+    display: 'flex',
+    gap: '12px',
+    padding: '12px',
+    marginTop: '8px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-surface)',
+    transition: 'border-color 0.25s ease'
+  }}>
+        {platforms.map(platform => <div key={platform} className="platform-item" style={{
+    flex: 1,
+    padding: '12px',
+    borderRadius: '6px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-bg)',
+    textAlign: 'center',
+    fontSize: '15px',
+    fontWeight: '500',
+    color: 'var(--stack-text)'
+  }}>
+            {platform}
+          </div>)}
+      </div>
+    </div>;
+};
+
+<Frame>
+  <img src="/assets/mirror/mobile-screen-e5685fc26793.png" alt="Replit 项目编辑器预览中运行的移动应用，设备上显示预览面板和二维码" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
+</Frame>
+
+使用 Agent 构建 iOS 和 Android 应用，在智能手机上预览，并通过引导式流程为构建做好准备。
+
+<Note>
+  如需构建或预览原生 iOS 应用，请使用 [replit.com](https://replit.com) 上的项目编辑器。在支持的情况下，也可通过 Replit Android 应用处理原生移动应用。
+</Note>
+
+<div id="section">
+  ## 入门
+</div>
+
+只需几个步骤，即可创建可运行的移动应用：
+
+<Steps>
+  <Step title="创建移动应用">
+    在 Replit 首页描述你的应用创意，并选择**移动应用**作为应用类型。
+
+    <Frame>
+      <img src="/assets/mirror/prompt-5cb144699b45.png" alt="Replit 首页中已选择移动应用的提示词" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
+    </Frame>
+  </Step>
+
+  <Step title="测试应用">
+    在构建过程中，可通过两种方式预览移动应用：
+
+    * **在项目编辑器中**：在预览面板的设备选择器中选择**iOS 模拟器**或**Android 模拟器**。真实的模拟器会流式传输到项目编辑器中，因此无需离开 Replit 即可进行点击操作。无需使用 Xcode 或 Android Studio。
+    * **使用 Expo Go 在真机上测试**：在 iPhone 或 Android 设备上安装 [Expo Go](https://expo.dev/go)。在项目编辑器的预览面板中选择**在 Expo Go 中打开**，然后扫描二维码。
+
+    <Frame>
+      <img src="/assets/mirror/workspace-dda0f81e6b83.png" alt="显示应用预览和移动设备预览选项的 Replit 项目编辑器" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
+    </Frame>
+  </Step>
+
+  <Step title="使用 Agent 迭代">
+    请 Agent 添加功能、连接数据源并集成服务。在迭代过程中，继续在模拟器或智能手机上测试。
+  </Step>
+</Steps>
+
+<Tip>
+  项目编辑器中的**iOS 模拟器**和**Android 模拟器**会显示应用的原生版本，包括平台专属样式和大多数原生组件。对于依赖真实硬件的功能，例如触觉反馈、相机、推送通知和位置信息，请使用 Expo Go 在真机上测试。
+</Tip>
+
+<div id="section-2">
+  ## 在模拟器或仿真器中预览
+</div>
+
+在 Replit 中，你可以使用 Expo 在智能手机上运行和测试移动应用。Replit 还会将真实的 **iOS 模拟器**或 **Android 模拟器**直接串流到预览面板。通过 Agent 所做的更改会热重载到模拟器中，其运行效果与真实设备相同。
+
+<Note>
+  Core、Pro 和 Enterprise 套餐的构建者可使用 iOS 模拟器和 Android 模拟器预览功能。仅适用于移动应用 — 纯 Web 项目不会显示此选项。
+</Note>
+
+<div id="section-3">
+  ### 如何打开模拟器
+</div>
+
+<Steps>
+  <Step title="打开移动项目">
+    打开包含移动端产物的项目。
+  </Step>
+
+  <Step title="选择设备">
+    在顶部预览面板的设备选择器中，选择**iOS 模拟器**或**Android 模拟器**。模拟器会启动，取代 Web 预览。
+  </Step>
+
+  <Step title="像使用真机一样操作">
+    使用鼠标和键盘进行轻触、滑动、输入和导航。若要在不重启模拟器的情况下重新加载应用，请在工具栏中选择**重启**。
+  </Step>
+</Steps>
+
+<Tip>
+  模拟器在云端运行，并流式传输到浏览器，因此无需下载或配置。项目文件会保留在 Replit 中。
+</Tip>
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/ios-emulator-9013ff1b602f.mp4" />
+</Frame>
+
+<div id="section-4">
+  ### 浏览器支持
+</div>
+
+* **Chrome**、**Safari** 和基于 Chromium 的浏览器均获完全支持。
+* 不支持 **Firefox**。在 Firefox 中打开 Replit 时，iOS 和 Android 选项会被禁用，并显示“Firefox 不受支持”的提示。这是由于用于运行模拟器的流式传输技术存在限制。
+
+<div id="expo-go">
+  ### 改用 Expo Go
+</div>
+
+如果需要测试依赖真实硬件的功能，或想与不在电脑旁的人分享预览，请在真机上使用 Expo Go：
+
+* 相机、麦克风、触觉反馈及其他原生传感器
+* 推送通知
+* 真实 GPS 位置信息
+* 与团队成员、测试人员和投资者分享开发预览
+
+要通过 Expo Go Build 应用，请在 [replit.com](https://replit.com) 中打开项目，在项目编辑器的预览面板中选择**在 Expo Go 中打开**，然后使用手机上的 [Expo Go](https://expo.dev/go) 应用扫描二维码。
+
+<div id="section-5">
+  ### 全屏模拟器
+</div>
+
+在移动端产物卡片中选择**更多操作** → **在 iOS 模拟器中打开**或**在 Android 模拟器中打开**，即可在独立标签页中打开模拟器，以获得更大的视口。
+
+<div id="section-6">
+  ## 为什么要构建移动应用？
+</div>
+
+当你需要以下功能时，可以构建移动应用：
+
+* **原生体验**：高性能、流畅交互以及符合平台风格的原生界面。
+* **设备功能**：摄像头、推送通知、位置信息等。
+* **App Store 分发**：通过 Apple 应用审核后，用户可发现并安装的可分享应用页面。
+
+<div id="section-7">
+  ## 主要功能
+</div>
+
+* **AI 优先构建**：描述你的 App，Agent 就会搭建一个可运行的移动 App。
+* **项目编辑器预览**：无需离开 Replit，即可在 iOS 模拟器或 Android 模拟器中进行测试，或通过 Expo Go 在手机上预览。
+* **默认全栈**：随着 App 的发展，可添加服务器路由、Database、App Storage、Connector 和 AI 集成。
+* **引导式提交**：无需管理本地 iOS 工具链，即可准备提交到 TestFlight 和 App Store 的构建版本。
+
+<div id="section-8">
+  ## 开发工作流程
+</div>
+
+App 可通过三个阶段访问，每个阶段面向的用户和功能各不相同：
+
+| 阶段            | 可访问人员            | 访问方式                   | 最适合的用途       |
+| ------------- | ---------------- | ---------------------- | ------------ |
+| **开发**        | 你                | 项目编辑器模拟器，或 Expo Go 二维码 | 构建和迭代        |
+| **部署**        | 使用 Expo Go 的测试人员 | 带二维码的公开 URL            | 开发预览、原型设计和演示 |
+| **App Store** | 任何人              | 通过应用审核后从 App Store 下载  | 正式发布         |
+
+**开发**：启动 App 后，你可以在项目编辑器的 **iOS 模拟器**或 **Android 模拟器**中预览，也可以扫描预览面板中的二维码，在手机上的 Expo Go 中打开。
+
+**部署**：点击 **发布** 后，Replit 会创建一个带有 Expo Go 二维码的公开 URL。这非常适合开发预览和原型设计 — 在进入 App Store 流程之前，你可以向投资者展示、收集反馈，或与朋友一起测试。
+
+**App Store**：提交到 App Store 后，Apple 会审核你的 App。审核通过后，任何人都可以从 App Store 下载并安装。这需要 Apple Developer 账户。
+
+<div id="section-9">
+  ## 发布概览
+</div>
+
+准备发布 iOS 版本时，通常需要按以下流程操作：
+
+* 从项目编辑器发布
+* 向 TestFlight 提交构建版本
+* 在 App Store Connect 中将 TestFlight 构建版本提交至 App Store
+
+<Note>
+  向 TestFlight 和 App Store 提交构建版本需要加入 Apple Developer Program。
+</Note>
+
+如需完整的操作指南，请参阅[构建和发布移动 App](/zh/ja/build/mobile-app)教程。
+
+<div id="section-10">
+  ## 在哪里构建原生移动应用
+</div>
+
+Replit 环境在云端运行，而不是在本地计算机上运行。要构建原生移动应用，请使用 [replit.com](https://replit.com) 上的项目编辑器。移动应用工作流——包括 Agent 脚手架搭建、Expo Go 预览、模拟器和仿真器测试、TestFlight 构建以及 App Store 提交——均在项目编辑器中完成。
+
+也可以在受支持的 [Replit Android 应用](/zh/ja/features/platforms/mobile-app)中处理原生移动应用相关工作。如果您使用 Replit iOS 应用，请在 [replit.com](https://replit.com) 上打开项目，创建、预览、构建和提交原生移动应用。
+
+<div id="section-11">
+  ## 技术原理
+</div>
+
+移动应用由一系列协同工作的技术构成。本节将介绍驱动应用运行的技术，以及各部分如何协同配合。
+
+<div id="section-12">
+  ### 技术栈
+</div>
+
+<MobileStackDiagram />
+
+* **React Native** 是一个开源框架，让你能够编写一套代码，并将其编译为 iOS、Android 和 Web 应用。它渲染的是平台原生界面组件，而不是网页视图。
+* **Expo** 通过提供构建处理、原生模块管理以及用于预览的 Expo Go 等工具，简化了 React Native 开发。
+* **Expo Go** 是一款可安装在智能手机上的免费应用。无需构建完整的原生二进制文件，即可在真机上运行开发预览。
+
+运行应用时，Metro 打包器会编译代码并将其推送到设备。由于没有缓存，首次构建耗时较长，后续构建则会更快。
+
+<div id="section-13">
+  ### 架构：服务器与客户端
+</div>
+
+预览移动应用或准备分发时，您需要处理两个部分：
+
+1. **服务器**：运行在云端的 Replit 上，负责处理数据库、API 路由、AI 集成和后端逻辑。
+2. **客户端应用**：运行在用户的智能手机上。开发期间通过 Expo Go 预览，审核后作为原生应用经由应用商店分发。
+
+<MobileArchitectureDiagram />
+
+这种分离方式带来了灵活性。您可以在服务器上运行复杂逻辑 (并访问 Replit 的数据库、对象存储和 Connector) ，同时让客户端保持轻量。构建时，请思考哪些操作应在智能手机上进行，哪些应在云端进行。
+
+<div id="section-14">
+  ## 注意事项
+</div>
+
+* **发布要求**：Apple 制定了 TestFlight 和 App Store 的相关要求，并会在分发前审核 iOS 应用。
+* **Android 发布**：您可以构建适用于 iOS 和 Android 的跨平台应用。引导式流程目前尚不支持发布到 Google Play，但您可以手动发布。
+* **原生更改**：更改应用图标、权限等内容通常需要重新构建商店版本。
+
+<div id="section-15">
+  ## 故障排除
+</div>
+
+如果您在开发移动 App 时遇到问题，请参阅[移动 App 故障排除](/zh/ja/features/troubleshooting/mobile-app)，了解常见问题及解决方案。
+
+<div id="section-16">
+  ## 后续步骤
+</div>
+
+* 了解 Agent 的工作原理：[Agent](/zh/ja/features/agent/overview)
+* 探索集成：[集成](/zh/ja/features/integrations/overview)
+* 在移动设备上使用 Replit：[Replit 移动应用](/zh/ja/features/platforms/mobile-app)
+* 深入了解 Expo：[Expo](https://expo.dev/)
+* 管理 TestFlight 和应用提交：[App Store Connect](https://appstoreconnect.apple.com/)
+
+<div id="section-17">
+  ## 常见问题
+</div>
+
+<AccordionGroup>
+  <Accordion title="什么是 Expo？">
+    Expo 是 Agent 在 Replit 上构建移动应用时使用的工具。它是一个开源平台和工具链，可用于借助 React Native 构建、运行和部署跨平台原生应用。详情请参阅[https://expo.dev。](https://expo.devをご覧ください。)
+  </Accordion>
+
+  <Accordion title="什么是 React Native？">
+    React Native 是 Meta 的开源框架，可使用 React 和 JavaScript 或 TypeScript 构建原生 iOS 和 Android 应用。它渲染的是平台原生界面组件，而非网页视图，因此应用具有原生的外观和使用体验。
+  </Accordion>
+
+  <Accordion title="什么是 Expo Go？">
+    Expo Go 是一款可从 App Store 或 Google Play 安装到智能手机上的免费 App。无需构建完整的原生二进制文件，即可在开发过程中预览移动应用。扫描项目编辑器中的二维码后，Expo Go 会下载应用代码并通过 Build 进行构建。
+  </Accordion>
+
+  <Accordion title="Expo Go 与开发构建有何区别？">
+    **Expo Go** 是一款用于运行代码的预构建应用。它设置快速，但仅支持 Expo SDK 中包含的模块。
+
+    **Dev 构建**是可包含任意原生模块的自定义原生二进制文件。它需要更多设置 (EAS Build 或本地 Xcode/Android Studio) ，但灵活性更高。
+
+    Replit 使用 Expo Go 进行开发预览。如果需要 Expo Go 不支持的原生模块，你可能需要参考 [Expo 文档](https://docs.expo.dev/develop/development-builds/introduction/) 使用 Dev 构建。
+  </Accordion>
+
+  <Accordion title="与移动端自适应 Web 应用有什么区别？">
+    移动端响应式 Web 应用是可在浏览器中自适应调整布局的网站。React Native 应用是安装在设备上的原生应用，可使用平台 API (相机、触觉反馈、推送通知) ，更好地访问硬件和离线功能，并可通过应用商店分发。响应式 Web 在覆盖面和无需安装方面表现出色；需要设备功能、更高性能或通过 App Store 分发时，原生应用是更佳选择。
+  </Accordion>
+
+  <Accordion title="需要 Mac 或 Xcode 吗？">
+    不需要。Replit 和 Expo 会在云端管理构建过程。
+  </Accordion>
+
+  <Accordion title="没有 Apple Developer 账户也可以预览吗？">
+    可以。你可以在项目编辑器的 iOS 模拟器中，或通过手机上的 Expo Go 进行预览。只有在准备提交至 TestFlight 或 App Store 时，才需要 Apple Developer 账户。
+  </Accordion>
+
+  <Accordion title="支持 Android 吗？">
+    可以。您可以使用同一代码库构建适用于 iOS 和 Android 的跨平台应用。您可以在项目编辑器的 Android 模拟器中预览，也可以通过 Expo Go 在 Android 设备上预览。您可以手动发布到 Google Play。
+  </Accordion>
+
+  <Accordion title="服务器和数据库会怎么样？">
+    使用 Replit 内置的 PostgreSQL、对象存储、Connector 和 AI 集成，无需额外基础设施。服务器运行在 Replit 上，移动应用则连接到服务器。
+  </Accordion>
+
+  <Accordion title="在项目编辑器中，应该使用模拟器还是真机进行测试？">
+    请根据情况结合使用两者。项目编辑器中的**iOS 模拟器**和**Android 模拟器**可显示应用的原生版本，满足大多数日常测试需求 (布局、导航、原生组件和平台样式) 。如需测试依赖真实硬件的功能，例如相机、触觉反馈、推送通知和 GPS 定位，请使用 **Expo Go** 切换到真机。
+  </Accordion>
+</AccordionGroup>

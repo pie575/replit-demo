@@ -1,0 +1,166 @@
+---
+title: "Concevoir une page de destination"
+description: "À partir d’un brief Notion et d’éléments de marque, concevez une page de liste d’attente ou de lancement dans Replit Design."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Il ne s'agit pas d'un connector natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+C’est le cas si vous n’avez pas encore de page : pour un nouveau produit, une liste d’attente ou une campagne. À partir du brief Notion et
+des fichiers de marque dans Google Drive, concevez une page de destination dans Replit Design :
+section héro, éléments de réassurance, fonctionnement et un seul appel à l’action. Agent utilise l’offre et les textes de Notion,
+ainsi que le logo, les couleurs et la typographie de Drive. Il ne s’agit pas d’un site développé
+en code, mais du système visuel de la page. Lorsque vous passerez au développement, utilisez cette frame comme spécification.
+
+<div id="section">
+  ## Pour qui ?
+</div>
+
+* Les designers produit qui ont besoin d’une liste d’attente ou d’une page de lancement avant le lancement de leur produit
+* Les fondateurs qui ont besoin d’une première mise en page conforme à leur identité de marque à partir d’un brief Notion et de ressources Drive
+
+<div id="section-2">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "Brief : offre, cible, preuves, appel à l’action",
+},
+{
+id: "google-drive",
+name: "Google Drive",
+why: "Logos, couleurs, typographie, éléments de marque",
+},
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Préparez une page Notion contenant le brief (offre, public cible, appel à l’action) ainsi que les fichiers de
+marque dans Drive. Connectez Notion et Drive. Indiquez-nous à qui s’adresse la page et quel doit être
+le principal appel à l’action (inscription, liste d’attente, réservation d’une démo, achat).
+
+<div id="agent">
+  ## Demander à Agent
+</div>
+
+<AiPrompt>
+  À partir de cette page Notion[lien] et des fichiers de marque sur Google Drive,
+  créez dans Replit Design une page de destination pour
+  [liste d’attente/lancement/réservation de démo]. Utilisez l’offre, le public cible, les preuves et les appels à l’action de Notion. Créez des
+  frames pour ordinateur et mobile : une section héro avec un appel à l’action, des preuves sociales, une section expliquant le fonctionnement,
+  et un dernier appel à l’action. Utilisez le logo, les couleurs et la typographie existants.
+</AiPrompt>
+
+<div id="section-4">
+  ## Résultat attendu
+</div>
+
+Agent lit le brief Notion et les fichiers de marque dans Drive, puis dispose les frames dans
+Replit Design. Vous obtenez une page pour ordinateur et un recadrage pour mobile, et non une application déployée. Lors de la
+création de l’application, utilisez ces frames comme spécifications ou demandez ensuite à Agent de les implémenter
+dans le workflow Build. Prévisualisez les versions pour ordinateur et mobile côte à côte. Avant de considérer les frames comme définitives,
+comparez les appels à l’action, les éléments de preuve et les couleurs avec Notion et Drive.
+
+<div id="section-5">
+  ## Personnalisez-la selon vos besoins
+</div>
+
+<AiPrompt>
+  Transformez ceci en page de destination de liste d’attente : une promesse, trois éléments de preuve,
+  collecte d’e-mails, sans navigation supplémentaire. Récupérez les éléments de preuve dans Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Ajoutez trois sections tarifaires à partir de ce tableau Notion[lien]. Conservez le
+  système visuel et mettez en avant le forfait intermédiaire.
+</AiPrompt>
+
+<div id="section-6">
+  ## Résolution des problèmes
+</div>
+
+* **Le contenu ne provient pas du brief :** fournissez un lien vers la page Notion et demandez à Agent d&#39;utiliser les offres, le public cible, les éléments de preuve et les appels à l&#39;action qui s&#39;y trouvent, plutôt que de les réécrire sur le site.
+* **Les couleurs et la typographie ne correspondent pas à la marque :** connectez Drive et indiquez les fichiers du logo, des couleurs et de la typographie.
+* **Vous vous attendiez à un vrai site :** ce workflow ne crée pas une application déployée, mais une frame dans Replit Design. Utilisez cette frame comme spécification ou demandez ensuite à Agent de l&#39;implémenter dans un workflow Build.
+
+<div id="section-7">
+  ## Documents associés
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Créer des icônes et des bannières pour les réseaux sociaux" href="/fr/ko/use-cases/create-social-kit">
+    Utilisez les mêmes fichiers de marque Google Drive pour les éléments de profil et de couverture.
+  </Card>
+
+  <Card title="Lancer un site web d’événements payants" href="/fr/ko/use-cases/launch-event-website">
+    Utilisez la même source Notion pour les frames et les pages publiques.
+  </Card>
+</CardGroup>

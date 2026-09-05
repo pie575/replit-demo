@@ -1,0 +1,155 @@
+---
+title: "创建面向投资者的路演材料"
+description: "根据网站、Drive 和财务 Sheet，生成一份包含 10 至 12 页的投资者路演材料。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+根据自家网站、Google Drive 中的品牌文件和 Google Sheets 中的财务数据，使用 Replit Slides 生成一份面向投资者的融资路演材料 (10～12 页) ：痛点、产品、市场、发展势头、团队和融资需求。Agent 从网站提取故事主线和佐证，从 Drive 获取品牌素材，并从 Sheet 获取数据 (收入、现金消耗率、资金续航期、单位经济效益、预测) 。
+
+<div id="section">
+  ## 适合以下人群
+</div>
+
+* 希望根据正在运营的网站和财务表格制作投资者路演材料的创始人。
+* 已在 Google Sheets 中管理指标、正处于融资轮次中的负责人。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "徽标、配色、参考路演材料（可选）",
+},
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "财务数据：收入、现金消耗率、资金续航期、预测",
+},
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+请准备好正在运行的网站、Drive 中的品牌文件，以及包含已标注行或标签页的 Sheet (收入、现金消耗率、资金续航期、预测) 。连接 Drive 和 Sheets。向 Agent 说明融资轮次 (种子前轮、种子轮、A 轮) 以及你的融资需求。
+
+<div id="agent">
+  ## 给 Agent 的提示词
+</div>
+
+<AiPrompt>
+  请根据此网站[URL]、Google Drive 中的品牌文件，以及此
+  Google Sheet[链接]中的财务数据，使用 Replit Slides 生成一份 10 至 12 页的投资者
+  路演材料。请涵盖痛点、解决方案、产品、市场、发展势头、商业模式、财务、团队及
+  融资需求。仅使用 Sheet 中列出的数字。请标记需要注明来源的内容。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期效果
+</div>
+
+Agent 会将网站内容转化为幻灯片大纲，将 Sheet 中的数据填入发展势头和财务幻灯片，并使用 Replit Slides 制作路演材料。发送给投资者之前，请将所有数据与 Sheet 核对。在预览中完整检查路演材料，将财务幻灯片与 Sheet 标签页逐一核对，并确认每项主张均可在网站或 Sheet 中找到依据。
+
+<div id="section-5">
+  ## 按需定制
+</div>
+
+<AiPrompt>
+  请根据 Sheet 添加一页财务幻灯片，包含过去 12 个月的收入和现金消耗率，
+  以及未来 18 个月的预测。请在幻灯片中明确标注来源标签页名称。
+</AiPrompt>
+
+<AiPrompt>
+  请将此路演材料调整为与 [参考演示文稿]一致。请保留布
+  局、排版、配色和章节结构。保留 Sheet 中已获批准的
+  数字，并标记不一致之处。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排除
+</div>
+
+* **数字与 Sheet 不一致：** 请标明关键行和标签页。为收入、现金消耗率、现金续航期和预测分别命名标签页，并告知 Agent 仅使用其中列出的数字。对需要注明来源的信息进行标记。
+* **品牌视觉效果不对：** 连接 Drive 并指定徽标和配色。如果有参考演示文稿，请让 Agent 在不更改已获批数字的前提下匹配其布局和字体。
+
+<div id="section-7">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计落地页" href="/zh/ja/use-cases/design-landing-page">
+    适合需要候补名单页面的创始人，使用相同的 Google Drive 品牌文件。
+  </Card>
+
+  <Card title="创建社交媒体图标和横幅" href="/zh/ja/use-cases/create-social-kit">
+    使用相同的 Google Drive 品牌文件，为所有平台创建素材。
+  </Card>
+</CardGroup>

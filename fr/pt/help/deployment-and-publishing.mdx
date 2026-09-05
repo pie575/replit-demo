@@ -1,0 +1,104 @@
+---
+title: "Déploiement et publication"
+description: "Réponses aux questions fréquentes sur la publication : déboguer les publications ayant échoué, consulter les logs, corriger les erreurs d’exécution, redéployer et changer de région."
+---
+
+Ces réponses couvrent la publication et les déploiements. Pour un dépannage étape par étape, consultez [Dépannage des déploiements](/fr/pt/build/troubleshooting). Pour en savoir plus sur les types de déploiement et le monitoring, consultez [Déploiements Autoscale](/fr/pt/features/publishing/deployment-types#autoscale) et [Surveiller un déploiement](/fr/pt/features/publishing/monitoring-a-deployment).
+
+<AccordionGroup>
+  <Accordion title="Ma publication échoue lors de « Creating Autoscale service » — comment la déboguer ?">
+    La plupart des échecs de publication Autoscale peuvent être corrigés en consultant les logs de déploiement :
+
+    1. Ouvrez **Publication** et recherchez le déploiement ayant échoué.
+    2. Sélectionnez le menu à trois points à côté de celui-ci pour ouvrir les logs.
+    3. Copiez la sortie du log, ouvrez un nouveau Chat Agent, collez-la, puis demandez ce qui ne va pas et comment le corriger.
+
+    Si l’erreur `No run command configured` s’affiche même après avoir configuré une commande, ouvrez les paramètres de votre déploiement, supprimez la commande d’exécution, ajoutez-la de nouveau, enregistrez, puis publiez à nouveau. Consultez [Résolution des problèmes de déploiement](/fr/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon application affiche une erreur interne du serveur après un déploiement réussi—qu’est-ce qui ne va pas ?">
+    Si la publication a réussi, mais que l&#39;application en ligne renvoie une erreur 500, le problème vient du code de votre application, et non de l&#39;infrastructure de Replit :
+
+    1. Ouvrez **Publication**, consultez les logs et copiez l&#39;intégralité du message d&#39;erreur.
+    2. Ouvrez un nouveau Chat avec Agent, collez les logs et demandez ce qui provoque l&#39;erreur.
+    3. Appliquez le correctif, puis publiez à nouveau.
+
+    Si Agent ne parvient pas à identifier le problème, ouvrez **Publication → Historique**, recherchez la dernière version fonctionnelle et redéployez-la. Consultez [Résolution des problèmes de déploiement](/fr/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon déploiement est bloqué lors de la compilation ou de la migration : que dois-je faire ?">
+    1. Ouvrez la palette de commandes avec `Cmd+K` (Mac) ou `Ctrl+K` (Windows), recherchez **Restart compute** et sélectionnez-la.
+    2. Ouvrez **Publication** et sélectionnez **Publier** pour lancer un nouveau déploiement.
+    3. En cas de nouvel échec, ouvrez les logs du déploiement ayant échoué depuis le menu à trois points, copiez le log de build et collez-le dans une nouvelle conversation Chat avec Agent pour obtenir un diagnostic.
+
+    Si le déploiement reste bloqué, [contactez l’assistance Replit](https://replit.com/support) en fournissant l’intégralité de vos logs de build. Consultez [Résolution des problèmes de déploiement](/fr/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon application est en ligne, mais elle est lente ou expire : que dois-je vérifier ?">
+    1. Vérifiez les logs de votre déploiement pour repérer les messages récurrents de délai d’expiration ou de manque de mémoire.
+    2. Vérifiez les limites de CPU ou de mémoire des ressources de votre déploiement—consultez [Surveiller un déploiement](/fr/pt/features/publishing/monitoring-a-deployment).
+    3. Ouvrez une nouvelle conversation avec Agent, collez les logs récents et demandez-lui d’identifier les goulots d’étranglement.
+
+    Les causes courantes incluent des requêtes de base de données non indexées, des opérations synchrones bloquantes et des fuites de mémoire. Avec les [déploiements Autoscale](/fr/pt/features/publishing/deployment-types#autoscale), la première requête après une mise à l’échelle à zéro peut prendre quelques secondes—il s’agit d’un démarrage à froid normal.
+  </Accordion>
+
+  <Accordion title="Mon historique de déploiement indique que des builds ont échoué : comment savoir ce qui ne va pas ?">
+    Ouvrez **Publication → Historique**, sélectionnez le déploiement ayant échoué et consultez les logs de build. Recherchez la première ligne marquée `ERROR` ou `FAILED` : il s’agit généralement de la cause première, les lignes suivantes n’étant que des effets secondaires. Copiez cette section dans un nouveau Chat avec Agent afin d’obtenir un diagnostic. La plupart des échecs de build sont dus à des dépendances manquantes, à une commande d’exécution incorrecte ou à l’échec d’une migration de base de données. Consultez [Surveiller un déploiement](/fr/pt/features/publishing/monitoring-a-deployment).
+  </Accordion>
+
+  <Accordion title="Mon application fonctionne dans l’aperçu de l’éditeur, mais pas une fois déployée — pourquoi ?">
+    Il s’agit presque toujours d’une différence de configuration entre les environnements. Vérifiez les points suivants :
+
+    * Chaque clé du panneau [Secrets](/fr/pt/core-concepts/project-editor/app-setup/secrets) de votre environnement de développement est également définie dans les secrets de déploiement : il s’agit d’environnements distincts.
+    * Votre `DATABASE_URL` pointe vers la base de données de production, et non vers celle de développement.
+    * Aucune référence à `localhost` ou `127.0.0.1` n’est codée en dur ; utilisez des chemins relatifs ou des URL dépendantes de l’environnement.
+
+    Ensuite, consultez vos logs de déploiement pour y rechercher des erreurs propres à l’environnement de production. Consultez [Résolution des problèmes de déploiement](/fr/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon déploiement Autoscale ne cesse de redémarrer : que signifient SIGTERM ou le code de sortie 1 ?">
+    [Les déploiements Autoscale](/fr/pt/features/publishing/deployment-types#autoscale) redémarrent régulièrement par conception. Un `SIGTERM` dans vos logs signifie que le processus a été arrêté de manière contrôlée — c’est normal. `Exit code 1` signifie que le processus a planté de lui-même ; vérifiez les lignes juste avant pour identifier l’erreur réelle.
+
+    Si les redémarrages sont suffisamment fréquents pour affecter les utilisateurs, recherchez des rejets de promesses non gérés, des erreurs de mémoire insuffisante ou des variables d’environnement manquantes qui provoquent un échec au démarrage.
+  </Accordion>
+
+  <Accordion title="J’ai mis à jour mes variables d’environnement, mais mon application déployée ne les utilise pas : pourquoi ?">
+    Replit conserve les secrets de développement et de production dans des stockages distincts : modifier l’un ne met pas à jour l’autre. Le panneau [Secrets](/fr/pt/core-concepts/project-editor/app-setup/secrets) de développement est uniquement accessible dans l’éditeur ; votre application déployée utilise ses secrets de déploiement.
+
+    Pour mettre à jour une variable dans votre application en production, définissez-la dans vos secrets de déploiement, puis ouvrez **Publication** et sélectionnez **Publier** pour redéployer. Les nouvelles valeurs prennent effet au démarrage du nouveau déploiement. Consultez [Résolution des problèmes de déploiement](/fr/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Comment déclencher un redéploiement sans modifier mon code ?">
+    Ouvrez **Publication** et sélectionnez **Publier**. Replit compile et déploie votre code actuel même si rien n’a changé — utile après avoir mis à jour un secret, après la remise en route d’une base de données ou pour bénéficier d’une mise à jour des dépendances.
+
+    Si votre application ne répond pas et qu’un redéploiement complet semble trop lourd, ouvrez la palette de commandes avec `Cmd+K` (Mac) ou `Ctrl+K` (Windows), recherchez **Restart compute** et sélectionnez-la.
+  </Accordion>
+
+  <Accordion title="Puis-je modifier la région de déploiement de mon application après l’avoir publiée ?">
+    Non. Vous ne pouvez pas modifier la région de publication d&#39;une app déjà publiée. Pour déplacer l&#39;app, créez-en un remix et publiez-le dans la nouvelle région. Consultez la [géographie du projet](/fr/pt/features/publishing/project-geography).
+
+    Vous ne pouvez pas non plus modifier la région de la base de données sur place. L&#39;app remixée peut recevoir un sous-domaine `.replit.app` différent. Connectez donc d&#39;abord un [domaine personnalisé](/fr/pt/features/publishing/custom-domains) si vous avez besoin d&#39;une URL stable, puis ajoutez à nouveau les Secrets de déploiement.
+  </Accordion>
+
+  <Accordion title="Pourquoi une analyse PCI ou de sécurité signale-t-elle le cookie GAESA dans mon application publiée ?">
+    L’infrastructure de diffusion de Google ajoute le cookie `GAESA` (affinité de session Google App Engine) aux applications Replit publiées afin d’acheminer les requêtes vers l’instance appropriée. Sa valeur est un identifiant de routage opaque qui ne contient aucune donnée sensible ni donnée propre à l’application.
+
+    Certains scanners de sécurité signalent le `GAESA` parce qu’il ne définit pas les attributs `Secure` ou `HttpOnly`. Votre application ne crée pas ce cookie et vous ne pouvez ni le modifier ni le désactiver dans une application publiée.
+
+    Si une analyse de conformité PCI ou de sécurité signale ce cookie, contestez ce constat auprès du fournisseur de l’analyse en le qualifiant de faux positif. Incluez le nom du cookie et expliquez que l’infrastructure Google le définit pour acheminer les requêtes. Votre application publiée ne peut ni lire, ni modifier, ni désactiver ce cookie, et celui-ci ne contient aucune donnée sensible.
+
+    La conformité de l’application que vous créez relève de votre responsabilité — consultez le [modèle de responsabilité partagée](/fr/pt/features/security/shared-responsibility-model). Si le fournisseur de votre analyse a besoin de plus de détails, [contactez l’assistance Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Comment mettre mon application hors ligne ou annuler sa publication ?">
+    Ouvrez **Publication** et sélectionnez l’option pour désactiver votre déploiement, puis confirmez. Votre application est mise hors ligne et ne génère plus de frais de déploiement. Vos fichiers de projet, votre code et votre base de données ne sont pas supprimés — seul le déploiement en ligne s’arrête. Les connexions de domaine personnalisé associées à ce déploiement sont supprimées. Ajoutez-les donc à nouveau si vous republiez.
+
+    Si le coût est un problème, notez que les [déploiements Autoscale](/fr/pt/features/publishing/deployment-types#autoscale) passent à zéro en l’absence de trafic. Vous n’aurez donc peut-être pas besoin de les désactiver.
+  </Accordion>
+</AccordionGroup>
+
+<div id="ainda-precisa-de-ajuda">
+  ## Besoin d’aide supplémentaire ?
+</div>
+
+Si vous n’avez pas trouvé de réponse à votre question sur le déploiement, [contactez l’assistance Replit](https://replit.com/support).

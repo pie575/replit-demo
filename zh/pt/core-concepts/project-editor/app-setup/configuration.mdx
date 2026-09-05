@@ -1,0 +1,397 @@
+---
+title: "Replit App 配置"
+description: "了解如何使用 .replit 和 replit.nix 文件配置你的 Replit App。"
+---
+
+Replit App 由两个文件进行配置：`.replit` 和 `replit.nix`。它们决定了 Replit App 的运行方式，从代码执行到开发工具和语言支持均受其影响。
+
+这些配置文件默认为隐藏状态。在文件树菜单中选择“显示隐藏文件”，即可在 Replit App 中查看它们。
+
+<Frame>
+  <img src="/assets/mirror/show-hidden-files-914df3399078.png" alt="图片" width="530" height="488" data-path="images/getting-started/show-hidden-files.png" />
+</Frame>
+
+<div id="arquivo-replitnix">
+  ## `replit.nix` 文件
+</div>
+
+Replit 使用 `Nix` 管理包和环境。`replit.nix` 文件用于：
+
+**指定系统依赖项：** 精确定义你的 Replit App 所需的包，由包管理器 Nix 统一管理。
+
+**创建可复现的环境：** 确保开发环境一致且可复现，非常适合协作项目以及跨多个系统的测试。
+
+你可以通过 `Dependencies` 工具以可视化方式管理 Nix 包。详见[系统依赖项](/zh/pt/core-concepts/project-editor/app-setup/dependency-management#system-dependencies)指南。
+
+若要通过 `replit.nix` 文件配置包，可在 `deps` 数组中列出 [Nix 包](https://search.nixos.org/packages)，并加上 `pkgs.` 前缀。重新加载 Shell 后，所做的更改即会同步生效。
+
+```nix theme={null}
+{ pkgs }: {
+  deps = [
+    pkgs.nodejs-19_x
+    pkgs.nodePackages.typescript-language-server
+    pkgs.yarn
+    pkgs.replitPackages.jest
+  ];
+}
+```
+
+<div id="arquivo-replit">
+  ## `.replit` 文件
+</div>
+
+`.replit` 文件用于控制 Replit App 的行为。它采用 `toml` [配置格式](https://toml.io/en/)。以下是一些主要的可配置项：
+
+**运行命令：**指定点击 Run 按钮时要执行的命令。每个 template 都提供默认运行命令，以便立即运行代码。对于更加自定义且复杂的应用，请使用 [Workflows](/zh/pt/core-concepts/project-editor/app-setup/workflows)。
+
+**语言服务器协议 (LSP)**：提供自动补全、代码导航、代码高亮、linting 和实时错误等功能。
+
+**环境变量：**定义和管理应用正常运行所需的环境变量。
+
+**依赖项和包：**直接通过 `.replit` 文件管理包的安装和配置，确保 Replit App 启动时具备所需的全部工具。你可以通过 `Dependencies` 工具以可视化方式管理依赖项。有关详细信息，请参阅[系统模块](/zh/pt/core-concepts/project-editor/app-setup/dependency-management#advanced-configuration)指南。
+
+对于 Python 应用，默认的 `.replit` 文件如下：
+
+```toml theme={null}
+entrypoint = "main.py"
+modules = ["python-3.10:v18-20230807-322e88b"]
+
+[nix]
+channel = "stable-23_05"
+
+[unitTest]
+language = "python3"
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+[deployment]
+run = ["python3", "main.py"]
+deploymentTarget = "cloudrun"
+```
+
+下表概述了 `.replit` 文件中的各项配置，说明每项配置的作用及其对 Replit App 环境的影响。
+
+| **配置键**                                         | **值/示例**                               | **说明**                                                                                                           |
+| ----------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| <a name="entrypoint" />`entrypoint`             | `main.py`                              | 指定打开编辑器时默认运行并显示的主文件。你可以根据自己的应用重命名该文件。                                                                            |
+| <a name="modules" />`modules`                   | `["python-3.10:v18-20230807-322e88b"]` | 定义 Replit 支持的特定编程语言版本或其他核心依赖。                                                                                    |
+| <a name="nix" />`[nix]`                         |                                        | 指定使用 Nix (一种包管理器) 管理系统依赖项的相关配置。更多信息请参阅[依赖管理](/zh/pt/core-concepts/project-editor/app-setup/dependency-management)文档。 |
+| <a name="channel" />`channel`                   | `stable-23_05`                         | 指定要使用的 Nix 渠道，它决定了可用的系统依赖项版本。                                                                                     |
+| <a name="packages" />`packages`                 | `["cowsay", "htop"]`                   | 指定要安装的若干 Nix 包。如需更精细的控制，也可以使用 `replit.nix`。                                                                      |
+| <a name="unitTest" />`[unitTest]`               |                                        | 定义 Replit App 内与单元测试相关的配置。                                                                                       |
+| <a name="language" />`language`                 | `python3`                              | 指定用于单元测试的语言，此处表示使用 Python 3 编写测试。                                                                                |
+| <a name="gitHubImport" />`[gitHubImport]`       |                                        | 控制项目从 GitHub 导入方式的配置，主要是必须包含哪些文件。                                                                                |
+| <a name="requiredFiles" />`requiredFiles`       | `[".replit", "replit.nix"]`            | 列出导入项目时必须存在的文件，以确保项目能够正常运行。                                                                                      |
+| <a name="deployment" />`[deployment]`           |                                        | 包含将 Replit App 中的应用部署到线上环境的配置。                                                                                   |
+| <a name="run" />`run`                           | `["python3", "main.py"]`               | 部署期间用于启动应用的命令。                                                                                                   |
+| <a name="deploymentTarget" />`deploymentTarget` | `cloudrun`                             | 指定用于托管应用的部署目标平台。                                                                                                 |
+
+现在你已经了解了 `.replit` 文件的默认配置，接下来的章节将介绍如何为你的 Replit App 配置基础和高级设置。
+
+<div id="configurando-definies-bsicas">
+  ## 配置基本设置
+</div>
+
+<div id="entrypoint">
+  ### Entrypoint
+</div>
+
+这是项目的主文件。如果未定义 `run` 属性，运行时将执行 `entrypoint` 指定的文件。
+
+```toml theme={null}
+entrypoint = "<file-name>.py"
+```
+
+<div id="comando-run">
+  ### `Run` 命令
+</div>
+
+`.replit` 文件中的 `run` 属性是一项核心配置，它决定了在 Replit 环境中点击 `Run` 按钮时运行的初始命令或一系列命令。`Run` 命令既可以写成一个字符串，表示要执行的命令；也可以写成字符串数组，分别表示命令及其各个参数。
+
+配置 `Run` 命令的几种常见方式：
+
+* **单个命令：**
+  该示例展示了如何传入单个命令，直接在 Replit App 中执行。在 `.replit` 文件中这样配置后，点击 `Run` 按钮就会在 `Console` 面板中输出一句问候语：
+  **示例：** `run = "echo 'Hello, Replit!'"`
+
+* **显式参数：**
+  在某些情况下，写得更明确会更方便，可以省去处理引号或 Shell 插值规则的麻烦。你可以把上面的示例改写成参数分开的形式。
+  注意，此时不必再同时使用 `'` 和 `"`，因为问候语是作为 `echo` 的第一个也是唯一一个参数显式传入的：
+  **示例：** `run = ["echo", "Hello, Replit!"]`
+
+* **多个命令：**
+  该示例展示了如何同时运行多个进程，例如一个 frontend 和一个 backend。当你用 Python 开发 backend、用 TypeScript 开发 frontend，且两个服务器分别监听不同端口时，这种方式会很有用：
+  **示例：** `run = "python -m app & npm run start & wait"`
+
+<div id="gerenciamento-de-processos">
+  #### 进程管理
+</div>
+
+虽然可以使用 `&` 同时运行多个命令，但为了更清晰地区分各服务的 logs，您可能需要更好的管理体验。您可以[添加系统依赖项](/zh/pt/core-concepts/project-editor/app-setup/dependency-management#system-dependencies)，例如 [`process-compose`](https://github.com/F1bonacc1/process-compose)，以便更好地编排多个进程。
+
+<div id="fase-de-build">
+  #### `Build` 阶段
+</div>
+
+对于某些语言或运行时，代码需要先经过一个独立的编译阶段，才能通过 `run` 执行。这既适用于 TypeScript、Golang、Java 等编译型语言，也可以作为一个参数，让你在下一次调用 `run` 之前重置环境、数据或配置。
+
+* **编译：**
+  在 TypeScript 仓库中，你可能需要先运行 `tsc`，然后才能执行代码。
+  **示例：**
+
+```toml theme={null}
+build = "tsc app.ts"
+run = "node app.js"
+```
+
+<div id="incluindo-variveis-de-ambiente">
+  #### 包含环境变量
+</div>
+
+若要在运行前为服务提供环境变量，可以将 `run` 属性扩展为一个[表](https://toml.io/en/v1.0.0#table)。
+
+这项改动较为复杂，通常需要调整 `run = "..."` 属性在 `.replit` 文件中的位置。
+
+以下 diff 展示了如何通过 `[run]` 的 `args` 提供命令，并在 `[run.env]` 中提供 `NAME` 变量：
+
+```diff theme={null}
+-run = ["bash", "-c", "echo \"Hello, $NAME!\""]
+
+ modules = ["nodejs-20"]
+
+ hidden = [".pythonlibs"]
+
++# 需要把新增的 [run] 移到所有不以 `[` 开头的
++# 顶层属性之后！
++[run]
++args = ["bash", "-c", "echo \"Hello, $NAME!\""]
++
++[run.env]
++NAME="Replit"
+
+ [nix]
+ channel = "stable-23_11"
+```
+
+<div id="interatividade">
+  #### 交互性
+</div>
+
+交互式程序同样可以通过 `Run` 按钮启动，这样便能将开发环境与程序实际运行的终端区分开来。
+请看下面这个计数脚本：
+
+**示例**
+
+```toml theme={null}
+[run]
+args = ["bash", "-c", """
+count=0
+while read -p "$PROMPT" -r next && [ -n "$next" ]; do
+    count=$((count+next))
+done
+echo "The numbers you entered sum to $count!"
+"""]
+
+[run.env]
+PROMPT = "Next number ([Enter] to end): "
+```
+
+<div id="opes-de-configurao-avanada">
+  ## 高级配置选项
+</div>
+
+了解适用于您的 Replit App 的详细配置选项。您可以自定义开发环境、管理运行命令、集成语言服务并处理依赖项。
+
+| **配置**     | **键**                               | **值/示例**                                    | **说明**                              |
+| ---------- | ----------------------------------- | ------------------------------------------- | ----------------------------------- |
+| onBoot     | <a name="onBoot" />`onBoot`         | `onBoot = "npm install"`                    | Replit App 启动时执行的命令。                |
+| compile    | <a name="compile" />`compile`       |  (无默认示例)                                    | 在 `run` 命令之前执行的命令，用于 C++ 等编译型语言。    |
+| language   | <a name="language" />`language`     | `language = "javascript"`                   | 指定从 GitHub 导入或创建 Replit App 时使用的语言。 |
+| entrypoint | <a name="entrypoint" />`entrypoint` | `entrypoint = "index.js"`                   | 打开编辑器时要运行和显示的主文件。                   |
+| hidden     | <a name="hidden" />`hidden`         | `hidden = [".config", "package-lock.json"]` | 默认在侧边文件树中隐藏的文件或文件夹。                 |
+| audio      | <a name="audio" />`audio`           | `audio = true`                              | 设为 `true` 时启用系统级音频。                 |
+
+<div id="notas-sobre-o-udio-em-todo-o-sistema">
+  ### 系统级音频说明
+</div>
+
+在 `.replit` 文件中设置 `audio = true` 后，您可能需要在 Shell 中运行 `kill 1`，以使新配置生效。
+
+运行图形应用时，`Output` 面板右下角会显示耳机图标和一个复选框。
+受浏览器限制，每次刷新页面后都需要重新启用。
+
+```toml theme={null}
+# 确保这一行位于 `.replit` 文件顶部，且不在任何 `[` 方括号小节内
+audio = true
+```
+
+<div id="configurao-do-gerenciador-de-pacotes">
+  ## 包管理器配置
+</div>
+
+| **配置**      | **键**                                             | **值/示例**                                      | **说明**                       |
+| ----------- | ------------------------------------------------- | --------------------------------------------- | ---------------------------- |
+| packager    | <a name="language" />`language`                   | `packager.language = "python3"`               | 执行包操作时使用的语言。                 |
+| packager 功能 | <a name="guessImports" />`guessImports`           | `packager.features.guessImports = true`       | 在运行 Replit App 之前自动推测需要安装的包。 |
+| packager 功能 | <a name="packageSearch" />`packageSearch`         | `packager.features.packageSearch = true`      | 设为 `true` 时启用包管理器支持。         |
+| packager 功能 | <a name="enabledForHosting" />`enabledForHosting` | `packager.features.enabledForHosting = false` | 指定托管 Replit App 时是否需要执行包安装。  |
+| packager    | <a name="afterInstall" />`afterInstall`           | `afterInstall = "echo 'package installed'"`   | 通过包管理器安装新包后执行的命令。            |
+| packager    | <a name="ignoredPaths" />`ignoredPaths`           | `ignoredPaths = [".git"]`                     | 推测包时需要忽略的路径。                 |
+| packager    | <a name="ignoredPackages" />`ignoredPackages`     | `ignoredPackages = ["twitter", "discord"]`    | 安装过程中永不进行包推测的模块。             |
+
+<div id="exemplo-de-configurao-replit-para-o-gerenciador-de-pacotes">
+  ### 包管理器的 `.replit` 配置示例
+</div>
+
+```toml theme={null}
+# 指定 Replit App 使用的语言
+packager.language = "python3"
+
+# 启用自动软件包管理功能
+[packager.features]
+guessImports = true
+packageSearch = true
+enabledForHosting = false
+
+# 每次安装软件包后执行的命令
+packager.afterInstall = "echo 'Package installed successfully'"
+
+# 指定软件包管理器应忽略的路径和软件包
+packager.ignoredPaths = [".git", "node_modules"]
+packager.ignoredPackages = ["twitter", "discord"]
+
+# 其他部署设置
+[deployment]
+run = ["python3", "app.py"]
+```
+
+<div id="configurao-de-implantao">
+  ## 部署配置
+</div>
+
+| **配置**     | **键**                                 | **值/示例**                             | **说明**                      |
+| ---------- | ------------------------------------- | ------------------------------------ | --------------------------- |
+| deployment | <a name="run" />`run`                 | `deployment.run = "npm start"`       | Deployment 容器启动时执行的命令。      |
+| deployment | <a name="build" />`build`             | `deployment.build = "npm run build"` | 启动 Deployment 前执行的命令。       |
+| deployment | <a name="ignorePorts" />`ignorePorts` | `deployment.ignorePorts = true`      | 如果为 `true`，部署成功时无需检查端口是否开放。 |
+
+<div id="exemplo-de-configurao-replit-para-implantao">
+  ### 部署的 `.replit` 配置示例
+</div>
+
+```toml theme={null}
+
+# 指定项目的主入口文件
+entrypoint = "app.js"
+
+# 应用部署配置
+[deployment]
+run = "npm start"
+build = "npm run build"
+ignorePorts = true
+```
+
+<Note>
+  **解释器配置**已弃用，Replit 中不再提供。建议改用 `Run` 命令来配置脚本和应用在你的 Replit App 环境中的运行方式。
+</Note>
+
+<div id="configurao-de-portas">
+  ## 端口配置
+</div>
+
+| **配置** | **键**                                   | **值/示例**            | **说明**                    |
+| ------ | --------------------------------------- | ------------------- | ------------------------- |
+| ports  | <a name="localPort" />`localPort`       | `localPort = 3000`  | Replit 映射到外部端口的本地端口。      |
+| ports  | <a name="externalPort" />`externalPort` | `externalPort = 80` | 与 `localPort` 绑定的公开可访问端口。 |
+
+<div id="exemplo-de-arquivo-de-configurao-replit-para-gerenciamento-de-portas">
+  ### 端口管理的 `.replit` 配置文件示例
+</div>
+
+```toml theme={null}
+# 网络配置，用于将应用暴露在指定端口上
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+<div id="acessando-metadados-do-ambiente-do-replit-app">
+  ## 访问 Replit App 的环境元数据
+</div>
+
+<div id="nodejs">
+  ### Node.js
+</div>
+
+访问所有环境变量：
+
+`console.log(process.env);`
+
+访问单个变量 (REPL&#95;SLUG) ：
+
+`console.log(process.env.REPL_SLUG);`
+
+<div id="python">
+  ### Python
+</div>
+
+要访问所有环境变量：
+
+```python theme={null}
+import os
+print(os.environ)
+```
+
+如需访问单个变量 (REPL&#95;SLUG) ：
+
+```python theme={null}
+import os
+variable = os.environ.get('REPL_SLUG')
+print(variable)
+```
+
+<div id="rust">
+  ### Rust
+</div>
+
+要访问所有环境变量：
+
+```rust theme={null}
+use std::env;
+fn main() {
+    for (key, value) in env::vars() {
+        println!("{}: {}", key, value);
+    }
+}
+```
+
+要访问单个变量 (REPL&#95;SLUG) ：
+
+```rust theme={null}
+use std::env;
+fn main() {
+    let variable = env::var("REPL_SLUG").unwrap();
+    println!("{}", variable);
+}
+```
+
+<div id="variveis-de-ambiente">
+  ## 环境变量
+</div>
+
+以下是可在 Replit App 内访问的环境变量：
+
+| 键                                                 | 描述                                                                                        |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| <a name="REPL_OWNER" />`REPL_OWNER`               | Replit App 所有者的用户名。如果你的 Replit App 是基于文本的且没有 Web 服务器，`REPL_OWNER` 将显示当前访问该 Replit App 的用户 |
+| <a name="REPL_ID" />`REPL_ID`                     | Replit App 的唯一 UUID 字符串                                                                   |
+| <a name="HOME" />`HOME`                           | Replit App 的 home 路径                                                                      |
+| <a name="system" />`system`                       | Replit App 上运行的操作系统                                                                       |
+| <a name="LANG" />`LANG`                           | 设置 Replit App 的语言和字符编码，影响文本的处理和显示方式                                                       |
+| <a name="REPL_IMAGE" />`REPL_IMAGE`               | 与 Replit App 对应的 Docker 镜像                                                                |
+| <a name="REPL_LANGUAGE" />`REPL_LANGUAGE`         | 为 Replit App 配置的编程语言，用于确定运行时环境和工具                                                         |
+| <a name="REPL_PUBKEYS" />`REPL_PUBKEYS`           | 字符串形式的 JSON 对象，包含各种公共 API 密钥                                                              |
+| <a name="REPL_SLUG" />`REPL_SLUG`                 | Replit App 名称的简化、机器可读版本，适合用于 URL 和文件名                                                     |
+| <a name="PRYBAR_FILE" />`PRYBAR_FILE`             | Replit App 的主文件/入口文件                                                                      |
+| <a name="REPLIT_DEV_DOMAIN" />`REPLIT_DEV_DOMAIN` | 在项目编辑器中为 Replit App 提供 `replit.dev` URL。请注意，此环境变量在部署中不可用                                  |

@@ -1,0 +1,107 @@
+---
+title: "Ajouter une intégration"
+description: "Envoyez toutes les réservations Velocity vers le Google Calendar du client."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Une fois cette tâche terminée, toutes les réservations Velocity apparaîtront dans le Google Calendar des clients, avec les heures de prise en charge et de retour déjà renseignées.
+
+Les intégrations permettent à Velocity de communiquer avec d&#39;autres outils. Vous pouvez envoyer chaque réservation dans le calendrier du client, envoyer un e-mail au responsable lorsqu&#39;une location haut de gamme est réservée ou afficher les données météo sur la page de planification du voyage. Pour l&#39;instant, n&#39;en choisissez qu&#39;une : Google Calendar offre à tous les clients un résultat clair et vérifiable (&quot;Ma location est dans mon calendrier&quot;), que vous pourrez consulter dans votre propre calendrier pendant les tests.
+
+<div id="agent">
+  ## Demander à Agent d’ajouter une intégration de calendrier
+</div>
+
+Replit propose un **connecteur Google Workspace** intégré incluant Google Calendar. Agent vous connecte à Google en un clic — aucun projet API à créer, aucune information d’identification OAuth à copier ni aucun Secret à coller.
+
+<AiPrompt>
+  Lorsqu’un client Velocity confirme une réservation, ajoutez la location à Google Calendar.<br />
+  Utilisez le connecteur Google Workspace de Replit pour Google Calendar — ne demandez pas d’informations d’identification OAuth.<br />
+  Le titre de l’événement doit être « Velocity rental: [marque et modèle du véhicule] ».<br />
+  L’événement doit s’étendre de l’heure de prise en charge à l’heure de retour et inclure l’adresse de prise en charge ainsi que le numéro de référence de la réservation dans sa description.<br />
+  Si le client modifie les dates ou annule la réservation, l’événement du calendrier doit être mis à jour automatiquement.<br />
+  Ajoutez un message clair à Velocity afin que la réservation soit confirmée même si l’ajout au calendrier échoue.
+</AiPrompt>
+
+Agent provisionne le connecteur Google Workspace, ouvre une seule boîte de dialogue Connect dans le Workspace et connecte Velocity afin d’ajouter un événement chaque fois qu’une réservation est confirmée, après connexion au compte Google propriétaire du calendrier.
+
+<Note>
+  Les connecteurs sont une fonctionnalité Core, Pro ou Enterprise. Avec le forfait gratuit, demandez plutôt à Agent d’utiliser un projet Google OAuth — vous devrez créer un projet Google Cloud, activer l’API Calendar et coller les informations d’identification obtenues dans le panneau Secrets de l’application.
+</Note>
+
+<div id="section">
+  ## Test de bout en bout
+</div>
+
+1. Ouvrez votre Google Calendar dans un nouvel onglet.
+2. Connectez-vous à Velocity dans Preview.
+3. Réservez un véhicule du samedi au dimanche suivants et confirmez la réservation.
+4. Basculez vers l’onglet Google Calendar. Un nouvel événement « Velocity rental : [véhicule] », dont la description contient l’adresse de prise en charge, devrait apparaître du samedi au dimanche.
+5. Dans Velocity, modifiez la réservation pour la déplacer du dimanche au lundi. L’événement du calendrier devrait se déplacer automatiquement.
+6. Annulez la réservation. L’événement du calendrier devrait disparaître.
+7. Pour un second test, ouvrez les **Intégrations** de votre workspace, déconnectez Google Workspace, puis tentez d’effectuer une réservation. Velocity devrait toujours confirmer la réservation et afficher un message clair, tel que « Impossible d’ajouter au calendrier — la réservation a été confirmée. » Reconnectez le connecteur une fois le test réussi.
+
+Si la réservation est confirmée mais que l’événement n’apparaît pas, transmettez l’erreur exacte à Agent.
+
+<AiPrompt>
+  L’intégration a échoué avec cette erreur : [collez l’erreur depuis les journaux Velocity ou Replit].<br />
+  Indiquez la cause la plus probable et apportez la correction la plus ciblée.<br />
+  Vérifiez que la réservation de véhicules fonctionne toujours dans Velocity, même sans accès à Google Calendar.
+</AiPrompt>
+
+<div id="url">
+  ## Déployer et tester depuis l&#39;URL publique
+</div>
+
+Une fois que l&#39;intégration du calendrier fonctionne dans le Preview :
+
+1. Redéployez Velocity depuis le chat Agent.
+2. Ouvrez l&#39;URL publique et réservez un véhicule en vous mettant à la place d&#39;un vrai client.
+3. Vérifiez que l&#39;événement apparaît bien dans le calendrier du compte utilisé pour la réservation.
+4. Modifiez puis annulez la réservation depuis l&#39;URL publique et vérifiez que l&#39;événement du calendrier suit ces changements.
+
+Désormais, lorsqu&#39;un client quitte Velocity, sa location est déjà inscrite dans son calendrier. La réservation ne se résume plus à un simple e-mail de confirmation : elle devient un événement impossible à oublier.
+
+<div id="section-2">
+  ## Prochaines améliorations
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/ko/build/add-custom-domain">
+    Faites passer Velocity sur une URL de marque que vos clients pourront partager.
+  </Card>
+
+  <Card title="Ajouter les paiements" icon="credit-card" href="/fr/ko/build/add-payments">
+    Encaissez un acompte remboursable au moment de la réservation.
+  </Card>
+</CardGroup>
+
+<div id="section-3">
+  ## Besoin d&#39;aide supplémentaire ?
+</div>
+
+* **Les événements n&#39;apparaissent pas dans Google Calendar :** ouvrez **Intégrations** dans votre workspace et vérifiez que le connecteur Google Workspace est bien indiqué comme Connected et que les portées Calendar ont été accordées.
+* **Le connecteur est indiqué comme Connected, mais les événements n&#39;arrivent toujours pas :** demandez à Agent de consigner dans les journaux la charge utile de calendrier envoyée, puis corrigez le mappage des champs.
+* **Les champs de date ou d&#39;adresse se retrouvent au mauvais endroit dans l&#39;événement :** demandez à Agent de consigner dans les journaux la structure de l&#39;événement envoyé, puis corrigez le mappage des champs.
+* **Vous souhaitez une autre intégration :** remplacez « Google Calendar » par un autre connecteur — des notifications Slack pour votre équipe, HubSpot pour enregistrer les clients comme contacts CRM, ou Airtable pour suivre les réservations dans une base partagée. Agent les traite tous de la même façon via le panneau Intégrations.
+
+<div id="section-4">
+  ## Documents connexes
+</div>
+
+* [Intégrations](/fr/ko/features/integrations/overview)
+* [Intégrations Replit AI](/fr/ko/features/integrations/replit-ai-integrations)

@@ -1,0 +1,120 @@
+---
+title: "数据库"
+description: "了解如何使用 Replit 内置的 SQL 数据库来存储和读取应用数据。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Replit Database 是一个完全托管的 SQL 数据库，让你可以直接在 Project Editor 中为 Replit App 添加持久化数据存储。
+
+<Note>
+  最快的上手方式是让 **Agent** 为你的应用添加数据库。Agent 会配置好集成、创建数据库架构，并更新你的应用以存储和读取数据。
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/database-editor-cbaa1fe049f8.jpg" alt="数据库编辑器截图" width="1389" height="871" data-path="images/databases/database-editor.jpg" />
+</Frame>
+
+<div id="recursos">
+  ## 功能
+</div>
+
+Replit Database 工具提供以下功能：
+
+* **数据库工具**：使用内置的 SQL 工具执行查询、管理数据库架构并查看数据
+* **时间回溯**：将数据库恢复到 **Agent** 的任意 checkpoint。参见[数据恢复](/zh/pt/features/data-and-storage/data-recovery)
+* **免费存储**：每个 Replit App 均包含 20 GB 免费存储空间。
+* **环境变量**：在 Replit App 中使用环境变量，安全地访问数据库
+
+<Info>
+  在 2025 年 12 月 4 日之前，开发数据库托管于 Neon，存在一些关键差异。详情请参见[开发与生产](/zh/pt/features/data-and-storage/development-and-production#banco-de-dados-de-desenvolvimento-legado)。
+</Info>
+
+<div id="uso">
+  ## 使用方式
+</div>
+
+<YouTubeEmbed videoId="zbyRuoPNIc8" title="如何在 Replit 中使用数据库" />
+
+你可以直接在 Project Editor 中打开 Replit Database 工具。
+以下各节将指导你完成 Database 的设置与管理。
+
+<Accordion title="如何打开 Database 工具">
+  1. 打开 **Tools** 面板，在 **Replit Cloud** 下选择 **Database**。
+  2. 初始视图会列出你的所有数据库。选择其中一个 (例如 **Development Database**) 即可打开。
+</Accordion>
+
+Database 工具围绕数据库列表来组织。初始视图会显示每个数据库及其存储用量，以及当前的 **Billing Period** 和 **Hours of Compute Used**。打开某个数据库后，会看到三个选项卡：
+
+* **Overview**：数据库中的表。
+* **My Data**：浏览和编辑数据行，或执行 SQL 查询。
+* **Settings**：连接字符串、存储用量和连接详情。
+
+<div id="adicionar-um-banco-de-dados">
+  ### 添加数据库
+</div>
+
+所有 Replit App 默认都自带一个数据库。你可以在 Project Editor 中选择 <img class="icon-svg" src="/assets/mirror/postgres-c4cb2a1e2de3.svg" alt="PostgreSQL 数据库图标" width="24" height="24" data-path="images/icons/postgres.svg" /> **Database** 工具来访问它。
+
+要将数据库集成到 Replit App 中，你可以让 **Agent** 为你的 Replit App 添加一个 PostgreSQL 数据库，
+并说明你的 Replit App 需要存储哪些数据。Agent 会创建数据库架构，
+并更新你的应用，使其能够与数据库通信。
+
+<div id="recursos-de-segurana">
+  ### 安全功能
+</div>
+
+当你使用 **Agent** 添加数据库集成时，它会添加一个对象关系映射器 (ORM) ，
+通过内置的安全机制来管理与数据库之间的所有通信。
+
+这一 ORM 层，再加上 Agent 对安全最佳实践的落实，可通过以下功能保护你的应用免受
+漏洞利用攻击：
+
+* **模式验证**：检查数据是否符合预期格式
+* **数据净化**：自动清理创建者输入，防止 SQL 注入攻击
+
+<div id="legacy-development-database">
+  ## Legacy Development Database
+</div>
+
+在 2025 年 12 月 4 日之前，开发数据库托管在 <a href="https://neon.com/" target="_blank">Neon</a> 上。
+该数据库现已弃用，所有新的开发数据库均托管在 Replit 自有的数据库基础设施上。
+
+你可以通过查看 `DATABASE_URL` [环境变量](#ver-credenciais-de-conexão-e-uso)来确认你的开发数据库是否托管在 Neon 上。
+
+<Info>
+  如果 `DATABASE_URL` 中包含 `neon.tech/neondb`，则说明你的开发数据库仍托管在 Neon 上。
+  反之，如果包含 `helium/heliumdb`，则说明你的开发数据库现已托管在 Replit 上。
+</Info>
+
+以下是 Neon 旧版开发数据库与新版 Replit 开发数据库之间的主要区别：
+
+| **功能**         | **Replit (当前)&#x20;**&#x20;                                                                  | **Neon (旧版)&#x20;**&#x20;                                                                            |
+| -------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **托管**         | 托管在 Replit 自有基础设施上                                                                      | 托管在 Neon (第三方提供商) 上                                                                             |
+| **计费**         | 每个 Replit App 免费包含                                                                      | 按用量计费。详情请参阅 [Publishing and Database Billing](/zh/pt/billing/about-usage-based-billing#databases)。 |
+| **恢复能力**       | 使用[回滚功能](/zh/pt/features/version-control/checkpoints-and-rollbacks/)将数据库恢复到任意 checkpoint   | 时间点恢复 (PITR) ——可恢复到备份保留期内的任意时间点。                                                                |
+| **连接安全性**      | 仅可从你的 app 访问，绝不对外公开。                                                                    | 使用完整的连接字符串——一旦泄露，任何人都可以访问并修改你的数据库。                                                              |
+| **Remix 时的行为** | [Remix](/zh/pt/features/projects-and-artifacts/remix-an-app) 会创建一个包含数据副本的新开发数据库，以实现隔离与安全。  | Remix 会让所有副本复用同一个数据库，因此在 remix 中所做的更改可能会影响原始 app。                                               |
+| **数据库创建**      | 为每个 Replit App 自动创建。                                                                    | 需要手动显式配置。                                                                                       |
+| **发布流程**       | 部署或发布时需要创建[生产数据库](/zh/pt/features/data-and-storage/development-and-production)，以实现环境之间的隔离。 | 开发与生产共用同一个数据库，因此开发环境中的意外更改可能会影响生产环境中的 app。                                                      |
+
+<Warning>
+  如果你的 app 在使用旧版 Neon 数据库期间被 fork 或 remix 过，你已发布的 app 可能仍在引用原始 app 的数据库 URL。在完成[数据库升级](/zh/pt/features/data-and-storage/development-and-production)后，该共享连接将不再可用。请参阅 [Fix a published app using a shared database](/zh/pt/features/data-and-storage/shared-database-migration)，了解如何更新已发布的 app。
+</Warning>
+
+* [开发与生产](/zh/pt/features/data-and-storage/development-and-production)：你的两个数据库、基础设施升级，以及与旧版 Neon 的对比。
+* [使用你的数据](/zh/pt/features/data-and-storage/work-with-your-data)：浏览、编辑和查询你的数据。
+* [连接详情](/zh/pt/features/data-and-storage/connection-details)：凭据与外部工具。
+* [数据恢复](/zh/pt/features/data-and-storage/data-recovery)：恢复开发或生产数据。

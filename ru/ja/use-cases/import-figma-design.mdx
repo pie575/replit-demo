@@ -1,0 +1,155 @@
+---
+title: "Из Figma в опубликованное App"
+description: "Преобразуйте фреймы Figma в готовые к публикации Replit App с идентичными раскладкой, типографикой и цветами."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent запросит ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Предположим, у вас уже есть экраны в Figma. Agent превратит их в живое
+Replit App, которое можно редактировать, просматривать в предпросмотре и публиковать. Раскладка, типографика, цвета и отступы будут перенесены.
+На выходе получается не снимок экрана, а полноценно работающий продукт. Если в файле несколько
+пользовательских сценариев, укажите Agent конкретные фреймы, с которыми нужно работать.
+
+<div id="section">
+  ## Для чего подходит лучше всего
+</div>
+
+* Продуктовым дизайнерам, которым нужно превратить уже готовые фреймы в работающий Replit App.
+* Основателям, у которых есть файл Figma и которые хотят запустить проект, не создавая всё заново с нуля.
+
+<div id="section-2">
+  ## Коннекторы
+</div>
+
+<Connectors
+  items={[
+{
+id: "figma",
+name: "Figma",
+why: "Фреймы, компоненты, типографика и цвета для реализации",
+},
+]}
+/>
+
+<div id="section-3">
+  ## Перед началом
+</div>
+
+Подготовьте файл Figma с именованными фреймами (например, «Главная», «Товары», «Оформление заказа»). Подключите Figma. Предоставьте Agent доступ к файлу или вставьте ссылку на файл и ссылки на нужные фреймы. Укажите, что именно вы создаёте: маркетинговый сайт, App или отдельную лендинговую страницу.
+
+<div id="section-4">
+  ## Инструкции для Agent
+</div>
+
+<AiPrompt>
+  На основе этих фреймов:[название фрейма или ссылка] из файла Figma[ссылка]
+  создай работающее Replit App. Воспроизведи раскладку, типографику, цвета, отступы
+  и брейкпоинты (для компьютеров и мобильных устройств).
+</AiPrompt>
+
+<div id="section-5">
+  ## Чего ожидать
+</div>
+
+Agent считывает выбранные фреймы и собирает соответствующие страницы, которые можно опубликовать из Replit.
+Выборочно сверьте отступы, типографику и цвета с Figma. Интерактивные элементы —
+навигацию, формы, состояния при наведении — проверьте самостоятельно. Часто требуются
+дополнительные правки. Посмотрите результат в режиме предпросмотра на ширине экрана компьютера и смартфона. Пройдитесь по элементам навигации
+и формам, а перед публикацией сравните снимки экрана с макетами в Figma.
+
+<div id="section-6">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Сначала реализуй только мобильный фрейм. Соблюдай автораскладку и отступы из Figma.
+  Десктопную версию сделай после того, как я утвержу мобильную.
+</AiPrompt>
+
+<AiPrompt>
+  Используй один и тот же компонент для кнопок, полей ввода и карточек. Если в Figma есть переменные,
+  бери цвета и типографику из них.
+</AiPrompt>
+
+<div id="section-7">
+  ## Устранение неполадок
+</div>
+
+* **Agent не может прочитать файл:** подключите Figma, откройте доступ к файлу и вставьте ссылку на фрейм, а не просто URL файла. Если в файле несколько сценариев, дайте фреймам понятные имена (например, «Главная», «Товар», «Оформление заказа») и укажите их.
+* **Наведение, навигация и формы выглядят незавершёнными:** раскладка и цвета обычно готовы раньше остального. Попросите дополнительно доработать интерактивные элементы и выборочно сверьте отступы с Figma.
+
+<div id="section-8">
+  ## Связанные материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Дизайн лендинга" href="/ru/ja/use-cases/design-landing-page">
+    Для продуктовых дизайнеров, которым по брифу из Notion сначала нужны фреймы.
+  </Card>
+
+  <Card title="Создание интернет-магазина" href="/ru/ja/use-cases/build-online-store">
+    Для основателей и продуктовых дизайнеров, которым затем нужна витрина Shopify.
+  </Card>
+</CardGroup>

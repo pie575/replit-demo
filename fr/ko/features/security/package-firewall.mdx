@@ -1,0 +1,83 @@
+---
+title: "Pare-feu de paquets"
+description: "Le Pare-feu de paquets bloque les paquets malveillants et compromis avant qu'ils n'atteignent votre application lors de leur installation. Il est activé par défaut et s'appuie sur Socket."
+---
+
+<Frame>
+  <img src="/assets/mirror/blocked-package-message-04011660ce75.png" alt="Installation de form-data bloquée dans le chat Agent par la politique de sécurité de Replit, avec une explication des vulnérabilités connues du paquet" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
+</Frame>
+
+<Note>
+  Vous découvrez la sécurité des dépendances ? Consultez les [concepts de sécurité](/fr/ko/features/security/concepts) pour connaître les définitions de CVE, SBOM, exposition, Fix with Agent, Republish et Auto-Protect.
+</Note>
+
+Le Pare-feu de paquets bloque les paquets malveillants et compromis au niveau du réseau avant leur installation dans votre application. Il fait partie de [Replit Auto-Protect](/fr/ko/features/security/concepts#auto-protect), un ensemble de protections activées par défaut pour tous les utilisateurs, et s&#39;appuie sur [Socket](https://socket.dev), une entreprise spécialisée dans la sécurité de la chaîne d’approvisionnement logicielle.
+
+Lorsque vous ou Agent exécutez une commande d&#39;installation telle que `npm install` ou `pip install`, la requête passe d&#39;abord par le Pare-feu de paquets. Les paquets sûrs s&#39;installent comme d&#39;habitude, sans différence perceptible. Les paquets signalés comme malveillants ou compromis par Socket sont bloqués avant que le moindre code n&#39;atteigne votre environnement.
+
+Le Pare-feu de paquets est **activé par défaut pour tous les utilisateurs, sans configuration ni migration nécessaire**. Il protège aussi bien les nouvelles applications que les applications existantes, sans aucun paramètre à configurer.
+
+<Frame>
+  <img src="/assets/mirror/auto-protect-layers-a65bc848b675.png" alt="Panneau Replit Auto-Protect présentant trois protections activées par défaut : pare-feu WAF, Pare-feu de paquets basé sur Socket et chiffrement SSL/TLS" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
+</Frame>
+
+<div id="section">
+  ## Pourquoi la protection au moment de l&#39;installation est essentielle
+</div>
+
+La plupart des outils de sécurité de la chaîne d&#39;approvisionnement logicielle analysent les dépendances uniquement au moment de la publication, soit bien après l&#39;installation du paquet. Pour les vulnérabilités classiques, cela peut suffire. Mais les logiciels malveillants, c&#39;est une autre histoire : ils causent des dégâts dès leur installation, en dérobant des secrets, en ouvrant des portes dérobées ou en exfiltrant des variables d&#39;environnement. Lorsqu&#39;une analyse au moment de la publication les détecte, l&#39;attaque a déjà eu lieu.
+
+Le Pare-feu de paquets comble cette lacune. En bloquant les paquets malveillants avant même leur téléchargement, il stoppe l&#39;attaque avant qu&#39;une seule ligne de code malveillant ne soit exécutée.
+
+<div id="section-2">
+  ## Fonctionnement
+</div>
+
+1. Vous ou Agent exécutez une commande d&#39;installation telle que `npm install <package>` ou `pip install <package>`.
+2. La requête passe par le Pare-feu de paquets, qui analyse le paquet à l&#39;aide des renseignements sur les menaces de Socket.
+3. Si le paquet est sûr, l&#39;installation se poursuit normalement, sans différence perceptible.
+4. Si le paquet est malveillant ou compromis, l&#39;installation est bloquée avant qu&#39;aucun code n&#39;atteigne votre environnement.
+
+Lorsqu&#39;un élément est bloqué, vous recevez un message clair indiquant ce qui a été interrompu et pourquoi, ainsi que la vulnérabilité ou la politique à l&#39;origine du blocage. Agent reçoit les mêmes signaux : il peut donc proposer une alternative sûre — par exemple corriger un nom de paquet mal orthographié — ou vous laisser trancher.
+
+<div id="section-3">
+  ### Gestionnaires de paquets pris en charge
+</div>
+
+Le Pare-feu de paquets sécurise les installations pour :
+
+* **JavaScript** — npm, yarn, pnpm
+* **Python** — pip
+* **Go** — modules Go
+
+<div id="package-firewall">
+  ## Ce que le Pare-feu de paquets détecte
+</div>
+
+Le Pare-feu de paquets ne bloque pas seulement les codes purement malveillants : il bloque aussi les versions de paquets légitimes — y compris des paquets très largement utilisés — qui ont été compromises ou qui présentent des vulnérabilités connues. Beaucoup de ces vulnérabilités ont été divulguées après la date limite d&#39;entraînement des modèles qui recommandent ces paquets : un modèle peut donc recommander en toute confiance une version de dépendance qui était sûre dans ses données d&#39;entraînement, mais dont les problèmes ont été découverts depuis. Ces risques portent les noms suivants.
+
+* **Typosquats** — des paquets malveillants dont le nom ne diffère que d&#39;un caractère du nom réel, comme `reqeusts` au lieu de `requests`. Vous demandez le mauvais paquet et vous téléchargez du code malveillant.
+* **Slopsquats** — le modèle invente un nom de paquet qui n&#39;existe pas, et un attaquant enregistre un paquet portant exactement ce nom, en attendant que le prochain agent l&#39;installe.
+* **Recommandations obsolètes (Stale recommendations)** — de vrais paquets, recommandés par le modèle parce qu&#39;ils étaient sûrs avant sa date limite d&#39;entraînement, mais dont des vulnérabilités ont été divulguées depuis.
+
+C&#39;est ce dernier cas qui explique pourquoi le Pare-feu de paquets est si important pour les applications créées avec l&#39;IA. L&#39;agent peut choisir en toute confiance une dépendance qui n&#39;est plus sûre, et le Pare-feu de paquets en empêche l&#39;installation avant que ce code ne s&#39;exécute.
+
+<div id="package-firewall-replit">
+  ## Relation entre le Pare-feu de paquets et les autres outils de sécurité de Replit
+</div>
+
+Le Pare-feu de paquets constitue l&#39;une des trois couches complémentaires. Chacune protège une étape différente du cycle de vie de l&#39;application : utilisez-les conjointement plutôt que d&#39;en choisir une seule.
+
+| Couche                                  | Moment d&#39;exécution               | Rôle                                                                                                                                                                                                                                              |
+| --------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pare-feu de paquets**                 | À l&#39;installation                 | Bloque les paquets malveillants et compromis avant leur téléchargement (prévention).                                                                                                                                                              |
+| **Analyse automatique des dépendances** | Après l&#39;installation, en continu | Détecte les CVE nouvellement publiées dans les dépendances installées et, en option, laisse Agent préparer les correctifs. Consultez le [Centre de sécurité du projet](/fr/ko/features/security/project-security-center#automatic-dependency-scans). |
+| **Security Agent**                      | Avant la publication                 | Audite l&#39;ensemble de la base de code à la recherche de vulnérabilités liées au code, aux dépendances et aux données personnelles. Consultez [Analyses de sécurité par Agent](/fr/ko/features/security/agent-security-scans).                     |
+
+<div id="section-4">
+  ## Étapes suivantes
+</div>
+
+* Examinez les résultats d&#39;un projet donné dans le [Centre de sécurité du projet](/fr/ko/features/security/project-security-center).
+* Auditez les dépendances de tous vos projets dans le [Workspace Security Center](/fr/ko/features/security/workspace-security-center).
+* Pour en savoir plus sur l&#39;approche de Replit en matière de sécurité, lisez [Comment Replit sécurise le code généré par l&#39;IA](https://blog.replit.com/securing-ai-generated-code).

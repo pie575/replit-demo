@@ -1,0 +1,109 @@
+---
+title: "修复 Salesforce 连接过期错误"
+description: "更新刷新令牌策略，修复在 Replit 中使用 Salesforce 连接器时出现的“连接过期”错误。"
+---
+
+<div id="viso-geral">
+  ## 概述
+</div>
+
+如果您的 Salesforce 连接器停止工作，并显示 **“连接过期”** 错误，通常表示您所在 Salesforce 组织的刷新令牌策略设置为在指定期限后使 token 失效。出现这种情况时，Replit 将无法再代表您向 Salesforce 进行身份验证，需要重新授权连接。
+
+本指南将指导您更新 Salesforce Connected App 设置，使刷新令牌保持有效，直到被明确撤销。
+
+<Warning>
+  以下步骤需要 **Salesforce 管理员访问权限**。如果您没有管理员权限，请联系 Salesforce 管理员并与其分享本指南。
+</Warning>
+
+<div id="etapas-de-soluo-de-problemas">
+  ## 故障排除步骤
+</div>
+
+<div id="etapa-1-abrir-as-configuraes-do-salesforce-connected-app">
+  ### 步骤 1：打开 Salesforce Connected App 的设置
+</div>
+
+<Steps>
+  <Step title="登录 Salesforce">
+    以管理员身份登录您的 Salesforce 组织。
+  </Step>
+
+  <Step title="前往 Connected Apps">
+    前往 **Setup &gt; Apps &gt; Connected Apps &gt; Manage Connected Apps**。
+  </Step>
+
+  <Step title="找到 Replit 应用">
+    在列表中找到并选择 **Replit** Connected App。
+  </Step>
+
+  <Step title="编辑策略">
+    选择 **Edit Policies**，打开策略配置页面。
+  </Step>
+</Steps>
+
+<div id="etapa-2-atualizar-a-poltica-de-token-de-atualizao">
+  ### 第 2 步：更新刷新令牌策略
+</div>
+
+Salesforce 的默认刷新令牌策略可能会在指定天数后或一段时间未使用后使令牌过期。为避免连接失效，请将策略更改为使令牌永久有效。
+
+<Steps>
+  <Step title="找到刷新令牌策略设置">
+    在 Connected App 编辑页面中，找到 **OAuth Policies** 下的 **Refresh Token Policy** 部分。
+  </Step>
+
+  <Step title="选择“Refresh token is valid until revoked”">
+    将策略更改为 **Refresh token is valid until revoked**。这样可确保令牌不会自动过期。
+
+    <Frame>
+      <img src="/assets/mirror/refresh-token-policy-e2f92339f33d.png" alt="Salesforce Connected App 编辑页面，显示刷新令牌策略设为“Refresh token is valid until revoked”" width="886" height="449" data-path="images/replitai/debugging-salesforce-connectors/refresh-token-policy.png" />
+    </Frame>
+  </Step>
+
+  <Step title="保存更改">
+    选择 **Save** 以应用更新后的策略。
+  </Step>
+</Steps>
+
+<Tip>
+  策略更改可能需要几分钟才能生效。保存后，请等待几分钟再在 Replit 中重新连接 Salesforce。
+</Tip>
+
+<div id="etapa-3-reconectar-o-salesforce-no-replit">
+  ### 第 3 步：在 Replit 中重新连接 Salesforce
+</div>
+
+更新刷新令牌策略后，请在 Replit 中重新连接 Salesforce 连接器。
+
+<Steps>
+  <Step title="打开项目编辑器">
+    前往项目编辑器中的应用。
+  </Step>
+
+  <Step title="前往连接器">
+    在侧边栏中打开 **Connectors** 面板。
+  </Step>
+
+  <Step title="重新连接 Salesforce">
+    在已过期的 Salesforce 连接中选择 **Reconnect**。出现提示时，完成 OAuth 授权流程。
+  </Step>
+</Steps>
+
+<div id="ainda-vendo-erros">
+  ## 仍然遇到错误？
+</div>
+
+如果您已更新刷新令牌策略，但连接仍然过期：
+
+* **检查其他 token 策略选项**：确保未选择任何其他过期选项 (例如“如果在以下时间内未使用则使刷新令牌过期”或“在以下时间后使刷新令牌过期”) 。
+* **检查 IP Relaxation 设置**：如果您的 Salesforce 组织实施了 IP 限制，Connected App 中的 **IP Relaxation** 设置可能会阻止来自 Replit 服务器的请求。如果符合您的安全要求，请考虑将其设置为 **Relax IP restrictions**。
+* **查看登录历史记录**：在 Salesforce 中，检查 **Setup &gt; Login History**，查看是否有与 Replit 相关的身份验证失败记录。
+* **联系 Replit 支持团队**：如果问题不在 Salesforce 端，请联系 [Replit 支持团队](https://replit.com/support) 寻求帮助。
+
+<div id="documentao-relacionada">
+  ## 相关文档
+</div>
+
+* [连接器概览](/zh/pt/features/integrations/overview) -- 了解所有集成类型，包括 Salesforce 连接器
+* [管理您的连接器](/zh/pt/replitai/managing-connectors) -- 配置 Workspace 和组织级连接器的管理员设置
+* [Salesforce 帮助：管理 Connected Apps](https://help.salesforce.com/s/articleView?id=sf.connected_app_manage.htm) -- Salesforce 关于管理 Connected App 策略的官方指南

@@ -1,0 +1,77 @@
+---
+title: "Recueillir des avis et des notes"
+description: "Utilisez les invites d’avis natives de chaque store pour encourager les joueurs satisfaits à noter PixelGames."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const reviewPrompt = "Demandez aux joueurs d'évaluer PixelGames via l'invite d'évaluation native juste après avoir réalisé un nouveau meilleur score dans Blocks.";
+
+Plus votre application reçoit d’évaluations, plus elle progresse dans les classements et gagne la confiance de nouveaux utilisateurs. Les deux stores proposent des
+prompts natifs à cet effet : des fenêtres contextuelles qui demandent directement une évaluation dans l’application.
+
+<div id="section">
+  ## Demandez un avis au bon moment
+</div>
+
+Demandez un avis après une victoire, un nouveau meilleur score ou un passage au niveau supérieur. Le moment choisi est plus
+important que la fréquence de vos demandes.
+
+<AiPrompt>
+  {reviewPrompt}
+</AiPrompt>
+
+<Frame caption="L’écran Game Over de PixelGames après un nouveau meilleur score : le moment idéal pour demander une évaluation.">
+  <img src="/assets/mirror/rate-app-dd66c937eaf7.webp" alt="Écran Game Over de PixelGames indiquant un nouveau meilleur score" data-path="images/pixelgames/mobile/rate-app.webp" width="1516" height="852" data-path="images/pixelgames/mobile/rate-app.webp" />
+</Frame>
+
+StoreKit d’iOS et l’API Google Play In-App Review d’Android limitent tous deux la fréquence à laquelle les demandes sont réellement
+affichées, quelle que soit la fréquence à laquelle votre code les envoie.
+
+<Note>
+  N’achetez pas et n’exigez pas d’avis, par exemple en déverrouillant le jeu uniquement après une évaluation de cinq étoiles.
+  Apple et Google interdisent tous deux les avis incités, et toute infraction peut entraîner le rejet ou la suppression de
+  PixelGames.
+</Note>
+
+<div id="section-2">
+  ## Dépannage
+</div>
+
+* **Le prompt ne s’affiche pas :** il s’agit parfois d’un comportement attendu. Quel que soit le nombre de fois où votre code appelle l’API,
+  les deux plateformes limitent la fréquence à laquelle le système l’affiche.
+* **Le prompt s’affiche à chaque fois pendant les tests :** ce comportement est normal pour les builds TestFlight ou Internal Testing.
+  La limite de fréquence annuelle s’applique uniquement aux installations réelles en production.
+* **Les joueurs se plaignent d’être sollicités trop souvent :** assurez-vous d’appeler l’API native plutôt que d’afficher
+  une fenêtre contextuelle personnalisée à chaque lancement. Les fenêtres contextuelles personnalisées contournent la limitation de fréquence
+  intégrée.
+
+<div id="section-3">
+  ## Prochaines étapes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter des paiements" icon="credit-card" href="/fr/ja/build/mobile-payments">
+    Faites payer les joueurs pour le contenu de PixelGames.
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ## Articles connexes
+</div>
+
+* [Publier sur l’App Store](/fr/build/mobile-publish-ios)
+* [Publier sur Google Play](/fr/build/mobile-publish-android)

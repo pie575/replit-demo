@@ -1,0 +1,125 @@
+---
+title: "定时发布"
+description: "了解如何使用 Scheduled Deployments 按计划运行任务。"
+---
+
+定义一条命令行操作并设置调度，Replit 就会在你的 Replit App 环境中自动运行它。
+运行完成后，该操作即告结束，直到下一次调度运行时再次启动。
+
+定时部署 (也称为 scheduled jobs) 最适合处理周期性任务，
+例如检查状态、发送通知和启动备份，并不适用于
+持续运行或长时间运行的任务，例如 Web 应用。
+
+<Frame>
+  <img src="/assets/mirror/scheduled-deployments-11ce7794e4cb.jpg" alt="Scheduled Deployments" width="1920" height="1080" data-path="images/deployments/scheduled/scheduled-deployments.jpg" />
+</Frame>
+
+<div id="recursos">
+  ## 功能
+</div>
+
+定时部署包含以下功能：
+
+* **自动调度**：为任务设置调度，Replit 会自动运行。
+* **自然语言调度**：输入易于理解的调度描述，AI 会将其转换为 cron 表达式，即一种计算机可读的调度格式。
+* **错误提醒**：计划任务失败时，你会收到通知。
+* **监控**：查看日志，随时掌握定时部署的运行状态。
+
+<div id="uso">
+  ## 使用方式
+</div>
+
+你可以在 Project Editor 的 Publishing 工具中访问定时部署。
+
+以下各节将引导你完成定时部署的配置与管理。
+
+<Accordion title="如何访问 Scheduled Deployments">
+  在左侧的 **Tool dock** 中：
+
+  1. 选择 <img class="icon-svg" src="/assets/mirror/workspace-all-tools-button-7e378364e0b4.svg" alt="所有工具图标" width="16" height="16" data-path="images/icons/workspace-all-tools-button.svg" /> **All tools**，查看 Project Editor 的工具列表。
+  2. 选择 <img class="icon-svg" src="/assets/mirror/deploy-icon-7dec74bde1ff.svg" alt="Publishing 图标" width="16" height="16" data-path="images/icons/deploy-icon.svg" /> **Publishing**。
+  3. 选择 **Scheduled** 选项，然后选择 **Set up your published app**。
+
+  在**搜索栏**中：
+
+  1. 选择顶部的 <img class="icon-svg" src="/assets/mirror/workspace-search-icon-d20ee3e562fb.svg" alt="放大镜图标" width="16" height="16" data-path="images/icons/workspace-search-icon.svg" /> 放大镜图标，打开搜索工具
+  2. 输入“Publishing”找到该工具，并在结果中选择它。
+  3. 选择 **Scheduled** 选项，然后选择 **Set up your published app**。
+</Accordion>
+
+<Frame caption="Publishing 工具中的 Scheduled Job 配置界面">
+  <img src="/assets/mirror/scheduled-deployment-options-89fb7f0241e5.png" alt="Scheduled Deployment 选项" width="4052" height="2040" data-path="images/deployments/scheduled/scheduled-deployment-options.png" />
+</Frame>
+
+<div id="configurao-da-mquina">
+  ### 机器配置
+</div>
+
+此字段可用于查看计划部署所用机器的 CPU、内存和使用成本。
+
+<div id="campos-de-agendamento">
+  ### 调度字段
+</div>
+
+* **Schedule description**：用自然语言描述调度时间，例如“Every Monday and Wednesday at 10 AM”或“March 24th, 2024 at 3 PM”。
+* **Cron expression**：可选，输入用于定义任务执行时间的计算机可读字符串。
+* **Timezone selection**：在下拉菜单中选择调度使用的时区。
+
+当你在 **Schedule description** 或 **Cron expression** 字段中输入值时，AI 会自动将其转换为另一种格式。
+若要详细了解 cron 表达式，请参阅维基百科的 <a href="https://en.wikipedia.org/wiki/Cron" target="_blank">cron</a> 页面。
+
+<div id="tempo-limite-do-job">
+  ### 作业超时时间
+</div>
+
+输入作业在被调度器终止前允许运行的最长时间。在时间单位下拉菜单中选择 &quot;minutes&quot; 或 &quot;hours&quot;。
+
+<Tip>
+  定时作业的运行速度可能比在 Project Editor 中慢。请测试
+  部署，并根据需要调整超时时间。
+</Tip>
+
+<div id="build-command">
+  ### Build command
+</div>
+
+在 **Build command** 字段中输入用于编译或配置应用的 Shell 命令，该命令会在 Run command 之前执行。
+例如，要安装 Node.js 应用的依赖项，可以添加 build command `npm install`。
+
+build command 的耗时不计入使用量，也不会占用任务的时间限制。
+
+<div id="run-command">
+  ### Run command
+</div>
+
+在 **Run command** 字段中输入用于启动任务的 Shell 命令。
+例如，要运行 Python 脚本，可以将 `python app.py` 设为 run command。
+
+Replit 的调度器会在设定的时间执行该 run command。
+命令的执行时长会计入你的用量。有关按用量计费的更多信息，
+请参阅定价文档中的 [Scheduled Deployments 部分](/zh/pt/billing/deployment-pricing#scheduled-deployments)。
+
+<div id="deployment-secrets">
+  ### 部署 secrets
+</div>
+
+选择 **Add deployment secret**，添加应用安全运行所需的环境变量或 secrets。
+
+如果你的 Replit App 中已有环境变量或 secrets，Publishing 工具会自动将它们添加到列表中。
+
+要修改某个环境变量的值，请点击
+
+<img class="icon-svg" src="/assets/mirror/vertical-dots-032f1c99d22e.svg" width="16" height="16" alt="三个竖点图标" data-path="images/icons/vertical-dots.svg" /> 三个竖点图标，然后在菜单中选择 **Edit**。Secrets 管理器只会将该值应用到
+部署，不会改动你的 Replit App 中已设置的环境变量。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+若想进一步了解部署，请参阅以下资源：
+
+* [监控已发布的应用](/zh/pt/features/publishing/monitoring-a-deployment)：了解如何查看日志并监控已发布的应用。
+* [发布费用](/zh/pt/billing/deployment-pricing)：查看发布相关的费用。
+* [价格](https://replit.com/pricing)：查看各类套餐的价格与配额。
+* [使用配额](/zh/pt/billing/about-usage-based-billing)：详细了解定时部署的使用上限与计费单位。
+* [创建面向 Slack 的 HackerNews 机器人](https://docs.replit.com/getting-started/quickstarts/webscrape-and-slack-notifications)：了解如何创建一个 Slack 机器人，按设定的时间表检查网站上的新内容并发送通知。

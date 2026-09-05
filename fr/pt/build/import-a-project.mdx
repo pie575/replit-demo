@@ -1,0 +1,210 @@
+---
+title: "Importer et publier un projet existant"
+description: "Importez du code existant dans Replit, faites-le fonctionner dans Preview, ajoutez la configuration requise, publiez-le et vérifiez l’URL publique."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+⏰ *Temps estimé : 10 minutes*
+
+Utilisez ce guide si vous disposez déjà de code, d’un projet créé avec un autre outil ou d’un fichier ZIP et souhaitez poursuivre son développement sur Replit.
+
+L’importation n’est que la première étape. Le véritable objectif est de faire fonctionner le projet, de déterminer les éléments à configurer, de le publier et de vérifier que la version publique fonctionne.
+
+<div id="o-que-voc-vai-conquistar">
+  ## Ce que vous saurez faire
+</div>
+
+À la fin de ce guide, vous aurez :
+
+* Importé un projet existant dans Replit.
+* Consulté le résumé d’Agent sur le framework, les dépendances, les commandes et la configuration manquante.
+* Un Preview fonctionnel.
+* Ajouté les Secrets et variables d’environnement nécessaires au bon endroit.
+* Une URL publiée, testée comme le ferait un visiteur qui la découvre pour la première fois.
+
+<div id="o-que-voc-vai-aprender">
+  ## Ce que vous allez apprendre
+</div>
+
+Vous apprendrez à :
+
+* Demander à Agent d’inspecter un projet importé avant d’en modifier le comportement.
+* Identifier les commandes d’exécution et de build, les dépendances, les ports et les Secrets.
+* Corriger les problèmes de configuration avec le moins de modifications possible.
+* Tester l’app dans Preview avant de la publier.
+* Vérifier l’app publiée après le déploiement.
+
+<div id="para-quem-este-guia">
+  ## À qui s’adresse ce guide
+</div>
+
+Utilisez ce guide si vous importez :
+
+* Un dépôt GitHub.
+* Un projet Figma, Bolt, Lovable, Base44 ou Vercel, ou un fichier ZIP.
+* Du code commencé par quelqu’un d’autre.
+* Un projet plus ancien que vous souhaitez poursuivre avec Agent.
+
+Pour connaître les étapes d’importation propres à chaque source, consultez [Importer depuis GitHub](/fr/pt/build/import-from-github) ou la présentation d’[Importation](/fr/pt/references/workspace/import).
+
+<div id="importar-o-projeto">
+  ## Importer le projet
+</div>
+
+Ouvrez [replit.com/import](https://replit.com/import), choisissez la source et suivez le processus d’importation.
+
+Une fois le projet ouvert dans Replit, résistez à l’envie de demander immédiatement de nouvelles fonctionnalités. Demandez d’abord à Agent d’inspecter ce que vous avez importé.
+
+<AiPrompt>
+  Inspecte ce projet importé et aide-moi à comprendre comment l’exécuter dans Replit.<br />
+  Identifie le framework, les dépendances, la commande d’exécution, la commande de build, les variables d’environnement nécessaires, les ports et les problèmes de configuration potentiels.<br />
+  Ne modifie pas encore le comportement de l’application.<br />
+  Donne-moi la liste de contrôle minimale pour faire fonctionner Preview.
+</AiPrompt>
+
+Les projets importés nécessitent souvent une configuration, car les valeurs locales, les identifiants privés et les configurations de déploiement ne sont pas toujours transférés depuis l’environnement d’origine.
+
+<div id="fazer-o-preview-funcionar">
+  ## Faire fonctionner le Preview
+</div>
+
+Le Preview doit fonctionner avant la publication.
+
+Si l’app ne démarre pas, demandez à l’Agent de corriger les problèmes de configuration un par un, plutôt que de réécrire l’app.
+
+<AiPrompt>
+  Aidez-moi à démarrer cette app importée dans le Preview.<br />
+  Vérifiez l’installation des dépendances, la commande d’exécution, la commande de build, les ports, la liaison de l’hôte et les Secrets manquants.<br />
+  Corrigez d’abord le plus petit problème et expliquez comment je peux tester le résultat.
+</AiPrompt>
+
+Vérifiez :
+
+* Les dépendances s’installent correctement.
+* La commande d’exécution démarre l’app.
+* L’app écoute sur le port attendu.
+* Le Preview s’ouvre sans page blanche ni écran d’erreur.
+* Le flux principal de l’app fonctionne.
+
+Si l’Agent suggère de modifier le comportement de l’app avant qu’elle ne s’exécute, demandez-lui de s’arrêter et de se concentrer uniquement sur la configuration.
+
+<div id="adicionar-secrets-e-configuraes-ausentes">
+  ## Ajouter les Secrets et paramètres de configuration manquants
+</div>
+
+Les valeurs des Secrets ne sont pas importées depuis GitHub ni depuis la plupart des sources externes. Ajoutez les clés d’API, les jetons, les URL de base de données et les identifiants des fournisseurs via [Secrets](/fr/pt/core-concepts/project-editor/app-setup/secrets), et non dans le code.
+
+Demandez à Agent d’identifier les valeurs manquantes sans les inventer.
+
+<AiPrompt>
+  Liste les variables d’environnement et les Secrets attendus par cette app.<br />
+  Pour chaque élément, explique à quoi il sert, s’il est nécessaire pour le Preview et où obtenir sa valeur.<br />
+  Ne crée pas de secrets fictifs dans le code.
+</AiPrompt>
+
+Si l’app dispose d’une commande personnalisée d’exécution ou de build, consultez la documentation pertinente sur la configuration des apps pour [Workflows](/fr/pt/references/workspace/workflows) et [Configuration](/fr/pt/references/configuration/configuration).
+
+<div id="testar-antes-de-publicar">
+  ## Tester avant de publier
+</div>
+
+Ouvrez le Preview et testez l’app importée comme si vous étiez un nouveau visiteur.
+
+Vérifiez :
+
+* La page d’accueil se charge.
+* La navigation principale fonctionne.
+* Les formulaires, boutons, connexions, checkout, téléversements ou appels d’API fonctionnent si l’app les utilise.
+* Actualiser la page ne casse pas l’app.
+* Redémarrer l’app fonctionne toujours.
+* Les logs ne montrent pas d’erreurs cachées.
+
+Si quelque chose échoue, décrivez le symptôme à l’Agent.
+
+<AiPrompt>
+  Le Preview se charge, mais l’envoi du formulaire de réservation échoue avec cette erreur : [collez l’erreur].<br />
+  Trouve le problème de configuration ou de code le plus minime à l’origine de l’erreur.<br />
+  Explique la correction et indique-moi comment vérifier que le formulaire fonctionne ensuite.
+</AiPrompt>
+
+<div id="publicar-e-verificar">
+  ## Publier et vérifier
+</div>
+
+Ne publiez qu’une fois que le Preview fonctionne.
+
+Ajoutez les Secrets de production et les variables d’environnement dans le panneau de publication si l’app en a besoin. Les valeurs utilisées dans le Preview peuvent ne pas être automatiquement disponibles dans l’app publiée.
+
+Après la publication :
+
+* Ouvrez l’URL publique dans un nouvel onglet.
+* Suivez le même parcours principal que celui testé dans le Preview.
+* Vérifiez les fonctionnalités propres à la production, comme les retours de connexion, les appels d’API, les redirections de paiement et l’accès à la base de données.
+* Vérifiez que l’app fonctionne toujours sur mobile si les visiteurs utilisent un téléphone.
+
+Si la publication échoue, consultez [Résoudre les problèmes de publication](/fr/pt/build/troubleshooting).
+
+<div id="voc-terminou-quando">
+  ## Vous avez terminé lorsque
+</div>
+
+* Le projet a été importé avec succès.
+* Agent a identifié le framework, les commandes, les ports, les dépendances et les Secrets nécessaires.
+* Preview démarre et le flux principal fonctionne.
+* Les Secrets nécessaires sont stockés en dehors du code.
+* L’app a été publiée avec succès.
+* L’URL publique fonctionne lorsqu’elle est testée dans un nouvel onglet.
+
+<div id="melhorias-a-seguir">
+  ## Prochaines améliorations
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter une base de données" icon="database" href="/fr/pt/build/add-database">
+    Enregistrez durablement les données de l’app importée.
+  </Card>
+
+  <Card title="Ajouter une connexion" icon="user-lock" href="/fr/pt/build/add-login">
+    Protégez les pages privées ou les données propres à chaque utilisateur.
+  </Card>
+
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/pt/build/add-integrations">
+    Reconnectez des API, des CRM, des e-mails, des outils d’analyse ou des services externes.
+  </Card>
+
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/pt/build/add-custom-domain">
+    Donnez à l’app publiée une URL à votre image.
+  </Card>
+</CardGroup>
+
+<div id="precisa-de-mais-ajuda">
+  ## Besoin de plus d’aide ?
+</div>
+
+* **L’importation fonctionne, mais l’app ne démarre pas :** vérifiez les dépendances, les commandes d’exécution, les ports et les variables d’environnement manquantes.
+* **Le Preview fonctionne, mais la publication échoue :** vérifiez les Secrets de production, l’accès à la base de données, la liaison de l’hôte et la configuration du port.
+* **Les fichiers importés disparaissent après la publication :** utilisez une base de données ou un service de stockage pour les données persistantes.
+* **L’Agent veut réécrire l’app :** demandez-lui de se concentrer d’abord sur la configuration et de préserver le comportement existant.
+
+<div id="relacionado">
+  ## Ressources associées
+</div>
+
+* [Importation](/fr/pt/references/workspace/import)
+* [Secrets](/fr/pt/core-concepts/project-editor/app-setup/secrets)
+* [Workflows](/fr/pt/references/workspace/workflows)
+* [Résoudre les problèmes de publication](/fr/pt/build/troubleshooting)

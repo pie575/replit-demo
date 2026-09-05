@@ -1,0 +1,165 @@
+---
+title: "监控头部广告"
+description: "集中查看广告效果，了解哪些创意真正带来了成效。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+从 TikTok Ads、Snapchat Ads、Meta Ads 和 Google Ads 获取上周的广告数据。汇总各平台的效果数据，并根据广告支出、点击率、获客成本和广告支出回报率识别表现最佳的广告。对优胜和表现不佳的广告进行排名，了解哪些创意应在各平台扩大投放或停止投放。
+
+<div id="section">
+  ## 适合以下人群
+</div>
+
+* 需要每周评估 Meta、Google、TikTok 和 Snapchat 广告创意的效果营销人员。
+* 想了解哪些广告该加大投放、哪些该暂停的增长负责人。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "tiktok-ads",
+name: "TikTok Ads",
+why: "短视频创意效果",
+},
+{
+id: "snapchat",
+name: "Snapchat Ads",
+why: "Snap 和 Story 广告效果",
+},
+{
+id: "google-ads",
+name: "Google Ads",
+why: "搜索和展示广告效果",
+auth: "api-key",
+},
+{
+id: "facebook",
+name: "Meta Ads",
+why: "广告支出、点击率、获客成本和广告支出回报率",
+auth: "api-key",
+},
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+在 Replit 中连接 TikTok Ads 和 Snapchat Ads。对于 Google Ads 和 Meta Ads，请准备好 API 密钥。需要获取数据时，Agent 会向您询问。请选择时间范围，并说明您最关注哪些指标 (广告支出回报率或获客成本) 。
+
+<div id="agent">
+  ## 向 Agent 发出的提示
+</div>
+
+<AiPrompt>
+  请创建一个每周一上午 9 点运行的例程。从 TikTok Ads、Snapchat
+  Ads、Meta Ads 和 Google Ads 获取上周的广告数据。汇总各平台的
+  效果，并根据广告支出、点击率、获客成本和广告支出回报率识别表现最佳的广
+  告。对表现最佳和最差的广告进行排名，并告诉我哪些创意应扩大投放或停止投放。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期效果
+</div>
+
+Agent 会创建跨平台的创意排行榜。调整预算前，请核对各广告管理工具中的汇总数据。由于日期范围和时区往往不同，请先在各广告管理工具中统一日期范围。分别选择一个表现最佳和一个表现最差的广告，在广告管理工具中打开，并确认广告支出一致后再调整预算。
+
+<div id="section-5">
+  ## 按需自定义
+</div>
+
+<AiPrompt>
+  请不仅按广告系列名称分组，还要按创意主题分组。请说明哪些主题在哪些平台上表现最佳。
+</AiPrompt>
+
+<AiPrompt>
+  请发布周一的 Slack 摘要：表现最佳的 3 条广告、表现最差的 3 条广告，以及建议将预算调整到哪些地方。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排除
+</div>
+
+* **无法获取 Google Ads 或 Meta Ads 数据：** 这两者并非原生连接器。Agent 会要求你提供 API 密钥。请提前准备好，并确认该密钥可访问所需的广告账户。
+* **汇总数据与广告管理工具不一致：** 通常是因为日期范围或时区不同。请让 Agent 使用与各平台相同的日期范围 (通常为上周一至周日) ，并在调整预算前核对广告支出。
+* **表格中缺少一个平台：** 请先在 Replit 中连接 TikTok Ads 和 Snapchat Ads。如果原生连接已过期，请重新连接并再次运行该例程。
+
+<div id="section-7">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="创建社交媒体图标和横幅" href="/zh/ja/use-cases/create-social-kit">
+    适合需要为不同平台准备个人资料图片和封面图片的营销人员。
+  </Card>
+
+  <Card title="分析客户反馈" href="/zh/ja/use-cases/analyze-customer-feedback">
+    确认广告是否与真实客户的反馈一致。
+  </Card>
+</CardGroup>

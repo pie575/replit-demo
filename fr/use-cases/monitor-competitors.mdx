@@ -1,6 +1,8 @@
 ---
-title: "Surveiller la concurrence"
-description: "Détectez les changements de prix et de fonctionnalités, puis gardez une page de veille concurrentielle à jour."
+title: "Surveiller les concurrents"
+description: "Détectez les changements de prix et de fonctionnalités, puis gardez votre page de veille concurrentielle à jour."
+sidebarTitle: "Surveiller les concurrents"
+icon: "binoculars"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                Ce n’est pas un connector natif. Agent vous demandera votre clé API.
               </div> : null}
           </div>
         </div>)}
@@ -67,78 +69,91 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Surveillez les pages de tarification, de changelog et de fonctionnalités des concurrents.
-Quand quelque chose de significatif change, résumez ce qui a changé, envoyez une alerte sur
-Slack, et tenez à jour une page de veille concurrentielle dans Notion. Confirmez un
-changement sur le site en direct avant d'en informer les ventes.
+Surveillez les pages de tarification, le changelog et les pages de fonctionnalités des concurrents. Lorsqu&#39;un changement important intervient,
+résumez-le, alertez Slack et tenez à jour une page de veille concurrentielle dans Notion.
+Vérifiez le changement sur le site en ligne avant d&#39;en informer l&#39;équipe commerciale.
 
-## Idéal pour
+<div id="best-for">
+  ## Idéal pour
+</div>
 
-* Les chefs de produit qui ont besoin d'une page concurrentielle vivante.
-* Les responsables de comptes qui ont besoin de connaître un changement de prix avant qu'un deal ne capote.
+* Les chefs de produit qui ont besoin d&#39;une page de suivi des concurrents mise à jour en continu.
+* Les responsables de compte qui ont besoin d&#39;une modification de la tarification avant qu&#39;une vente ne tourne mal.
 
-## Connecteurs
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 {
-  id: "slack",
-  name: "Slack",
-  why: "Alerter quand quelque chose de significatif change",
+id: "slack",
+name: "Slack",
+why: "Alerte en cas de changement majeur",
 },
 { id: "notion", name: "Notion", why: "Page de veille concurrentielle" },
 ]}
 />
 
-## Avant de commencer
+<div id="before-you-start">
+  ## Avant de commencer
+</div>
 
-Donnez à l'Agent la liste des concurrents et les pages à surveiller (tarification, changelog,
-fonctionnalités). Connectez Slack et Notion.
+Indiquez à Agent la liste des concurrents et les pages à surveiller (tarification, changelog, fonctionnalités).
+Connectez Slack et Notion.
 
-## Invite à l'Agent
-
-<AiPrompt>
-  Crée une routine qui s'exécute chaque matin à 8h00. Surveille ces
-  concurrents : \[liste d'URL]. Détecte les changements de prix ou de
-  fonctionnalités, résume ce qui a changé, envoie une alerte sur Slack quand
-  c'est significatif, et tiens à jour une page de veille concurrentielle dans
-  Notion.
-</AiPrompt>
-
-## À quoi s'attendre
-
-L'Agent compare chaque page à la version précédente, rédige un court « ce qui a changé », et
-met à jour Notion. Confirmez un changement sur le site en direct avant d'en informer les
-ventes. Les premiers jours seront bruyants si une page est refaite ; précisez ce qui compte
-comme significatif. Quand Slack alerte, ouvrez l'URL en direct et vérifiez le changement
-vous-même avant de le transmettre.
-
-## Adaptez-le à vos besoins
+<div id="prompt-the-agent">
+  ## Donnez un prompt à l’Agent
+</div>
 
 <AiPrompt>
-  Alerte sur Slack uniquement pour les changements de prix ou d'offres.
-  Enregistre les autres modifications de page dans Notion sans alerter.
+  Créez une routine qui s’exécute chaque matin à 8 h 00. Surveillez ces concurrents :
+  [liste d’URL]. Détectez les changements de tarification ou de fonctionnalités, résumez-les,
+  alertez Slack lorsqu’ils sont significatifs et tenez à jour une page de veille
+  concurrentielle dans Notion.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## À quoi vous attendre
+</div>
+
+Agent compare chaque page à sa dernière version, rédige un bref résumé des modifications et
+met à jour Notion. Confirmez toute modification sur le site en ligne avant d’en informer l’équipe commerciale. Les premiers
+jours seront mouvementés en cas de refonte d’une page ; précisez ce qui constitue un changement important. Lorsque Slack vous avertit,
+ouvrez l’URL en ligne et vérifiez vous-même la modification avant de la transmettre.
+
+<div id="make-it-work-for-you">
+  ## Adaptez-le à vos besoins
+</div>
+
+<AiPrompt>
+  Alertez Slack uniquement en cas de modification de la tarification ou des offres. Consignez les autres modifications de pages dans
+  Notion sans envoyer d&#39;alerte.
 </AiPrompt>
 
 <AiPrompt>
-  Quand les prix changent, rédige un brief commercial de 5 lignes dans
-  Notion : ce qui a changé, qui est concerné, et notre positionnement.
+  Lorsque la tarification change, rédigez dans Notion un brief commercial de 5 lignes : ce qui a changé, qui est concerné
+  et comment nous nous positionnons par rapport à la concurrence.
 </AiPrompt>
 
-## Dépannage
+<div id="troubleshooting">
+  ## Dépannage
+</div>
 
-* **Chaque refonte ressemble à un changement de prix :** indiquez à l'Agent quelles pages surveiller (tarification, changelog, fonctionnalités) et ce qui compte comme significatif. Confirmez un changement sur le site en direct avant d'en informer les ventes.
-* **Rien n'alerte jamais :** les pages sont peut-être inaccessibles, ou la liste de concurrents est trop restreinte. Donnez des URL complètes et demandez à l'Agent de signaler quand il n'a pas pu charger une page.
-* **Notion est un tas de notes ponctuelles :** pointez l'Agent vers une seule page de veille concurrentielle et demandez-lui de mettre à jour cette page sur place plutôt que d'en créer une nouvelle chaque matin.
+* **Chaque refonte semble être une modification tarifaire :** indiquez à Agent les pages à surveiller (tarification, changelog, fonctionnalités) et ce qui constitue un changement significatif. Confirmez la modification sur le site en ligne avant d’en informer l’équipe commerciale.
+* **Aucune alerte n’est jamais envoyée :** les pages sont peut-être inaccessibles ou la liste des concurrents est trop restreinte. Fournissez les URL complètes et demandez à Agent de vous signaler lorsqu’il n’a pas pu charger une page.
+* **Notion est un amas de notes isolées :** indiquez à Agent une seule page de veille concurrentielle et demandez-lui de la mettre à jour directement plutôt que d’en créer une nouvelle chaque matin.
 
-## Voir aussi
+<div id="related">
+  ## Articles connexes
+</div>
 
 <CardGroup cols={2}>
-  <Card title="Surveiller les mentions de marque" href="/fr/use-cases/monitor-brand-mentions">
-    La même configuration Slack et Notion pour ce que les gens disent, pas seulement pour les sites concurrents.
+  <Card title="Surveiller les mentions de votre marque" href="/fr/use-cases/monitor-brand-mentions">
+    La même configuration Slack et Notion pour savoir ce que les gens disent, et pas seulement sur les sites de vos concurrents.
   </Card>
 
-  <Card title="Générer un rapport de ventes hebdomadaire" href="/fr/use-cases/weekly-pipeline-report">
-    Pour les responsables de comptes et les directeurs commerciaux qui ont besoin de suivre l'évolution du pipeline.
+  <Card title="Générer un rapport commercial hebdomadaire" href="/fr/use-cases/weekly-pipeline-report">
+    Pour les responsables de compte et les directeurs commerciaux qui doivent suivre l&#39;évolution du pipeline.
   </Card>
 </CardGroup>

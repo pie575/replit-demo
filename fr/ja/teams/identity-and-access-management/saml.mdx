@@ -1,0 +1,144 @@
+---
+title: "Authentification unique (SAML SSO)"
+description: "Configurez directement l’authentification unique de Replit Enterprise depuis les paramètres de l’espace de travail. Inclut la configuration de l’IdP et les revendications de domaine d’adresse e-mail."
+icon: "id-card"
+---
+
+<div id="section">
+  ## Introduction
+</div>
+
+<Note>
+  Vous souhaitez ajouter le SSO au flux de connexion des **applications que vous créez** sur Replit ? Consultez [Ajouter le SSO à votre application (Clerk)](/fr/ja/features/auth-and-identity/single-sign-on). Cette page explique comment activer le SSO pour votre **organisation Replit** (la manière dont votre équipe se connecte à replit.com).
+</Note>
+
+<Note>
+  Le SSO SAML est disponible uniquement pour les organisations disposant du forfait Enterprise. Vous pouvez [acheter directement le forfait Enterprise depuis la page des tarifs](https://replit.com/pricing) ou [nous contacter](https://replit.com/teams#inlineForm) pour demander une démonstration guidée.
+</Note>
+
+Le [SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) SSO vous permet d’authentifier, via votre fournisseur d’identité (IdP), les utilisateurs qui se connectent à replit.com. Les utilisateurs de votre organisation sont redirigés vers l’IdP pour s’authentifier, puis l’IdP vérifie leur identité et renvoie à Replit une réponse de connexion.
+
+Les administrateurs Enterprise peuvent configurer directement le SSO SAML depuis **Paramètres Enterprise → Authentification**, sans contacter Replit. L’assistant génère les valeurs du fournisseur de services (SP), recueille les identifiants de l’IdP et provisionne automatiquement le SSO. Ce même parcours en libre-service est également utilisé lors de l’inscription à un forfait Enterprise en ligne, afin de vous guider dans la configuration du SSO pendant l’intégration.
+
+<div id="saml-sso">
+  ## Configuration du SSO SAML
+</div>
+
+<img src="/assets/mirror/saml-enterprise-settings-d2d44c2de846.png" alt="Configuration du SSO SAML dans les paramètres Enterprise" width="1024" height="613" data-path="images/teams/identity-and-access-management/saml-enterprise-settings.png" />
+
+L’assistant de configuration vous guide en cinq étapes. Vous devez disposer d’un accès administrateur à Replit et à l’IdP.
+
+<Steps>
+  <Step title="Ouvrir les paramètres d’authentification">
+    Ouvrez le sélecteur d’espace de travail, sélectionnez votre espace de travail Enterprise, puis ouvrez les **paramètres**. Sélectionnez **Avancé**, développez la section **Authentification**, puis cliquez sur **Activer le SSO** dans la carte **Authentification unique SAML**.
+
+    L’indicateur d’état passe à **En cours** et l’assistant affiche les valeurs requises par l’IdP.
+  </Step>
+
+  <Step title="Sélectionner un fournisseur d’identité">
+    Sélectionnez votre IdP dans **Configurer le fournisseur d’identité** :
+
+    * **Microsoft Entra ID**
+    * **Google Workspace**
+    * **Okta**
+    * **Autre fournisseur**
+
+    Chaque option adapte les libellés des champs et fournit un lien direct vers la console d’administration de l’IdP pour vous permettre de créer une application SAML dans un nouvel onglet.
+  </Step>
+
+  <Step title="Créer une application SAML dans l’IdP">
+    Dans la console d’administration de votre IdP, créez une application SAML à l’aide des valeurs affichées par Replit :
+
+    | Champ                              | Valeur                                                                                                                       |
+    | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+    | URI d’audience / ID d’entité SP    | Copiez la valeur affichée dans l’assistant (spécifique à l’organisation, au format `https://replit.com/<tenant-id>/saml/sp`) |
+    | URL SSO (URL ACS)                  | `https://replit.com/__/auth/handler`                                                                                         |
+    | Format de l’ID de nom              | Adresse e-mail                                                                                                               |
+    | Nom d’utilisateur de l’application | E-mail                                                                                                                       |
+  </Step>
+
+  <Step title="Saisir les valeurs de l’IdP">
+    Une fois l’application SAML créée dans votre IdP, copiez les valeurs suivantes dans la section **Saisir les valeurs du fournisseur** de Replit :
+
+    * **URL SSO de l’IdP** — URL vers laquelle Replit redirige les utilisateurs lors de l’authentification.
+    * **ID d’entité de l’IdP** — Identifie l’IdP de Replit.
+    * **Certificat X.509** — Certificat de signature de l’IdP au format PEM ou base64. Les marqueurs `BEGIN/END` sont facultatifs.
+    * **Domaines de messagerie** — Liste séparée par des virgules des domaines avec lesquels les utilisateurs se connectent (par exemple : `acme.com, acme.co.uk`). Incluez tous les alias et sous-domaines que votre IdP pourrait déclarer.
+
+    Cliquez sur **Envoyer les identifiants**. Replit valide les URL de manière synchrone, analyse le certificat (en rejetant les certificats expirés ou pas encore valides) et vérifie les domaines de messagerie demandés. Chaque domaine doit correspondre à l’adresse e-mail d’au moins un administrateur de facturation de l’organisation, et les domaines publics (tels que `gmail.com`) ne peuvent pas être revendiqués.
+  </Step>
+
+  <Step title="Attendre le provisionnement">
+    L’indicateur d’état passe à **Provisionnement en cours…** pendant que Replit crée le locataire SAML sous-jacent. Cela prend généralement environ une minute. Une fois terminé, l’indicateur d’état devient **Actif** et votre organisation peut se connecter à l’aide du SSO.
+
+    Si le provisionnement échoue, l’indicateur d’état devient **Échec de la configuration** et Replit nettoie automatiquement l’état partiel. Cliquez sur **Réessayer** pour redémarrer l’assistant.
+  </Step>
+</Steps>
+
+<div id="section-2">
+  ## Sélection des domaines de messagerie
+</div>
+
+Vous pouvez revendiquer plusieurs domaines et sous-domaines de messagerie pour votre organisation. Les utilisateurs qui tentent de s&#39;inscrire avec une adresse e-mail correspondant à un domaine revendiqué devront utiliser le SSO SAML. Les domaines revendiqués doivent correspondre à ceux que l&#39;IdP fournit pour les utilisateurs. Si vous utilisez des alias de domaines de messagerie, incluez-les également afin d&#39;empêcher les utilisateurs de s&#39;inscrire sans SSO.
+
+Par exemple, si votre entreprise utilise les domaines de messagerie `acmeco.com`, `foo.acmeco.com` et `acmebiz.com`, revendiquez-les tous les trois lors de l&#39;envoi des identifiants.
+
+Replit vérifie chaque domaine revendiqué en le comparant à l&#39;adresse e-mail d&#39;un administrateur. Pour ajouter ou supprimer un domaine après l&#39;avoir revendiqué, modifiez le champ **Domaines de messagerie** de la carte **Authentification**. Pour revendiquer un domaine qui ne correspond à l&#39;adresse e-mail d&#39;aucun administrateur existant, contactez [support@replit.com](mailto:support@replit.com).
+
+<div id="saml-sso-2">
+  ## Utiliser SAML SSO
+</div>
+
+<Note>
+  L’inscription via SAML n’invite pas automatiquement les utilisateurs à rejoindre l’organisation. Pour automatiser la gestion des utilisateurs et les opérations groupées, consultez plutôt [SCIM](/fr/ja/teams/identity-and-access-management/scim).
+</Note>
+
+Lorsque SAML SSO est **actif**, les utilisateurs peuvent se connecter à [replit.com](https://replit.com) à l’aide du bouton **Continuer avec SSO**.
+
+<div id="faq">
+  ## FAQ
+</div>
+
+<div id="saml-ssoreplitcom">
+  ### Que se passe-t-il pour les utilisateurs qui possèdent déjà un compte sur replit.com avant la configuration du SSO SAML ?
+</div>
+
+Lorsqu&#39;une organisation active le SSO SAML, tous les utilisateurs dont le domaine d&#39;adresse e-mail est revendiqué pour le SSO doivent se connecter via le SSO. Les utilisateurs existants dont l&#39;adresse e-mail correspond au domaine SSO ne peuvent plus utiliser leur ancienne méthode d&#39;authentification (e-mail ou connexion via les réseaux sociaux). Ils ne sont pas automatiquement ajoutés à l&#39;organisation.
+
+<div id="idpreplit">
+  ### Lorsqu’un IdP révoque l’accès, les utilisateurs sont-ils automatiquement déprovisionnés dans Replit ?
+</div>
+
+Non, le SSO SAML ne gère que l’authentification. Pour automatiser le provisionnement et le déprovisionnement des utilisateurs, les clients Enterprise peuvent utiliser l’intégration [SCIM](/fr/ja/teams/identity-and-access-management/scim). SCIM vous permet de synchroniser l’annuaire de votre IdP afin de gérer automatiquement les rôles et le provisionnement des utilisateurs.
+
+<div id="idp">
+  ### Lorsqu’un utilisateur obtient un accès via l’IdP, un siège de l’organisation est-il automatiquement utilisé ?
+</div>
+
+Non, un siège n’est utilisé que lorsque l’utilisateur accepte l’invitation à rejoindre l’organisation.
+
+<div id="saml">
+  ### Que faire si la configuration SAML échoue ?
+</div>
+
+L’assistant indique l’échec à l’aide de l’indicateur d’état **Échec de la configuration**, et Replit annule automatiquement tout provisionnement partiel. Cliquez sur **Réessayer** pour redémarrer l’assistant, vérifiez à nouveau les valeurs de l’IdP et soumettez de nouveau les identifiants. Si l’erreur persiste, contactez votre gestionnaire de compte.
+
+<div id="saml-sso-3">
+  ### Comment désactiver le SAML SSO ?
+</div>
+
+La désactivation en libre-service n’est pas encore prise en charge. Pour désactiver le SSO de votre organisation, contactez votre gestionnaire de compte. Après l’activation, vous pouvez toujours modifier en libre-service les domaines de messagerie revendiqués depuis la carte **d’authentification**.
+
+<div id="section-3">
+  ## Ressources associées
+</div>
+
+<CardGroup cols={2}>
+  <Card title="SCIM" icon="key" href="/fr/ja/teams/identity-and-access-management/scim">
+    Découvrez comment automatiser la gestion des utilisateurs grâce à l’intégration SCIM
+  </Card>
+
+  <Card title="Groupes et autorisations" icon="shield" href="/fr/ja/teams/identity-and-access-management/groups-and-permissions">
+    Découvrez comment gérer les rôles des utilisateurs et les accès
+  </Card>
+</CardGroup>

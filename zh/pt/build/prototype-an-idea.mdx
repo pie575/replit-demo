@@ -1,0 +1,373 @@
+---
+title: "将产品创意制作成原型"
+description: "将产品创意转化为聚焦明确的原型，与他人协作，并利用反馈决定下一步要构建什么。"
+---
+
+export const PACE_PROMPT = `Build me a personal running web app called "Pace".
+
+I want a clean, modern web app where I can track my runs and see my progress at a glance — a friendlier, more visual version of a running journal like Strava or Nike Run Club, but simpler and prettier. It only needs to support one user (me) for now, and my profile name should be Alex Morgan. Pre-fill it with about a month of pretend running history so it looks alive from the moment I open it — runs through San Francisco, a mix of easy runs, tempo runs, long runs, and recovery runs, with at least 4–5 runs in the past week so the dashboard looks active.
+
+The app should run in any modern browser, feel fast, and be fully responsive — great on desktop, tablet, and phone.
+
+Look and feel
+The vibe is sporty, premium, "athletic brand" — black, white, and a punchy lime green as the accent color. Use the Inter font everywhere. Rounded corners on everything (cards, buttons, pills). It should feel calm and uncluttered, not busy. Light mode by default. Smooth, subtle animations when pages transition, when cards appear, and when I click buttons — it should feel responsive and alive, not stiff.
+
+Overall navigation
+A top nav bar with the Pace logo on the left and 5 links across the middle: Home, Runs, Plan, Stats, Profile. The active link has a lime underline; inactive links are gray. On the right: a lime "Log a Run" button (always visible) and a round profile photo (clicking it opens Profile).
+
+On smaller screens, the middle nav links collapse into a hamburger menu, but the lime "Log a Run" button stays visible.
+
+The Home page (the main page) — a scrollable feed, top to bottom:
+
+Greeting. A friendly greeting that changes with the time of day ("Good morning, Alex" / "Good afternoon, Alex" / "Good evening, Alex"), with a subtitle "Ready for your next run?".
+
+Hero banner card. A wide photo of someone running on pavement, with a dark gradient on the left so the text is readable. Big white headline: "You don't find willpower, you create it." Underneath: "Keep showing up." Bottom-left: a lime pill button "Start a Run" with a little black play-circle. Clicking it opens the Log a Run dialog.
+
+"This Week" stats. A row of four cards (2×2 grid on smaller widths): Distance (km), Time (h/min), Elevation (m), Runs (count). Each card: small icon, big number, "+12% vs last week" caption, thin squiggly line graph at the bottom (lime, blue, purple, lime). Numbers reflect my actual runs from the last 7 days.
+
+Weekly Progress card. Title + small "View goals" link. Then "X of Y runs completed" and a big bold percentage on the right. Gradient lime progress bar. Below: seven day pills (M T W T F S S) with date numbers. Today is a black filled circle; days I've run show a lime circle with a white checkmark; others are empty circles.
+
+Your Last Run card. A real interactive map (Leaflet, Mapbox, or similar) showing the route of my most recent run as a lime line, date in the corner, lime "View Run" button, and four stats (Distance, Time, Pace, Calories). Click → full run detail page.
+
+Recent Runs section. Title "Recent Runs" + "See all" link. Three rows, one per recent run: tiny green map-line thumbnail on the left, run name + date, distance + pace lined up on the right. Click a row → run detail. A small "Delete" icon appears on hover.
+
+Upcoming Workout card. Title + small lime circle icon with footprints. Workout name "Tempo Run", "Tomorrow · 6:30 AM". Three stats: 8 km, 5:40/km target pace, "Moderate" intensity. A muted gray "View workout" button. (Placeholder — no real training plan yet.)
+
+Recent Achievements card. Two badges, each with a colorful icon, the badge name, and a one-line description. First is a real PR from my history (e.g. "10K Crusher — Completed a 10K in under 60 minutes"). Second is a placeholder: "Early Bird — Completed 5 runs before 7 AM" with a lime crescent moon icon.
+
+The Runs page
+Full list of all my runs, grouped by month (sticky month headers as I scroll). Each row like the recent-runs rows. A search input in the top-right filters by name or run type (Easy, Tempo, Long, Recovery, Interval). Click a row → run detail.
+
+The Stats page — a scrollable view with:
+- Time-range pill tabs at the top (7D / 30D / 3M / 6M / 1Y / All).
+- Three KPI numbers (Total Distance, Avg Pace, Total Time), each with a green or red badge for change vs the previous period.
+- A smooth lime area chart of distance over time. Hover a point to see that day's value.
+- Below: a small bar chart of "runs per day of week" and a list of personal records (fastest 5K, fastest 10K, longest run, etc.).
+
+The Plan page
+A weekly calendar of upcoming workouts (placeholder — mostly the visual shell). Each day is a row showing what's planned (or "Rest day"). Today's row highlighted lime.
+
+The Profile page
+Avatar, name, weekly goal setting, total all-time stats (total distance, total runs, total hours), an "Upgrade to Pro" card with a lime sparkle and "Upgrade Now" button, and a settings list (units km/mi, notifications, sign out).
+
+The "Log a Run" dialog (modal that centers on desktop, slides up from the bottom on mobile):
+- Type of run (segmented control: Easy / Tempo / Long / Recovery / Interval)
+- Distance in km (number input)
+- Duration (mm:ss or hh:mm:ss input)
+- Date and time (date and time pickers)
+- Optional name
+- Big lime "Save Run" button at the bottom
+After saving: smooth dismiss, dashboard updates instantly, small toast confirmation.
+
+The Run Detail page (a dedicated page when I click a run):
+- Big interactive map of the full route at the top
+- Date, run type chip, back link
+- Stats row (Distance, Duration, Avg Pace, Calories)
+- Per-kilometer splits with pace per km
+- "..." menu with Edit and Delete
+
+How it should behave
+- The greeting changes based on time of day.
+- Hero "Start a Run" and the nav "Log a Run" both open the same Log a Run dialog.
+- Loading skeletons instead of blank space.
+- Smooth page transitions.
+- Fully responsive — every screen looks great on desktop, tablet, and phone.
+
+Things to be honest about
+- No real elevation data yet — use a sensible placeholder for the elevation stat card and flag it.
+- The little route thumbnails in the recent-runs list can be a generic green squiggle if the real route shape would slow the list down — the big Run Detail map should be real.
+- "Upcoming Workout" and the Plan page are placeholders — no training plan engine yet.
+- No live GPS tracking in this first version — runs are added by manually filling the Log a Run form.
+
+Build the whole thing end-to-end so it's actually usable: I should be able to open the URL, see my Alex Morgan dashboard fully populated with realistic San Francisco runs, log a new run from either the hero button or the nav, and have it show up in my stats and recent runs immediately.`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "已复制！";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        复制 prompt
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        在 Replit 上构建 ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+⏰ *预计用时：15 分钟*
+
+原型是他人可以体验并提供反馈的最小产品创意版本。
+
+您将以 **Pace** 为例：这是一款高级跑步追踪器，可让跑者清晰了解自己的训练、恢复情况和进展。
+
+<Frame>
+  <img src="/assets/mirror/pace-running-tracker-7c5b75e07856.png" alt="已发布到公开 URL 的 Pace 原型——一个高级跑步追踪器仪表板，包含每周跑步距离、近期跑步记录、即将进行的训练和成就" width="2880" height="1800" data-path="images/build-examples/pace-running-tracker.png" />
+</Frame>
+
+<PromptActions prompt={PACE_PROMPT} campaign="docs-prototype-an-idea" />
+
+<div id="o-que-voc-vai-aprender">
+  ## 您将学到什么
+</div>
+
+您将学会如何：
+
+* 将宽泛的产品创意转化为可测试的流程。
+* 在开始构建前使用 Plan 模式确定原型范围。
+* 评估 Agent 的计划是否足够精简，便于测试。
+* 使用 Canvas 注释和协作功能，在相关上下文中收集反馈。
+* 当产品问题尚不明确时，并行探索两种原型方向。
+
+<Steps>
+  <Step title="编写提示词">
+    上面的提示词描述了 **Pace**——一款个人跑步追踪器，包含精致的首页仪表板、“添加跑步”流程、统计数据、计划视图占位符，以及逼真的旧金山示例数据。你可以使用 **复制提示词** 自行将其粘贴到 Replit，或使用 **在 Replit 中构建** 打开已附带该提示词的 Replit。
+
+    该提示词特意明确了视觉方向、页面、需要模拟的数据以及哪些内容只是占位符——这能让 Agent 有清晰的评估目标。
+  </Step>
+
+  <Step title="使用 Plan 模式（可选）">
+    如果你希望 Agent 在编写任何代码前先思考产品方向，请启用提示词输入框旁的 **Plan**。Plan 模式会生成一份结构化计划，供你在批准构建前审阅——当方向尚未完全确定时尤其有用。
+
+    <Frame>
+      <img src="/assets/mirror/agent-plan-mode-prompt-059fe8d2c277.png" alt="Replit 的提示词编辑器，其中已输入 Pace 原型摘要，并突出显示了 Plan 复选框，可在 Agent 开始前确定构建范围" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
+    </Frame>
+
+    审阅计划：目标用户、核心流程、哪些内容应真实实现、哪些可以模拟，以及测试检查清单。如果计划包含太多功能，请让 Agent 精简它。
+
+    <AiPrompt>
+      这个原型范围太大了。<br />
+      请将其缩减为一个目标用户、一个核心流程，以及一个我可以通过反馈回答的问题。<br />
+      将其他想法移至未来改进列表。
+    </AiPrompt>
+  </Step>
+
+  <Step title="检查 Agent 构建的内容">
+    当 Agent 完成后，打开 Preview，像首次访问的用户一样体验 Pace。
+
+    确认你可以：
+
+    * 查看 Alex Morgan 的仪表板，其中已填充逼真的示例跑步记录。
+    * 通过浮动 **+** 按钮或首屏的 **开始跑步** 按钮记录一次新的跑步。
+    * 看到新跑步记录出现在 **最近跑步** 中，且 **本周** 统计数据随之更新。
+    * 在“跑步”“统计”“计划”和“个人资料”标签之间切换。
+    * 将 Preview 调整至手机宽度，检查移动端布局。
+
+    如果发现任何问题，请向 Agent 描述具体症状，并要求其进行最小范围的修复。
+
+    <Frame>
+      <img src="/assets/mirror/fitstart-preview-1b631e7ed180.png" alt="在 Preview 中运行的 Pace 原型 — Workspace 左侧显示 Agent Chat，右侧显示已填充内容的 Pace 仪表板，这是首次访问用户会与之交互的界面" width="1440" height="900" data-path="images/fitstart/fitstart-preview.png" />
+    </Frame>
+  </Step>
+
+  <Step title="发布并征求反馈">
+    当核心流程可用后，即可部署。
+
+    <Frame>
+      <img src="/assets/mirror/fitstart-publish-dialog-137f98d0f7cd.png" alt="项目编辑器中显示两个部署入口：Agent Chat 中包含子域名字段的内嵌“部署”卡片，以及“工具和文件”面板中的“部署”区块" width="1440" height="900" data-path="images/fitstart/fitstart-publish-dialog.png" />
+    </Frame>
+
+    部署后，在新的浏览器标签页中打开公开 URL，确认首次访问的用户也能顺利使用，再进行分享。
+
+    <Frame>
+      <img src="/assets/mirror/pace-running-tracker-7c5b75e07856.png" alt="已部署的 Pace 原型在新的浏览器标签页中打开，可分享给评审者以获取有针对性的反馈" width="2880" height="1800" data-path="images/build-examples/pace-running-tracker.png" />
+    </Frame>
+
+    分享 URL 时附上明确的任务：
+
+    > 以跑者的身份使用 Pace，尝试追踪一周的训练。记录一次跑步，浏览仪表板，然后告诉我哪些地方让你感到困惑，哪些地方能激励你。
+
+    好的反馈应能帮助你决定下一步要构建什么。除非你想得到模糊的回答，否则不要问“你觉得怎么样？”
+  </Step>
+
+  <Step title="与团队协作">
+    当团队成员能够审阅同一产物并结合上下文提供反馈时，产品原型会不断完善。
+
+    根据协作者需要与你协作的紧密程度发出邀请：
+
+    * 如果对方只需审阅或协助此原型，请邀请他们加入项目。请参阅[邀请团队成员](/zh/pt/build/invite-teammates)。
+    * 如果对方是长期协作团队的一员，并且需要访问所有项目，请邀请他们加入 workspace。请参阅[团队 Workspace](/zh/pt/features/collaboration/team-workspaces)。
+
+    <Frame>
+      <img src="/assets/mirror/agent-invite-dialog-2703a335500c.png" alt="Workspace 顶部栏中打开的“邀请”对话框，突出显示了用户名或电子邮件输入字段，可用于邀请团队成员加入项目" width="700" height="400" data-path="images/fitstart/work-with-agent/agent-invite-dialog.png" />
+    </Frame>
+
+    接下来，如果反馈涉及视觉内容，请使用 [Canvas](/zh/pt/design/canvas)。直接在原型中添加备注，标注想要更改的区域，并让 Agent 在更新 App 时参考这些备注。
+
+    <AiPrompt>
+      使用 Pace 中的 Canvas 注释来改进原型。<br />
+      保持跑步记录流程不变。<br />
+      仅将注释应用于 hero 区域、每周进度卡片和最近跑步列表。<br />
+      更新后，测试记录跑步是否仍会更新今天的进度。
+    </AiPrompt>
+
+    <Frame>
+      <img src="/assets/mirror/agent-canvas-annotations-c88ab5856966.png" alt="Canvas 上的 Pace frame：矩形、箭头和文本标签指向“使用 Strava 登录”按钮旁、“记录跑步”按钮附近的位置——这是协作者可以留给 Agent 的上下文备注类型" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-canvas-annotations.png" />
+    </Frame>
+
+    对于产品经理而言，这意味着原型可以作为共享产物：设计师可以为流程添加注释，工程师可以评估可行性，利益相关者则可以体验已发布的版本。
+  </Step>
+</Steps>
+
+<div id="parabns">
+  ## 🎉 恭喜
+</div>
+
+你已将一个产品创意转化为聚焦且可分享的原型——一个可供团队成员和客户试用并提供反馈的功能完善的 Pace 仪表板。难点不在于制作这个原型，而在于学会如何将一个宽泛的想法提炼为可测试的流程，在实际情境中收集反馈，并决定接下来值得构建什么。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+根据反馈选择下一步：
+
+<CardGroup cols={2}>
+  <Card title="添加数据库" icon="database" href="/zh/pt/build/add-database">
+    保存跑步历史记录，确保页面重新加载后数据仍然保留。
+  </Card>
+
+  <Card title="添加登录功能" icon="lock" href="/zh/pt/build/add-login">
+    为每位跑者创建账户，保存各自的进度。
+  </Card>
+
+  <Card title="创建移动 App" icon="mobile-screen" href="/zh/pt/build/mobile-app">
+    将 Pace 带到 iOS 或 Android 平台，优先支持移动端追踪。
+  </Card>
+
+  <Card title="根据数据创建仪表板" icon="chart-line" href="/zh/pt/build/dashboard">
+    将跑步历史记录转化为进度洞察。
+  </Card>
+</CardGroup>
+
+<div id="construa-em-paralelo">
+  ### 并行构建
+</div>
+
+当产品问题关乎方向而不只是实现时，同时探索多个想法能帮助你比较不同方案，避免过早确定方向。Replit Agent 支持并行任务——你可以让 Agent 同时处理多个原型、功能或实验，并将它们并排评估。
+
+<Frame>
+  <img src="/assets/mirror/task-plan-sidebar-ecab81b06bb0.png" alt="线程视图，显示多个并行运行的 Agent 任务及其状态指示器" width="3430" height="1986" data-path="images/replitai/task-plan-sidebar.png" />
+</Frame>
+
+要了解任务如何排队、执行和完成，请参阅[任务系统](/zh/pt/core-concepts/agent/task-system)。
+
+当你不确定哪个方向更好时，可以让 Agent 创建两个并行任务。对于 Pace，你可以比较：
+
+* **侧重激励的原型**：连续打卡、成就和鼓励性建议。
+* **侧重分析的原型**：更深入的统计数据、每周趋势和个人纪录。
+
+<AiPrompt>
+  创建两个并行任务，将 Pace 改进为产品原型。<br />
+  任务 1 应探索一个侧重激励的版本，包含连续打卡、成就和鼓励性建议。<br />
+  任务 2 应探索一个侧重分析的版本，包含更深入的统计数据、每周趋势和个人纪录。<br />
+  两个版本都要足够精简，以便今天进行测试。<br />
+  对于每个任务，请定义用户流程、要构建的内容，以及我应如何评估结果。
+</AiPrompt>
+
+两个任务完成后，使用同一个反馈问题进行比较：
+
+> 哪个版本更能让你愿意明天再回来，为什么？
+
+<div id="precisa-de-mais-ajuda">
+  ## 需要更多帮助？
+</div>
+
+* **原型功能过多：**请 Agent 将其聚焦于一个目标用户和一个流程。
+* **目标受众不明确：**请 Agent 为目标用户重写欢迎部分。
+* **模拟数据掩盖了风险：**请 Agent 列出哪些是真实内容，哪些是模拟内容。
+* **反馈过于笼统：**给审核者一项任务和一个问题。
+* **部署失败：**请参阅[部署故障排除](/zh/pt/build/troubleshooting)。
+
+<div id="relacionado">
+  ## 相关内容
+</div>
+
+* [构建并发布你的第一个 App](/zh/pt/build/your-first-app)
+* [Vibe coding 101](/zh/pt/learn/foundations/vibe-coding-101)
+* [邀请团队成员](/zh/pt/build/invite-teammates)

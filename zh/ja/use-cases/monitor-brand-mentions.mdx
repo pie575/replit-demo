@@ -1,0 +1,159 @@
+---
+title: "监测品牌提及"
+description: "发现与品牌相关的重要讨论，并将其发送到团队已在使用的平台。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+监控 X 上的品牌提及，识别重要对话，汇总情感倾向和上下文，将相关提及发送到 Slack，并归档到 Notion。Agent 会忽略噪声，只标记需要回复的内容，让您能在问题演变为客服或公关事件前发现提及量激增。
+
+<div id="section">
+  ## 适用人群
+</div>
+
+* 希望在情绪波动激增演变为客服或公关问题前及时掌握情况的品牌和社区经理。
+* 只想了解需要回复的提及，而非所有提及的社交媒体客服人员。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "x",
+name: "X",
+why: "公开提及和对话的信息来源",
+auth: "api-key",
+},
+{
+id: "slack",
+name: "Slack",
+why: "如有需要回复的提及，通知团队",
+},
+{ id: "notion", name: "Notion", why: "归档摘要，方便日后查阅" },
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+请准备好你要关注的品牌名称或账号、用于接收提醒的 Slack 频道，以及用于归档的 Notion 数据库。
+
+Agent 会要求你提供 **X 的 Bearer Token**。请在 [console.x.com](https://console.x.com) 注册账号并生成 Bearer Token。
+
+请为你的 X 开发者账号充值。若账户没有余额，在 X 上搜索提及内容会失败。
+
+<div id="agent">
+  ## Agent 提示词
+</div>
+
+<AiPrompt>
+  请创建一个每天早上 8 点运行的例行任务。监控 X 上对[品牌]的提及。
+  识别重要对话，总结情感倾向和上下文，将相关提及发送到 Slack，
+  并归档到 Notion。忽略噪声，并为需要回复的内容添加标记。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期结果
+</div>
+
+Agent 会监控提及内容，评估其重要性，在 Slack 中发布简短摘要，并将讨论串保存到 Notion。请查看首批结果，并调整“重要”的判定标准。如果完全没有收到提及内容，请确认是否已设置 Bearer Token，以及 X 开发者账户是否有可用额度。首次在早晨运行后，打开 Slack 提醒，跳转到 X 中的链接，再确认 Notion 中对应行是否包含相同链接。
+
+<div id="section-5">
+  ## 按需自定义
+</div>
+
+<AiPrompt>
+  仅将负面情感或点赞数超过[n]的提及内容发送至Slack
+  提醒。将其余内容全部归档到Notion。
+</AiPrompt>
+
+<AiPrompt>
+  请将包含前 5 条提及内容和整体情感倾向的每日摘要添加到Slack。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排查
+</div>
+
+* **完全收不到提及：** 请确认已配置 X 的 Bearer Token，并检查 X 开发者账号中是否还有额度。额度不足时，即使 Token 有效，提及搜索也会失败。
+* **Slack 毫无动静，只有 Notion 在不断堆积：** 可能是 Agent 把所有内容都当成了噪声。请收紧“重要”的判定标准，或要求它即使无需回复也发布每日摘要。
+* **归档变得杂乱：** 请为 Agent 指定一个已有相应列 (日期、链接、情感倾向、是否需要回复) 的 Notion 数据库，并要求它把内容映射到这些字段，而不是每次都新建页面。
+
+<div id="section-7">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="分析客户反馈" href="/zh/ja/use-cases/analyze-customer-feedback">
+    对支持工单使用相同的 Slack 和 Notion 配置。
+  </Card>
+
+  <Card title="监控竞争对手" href="/zh/ja/use-cases/monitor-competitors">
+    针对竞争对手网站使用相同的 Slack 提醒和 Notion 归档。
+  </Card>
+</CardGroup>

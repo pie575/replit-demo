@@ -1,0 +1,148 @@
+---
+title: "Workflows"
+description: "Workflows — узнайте, как настроить кнопки для запуска нужных команд."
+---
+
+export const YouTubeEmbed = ({videoId, title = "Видео на YouTube", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Это многоразовые настраиваемые последовательности шагов, которые можно запускать в Replit App. Они могут быть настолько простыми, как запуск `python main.py`, или настолько сложными, как выполнение многоэтапного процесса.
+
+<Frame>
+  <img src="/assets/mirror/workflows-pane-e7d5e4251006.png" alt="Изображение" width="525" height="622" data-path="images/workflows/workflows-pane.png" />
+</Frame>
+
+Примеры использования:
+
+* Одновременный запуск нескольких сервисов (например, фронтенда и бэкенда)
+* Последовательный запуск файлов или команд (например, линтер → тесты, компиляция → запуск кода)
+
+Чтобы [создать Workflow](#creating-workflows), откройте окно Workflows через меню инструментов на боковой панели или найдите его с помощью `Command + K`.
+
+<YouTubeEmbed videoId="I5wePXNdPwg" title="Workflows в Replit" />
+
+<div id="section">
+  ## Доступные типы задач
+</div>
+
+В настоящее время доступны три типа задач: `Execute Shell Command`, `Install Packages` и `Run Workflow`.
+
+<div id="execute-shell-command">
+  ### Выполнение команд Shell
+</div>
+
+`Execute Shell Command` сохраняет и выполняет команды оболочки в той же среде, что и в окне Shell. Этот тип задачи подходит для всего: от запуска отдельных файлов до
+
+```text theme={null}
+python main.py
+```
+
+Поддерживает широкий спектр сценариев использования, включая выполнение сложных сохранённых запросов к базе данных:
+
+```text theme={null}
+psql -h 0.0.0.0 -U your_username -d your_database -c "SELECT * FROM your_table;"
+```
+
+Пример использования:
+
+<Frame>
+  <img src="/assets/mirror/shellExec-task-example-44b117f3fc2d.gif" alt="Изображение" width="908" height="602" data-path="images/workflows/shellExec-task-example.gif" />
+</Frame>
+
+<div id="install-packages">
+  ### Установка пакетов
+</div>
+
+`Install Packages` автоматически определяет зависимости проекта и устанавливает необходимые пакеты с помощью встроенной системы управления зависимостями Replit. Подробнее о том, как UPM определяет, какие пакеты нужно установить в проекте, см. в разделе [Управление зависимостями](/ru/ko/features/project-setup/dependency-management#the-universal-package-manager).
+
+Пример использования:
+
+<Frame>
+  <img src="/assets/mirror/packager-task-example-0ed4437abfc1.webp" alt="Изображение" width="720" height="429" data-path="images/workflows/packager-task-example.webp" />
+</Frame>
+
+<div id="run-workflow">
+  ### Run Workflow
+</div>
+
+`Run Workflow` позволяет запускать другой воркфлоу из текущего. Это позволяет повторно использовать и комбинировать воркфлоу для создания более сложных процессов.
+
+Пример использования:
+
+<Frame>
+  <img src="/assets/mirror/example-run-workflow-62f93cd1bf00.webp" alt="Изображение" width="720" height="678" data-path="images/workflows/example-run-workflow.webp" />
+</Frame>
+
+Создавая зависимости между воркфлоу с помощью этого типа действия, вы обеспечиваете, что при редактировании одного воркфлоу другие воркфлоу, ссылающиеся на него, автоматически используют последние изменения. Обратите внимание, что для вызовов с глубокой вложенностью действует ограничение глубины.
+
+<div id="section-2">
+  ## Режимы выполнения Workflows
+</div>
+
+Workflows поддерживает два режима выполнения: последовательный и параллельный.
+
+<div id="section-3">
+  ### Последовательное выполнение
+</div>
+
+При последовательном выполнении задачи запускаются в заданном порядке: система ждёт завершения каждой задачи, прежде чем перейти к следующей, и прекращает выполнение последовательности, если какая-либо задача в рабочем процессе завершается с ошибкой.
+
+Этот режим подходит, например, для определения логически связанных команд: сначала получить последние изменения из основной ветки, а затем выполнить ребейз текущей ветки поверх основной ветки:
+
+<Frame>
+  <img src="/assets/mirror/example-sequential-workflow-62ae8a64038f.png" alt="Изображение" width="721" height="654" data-path="images/workflows/example-sequential-workflow.png" />
+</Frame>
+
+<div id="section-4">
+  ### Параллельное выполнение
+</div>
+
+В режиме параллельного выполнения каждая задача запускается и выполняется независимо от других задач в рабочем процессе. Сбой одной задачи не останавливает выполнение остальных.
+
+Этот режим полезен, например, при запуске full-stack проекта, в котором необходимо запустить и фронтенд-, и бэкенд-серверы:
+
+<Frame>
+  <img src="/assets/mirror/example-parallel-workflow-ebda6681ce61.png" alt="Изображение" width="721" height="654" data-path="images/workflows/example-parallel-workflow.png" />
+</Frame>
+
+<div id="section-5">
+  ## Создание рабочего процесса
+</div>
+
+Нажмите кнопку `+ New Workflow`, чтобы создать рабочий процесс в окне Workflows. Укажите понятное название рабочего процесса, выберите подходящий режим запуска и добавьте задачи. Задачи можно перетаскивать, чтобы изменить их порядок.
+
+<Frame>
+  <img src="/assets/mirror/example-workflow-setup-c9ffc4fca282.webp" alt="Изображение" width="720" height="414" data-path="images/workflows/example-workflow-setup.webp" />
+</Frame>
+
+<div id="run">
+  ## Назначение Workflows кнопке Run
+</div>
+
+Вы можете назначить Workflows кнопке Run, чтобы заменить её стандартное действие (см. [Настройка Replit App](/ru/ko/features/project-setup/configuration)). Чтобы сохранить стандартную команду запуска, заданную в `.replit`, выберите в раскрывающемся списке вариант по умолчанию «Run Replit App».
+
+При нажатии кнопки Run запускается выбранный в раскрывающемся меню Workflows. Чтобы изменить Workflows, запускаемый кнопкой Run, выберите нужный вариант в раскрывающемся меню.
+
+<Frame>
+  <img src="/assets/mirror/configure-run-button-workflow-92b0243e955c.gif" alt="Изображение" width="588" height="254" data-path="images/workflows/configure-run-button-workflow.gif" />
+</Frame>
+
+<div id="section-6">
+  ## Просмотр вывода рабочего процесса
+</div>
+
+Вывод рабочего процесса отображается в окне `Console`. Можно настроить отображение только последнего вывода или полностью очистить консоль.
+
+<Frame>
+  <img src="/assets/mirror/workflow-output-view-550fb8b764ff.gif" alt="Изображение" width="706" height="434" data-path="images/workflows/workflow-output-view.gif" />
+</Frame>

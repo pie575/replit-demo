@@ -1,0 +1,279 @@
+---
+title: "SSH"
+description: "Découvrez comment configurer et utiliser SSH pour connecter votre environnement de développement local à applications Replit afin de bénéficier d’un accès distant sécurisé et de synchroniser vos fichiers."
+---
+
+<div id="o-que-ssh">
+  ## Qu’est-ce que SSH ?
+</div>
+
+SSH, qui signifie Secure Shell, est un protocole sécurisé qui facilite l’accès à distance à l’interface en ligne de commande de votre application Replit. Avec SSH, vous pouvez transférer facilement des fichiers et utiliser votre environnement de développement intégré (IDE) local préféré pour modifier du code dans Replit, améliorant ainsi la collaboration et la productivité dans votre flux de développement.
+
+La fonctionnalité SSH est disponible avec les forfaits Core, Pro et tous les autres forfaits payants.
+
+Voici un aperçu du processus :
+
+* Générez une paire de clés SSH sur votre machine locale
+* Ajoutez cette clé SSH au panneau **SSH** de n’importe quelle application Replit
+* Connectez-vous à l’aide d’un client SSH ou d’un éditeur compatible avec SSH (comme [VSCode](https://code.visualstudio.com/) ou [Cursor](https://www.cursor.com/))
+
+<Note>
+  Les clés SSH sont associées à votre compte, et non à une application Replit spécifique. Vous ne devez donc ajouter une clé publique qu’une seule fois, après quoi vous pouvez vous connecter à toute application Replit à laquelle vous avez accès.
+</Note>
+
+<div id="por-que-usar-ssh">
+  ## Pourquoi utiliser SSH ?
+</div>
+
+* **Mises à jour automatiques entre l’application Replit et l’éditeur** : toute modification effectuée dans l’application Replit est instantanément répercutée dans votre éditeur, et toute modification apportée dans l’éditeur est synchronisée avec l’application Replit. Cette synchronisation fluide garantit que votre base de code est toujours à jour sur les deux plateformes.
+
+* **Synchronisation de la gestion des fichiers** : qu’il s’agisse d’ajouter, de supprimer ou de mettre à jour des fichiers, ces modifications sont synchronisées en temps réel entre votre éditeur et l’application Replit. Cette fonctionnalité garantit que la structure de votre projet reste cohérente, quel que soit l’endroit où les modifications sont effectuées.
+
+* **Gestion des dossiers et déplacement des fichiers** : le déplacement de fichiers entre les dossiers est également synchronisé entre vos éditeurs et l’application Replit. Ainsi, les modifications apportées à l’organisation dans un environnement sont fidèlement répercutées dans l’autre, tout en préservant l’intégrité et la structure de votre projet.
+
+<div id="encontre-ou-crie-um-par-de-chaves">
+  ## Trouvez ou créez une paire de clés
+</div>
+
+Pour configurer SSH sur votre compte, vous aurez besoin de votre clé publique SSH.
+
+<div id="verificando-se-voc-j-tem-um-par-de-chaves">
+  ### Vérifier si vous possédez déjà une paire de clés
+</div>
+
+Vous pouvez vérifier si vous possédez déjà une clé publique en exécutant la commande suivante dans un terminal sur votre ordinateur local :
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    ls -l ~/.ssh
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    dir %HOMEPATH%\.ssh
+    ```
+  </Tab>
+</Tabs>
+
+Si vous obtenez une erreur, ce n’est pas grave : passez à [Générer une nouvelle paire de clés](#generating-a-new-keypair).
+Si vous voyez un fichier nommé `replit.pub`, passez à [Obtenir le contenu de votre clé publique](#get-the-contents-of-your-public-key).
+
+<div id="gerando-um-novo-par-de-chaves">
+  ### Générer une nouvelle paire de clés
+</div>
+
+Sur votre machine, ouvrez un terminal (ou l’Invite de commandes) et collez la commande suivante :
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```bash theme={null}
+    ssh-keygen -t ed25519 -f ~/.ssh/replit -q -N ""
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    ssh-keygen -t ed25519 -f %HOMEPATH%\.ssh\replit -q -N ""
+    ```
+  </Tab>
+</Tabs>
+
+Cette commande vérifie si un fichier de clé publique SSH spécifique existe déjà. S’il n’existe pas, elle crée une nouvelle clé SSH avec les paramètres appropriés.
+
+<div id="obtenha-o-contedo-da-sua-chave-pblica">
+  ### Récupérez le contenu de votre clé publique
+</div>
+
+Après avoir vérifié que vous disposez d’une paire de clés ou en avoir créé une, affichez le contenu de la clé publique (l’un des deux fichiers portant des noms similaires et se terminant par `.pub`), car vous en aurez besoin plus loin.
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    cat ~/.ssh/replit.pub
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    notepad %HOMEPATH%\.ssh\replit.pub
+    ```
+  </Tab>
+</Tabs>
+
+Conservez le contenu de `replit.pub` pour l’utiliser plus loin dans cet article, puis passez à [l’ajout de la clé SSH à votre compte](#add-the-ssh-key-to-your-account).
+
+<div id="adicione-a-chave-ssh-sua-conta">
+  ## Ajoutez la clé SSH à votre compte
+</div>
+
+<div id="adicione-a-chave-pblica-diretamente-em-um-replit-app-usando-o-painel-ssh">
+  ### Ajoutez directement la clé publique à une application Replit à l’aide du panneau SSH
+</div>
+
+1. Dans votre application Replit, depuis n’importe quel panneau, sélectionnez le bouton **+** et recherchez **SSH**.
+
+<Frame>
+  <img src="/assets/mirror/ssh-tool-2db02c6a83d0.png" alt="Bouton de l’outil SSH dans l’interface Replit" width="846" height="328" data-path="images/ssh-vscode/ssh-tool.png" />
+</Frame>
+
+2. Accédez à l’onglet **Keys** et sélectionnez **New SSH key**.
+3. Dans la fenêtre contextuelle, saisissez un **Label** pour votre clé (par exemple, my-ssh-key) et collez la clé publique que vous avez copiée dans la section **Key**.
+   Sélectionnez le bouton **Add SSH Key**. Votre clé a été ajoutée et autorisée à être utilisée.
+
+<Frame>
+  <img src="/assets/mirror/add-ssh-key-with-values-5d6f440e56ba.png" alt="Boîte de dialogue Add SSH key avec les champs de libellé et de clé remplis" width="500" height="511" data-path="images/ssh-vscode/add-ssh-key-with-values.png" />
+</Frame>
+
+<div id="adicione-a-chave-pblica-diretamente-em-settings">
+  ### Ajoutez la clé publique directement dans les paramètres
+</div>
+
+Vous pouvez également ajouter une clé SSH en ouvrant **paramètres** puis, dans **compte**, en sélectionnant **avancé** (ou l’option **Clés SSH**). Sélectionnez **Add SSH key**, puis collez le contenu du fichier `replit.pub` de la section précédente, [Trouver ou créer une paire de clés](#find-or-create-a-keypair).
+
+<Note>
+  Si vous avez plusieurs clés publiques sur votre machine, assurez-vous d’utiliser la bonne combinaison de clés privée et publique dans votre configuration SSH.
+</Note>
+
+<div id="conectando-se-ao-seu-replit-app">
+  ## Connexion à votre application Replit
+</div>
+
+<div id="configure-seu-arquivo-de-configurao-ssh">
+  ### Configurez votre fichier de configuration SSH
+</div>
+
+1. Dans un terminal, vérifiez que le répertoire `~/.ssh` et le fichier `~/.ssh/config` existent :
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/config && chmod 600 ~/.ssh/config
+    open -a 'TextEdit' ~/.ssh/config || nano ~/.ssh/config
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    if not exist %HOMEPATH%\.ssh mkdir %HOMEPATH%\.ssh && type \NUL > %HOMEPATH%\.ssh\config
+    notepad %HOMEPATH%\.ssh\config
+    ```
+  </Tab>
+</Tabs>
+
+2. Ajoutez un bloc de configuration afin d&#39;utiliser la paire de clés `replit` pour tous les domaines *.replit.dev :
+
+<Tabs>
+  <Tab title="Mac/Linux/Windows">
+    ```
+    Host *.replit.dev
+        Port 22
+        IdentityFile ~/.ssh/replit
+        StrictHostKeyChecking accept-new
+    ```
+  </Tab>
+</Tabs>
+
+<div id="conecte-se-pelo-vscode-ou-cursor">
+  ### Connectez-vous avec VS Code ou Cursor
+</div>
+
+1. Dans une application Replit, ouvrez le panneau **SSH**.
+
+2. Dans le panneau SSH, accédez à l’onglet **Connect**, puis sélectionnez **Launch VS Code**.
+
+<Tabs>
+  <Tab title="Se connecter avec VS Code">
+    <img src="/assets/mirror/ssh-connect-439a3c150846.png" alt="Onglet Connect de SSH affichant l’option Launch VS Code" width="788" height="482" data-path="images/ssh-vscode/ssh-connect.png" />
+  </Tab>
+</Tabs>
+
+3. Si vous êtes invité à renseigner `~/.ssh/config`, saisissez ce qui suit :
+
+   ```
+   Host *.replit.dev
+       Port 22
+       IdentityFile ~/.ssh/replit
+       StrictHostKeyChecking accept-new
+   ```
+
+   <Note>
+     L’ajout de la configuration SSH vous est demandé uniquement lors de votre première tentative de connexion à VS Code ou à un autre éditeur. Pour revenir au fichier de configuration, sélectionnez **Configure SSH Hosts...**.
+   </Note>
+
+4. Si une alerte relative à une application externe s’affiche, sélectionnez **Yes** pour confirmer que vous souhaitez ouvrir votre projet dans l’éditeur de votre choix ou dans VS Code.
+
+5. Il se peut que vous soyez invité à installer ou à mettre à jour des extensions SSH. Replit s’efforcera de maintenir la compatibilité avec les versions les plus récentes de ces IDE, et vous pourriez également recevoir d’importantes mises à jour de sécurité.
+
+<div id="conecte-se-manualmente">
+  ### Connectez-vous manuellement
+</div>
+
+En bas de l’onglet &quot;Connect&quot; du panneau **SSH**, vous trouverez l’option &quot;Connect manually&quot;.
+
+Copiez cette commande et collez-la dans un terminal local (Mac ou Linux) ou une invite de commandes locale (Windows) pour vous connecter directement.
+
+C’est également un bon moyen de résoudre les problèmes de connexion aux IDE et de recueillir de précieuses informations de connexion &quot;détaillées&quot; lorsque vous signalez des bugs à l’assistance Replit.
+
+**Une erreur indiquant que nous essayons de nous connecter avec une clé privée inexistante** :
+
+```
+$ ssh -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+Warning: Identity file /Users/user/.ssh/replit not accessible: No such file or directory.
+```
+
+**Logs de débogage complets d’une tentative de connexion SSH, à inclure dans un rapport de bug** :
+
+```
+$ ssh -vvv -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+OpenSSH_9.6p1, LibreSSL 3.3.6
+debug1: Reading configuration data /Users/.../.ssh/config
+debug1: /Users/.../.ssh/config line 1: Applying options for *
+debug1: /Users/.../.ssh/config line 4: Applying options for *.replit.dev
+debug3: channel_clear_timeouts: clearing
+debug1: Connecting to c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev port 22.
+debug1: Connection established.
+debug1: identity file /Users/dstewart/.ssh/replit type 3
+debug1: Local version string SSH-2.0-OpenSSH_9.6
+debug1: Remote protocol version 2.0, remote software version Replit-SSH-Proxy
+debug1: compat_banner: no match: Replit-SSH-Proxy
+debug3: fd 5 is O_NONBLOCK
+...
+Welcome to the Replit SSH Proxy.
+
+Visit https:/.replit.com/replit-workspace/ssh to learn more about SSH on Replit.
+debug3: receive packet: type 51
+debug1: Authentications that can continue: password,publickey
+debug3: start over, passed a different list password,publickey
+debug3: preferred publickey,keyboard-interactive,password
+debug3: authmethod_lookup publickey
+debug3: remaining preferred: keyboard-interactive,password
+debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+...
+debug2: we did not send a packet, disable method
+debug3: authmethod_lookup password
+debug3: remaining preferred: ,password
+debug3: authmethod_is_enabled password
+debug1: Next authentication method: password
+```
+
+<div id="conecte-se-por-meio-de-uma-ferramenta-no-listada-aqui">
+  ### Connectez-vous avec un outil non répertorié ici
+</div>
+
+De nombreux clients SSH sont disponibles pour différentes plateformes et systèmes d’exploitation, chacun proposant diverses fonctionnalités ou intégrations.
+
+Vous pouvez toujours décomposer la commande affichée dans &quot;Connect Manually&quot; en ses différents éléments afin de déterminer comment configurer chaque client :
+
+```sh theme={null}
+ssh -i ~/.ssh/replit -p 22  c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+       ^-----v-----^    ^^  ^-----------------v----------------^ ^------------------------------v-------------------------------------^
+        Private Key   Port                   User               @                           Hostname
+```
+
+**Nom d’hôte** : `<your_hostname>.<cluster>.replit.dev`
+**Port** : `<port_number>`
+**Utilisateur** : `Username`
+**Clé privée** : chemin d’accès au fichier de clé privée sur votre ordinateur, généralement situé à côté de `replit.pub`.

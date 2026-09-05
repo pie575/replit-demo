@@ -1,0 +1,269 @@
+---
+title: "Résolution des problèmes de déploiement"
+description: "Diagnostiquez les problèmes courants lorsqu’une application Replit fonctionne dans Preview, mais échoue lors du déploiement ou se comporte différemment sur son URL publique."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Le déploiement transforme un projet en application publique. Si le déploiement échoue ou si l’URL publique se comporte différemment de Preview, procédez au dépannage dans l’ordre.
+
+Cette page sert de guide de restauration de build et de référence pour le dépannage des déploiements. Commencez par la question la plus simple : l’application fonctionne-t-elle dans Preview ?
+
+<div id="section">
+  ## Ce que vous allez accomplir
+</div>
+
+À la fin de cette page, vous saurez si le problème vient de l’application elle-même, de la configuration du déploiement, des Secrets de production, du type de déploiement, de la configuration des ports ou de l’accès au réseau/DNS.
+
+<div id="preview">
+  ## Commencez par Preview
+</div>
+
+Avant le déploiement, vérifiez que l’application fonctionne correctement dans Project Editor.
+
+En haut de Project Editor, sélectionnez **Run**, puis ouvrez Preview. Si votre application ne s’affiche pas dans Preview à l’URL `replit.dev`, corrigez le problème avant le déploiement.
+
+Demandez d’abord à Agent de diagnostiquer le problème dans Preview.
+
+<AiPrompt>
+  Cette application ne fonctionne pas dans Preview.<br />
+  Vérifiez la commande d’exécution, l’installation des dépendances, les erreurs de l’application, les ports et les Secrets manquants.<br />
+  Corrigez d’abord le problème le plus simple et indiquez-moi comment vérifier que Preview fonctionne avant le déploiement.
+</AiPrompt>
+
+Si Preview ne fonctionne pas, le déploiement ne résoudra pas le problème.
+
+<div id="preview-2">
+  ## Lorsque Preview fonctionne mais que le déploiement échoue
+</div>
+
+Si Preview fonctionne mais que le déploiement échoue, vérifiez les paramètres propres au déploiement.
+
+<div id="section-2">
+  ### Vérifier les logs
+</div>
+
+Ouvrez l’onglet **Logs** du panneau **Publishing**. Recherchez les traces de pile, les packages manquants, les commandes ayant échoué, les variables d’environnement manquantes ou les erreurs de démarrage.
+
+Collez l’erreur correspondante dans Agent.
+
+<AiPrompt>
+  Le déploiement a échoué avec cette sortie de log : [collez l’erreur].<br />
+  Expliquez la cause la plus probable.<br />
+  Indiquez s’il s’agit d’une erreur liée à une commande, une dépendance, un Secret, un port, un build ou l’application.<br />
+  Recommandez la correction minimale et la manière de la vérifier.
+</AiPrompt>
+
+<div id="section-3">
+  ### Vérifiez les commandes d’exécution et de build
+</div>
+
+Les erreurs courantes incluent les fautes de frappe, des options incorrectes, un mauvais fichier d’entrée ou des commandes qui ne fonctionnent qu’en local.
+
+Vérifiez les commandes dans le panneau **Publishing**. Si votre application nécessite à la fois une commande de build et une commande de démarrage, assurez-vous qu’elles sont toutes deux correctes.
+
+<div id="secrets">
+  ### Vérifier les Secrets de production
+</div>
+
+Les Secrets configurés dans le Project Editor ne sont pas automatiquement transmis à l&#39;application publiée. Dans le panneau **Publishing**, ajoutez tous les Secrets et toutes les variables d&#39;environnement de production.
+
+L&#39;absence de Secrets peut entraîner des erreurs de valeurs non définies, des échecs d&#39;appels API, des échecs de connexion à la base de données, des erreurs de connexion ou des échecs de paiement.
+
+Consultez [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets).
+
+<div id="section-4">
+  ### Vérifier le fonctionnement des processus de longue durée
+</div>
+
+Les applications déployées doivent rester en cours d’exécution. Si votre programme s’exécute une seule fois puis s’arrête, la plateforme le redémarre automatiquement.
+
+Vérifiez que votre application démarre un processus de longue durée, tel qu’un serveur web.
+
+<div id="section-5">
+  ### Vérifier la configuration de l&#39;hôte et du port
+</div>
+
+Si vous exécutez un serveur web, le déploiement peut détecter automatiquement le port utilisé par le serveur, mais celui-ci doit écouter sur `0.0.0.0`. Un serveur qui écoute uniquement sur `localhost` ou `127.0.0.1` ne fonctionnera pas dans une application déployée.
+
+[Si vous avez spécifié un port dans la configuration `.replit`](/fr/ko/features/project-setup/configuration), la détection automatique des ports est désactivée. Pour passer l&#39;étape de promotion, vous devez spécifier un port dont `externalPort` est défini sur `80`. Vérifiez que le serveur écoute sur le `localPort` spécifié.
+
+Demandez à Agent de vérifier attentivement.
+
+<AiPrompt>
+  Vérifiez que cette application est correctement configurée pour le déploiement.<br />
+  Vérifiez que le serveur démarre un processus de longue durée, écoute sur 0.0.0.0, utilise le port attendu et correspond à la configuration des ports dans .replit.<br />
+  Ne modifiez pas le comportement de l&#39;application en dehors des corrections nécessaires au déploiement.
+</AiPrompt>
+
+<div id="section-6">
+  ### Vérifier le délai du contrôle de santé
+</div>
+
+Avant de déclarer une application déployée disponible, Replit lui envoie une requête HTTP. Si la page d’accueil met plus de 5 secondes à répondre, le contrôle de santé peut expirer et le déploiement échouer lors de la dernière étape.
+
+Si le démarrage est lent, demandez à Agent de réduire les tâches de démarrage, de reporter les opérations coûteuses après une action de l’utilisateur ou, le cas échéant, de mettre les données en cache.
+
+<div id="url">
+  ## Le déploiement a réussi, mais l’URL publique ne fonctionne pas
+</div>
+
+Si Preview fonctionne et que le déploiement a réussi, mais que l’URL publique ne fonctionne pas, comparez le comportement de Preview à celui de la production.
+
+Points à vérifier :
+
+* Les Secrets et les variables d’environnement de production.
+* La configuration de la connexion à la base de données.
+* Les URL de rappel ou de redirection de connexion.
+* Les paramètres des webhooks ou des redirections de paiement.
+* Les listes d’autorisation d’API ou les paramètres CORS.
+* Les fichiers enregistrés localement au lieu d’être stockés dans une base de données ou un service de stockage.
+* La mise en page mobile et les différences entre navigateurs.
+
+Demandez à Agent de comparer les environnements.
+
+<AiPrompt>
+  L’application fonctionne dans Preview, mais pas sur l’URL déployée.<br />
+  Aidez-moi à comparer le comportement de Preview à celui de la production.<br />
+  Vérifiez les Secrets, la configuration de la base de données, les appels d’API, les redirections de connexion, les redirections de paiement, la sortie de build et les logs.<br />
+  Indiquez-moi la prochaine vérification la plus sûre.
+</AiPrompt>
+
+<div id="static">
+  ## Problèmes de déploiement Static
+</div>
+
+Les déploiements Static servent des fichiers statiques tels que des fichiers HTML, CSS et JavaScript.
+
+Si votre application inclut des fonctionnalités côté serveur, des routes API, des rappels d’authentification, des appels à la base de données depuis le serveur ou une logique backend de longue durée, elle n’est peut-être pas adaptée à un déploiement Static. Modifiez plutôt le type de déploiement en Autoscale dans le panneau **Publishing**.
+
+Les problèmes de déploiement Static surviennent souvent lorsqu’un mauvais répertoire public est spécifié ou lorsque Static est sélectionné pour une application nécessitant un serveur.
+
+<div id="section-7">
+  ## Limites de fichiers et de taille
+</div>
+
+Les déploiements Reserved VM et Autoscale prennent en charge les applications Replit jusqu’à 8 Go. Les déploiements Static prennent en charge les applications jusqu’à 1 Go.
+
+Pour réduire la taille de votre application, supprimez les fichiers inutiles, évitez de valider les fichiers générés ou utilisez un stockage externe pour les ressources volumineuses.
+
+<Warning>
+  Le système de fichiers d’une application déployée n’est pas persistant et est réinitialisé à chaque déploiement. Pour assurer la persistance des données, utilisez une base de données telle que [SQL Database](/fr/ko/features/data-and-storage/sql-database).
+</Warning>
+
+Si des fichiers téléversés ou des données générées disparaissent après le déploiement, stockez-les dans une base de données ou un service de stockage plutôt que dans le système de fichiers de l’application.
+
+<div id="replitapp-replitdev-url">
+  ## Problèmes d&#39;accès aux URL `replit.app` et `replit.dev`
+</div>
+
+Si vous rencontrez des difficultés pour accéder à votre application via les domaines `replit.app` ou `replit.dev`, elles peuvent être dues à des filtres Web ou à des restrictions réseau.
+
+Essayez d&#39;utiliser un résolveur DNS public, comme Google DNS (`8.8.8.8`) ou Cloudflare DNS (`1.1.1.1`).
+
+<div id="dns">
+  ### Modifier les paramètres DNS
+</div>
+
+<Tabs>
+  <Tab title="Windows">
+    1. Ouvrez le **Panneau de configuration**.
+    2. Accédez au **Centre Réseau et partage**.
+    3. Sélectionnez **Modifier les paramètres de la carte** dans le volet de gauche.
+    4. Cliquez avec le bouton droit sur votre connexion réseau active, puis sélectionnez **Propriétés**.
+    5. Sélectionnez **Protocole Internet version 4 (TCP/IPv4)**, puis **Propriétés**.
+    6. Sélectionnez **Utiliser l&#39;adresse de serveur DNS suivante**.
+    7. Saisissez l&#39;adresse IP d&#39;un serveur DNS public, par exemple `8.8.8.8` pour Google DNS ou `1.1.1.1` pour Cloudflare DNS.
+    8. Sélectionnez **OK** pour enregistrer les modifications.
+
+    Pour des instructions détaillées, consultez le [guide de configuration DNS de Microsoft](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace).
+  </Tab>
+
+  <Tab title="macOS">
+    1. Ouvrez les **Préférences Système**.
+    2. Sélectionnez **Réseau**.
+    3. Sélectionnez votre connexion réseau active dans le volet de gauche.
+    4. Sélectionnez **Avancé** en bas à droite.
+    5. Accédez à l&#39;onglet **DNS**.
+    6. Sélectionnez le bouton **+** pour ajouter un serveur DNS.
+    7. Saisissez l&#39;adresse IP d&#39;un serveur DNS public, par exemple `8.8.8.8` pour Google DNS ou `1.1.1.1` pour Cloudflare DNS.
+    8. Sélectionnez **OK**, puis **Appliquer**.
+
+    Pour des instructions détaillées, consultez le [guide de configuration DNS d&#39;Apple](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac).
+  </Tab>
+
+  <Tab title="Linux">
+    1. Modifiez le fichier `/etc/resolv.conf` pour y ajouter des serveurs DNS publics. La méthode exacte varie selon la distribution.
+    2. Ajoutez les lignes suivantes.
+
+    ```bash theme={null}
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+
+    Pour en savoir plus sur la configuration du DNS selon les distributions, consultez le [guide de configuration réseau du wiki Debian](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers).
+  </Tab>
+</Tabs>
+
+<div id="dns-2">
+  ### Vider le cache DNS
+</div>
+
+Après avoir modifié les paramètres DNS, videz le cache DNS pour appliquer la nouvelle configuration.
+
+* **Windows** : exécutez `ipconfig /flushdns` dans l’invite de commandes.
+* **macOS et Linux** : exécutez `sudo systemctl restart NetworkManager` dans le terminal. La commande exacte peut varier selon la distribution.
+
+<Note>
+  Afin d’améliorer les performances et la stabilité dans votre région, les URL `replit.dev` des Replit Apps peuvent parfois changer lors d’une migration de cluster. Une fois la migration terminée, les URL restent stables pendant environ un an, sauf si vous demandez explicitement un changement d’emplacement.
+</Note>
+
+<div id="streamlit">
+  ## Déployer une application Streamlit
+</div>
+
+Les applications Streamlit fonctionnent avec les déploiements Replit. Le moyen le plus simple de commencer est d’utiliser le [modèle Streamlit](https://replit.com/@replit/Streamlit?v=1).
+
+Vous pouvez également définir la commande d’exécution suivante pour le déploiement.
+
+```bash theme={null}
+streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
+```
+
+Si votre application utilise un autre fichier d’entrée, remplacez `main.py` par le nom de ce fichier.
+
+<div id="section-8">
+  ## Critères d’achèvement
+</div>
+
+* Preview fonctionne.
+* Le déploiement est terminé.
+* L’URL publique se charge.
+* Le parcours principal de l’application fonctionne via l’URL publique.
+* Les Secrets et les paramètres de production sont configurés.
+* Les logs ne contiennent aucune erreur de démarrage masquée.
+
+<div id="section-9">
+  ## Documentation connexe
+</div>
+
+* [Déploiements Replit](/fr/ko/learn/projects-and-artifacts/replit-deployments)
+* [Ajouter un domaine personnalisé](/fr/ko/build/add-custom-domain)
+* [Domaines personnalisés](/fr/ko/features/publishing/custom-domains)
+* [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets)
+* [SQL Database](/fr/ko/features/data-and-storage/sql-database)
+
+Si vous avez encore besoin d&#39;aide après avoir suivi ces étapes, rendez-vous sur le [hub de la communauté Replit](https://replit.com/community) pour découvrir d&#39;autres ressources.

@@ -1,0 +1,101 @@
+---
+title: "发布 和数据库计费"
+description: "了解 Replit 如何针对 发布 和数据库收费，包括出站数据传输、计算单元、请求和 PostgreSQL 使用指标。"
+sidebarTitle: "发布 和数据库"
+icon: "chart-line"
+---
+
+发布 包含三种按用量计费的项目：
+
+1. 出站数据传输
+2. 自动扩缩计算单元
+3. 请求
+
+你可以在 **设置** 中依次选择 **账户** → **账户使用情况**，查看用量。系统会按月计费，或者当累计费用超过每月积分额度时计费。Replit Core 和 Pro 用户每月可获得这些资源的额度。
+
+如果需要的积分超出每月订阅额度，你可以在账单页面购买积分包。有关积分包的更多信息，请参阅[管理支出](/zh/billing/managing-spend)。
+
+<div id="publishing">
+  # 发布
+</div>
+
+<div id="1-publishing-outbound-data-transfer">
+  ## 1. 发布 出站数据传输
+</div>
+
+此类用量按字节计费，Replit Core 和 Pro 用户每月可享有一定额度。只有出站 (传出) 数据会计入此额度，超出后可能产生额外费用。相比之下，入站 (传入) 数据始终免费。
+
+| 订阅          | 额度                                                  |
+| ----------- | --------------------------------------------------- |
+| Replit Core | 100 GiB                                             |
+| Replit Pro  | 请参阅 [Replit Pro 定价](https://www.replit.com/pricing) |
+
+这些额度适用于 [静态部署](/zh/features/publishing/deployment-types#static)、[Autoscale](/zh/features/publishing/deployment-types#autoscale)、[Reserved VM](/zh/features/publishing/deployment-types#reserved-vm) 和 [Scheduled](/zh/features/publishing/deployment-types#scheduled) 部署。
+
+有关当前出站数据传输价格，请参阅[定价页面](https://www.replit.com/pricing)。
+
+***
+
+<div id="2-compute-units">
+  ## 2. 计算单元
+</div>
+
+Autoscale Deployments 按计算单元计费，计费会综合考虑 CPU 和 RAM 的使用时长。
+
+超额用量也按计算单元计费，计费粒度精确到每个计算单元。计算单元的当前价格请参阅[定价页面](https://www.replit.com/pricing)。
+
+以下说明 Autoscale Deployment 的 RAM 秒和 CPU 秒如何换算为计算单元：
+
+| 资源      | 计算单元  |
+| ------- | ----- |
+| 1 RAM 秒 | 2 单元  |
+| 1 CPU 秒 | 18 单元 |
+
+静态部署不会消耗计算单元。其费用仅适用于超出[指定额度](#)的出站数据传输。
+
+[详细了解 Autoscale Deployments](/zh/features/publishing/deployment-types#autoscale)。
+
+***
+
+<div id="3-requests">
+  ## 3. 请求
+</div>
+
+Autoscale Deployments 还会考虑请求数量。
+
+有关请求的当前价格，请参阅[定价页面](https://www.replit.com/pricing)。
+
+<div id="databases">
+  # 数据库
+</div>
+
+Replit 仅对[生产数据库](/zh/features/data-and-storage/development-and-production)的使用量收费——开发数据库始终免费，且每个 Replit App 均包含开发数据库。有关开发数据库的更多信息，请参阅[开发数据库](/zh/features/data-and-storage/sql-database)。
+
+Replit PostgreSQL 是全托管无服务器服务，提供轻松实现的高可用性，无需维护。生产数据库按实际使用量计费，可显著降低成本。
+
+生产 PostgreSQL 数据库按以下两项使用指标计费：
+
+* **[计算时间](#compute-time)**：每小时消耗的计算资源量。
+* **[数据存储](#data-storage)**：存储的数据总量 (包括历史数据) 。
+
+你可以在 **设置** → **账户** → **账户使用情况** 中查看当前资源使用情况，包括生产数据库的使用情况。
+
+<div id="compute-time">
+  ## 计算时间
+</div>
+
+计算时间取决于数据库在指定计费周期内处于活跃状态的小时数。数据库收到请求时，以及最后一次请求后的额外 5 分钟内，均视为活跃状态。如果数据库连续 5 分钟处于空闲状态，将被暂停并进入非活跃状态。
+
+<div id="data-storage">
+  ## 数据存储
+</div>
+
+数据存储是指你的 Account 中所有数据库内存储的数据总量，以吉比字节 (GiB) 为单位。存储用量按每月的最高用量计算。每个 PostgreSQL 数据库都会占用 33MB 存储空间，即使不包含任何数据也是如此。这是 Postgres 服务器的默认存储占用空间。
+
+<Note>每个生产数据库的总存储上限为 10 吉比字节 (GiB)。每个 Replit App 的开发数据库均包含 20 GiB 免费存储空间。</Note>
+
+<div id="additional-notes">
+  # 补充说明
+</div>
+
+如果你的付款方式出现问题，我们会通知你。付款持续失败可能会导致你已发布的 App 被暂停。若发生这种情况，请[联系支持团队](https://replit.com/help)，并更新付款信息，以恢复对我们服务的访问权限。

@@ -1,0 +1,329 @@
+---
+title: "Как максимально эффективно использовать Free Mode"
+description: "Узнайте, как эффективнее использовать Free Mode для повседневного общения, создания и сборки."
+sidebarTitle: "Как максимально эффективно использовать Free Mode"
+tag: "New"
+icon: "seedling"
+canonical: "https://docs.replit.com/chat/free-mode"
+---
+
+export const FreeModePlanAvailability = `Free Mode доступен на тарифах Starter, Core и Pro. Лимиты Free Mode зависят от вашего тарифа, а в Core и Pro предусмотрен объём включённого использования, который обновляется каждые ${FreeModeAllowanceRefreshPeriod}.`;
+
+export const FreeModeCover = () => <>
+    <style>{`
+      .free-mode-cover {
+        position: relative;
+        display: grid;
+        min-height: 360px;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        place-items: center;
+        margin: 28px 0 42px;
+        border: 0;
+        border-radius: 16px;
+        padding: clamp(24px, 4vw, 44px);
+        isolation: isolate;
+        background:
+          radial-gradient(circle at 50% -18%, rgba(255,255,255,.82), transparent 42%),
+          radial-gradient(circle at 4% 96%, rgba(255,184,146,.48), transparent 38%),
+          linear-gradient(140deg, #ff764d, #ff3c00 60%, #c92d00);
+        box-sizing: border-box;
+      }
+      .free-mode-cover-panels {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 48%, rgba(111,24,0,.2));
+      }
+      .free-mode-cover-panels span {
+        position: absolute;
+        display: block;
+        border-radius: 999px;
+        pointer-events: none;
+      }
+      .free-mode-cover-panels span:nth-child(1) {
+        width: 62%;
+        height: 54%;
+        left: 19%;
+        top: -34%;
+        background: rgba(255, 255, 255, .2);
+        filter: blur(30px);
+      }
+      .free-mode-cover-panels span:nth-child(2) {
+        width: 48%;
+        height: 58%;
+        left: -20%;
+        bottom: -28%;
+        background: rgba(255, 203, 180, .34);
+        filter: blur(36px);
+      }
+      .free-mode-cover-panels span:nth-child(3) {
+        width: 44%;
+        height: 60%;
+        right: -18%;
+        top: 20%;
+        background: rgba(164, 32, 0, .2);
+        filter: blur(44px);
+      }
+      .free-mode-cover-panels span:nth-child(4) {
+        width: min(72%, 520px);
+        height: 68%;
+        left: 50%;
+        top: 16%;
+        transform: translateX(-50%) rotate(3deg);
+        border: 1px solid rgba(255,255,255,.26);
+        border-radius: 28px;
+        background: transparent;
+      }
+      .free-mode-menu {
+        position: relative;
+        z-index: 1;
+        width: min(66%, 660px);
+        border: 1px solid rgba(255,255,255,.46);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.1));
+        box-shadow: 0 22px 44px rgba(78,20,4,.22), inset 0 1px 0 rgba(255,255,255,.14);
+        padding: 20px clamp(24px, 3.5vw, 34px);
+        color: #fff;
+        backdrop-filter: blur(7px) saturate(110%);
+      }
+      .free-mode-menu-label {
+        margin: 0 0 8px;
+        font-size: clamp(13px, 1.5vw, 17px);
+        font-weight: 600;
+        letter-spacing: .02em;
+        text-transform: uppercase;
+      }
+      .free-mode-row {
+        display: grid;
+        grid-template-columns: 18px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+        margin: 0;
+        padding: 8px 0;
+        color: #fff !important;
+      }
+      .free-mode-row-dot {
+        width: 10px;
+        height: 10px;
+        margin-top: 8px;
+        border: 2px solid currentColor;
+        border-radius: 999px;
+        box-sizing: border-box;
+      }
+      .free-mode-row strong {
+        display: block;
+        font-size: clamp(21px, 2.2vw, 27px);
+        font-weight: 500;
+        letter-spacing: -.025em;
+        line-height: 1.1;
+        color: inherit !important;
+      }
+      .free-mode-row p {
+        margin: 4px 0 0;
+        font-size: clamp(13px, 1.45vw, 16px);
+        line-height: 1.4;
+        color: inherit !important;
+      }
+      .free-mode-row.is-selected {
+        width: calc(100% + 96px);
+        margin: 0 0 0 -48px;
+        border-radius: 18px;
+        background: #fff1ed;
+        padding: 13px 28px;
+        color: #746c69 !important;
+        box-shadow: 0 18px 34px rgba(116,39,18,.13);
+        box-sizing: border-box;
+      }
+      .free-mode-row.is-selected .free-mode-row-dot {
+        border-color: #746c69;
+        background: #746c69;
+      }
+      @media (max-width: 640px) {
+        .free-mode-cover { min-height: 390px; aspect-ratio: auto; padding: 24px 18px; }
+        .free-mode-menu { width: 92%; padding: 28px 22px; }
+        .free-mode-row { gap: 12px; padding: 15px 0; }
+        .free-mode-row.is-selected { width: calc(100% + 24px); margin-left: -12px; padding: 18px 16px; }
+      }
+    `}</style>
+    <div className="free-mode-cover" role="img" aria-label="Agent Modes menu with Free Mode selected above Power Mode and Max Mode">
+      <div className="free-mode-cover-panels" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="free-mode-menu" aria-hidden="true">
+        <div className="free-mode-menu-label">Agent Modes</div>
+        <div className="free-mode-row is-selected">
+          <span className="free-mode-row-dot" />
+          <div>
+            <strong>Free</strong>
+            <p>Great for everyday tasks and quick edits.</p>
+          </div>
+        </div>
+        <div className="free-mode-row">
+          <span className="free-mode-row-dot" />
+          <div>
+            <strong>Power</strong>
+            <p>A smart balance of speed and capability for most work.</p>
+          </div>
+        </div>
+        <div className="free-mode-row">
+          <span className="free-mode-row-dot" />
+          <div>
+            <strong>Max</strong>
+            <p>The most capable models for complex, ambitious builds.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>;
+
+export const PromptingCardVisual = () => <div className="chat-use-case-visual" aria-hidden="true" style={{
+  background: "radial-gradient(circle at 48% -30%, rgba(255,255,255,.78), transparent 54%), linear-gradient(140deg, #ff764d, #ff3c00 60%, #c92d00)"
+}}>
+    <div style={{
+  position: "relative",
+  width: "72%",
+  margin: "auto",
+  padding: 12,
+  border: "1px solid rgba(255,255,255,.56)",
+  borderRadius: 14,
+  background: "rgba(255,255,255,.2)"
+}}>
+      <span style={{
+  display: "block",
+  width: "66%",
+  height: 7,
+  borderRadius: 999,
+  background: "rgba(255,255,255,.8)"
+}} />
+      <span style={{
+  display: "block",
+  width: "92%",
+  height: 7,
+  marginTop: 7,
+  borderRadius: 999,
+  background: "rgba(255,255,255,.38)"
+}} />
+      <span style={{
+  display: "block",
+  width: "82%",
+  height: 22,
+  marginTop: 12,
+  border: "1px solid rgba(255,255,255,.62)",
+  borderRadius: 8,
+  background: "rgba(255,255,255,.16)"
+}} />
+    </div>
+  </div>;
+
+<FreeModeCover />
+
+<p>
+  {FreeModePlanAvailability}
+</p>
+
+Free Mode позволяет общаться, создавать приложения и выполнять сборки без использования кредитов Power Mode или Max Mode.
+
+<Note>
+  Free Mode всегда использует интеллектуальную маршрутизацию моделей: Replit выбирает модель, подходящую для вашего запроса. В Free Mode нельзя выбрать конкретную модель.
+</Note>
+
+Routine не выполняются в Free Mode. Они выполняются в Power Mode или Max Mode и требуют бюджета для каждого запуска. Подробнее см. в разделе [Routine](/ru/ko/chat/routines).
+
+<div id="section">
+  ## Как эффективнее использовать лимит
+</div>
+
+Free Mode помогает поддерживать темп текущей работы. Используйте его в следующих случаях:
+
+* Изучайте и проверяйте идеи, прежде чем приступать к более крупной сборке.
+* Начинайте новый проект, впервые пробуйте новую функцию или вносите небольшие изменения.
+* Задавайте вопросы, составляйте планы и дорабатывайте работу с помощью последующих сообщений.
+* Продолжайте выполнять повседневные задачи без использования кредитов, пока не исчерпаете лимит.
+
+Чтобы начать, откройте переключатель режимов под полем ввода промпта и убедитесь, что выбран режим **Free**. Затем отправьте Replit чётко сформулированный запрос. Укажите желаемый результат, поделитесь важным контекстом и уточняйте его с помощью уточняющих вопросов.
+
+<div id="section-2">
+  ## Когда стоит использовать другие режимы
+</div>
+
+Лимиты Free Mode зависят от вашего тарифа. Откройте **Settings** → **Usage**, чтобы узнать текущий лимит и дату его обновления.
+
+<Frame caption="На странице Usage отображаются оставшийся лимит Free и дата обновления.">
+  <img src="/assets/mirror/free-mode-usage-sanitized-1b738ae092bb.jpg" alt="Страница Usage в Settings с панелью лимита Free" width="1538" height="1022" data-path="images/chat/free-mode-usage-sanitized.jpg" />
+</Frame>
+
+На тарифах Core и Pro переключайтесь на **Power Mode** или **Max Mode**, если вам нужна более высокая производительность, вы хотите выбрать конкретную модель или достигли лимита Free Mode. В этих режимах расходуются ежемесячные кредиты. Разработчикам на тарифе Starter необходимо перейти на другой тариф, прежде чем использовать Power Mode или Max Mode.
+
+<Tip>
+  Если ваш тариф включает Power Mode и Max Mode, начинайте с Free Mode и
+  переключайтесь, только когда для задачи потребуется более высокая производительность.
+  Replit предупредит вас, прежде чем запрос будет переключён в режим,
+  за использование которого взимается плата.
+</Tip>
+
+<div id="section-3">
+  ## Выберите режим для своей задачи
+</div>
+
+| Если вы хотите...                                                                 | Начните с режима |
+| --------------------------------------------------------------------------------- | ---------------- |
+| изучать, задавать вопросы, планировать или начинать сборку                        | Free Mode        |
+| добиться оптимального баланса скорости и производительности для большинства задач | Power Mode       |
+| выполнять сложные или трудоёмкие задачи                                           | Max Mode         |
+
+Power Mode заменяет Economy Mode при той же стоимости и обеспечивает сопоставимую или более высокую производительность. На тарифах Core и Pro можно выбрать модель, доступную в Power Mode или Max Mode.
+
+<div id="section-4">
+  ## Подробнее
+</div>
+
+<section className="chat-mkt chat-workflow-grid has-visuals">
+  <a className="chat-example has-visual" href="/ru/ko/features/agent/agent-modes#free-mode">
+    <div className="chat-use-case-visual palette-ink">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="bolt" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="bolt" size={19} />
+    </span>
+
+    <div className="chat-card-title">О Free Mode</div>
+    <p>Узнайте, как Free Mode соотносится с Power Mode и Max Mode.</p>
+    <div className="chat-card-link">Открыть справку →</div>
+  </a>
+
+  <a className="chat-example has-visual" href="/ru/ko/chat/prompting">
+    <PromptingCardVisual />
+
+    <span>
+      <Icon icon="comment-dots" size={19} />
+    </span>
+
+    <div className="chat-card-title">Как составлять промпты</div>
+    <p>Узнайте, как давать Replit полезные указания и контекст.</p>
+    <div className="chat-card-link">Читать далее →</div>
+  </a>
+</section>
+
+Далее узнайте, как [интеллектуальная маршрутизация моделей](/ru/ko/chat/auto-mode) выбирает модель в зависимости от задачи.

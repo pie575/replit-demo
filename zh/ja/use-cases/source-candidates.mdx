@@ -1,0 +1,161 @@
+---
+title: "搜寻候选人"
+description: "根据职位描述，在 GitHub 上查找符合条件的工程师，跳过已在 Ashby 中的候选人，并生成外联文案。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                不是原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ashby 已经在负责筛选主动投递 (inbound) 的应聘者。本工作流则面向主动寻访 (outbound) ：从 Drive 中读取职位描述，在 GitHub 上寻找符合条件的工程师，跳过已在 Ashby 中的人选，并生成可供你直接发送的触达文案。Agent 会将新发现的人才标记为“已寻访”，并附上简短的“为何合适”说明以及给候选人的文案草稿。由你确认后再发送。请勿将其作为招聘决策的唯一依据。
+
+<div id="section">
+  ## 适合人群
+</div>
+
+* 主动投递的简历较少，需要一份现成候选人名单的技术招聘专员。
+* 不想整天耗在搜索上，却又希望在 GitHub 上找到匹配工程师的招聘经理。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "职位描述和任职要求",
+},
+{
+id: "github",
+name: "GitHub",
+why: "公开仓库、贡献记录和个人资料",
+},
+{
+id: "ashby",
+name: "Ashby",
+why: "跳过现有候选人并记录已寻访的人才",
+},
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+请准备一份明确区分必备条件和优先条件的职位描述。连接 Drive、GitHub 和 Ashby。向 Agent 提供工作地点、经验级别和招聘人数。请勿将此作为唯一的招聘决策依据。
+
+<div id="agent">
+  ## 给 Agent 的提示词
+</div>
+
+<AiPrompt>
+  请创建一个每周一 9 点运行的例程。根据这份职位描述
+  [Drive 链接或粘贴的文本]，在 GitHub 上找出 30 位符合必备条件的工程师，
+  跳过已经在 Ashby 中的人。为每个人写一段 3 行的「为何合适」说明，
+  以及一份简短的外联文案草稿。不要发送任何内容。将新发掘的人才以“已寻访”状态
+  添加到 Ashby，并为候选人附上备注和文案草稿。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期结果
+</div>
+
+Agent 会读取职位描述、搜索 GitHub、跳过已在 Ashby 中的人员，并返回一份附带消息草稿的候选人列表。你需要审核后再发送。第一轮结果可能包含较多无关候选人。查看结果后，进一步收紧必备条件。打开列表中的 3 个 GitHub 个人资料，确认他们是否符合必备条件，并在发送任何内容前确认他们尚未在 Ashby 中。
+
+<div id="section-5">
+  ## 按需定制
+</div>
+
+<AiPrompt>
+  仅包括最近在[语言 / 仓库类型]中有提交记录且拥有[n]年以上相关经验的
+  人。排除看似为现有客户或竞争对手员工的人。
+</AiPrompt>
+
+<AiPrompt>
+  根据这些示例[粘贴的文本]，以我的写作风格重写外联文案。控制在 80 个词以
+  内。不要提及由 Agent 撰写。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排除
+</div>
+
+* **候选人列表中干扰项过多：** 首轮筛选后，进一步收紧必备条件和优先条件。可要求候选人近期曾使用特定编程语言或在特定类型的仓库中提交，并排除疑似现有客户或竞争对手员工的人员。
+* **已在 Ashby 中的人员仍然显示：** 确认 Ashby 已连接到正确的工作区，并确认 Agent 不仅按显示名称匹配，也会按电子邮件地址和 GitHub 用户名匹配。
+* **外联信息已被发送：** 此工作流应仅创建文案草稿。如果发送了任何内容，请停止该流程，并告知 Agent 绝不能向候选人发送电子邮件或消息。
+
+<div id="section-7">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="生成发布说明" href="/zh/ja/use-cases/generate-release-notes">
+    使用同一个 GitHub 连接器，为团队已发布的内容生成发布说明。
+  </Card>
+
+  <Card title="创建面向投资者的路演幻灯片" href="/zh/ja/use-cases/pitch-deck-from-website">
+    使用同一个 Google Drive 连接器，帮助同时负责公司推介的招聘经理创建演示文稿。
+  </Card>
+</CardGroup>

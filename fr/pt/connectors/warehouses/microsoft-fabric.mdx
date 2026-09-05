@@ -1,0 +1,155 @@
+---
+title: "Créer des applications de données dans Microsoft Fabric"
+description: "Créez et publiez des applications de données dans Microsoft Fabric avec Replit Agent."
+sidebarTitle: "Microsoft Fabric"
+icon: "chart-column"
+---
+
+<Frame>
+  <img src="/assets/mirror/fabric-template-selector-d3f975e2e1d0.png" alt="Page d’accueil de Replit avec le menu déroulant Templates ouvert, montrant Microsoft Fabric App mis en évidence dans Org templates" width="872" height="406" data-path="images/connectors/microsoft-fabric/fabric-template-selector.png" />
+</Frame>
+
+Créez des applications propulsées par l’IA dans Replit et publiez-les directement dans Microsoft Fabric, avec une gouvernance et une sécurité de niveau entreprise intégrées. L’intégration à Microsoft Fabric transforme des données d’entreprise gouvernées en outils internes, tels que des tableaux de bord, des flux de travail et des applications d’IA. Les Teams passent plus rapidement du prompt à la production, tandis que les politiques d’authentification et d’accès restent au sein de l’environnement Fabric auquel elles font déjà confiance.
+
+<div id="o-que-um-aplicativo-de-dados-fabric">
+  ## Qu’est-ce qu’une application de données Fabric ?
+</div>
+
+Une application de données Fabric est une application React statique qui affiche des graphiques Power BI en exécutant des requêtes [Data Analysis Expressions (DAX)](https://learn.microsoft.com/pt-br/dax/) sur un [modèle sémantique Power BI](https://learn.microsoft.com/pt-br/power-bi/connect-data/service-datasets-understand). Voici les principales caractéristiques qui influencent sa conception :
+
+* **Les modèles sémantiques Power BI sont la source de données.** Les graphiques sont alimentés par des requêtes DAX sur les modèles sémantiques (datasets) auxquels vous vous connectez.
+* **Conçue pour la lecture seule.** L’application lit les données avec DAX `EVALUATE` ; elle ne les écrit pas dans Power BI. Si vous avez besoin d’un état modifiable, utilisez une base de données d’application distincte en complément du tableau de bord.
+* **Exécutée par le portail Fabric.** La couche de données s’exécute dans le portail Microsoft Fabric, qui exécute vos requêtes sur le modèle sémantique et renvoie les résultats à l’application. Vos données restent dans votre environnement Fabric.
+* **Hébergée sur l’infrastructure Microsoft.** Vous pouvez publier une application de données finalisée sur l’hébergement Microsoft afin qu’elle s’exécute avec le reste de votre environnement Fabric.
+
+<Note>
+  Les applications de données Microsoft Fabric nécessitent l’accès à un tenant Microsoft Fabric disposant de modèles sémantiques Power BI et, durant la préversion, l’adhésion au programme de testeurs approuvés.
+</Note>
+
+En coulisses, [Rayfin](https://github.com/microsoft/rayfin), un SDK et une CLI open source permettant de créer des backends d’applications, permet à l’Agent de définir et de publier des applications prêtes pour la production à partir de vos données Fabric.
+
+Vous travaillez dans un flux unique : décrivez l’application, laissez l’Agent la structurer, connectez-vous aux données Fabric régies, puis publiez-la pour l’exécuter dans le tenant Fabric de votre organisation.
+
+Ce guide présente le flux de travail de création, la façon dont l’application se connecte aux données Fabric, ainsi que les options pour les Teams et l’automatisation. Pour créer des tableaux de bord de données généraux reposant sur d’autres entrepôts de données, consultez [Visualisation des données](/fr/pt/features/artifact-types/data-apps).
+
+<div id="casos-de-uso">
+  ## Cas d’utilisation
+</div>
+
+Pour les organisations déjà investies dans l’écosystème de données Microsoft, cette solution permet de développer bien plus rapidement des logiciels internes. Au lieu de passer des semaines à intégrer l’authentification, les API, les outils de déploiement et les politiques de gouvernance, les Teams décrivent ce qu’elles veulent et laissent Agent s’en charger.
+
+Les cas d’utilisation courants incluent :
+
+* Des outils de productivité propres à chaque service
+* Des tableaux de bord opérationnels
+* Des outils d’exploration de données
+* Des applications d’automatisation des flux de travail
+* Des interfaces de génération de rapports
+
+Pour les Teams informatiques d’entreprise, la gouvernance, l’authentification et la sécurité restent dans l’environnement Fabric que votre organisation gère déjà. La création rapide d’applications ne se fait donc pas au détriment du contrôle centralisé.
+
+<div id="criar-um-aplicativo-de-dados-fabric">
+  ## Créer une application de données Fabric
+</div>
+
+Le processus de création est conversationnel. Vous restez dans Replit tout au long du processus ; lorsque nécessaire, l’authentification et l’accès aux données s’effectuent via Microsoft.
+
+<Steps>
+  <Step title="Commencez avec le template Fabric">
+    Sur la page d’accueil de Replit, ouvrez le menu déroulant **Templates** et sélectionnez **Microsoft Fabric App** sous **Org templates**. Agent est alors configuré pour créer une application de données avec les outils Fabric préchargés.
+
+    <Frame caption="Sélection du template d’organisation Microsoft Fabric App sur la page d’accueil de Replit (interface en préversion privée).">
+      <img src="/assets/mirror/fabric-template-selector-d3f975e2e1d0.png" alt="Page d’accueil de Replit avec le menu déroulant Templates ouvert, montrant Microsoft Fabric App mis en évidence dans Org templates" width="872" height="406" data-path="images/connectors/microsoft-fabric/fabric-template-selector.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Décrivez le tableau de bord souhaité">
+    Saisissez un prompt décrivant le tableau de bord ou l’outil de reporting à créer. Par exemple : « Créez un tableau de bord de la croissance mensuelle des ventes à partir de notre modèle de ventes Fabric. » Vous n’avez pas besoin d’écrire du DAX : Agent génère les requêtes.
+  </Step>
+
+  <Step title="Connectez-vous avec Microsoft">
+    Lorsque vous y êtes invité, connectez-vous via Microsoft OAuth au tenant contenant vos données Fabric. Cela autorise Agent à lire les modèles sémantiques auxquels vous avez accès. L’identité utilisée pour vous connecter doit avoir accès au workspace Fabric que vous souhaitez utiliser.
+  </Step>
+
+  <Step title="Ajoutez vos sources de données">
+    Lorsque Agent vous le demande, partagez le modèle sémantique Power BI / Fabric que vous souhaitez utiliser. Vous pouvez fournir l’URL complète du dataset dans le portail Fabric (par exemple, `https://app.powerbi.com/groups/<workspaceId>/datasets/<datasetId>/...`) ou l’ID du workspace et l’ID du dataset/item. Agent utilise ces informations pour identifier le workspace et le modèle sémantique à interroger.
+
+    Le modèle doit être **publié dans le service Power BI** : les fichiers `.pbix` locaux ne peuvent pas être utilisés.
+
+    <Frame caption="Agent demandant le lien du modèle sémantique Power BI / Fabric (interface en préversion privée).">
+      <img src="/assets/mirror/fabric-agent-semantic-model-prompt-732ce9c4a29d.png" alt="Panneau Agent demandant au créateur de partager le modèle sémantique Power BI ou Fabric, sous la forme d’une URL complète du portail Fabric ou d’un ID de workspace avec un ID de dataset ou d’item, en précisant que les fichiers .pbix locaux ne peuvent pas être utilisés, car le modèle doit être publié dans le service Power BI" width="1316" height="650" data-path="images/connectors/microsoft-fabric/fabric-agent-semantic-model-prompt.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Laissez Agent créer et itérer">
+    Agent explore le schéma du modèle sémantique, rédige des requêtes DAX et crée le tableau de bord avec des graphiques adaptés. Examinez le résultat et demandez des modifications en langage naturel : ajoutez un filtre, changez le type de graphique ou ajoutez une autre métrique.
+  </Step>
+
+  <Step title="Publier (facultatif)">
+    Une fois le tableau de bord prêt, vous pouvez le publier sur l’hébergement Microsoft afin qu’il s’exécute dans votre environnement Fabric. La publication est traitée séparément ; ce guide se concentre sur la connexion aux données et la création de l’application.
+  </Step>
+</Steps>
+
+<div id="conectando-se-aos-dados-fabric">
+  ## Connexion aux données Fabric
+</div>
+
+Pour lire des données, l’application doit disposer d’une connexion autorisée à Microsoft Fabric. Replit établit cette connexion de l’une des deux manières suivantes.
+
+<div id="login-no-fabric-no-nvel-do-aplicativo-visualizadores">
+  ### Connexion à Fabric au niveau de l’application (lecteurs)
+</div>
+
+Les lecteurs d’une application de données publiée n’ont jamais à configurer de connecteur. Ils s’authentifient via l’authentification unique Microsoft Fabric intégrée à l’application, qui lit les données en utilisant leur identité via le portail Fabric. L’accès reste ainsi régi par les autorisations Fabric existantes.
+
+<div id="o-conector-microsoft-fabric-o-caminho-fcil-para-construtores">
+  ### Le connecteur Microsoft Fabric (la solution simple pour les créateurs)
+</div>
+
+Pour les créateurs, le **connecteur Microsoft Fabric** constitue un moyen pratique d’autoriser l’accès aux données pendant le développement. Il est facultatif : c’est une solution simple, pas une exigence.
+
+* Le premier créateur à le configurer effectue une **authentification OAuth unique** auprès de Microsoft.
+* Les autres collaborateurs **du même projet héritent** de cette connexion.
+* Un **workspace différent** doit activer le connecteur et effectuer sa propre authentification OAuth.
+* L’identité authentifiée via OAuth doit avoir accès au workspace Fabric cible.
+
+Le connecteur utilise OAuth Microsoft Entra et est limité à votre tenant. Gérez-le depuis la page [Intégrations](/fr/pt/features/integrations/overview) de votre projet, comme tout autre connecteur Replit. Pour en savoir plus sur les connecteurs, consultez [Gérer vos connecteurs](/fr/pt/replitai/managing-connectors).
+
+<Note>
+  Pendant la préversion privée, aucune information d’identification gérée par Replit n’est partagée pour le connecteur Microsoft Fabric. Les créateurs s’autorisent dans leur propre tenant Microsoft Entra.
+</Note>
+
+<div id="equipes-e-automao">
+  ## Teams et automatisation
+</div>
+
+Pour une utilisation partagée en équipe ou dans des environnements non interactifs (comme CI), l’authentification OAuth interactive n’est pas toujours pratique. Dans ce cas, fournissez un jeton de **principal de service** via les [Secrets](/fr/pt/core-concepts/project-editor/app-setup/secrets) de votre projet plutôt que de vous connecter de manière interactive. L’application utilise l’identité du principal de service pour lire les données Fabric.
+
+C’est ce qui se rapproche le plus d’une configuration machine à machine : une identité non humaine, provisionnée dans Microsoft Entra et autorisée à accéder au workspace Fabric, authentifie l’application sans intervention humaine. Vérifiez que le principal de service a accès aux workspaces et aux modèles sémantiques interrogés par l’application.
+
+<div id="soluo-de-problemas">
+  ## Résolution des problèmes
+</div>
+
+<AccordionGroup>
+  <Accordion title="Les données ne se chargent pas dans l’aperçu de l’application">
+    La couche de données Fabric s’exécute via le portail Microsoft Fabric. Si les graphiques s’affichent vides ou si l’aperçu de l’application ne charge pas les données, vérifiez que vous êtes bien connecté à Microsoft et que l’identité connectée a accès au workspace et au modèle sémantique associés.
+  </Accordion>
+
+  <Accordion title="Agent ne parvient pas à trouver votre modèle sémantique">
+    Assurez-vous d’avoir collé le lien du dataset Power BI dans le portail Fabric et que votre identité (ou principal de service) dispose au minimum d’un accès en lecture à ce workspace. Partagez à nouveau le lien du dataset si Agent indique qu’il ne parvient pas à identifier le workspace ou le modèle.
+  </Accordion>
+
+  <Accordion title="Le connecteur est bloqué ou demande à être connecté à plusieurs reprises">
+    Réautorisez le connecteur Microsoft Fabric sur la page [Intégrations](/fr/pt/features/integrations/overview) du projet. Vérifiez que l’identité authentifiée via OAuth a accès au workspace Fabric. Pour une utilisation en équipe ou en CI, privilégiez un jeton de principal de service fourni via Secrets.
+  </Accordion>
+</AccordionGroup>
+
+<div id="documentao-relacionada">
+  ## Documentation associée
+</div>
+
+* [Visualisation de données](/fr/pt/features/artifact-types/data-apps) : créez des tableaux de bord et des outils de reporting avec Agent.
+* [Présentation des connecteurs d’entrepôt de données](/fr/pt/connectors/warehouses/overview) : tous les connecteurs d’entrepôt de données pris en charge.
+* [Gérer vos connecteurs](/fr/pt/replitai/managing-connectors) : gestion et configuration des connecteurs.
+* [Documentation Microsoft Fabric](https://learn.microsoft.com/pt-br/fabric/) : documentation Microsoft sur Fabric et Power BI.

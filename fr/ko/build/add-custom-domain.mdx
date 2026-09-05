@@ -1,0 +1,113 @@
+---
+title: "Ajouter un domaine personnalisé"
+description: "Migrez Velocity de velocity.replit.app vers velocityrentals.com."
+---
+
+import { YouTubeEmbed } from "/snippets/fr/shared-components.mdx";
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Une fois cette opération terminée, Velocity sera accessible sur `velocityrentals.com` au lieu de `velocity.replit.app`.
+
+<YouTubeEmbed videoId="rGYdyb58wJY" />
+
+Vous avez ajouté à Velocity la connexion, une base de données, les paiements et l&#39;intégration du calendrier. Il est temps de lui donner une URL digne d&#39;une véritable marque de location. Dans ce guide, nous transférons Velocity vers `velocityrentals.com` — remplacez cette adresse par le domaine que vous possédez.
+
+<div id="replit-url-velocity">
+  ## Vérifiez d&#39;abord que Velocity fonctionne sur l&#39;URL Replit
+</div>
+
+Avant de modifier le DNS, assurez-vous que l&#39;URL publique `velocity.replit.app` est stable. Ouvrez-la dans un nouvel onglet de navigateur et vérifiez les points suivants :
+
+* La page de liste des véhicules se charge.
+* Les clients peuvent se connecter et réserver un véhicule, et la réservation est conservée après actualisation.
+* Le paiement de la caution Stripe s&#39;ouvre et la réservation est confirmée avec une carte de test.
+* Les événements Google Calendar apparaissent dans le calendrier du client ayant réservé.
+
+Si l&#39;un de ces points génère une erreur, corrigez-le avant de modifier le DNS. Consultez [Résolution des problèmes de déploiement](/fr/ko/build/troubleshooting).
+
+<div id="replit-velocityrentalscom">
+  ## Connecter velocityrentals.com dans Replit
+</div>
+
+Ouvrez les paramètres de Publishing de Velocity et ajoutez `velocityrentals.com` comme domaine personnalisé. Replit affiche alors deux enregistrements DNS — copiez-les exactement tels quels.
+
+<Frame>
+  <img src="/assets/mirror/dns-records-d64f183fa655.png" alt="Boîte de dialogue de domaine personnalisé Replit dans les paramètres de Publishing de Velocity, avec velocityrentals.com saisi et deux enregistrements DNS prêts à être copiés (un enregistrement A et un enregistrement TXT de vérification)" width="1280" height="720" data-path="images/velocity/add-custom-domain/dns-records.png" />
+</Frame>
+
+Ouvrez ensuite le tableau de bord de votre fournisseur de domaine (Namecheap, Cloudflare, Google Domains, GoDaddy, etc.) et ajoutez ces enregistrements à l&#39;identique. Si vous souhaitez qu&#39;Agent vous guide pas à pas selon votre fournisseur :
+
+<AiPrompt>
+  Je transfère Velocity de velocity.replit.app vers velocityrentals.com. Mon domaine est enregistré chez [nom du fournisseur de domaine].<br />
+  Indique-moi précisément quels enregistrements DNS ajouter et dans quel ordre.<br />
+  Utilise les valeurs affichées dans Replit et n&#39;invente aucune valeur d&#39;enregistrement.<br />
+  Explique-moi comment vérifier que le domaine est bien connecté avant qu&#39;il ne soit opérationnel.
+</AiPrompt>
+
+Les modifications DNS peuvent prendre de quelques minutes à quelques heures avant d&#39;être prises en compte. Dès que Replit détecte les enregistrements, la mention « Verified » apparaît à côté de `velocityrentals.com`.
+
+<div id="velocityrentalscom-velocity">
+  ## Tester Velocity sur velocityrentals.com
+</div>
+
+Lorsque Replit indique que le domaine est vérifié :
+
+1. Ouvrez `https://velocityrentals.com` dans un nouvel onglet de navigateur. Un cadenas vert doit apparaître — le HTTPS est appliqué automatiquement.
+2. Connectez-vous en tant que client. La connexion doit toujours fonctionner (Replit Auth gère automatiquement le nouveau domaine).
+3. Réservez un véhicule, actualisez la page et vérifiez que la réservation est bien conservée.
+4. Ouvrez le paiement de la caution Stripe. La page doit désormais afficher `velocityrentals.com` comme URL du marchand.
+5. Confirmez la réservation et vérifiez que l&#39;événement Google Calendar apparaît toujours dans le calendrier du client.
+
+Si la connexion, le paiement ou l&#39;intégration du calendrier ne fonctionne pas correctement uniquement sur `velocityrentals.com`, décrivez les symptômes précis à Agent.
+
+<AiPrompt>
+  Velocity fonctionne sur velocity.replit.app, mais [décrivez l&#39;erreur] se produit sur velocityrentals.com.<br />
+  Dis-moi si le correctif se situe au niveau du DNS, des paramètres Replit ou des paramètres d&#39;un fournisseur tiers comme Stripe ou Google.<br />
+  Indique-moi la vérification suivante la plus sûre.
+</AiPrompt>
+
+Velocity fonctionne désormais sur l&#39;URL réelle de votre marque de location. Partagez `velocityrentals.com` avec vos clients — « replit.app » n&#39;apparaît nulle part.
+
+<div id="section">
+  ## Prochaines améliorations
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Résolution des problèmes de déploiement" icon="triangle-exclamation" href="/fr/ko/build/troubleshooting">
+    Corrigez les problèmes lorsque l&#39;URL publique ne fonctionne pas.
+  </Card>
+
+  <Card title="Achat de domaine" icon="cart-shopping" href="/fr/ko/build/domain-purchasing">
+    Si ce n&#39;est pas déjà fait, achetez velocityrentals.com via Replit.
+  </Card>
+</CardGroup>
+
+<div id="section-2">
+  ## Besoin d&#39;aide supplémentaire ?
+</div>
+
+* **`velocityrentals.com` ne se charge pas tout de suite :** les modifications DNS peuvent prendre plusieurs heures. Patientez et vérifiez à nouveau avant de modifier d&#39;autres paramètres.
+* **L&#39;URL Replit fonctionne, mais pas le domaine personnalisé :** vérifiez que les enregistrements DNS correspondent exactement à ceux affichés dans Replit — les erreurs les plus courantes sont un point final, un sous-domaine en trop ou des enregistrements obsolètes.
+* **Stripe Checkout affiche toujours `velocity.replit.app` :** demandez à Agent de mettre à jour les URL de redirection Stripe pour qu&#39;elles utilisent `velocityrentals.com`.
+* **Vous n&#39;avez pas encore de domaine :** achetez-en un via Replit — consultez [Achat de domaine](/fr/ko/build/domain-purchasing).
+
+<div id="section-3">
+  ## Documentation connexe
+</div>
+
+* [Domaines personnalisés](/fr/ko/features/publishing/custom-domains)
+* [Achat de domaine](/fr/ko/build/domain-purchasing)

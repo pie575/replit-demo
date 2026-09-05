@@ -1,0 +1,170 @@
+---
+title: "Создание интернет-магазина"
+description: "Импортируйте каталог в Shopify и оформите витрину в Replit."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent запросит ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Предоставьте Agent информацию о товарах из имеющихся источников: Google Таблиц (название, цена,
+описание, код товара, наличие) и фотографий из Google Drive. Agent настроит магазин Shopify,
+импортирует товары, цены, описания и изображения, а также подключит оплату и оформление заказа.
+Дизайн витрины и фронтенд находятся в Replit, а не в теме Shopify. Оплата
+осуществляется через Shopify Checkout, поэтому отдельный коннектор Stripe не требуется.
+
+<div id="section">
+  ## Кому подходит
+</div>
+
+* Основателям, которые уже ведут каталог в Sheets и Drive
+* Продакт-дизайнерам, использующим Shopify в качестве бэкенда для электронной коммерции и которым нужна собственная витрина на Replit
+
+<div id="section-2">
+  ## Коннекторы
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-sheets",
+name: "Google Таблицы",
+why: "Список товаров: название, цена, описание, код товара, наличие",
+},
+{
+id: "google-drive",
+name: "Google Drive",
+why: "Фотографии товаров и брендовые материалы",
+},
+{
+id: "shopify",
+name: "Shopify",
+why: "Настройка магазина, импорт каталога, оформление заказа, платёж",
+},
+]}
+/>
+
+<div id="section-3">
+  ## Перед началом работы
+</div>
+
+Подготовьте таблицу Sheets: по одной строке на каждый товар (название, цена, описание, код товара, наличие), а также папку на Drive с фотографиями, названными так, чтобы Agent мог сопоставить их со строками.
+Подключите Sheets, Drive и Shopify. Если у вас ещё нет магазина, Agent может создать его в Shopify прямо в чате.
+Прежде чем делиться магазином, оформите тестовый заказ.
+
+<div id="agent">
+  ## Запрос для Agent
+</div>
+
+<AiPrompt>
+  На основе этого источника данных о продуктах[Google Таблицы и папка на Google Диске] настройте полноценный магазин Shopify:
+  импортируйте все товары с названиями, ценами, описаниями и фотографиями. Разработайте и создайте
+  фронтенд витрины (главную страницу, коллекции, страницы товаров и корзину) в этом Replit App.
+  Используйте Shopify для каталога, корзины, оформления заказа и платежей. Не используйте темы Shopify
+  для страниц, которые видят покупатели.
+</AiPrompt>
+
+<div id="section-4">
+  ## Ожидаемый результат
+</div>
+
+Agent импортирует каталог в Shopify, а затем создаёт витрину Replit, которая загружает товары из Shopify
+и перенаправляет покупателей к оформлению заказа в Shopify. Сверьте несколько товаров (цены,
+описания, изображения) с Sheet и оформите тестовый заказ. Используйте тестовый платёж Shopify,
+убедитесь, что итоговая сумма в корзине совпадает с Sheet и что оформление заказа полностью остаётся в Shopify.
+
+<div id="section-5">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Сопоставьте фотографии из Drive со строками Sheet по именам файлов с кодами товаров (CODE.jpg). Пропустите
+  строки без фотографий.
+</AiPrompt>
+
+<AiPrompt>
+  Добавьте страницы коллекций на основе столбца категорий в Sheet и добавьте
+  строку поиска на витрину Replit.
+</AiPrompt>
+
+<div id="section-6">
+  ## Устранение неполадок
+</div>
+
+* **Фотографии не соответствуют товарам:** Назовите файлы на Drive по коду товара (`CODE.jpg`) и попросите Agent пропускать строки без фотографий.
+* **Цена или текст отличаются от данных в Sheet:** Убедитесь, что каждый товар указан в отдельной строке (название, цена, описание, код товара, наличие), и после импорта выборочно проверьте несколько позиций.
+* **Оформление заказа происходит не через Shopify или витрина использует тему:** Страница, которую видят покупатели, должна размещаться в Replit. Оплата производится через оформление заказа Shopify. Перед публикацией магазина сделайте тестовый заказ.
+
+<div id="section-7">
+  ## Связанные материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Дизайн лендинг-страницы" href="/ru/ko/use-cases/design-landing-page">
+    Для основателей стартапов и продакт-дизайнеров, которым нужно сначала создать страницу списка ожидания.
+  </Card>
+
+  <Card title="Превращение дизайна из Figma в полноценное App" href="/ru/ko/use-cases/import-figma-design">
+    Для продакт-дизайнеров, которые уже создали витрину в Figma.
+  </Card>
+</CardGroup>

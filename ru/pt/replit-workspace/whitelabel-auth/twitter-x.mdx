@@ -1,0 +1,123 @@
+---
+title: "Настройка OAuth для X (Twitter)"
+description: "Настройте X (бывший Twitter) в качестве провайдера входа через социальные сети для аутентификации вашего приложения"
+---
+
+В этом руководстве описано, как создать OAuth-приложение X на портале разработчиков X. Вам понадобятся **Client ID** и **Client Secret**, которые нужно указать в **панели Auth**.
+
+<Note>
+  Эта страница охватывает только настройку на стороне провайдера на портале разработчиков X. Общие инструкции по Clerk Auth, включая включение X и ввод учётных данных в **панели Auth**, см. в разделе [Настройка учётных данных OAuth для провайдера SSO](/ru/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) документации Clerk Auth.
+</Note>
+
+<div id="pr-requisitos">
+  ## Предварительные требования
+</div>
+
+* [Учётная запись разработчика X](https://developer.twitter.com/) (доступен бесплатный тариф)
+* Развёрнутое [App Replit](/ru/category/replit-deployments) — пользовательские учётные данные OAuth доступны только в среде **Production**
+* Откройте панель редактирования провайдера **X**: **панель Auth** → вкладка **Configure** → раздел **SSO providers** → выберите среду **Production** → нажмите **Edit** рядом с **X**
+
+<div id="passo-1-configurar-o-app-de-desenvolvedor-do-x">
+  ## Шаг 1: Настройка приложения разработчика X
+</div>
+
+<div id="criar-uma-conta-de-desenvolvedor-se-necessrio">
+  ### Создайте аккаунт разработчика (при необходимости)
+</div>
+
+1. Перейдите на [Портал разработчиков X](https://developer.twitter.com/en/portal/dashboard)
+2. Подайте заявку на аккаунт разработчика, если у вас его ещё нет
+3. Завершите оформление заявки, описав свой вариант использования
+
+<div id="criar-ou-selecionar-um-app">
+  ### Создайте или выберите App
+</div>
+
+1. На портале разработчиков X перейдите в раздел **Projects &amp; Apps**
+2. Используйте существующее App или выберите **Add App**
+3. Введите название App и выберите **Next**
+4. Выберите **App settings**
+
+<div id="passo-2-configurar-a-autenticao">
+  ## Шаг 2. Настройте аутентификацию
+</div>
+
+1. Прокрутите страницу до раздела **User authentication settings**
+2. Выберите **Set up**
+
+**Разрешения приложения:**
+
+Выберите минимально необходимый уровень разрешений:
+
+* **Read** — Требуется для профиля пользователя (минимум)
+* **Write** — Для публикации от имени пользователей (необязательно)
+* **Direct Messages** — Для доступа к личным сообщениям (необязательно)
+
+<Warning>
+  Разрешения должны соответствовать запрошенным областям действия. Если ваше приложение запрашивает `tweet.write`, но вы включили только Read, аутентификация завершится ошибкой.
+</Warning>
+
+**Тип приложения:**
+
+Выберите **Web App, Automated App or Bot**
+
+**Информация о приложении:**
+
+* **Callback URI / Redirect URL**: Скопируйте значение из раздела **Provider setup** на **панели Auth**
+* **Website URL**: Скопируйте значение из раздела **Provider setup** на **панели Auth**
+
+См. [Настройка учетных данных OAuth для провайдера SSO](/ru/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider), чтобы узнать, где найти эти значения.
+
+3. Выберите **Save**
+4. **Сохраните Client ID и Client Secret**
+
+<Warning>
+  Храните Client Secret в безопасном месте. Если вы его потеряете, создание нового сделает предыдущий недействительным.
+</Warning>
+
+<div id="soluo-de-problemas">
+  ## Устранение неполадок
+</div>
+
+<div id="incompatibilidade-de-uri-de-redirecionamento">
+  ### Несоответствие URI перенаправления
+</div>
+
+* Убедитесь, что Callback URI в точности соответствует значению, указанному в **Provider setup** на **панели Auth**
+* Проверьте наличие опечаток и правильность протокола
+* Не используйте завершающие слэши
+
+<div id="cliente-invlido">
+  ### Недопустимый клиент
+</div>
+
+* Ещё раз проверьте Client ID и Client Secret
+* Убедитесь, что нет лишних пробелов
+* Убедитесь, что используются учётные данные OAuth 2.0, а не OAuth 1.0a
+
+<div id="erros-de-escopopermisso">
+  ### Ошибки, связанные с областями действия и разрешениями
+</div>
+
+* Убедитесь, что области действия соответствуют разрешениям, включённым на Портале разработчиков X
+* Убедитесь, что включено как минимум разрешение Read
+
+<div id="app-em-modo-de-desenvolvimento">
+  ### App в режиме разработки
+</div>
+
+* Apps X запускаются в режиме разработки с ограниченным числом пользователей
+* Для использования в производственной среде может потребоваться запросить расширенный доступ
+
+<div id="no-est-funcionando-no-domnio-personalizado">
+  ### Не работает на пользовательском домене
+</div>
+
+* Укажите в Website URL и Callback URI значения пользовательского домена из раздела **Provider setup** на **панели Auth**
+
+<div id="recursos-adicionais">
+  ## Дополнительные ресурсы
+</div>
+
+* [Документация по OAuth 2.0 для X](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
+* [Области действия OAuth для X](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)

@@ -1,0 +1,373 @@
+---
+title: "Créer un prototype de votre idée de produit"
+description: "Transformez votre idée de produit en un prototype ciblé, collaborez avec d'autres personnes et utilisez les retours pour décider de ce que vous allez développer ensuite."
+---
+
+export const PACE_PROMPT = `Build me a personal running web app called "Pace".
+
+I want a clean, modern web app where I can track my runs and see my progress at a glance — a friendlier, more visual version of a running journal like Strava or Nike Run Club, but simpler and prettier. It only needs to support one user (me) for now, and my profile name should be Alex Morgan. Pre-fill it with about a month of pretend running history so it looks alive from the moment I open it — runs through San Francisco, a mix of easy runs, tempo runs, long runs, and recovery runs, with at least 4–5 runs in the past week so the dashboard looks active.
+
+The app should run in any modern browser, feel fast, and be fully responsive — great on desktop, tablet, and phone.
+
+Look and feel
+The vibe is sporty, premium, "athletic brand" — black, white, and a punchy lime green as the accent color. Use the Inter font everywhere. Rounded corners on everything (cards, buttons, pills). It should feel calm and uncluttered, not busy. Light mode by default. Smooth, subtle animations when pages transition, when cards appear, and when I click buttons — it should feel responsive and alive, not stiff.
+
+Overall navigation
+A top nav bar with the Pace logo on the left and 5 links across the middle: Home, Runs, Plan, Stats, Profile. The active link has a lime underline; inactive links are gray. On the right: a lime "Log a Run" button (always visible) and a round profile photo (clicking it opens Profile).
+
+On smaller screens, the middle nav links collapse into a hamburger menu, but the lime "Log a Run" button stays visible.
+
+The Home page (the main page) — a scrollable feed, top to bottom:
+
+Greeting. A friendly greeting that changes with the time of day ("Good morning, Alex" / "Good afternoon, Alex" / "Good evening, Alex"), with a subtitle "Ready for your next run?".
+
+Hero banner card. A wide photo of someone running on pavement, with a dark gradient on the left so the text is readable. Big white headline: "You don't find willpower, you create it." Underneath: "Keep showing up." Bottom-left: a lime pill button "Start a Run" with a little black play-circle. Clicking it opens the Log a Run dialog.
+
+"This Week" stats. A row of four cards (2×2 grid on smaller widths): Distance (km), Time (h/min), Elevation (m), Runs (count). Each card: small icon, big number, "+12% vs last week" caption, thin squiggly line graph at the bottom (lime, blue, purple, lime). Numbers reflect my actual runs from the last 7 days.
+
+Weekly Progress card. Title + small "View goals" link. Then "X of Y runs completed" and a big bold percentage on the right. Gradient lime progress bar. Below: seven day pills (M T W T F S S) with date numbers. Today is a black filled circle; days I've run show a lime circle with a white checkmark; others are empty circles.
+
+Your Last Run card. A real interactive map (Leaflet, Mapbox, or similar) showing the route of my most recent run as a lime line, date in the corner, lime "View Run" button, and four stats (Distance, Time, Pace, Calories). Click → full run detail page.
+
+Recent Runs section. Title "Recent Runs" + "See all" link. Three rows, one per recent run: tiny green map-line thumbnail on the left, run name + date, distance + pace lined up on the right. Click a row → run detail. A small "Delete" icon appears on hover.
+
+Upcoming Workout card. Title + small lime circle icon with footprints. Workout name "Tempo Run", "Tomorrow · 6:30 AM". Three stats: 8 km, 5:40/km target pace, "Moderate" intensity. A muted gray "View workout" button. (Placeholder — no real training plan yet.)
+
+Recent Achievements card. Two badges, each with a colorful icon, the badge name, and a one-line description. First is a real PR from my history (e.g. "10K Crusher — Completed a 10K in under 60 minutes"). Second is a placeholder: "Early Bird — Completed 5 runs before 7 AM" with a lime crescent moon icon.
+
+The Runs page
+Full list of all my runs, grouped by month (sticky month headers as I scroll). Each row like the recent-runs rows. A search input in the top-right filters by name or run type (Easy, Tempo, Long, Recovery, Interval). Click a row → run detail.
+
+The Stats page — a scrollable view with:
+- Time-range pill tabs at the top (7D / 30D / 3M / 6M / 1Y / All).
+- Three KPI numbers (Total Distance, Avg Pace, Total Time), each with a green or red badge for change vs the previous period.
+- A smooth lime area chart of distance over time. Hover a point to see that day's value.
+- Below: a small bar chart of "runs per day of week" and a list of personal records (fastest 5K, fastest 10K, longest run, etc.).
+
+The Plan page
+A weekly calendar of upcoming workouts (placeholder — mostly the visual shell). Each day is a row showing what's planned (or "Rest day"). Today's row highlighted lime.
+
+The Profile page
+Avatar, name, weekly goal setting, total all-time stats (total distance, total runs, total hours), an "Upgrade to Pro" card with a lime sparkle and "Upgrade Now" button, and a settings list (units km/mi, notifications, sign out).
+
+The "Log a Run" dialog (modal that centers on desktop, slides up from the bottom on mobile):
+- Type of run (segmented control: Easy / Tempo / Long / Recovery / Interval)
+- Distance in km (number input)
+- Duration (mm:ss or hh:mm:ss input)
+- Date and time (date and time pickers)
+- Optional name
+- Big lime "Save Run" button at the bottom
+After saving: smooth dismiss, dashboard updates instantly, small toast confirmation.
+
+The Run Detail page (a dedicated page when I click a run):
+- Big interactive map of the full route at the top
+- Date, run type chip, back link
+- Stats row (Distance, Duration, Avg Pace, Calories)
+- Per-kilometer splits with pace per km
+- "..." menu with Edit and Delete
+
+How it should behave
+- The greeting changes based on time of day.
+- Hero "Start a Run" and the nav "Log a Run" both open the same Log a Run dialog.
+- Loading skeletons instead of blank space.
+- Smooth page transitions.
+- Fully responsive — every screen looks great on desktop, tablet, and phone.
+
+Things to be honest about
+- No real elevation data yet — use a sensible placeholder for the elevation stat card and flag it.
+- The little route thumbnails in the recent-runs list can be a generic green squiggle if the real route shape would slow the list down — the big Run Detail map should be real.
+- "Upcoming Workout" and the Plan page are placeholders — no training plan engine yet.
+- No live GPS tracking in this first version — runs are added by manually filling the Log a Run form.
+
+Build the whole thing end-to-end so it's actually usable: I should be able to open the URL, see my Alex Morgan dashboard fully populated with realistic San Francisco runs, log a new run from either the hero button or the nav, and have it show up in my stats and recent runs immediately.`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Copié !";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Copier le prompt
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Créer sur Replit ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+⏰ *Temps estimé : 15 minutes*
+
+Un prototype est la version la plus simple d’une idée de produit qu’une personne peut essayer et à laquelle elle peut réagir.
+
+Nous utiliserons **Pace** comme exemple : un tracker de course à pied premium offrant aux coureurs un aperçu clair de leur entraînement, de leur récupération et de leurs progrès.
+
+<Frame>
+  <img src="/assets/mirror/pace-running-tracker-7c5b75e07856.png" alt="Prototype Pace publié sur une URL publique — tableau de bord d’un tracker de course à pied premium avec distance hebdomadaire, courses récentes, entraînements à venir et réalisations" width="2880" height="1800" data-path="images/build-examples/pace-running-tracker.png" />
+</Frame>
+
+<PromptActions prompt={PACE_PROMPT} campaign="docs-prototype-an-idea" />
+
+<div id="section">
+  ## Ce que vous apprendrez
+</div>
+
+Vous apprendrez à :
+
+* transformer une idée de produit générale en un parcours testable.
+* utiliser le mode Plan pour définir le périmètre d’un prototype avant de le développer.
+* vérifier si le plan d’Agent est suffisamment restreint pour être testé.
+* utiliser les annotations et les fonctionnalités de collaboration de Canvas pour recueillir des retours dans leur contexte.
+* explorer en parallèle deux pistes de prototype lorsque l’orientation du produit n’est pas claire.
+
+<Steps>
+  <Step title="Rédiger des prompts">
+    Le prompt ci-dessus décrit **Pace** — un outil personnel de suivi de course à pied avec un tableau de bord d’accueil soigné, un flux Ajouter une course, des statistiques, une vue de planification avec des espaces réservés et des données d’exemple réalistes de San Francisco. Utilisez **Copier le prompt** pour le coller directement dans Replit, ou **Créer sur Replit** pour ouvrir Replit avec le prompt déjà joint.
+
+    Le prompt est volontairement précis sur la direction visuelle, les écrans, les données fictives et le rôle des espaces réservés — il donne ainsi à Agent un objectif clair à évaluer.
+  </Step>
+
+  <Step title="Utiliser le mode Plan (facultatif)">
+    Pour amener Agent à réfléchir d’abord à l’orientation du produit avant d’écrire du code, activez **Plan** à côté du champ de saisie du prompt. Le mode Plan crée un plan structuré que vous pouvez examiner avant d’approuver le build — utile lorsque l’orientation n’est pas encore entièrement définie.
+
+    <Frame>
+      <img src="/assets/mirror/agent-plan-mode-prompt-059fe8d2c277.png" alt="Brief de prototype Pace saisi et case à cocher Plan mise en évidence dans le rédacteur de prompts Replit — prêt à définir le périmètre avant qu’Agent ne commence le build" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
+    </Frame>
+
+    Examinez le plan : utilisateurs cibles, parcours principaux, éléments qui seront réellement implémentés, éléments simulés et liste de vérification des tests. Si le plan comporte trop de fonctionnalités, demandez à Agent de le réduire.
+
+    <AiPrompt>
+      Ce prototype est trop vaste.<br />
+      Réduisez-le à un utilisateur cible, un parcours principal et une question à laquelle je peux répondre grâce aux retours.<br />
+      Déplacez les autres idées dans une liste d’améliorations futures.
+    </AiPrompt>
+  </Step>
+
+  <Step title="Examiner ce qu’Agent a conçu">
+    Une fois qu’Agent a terminé, ouvrez Preview et utilisez Pace comme si vous le découvriez pour la première fois.
+
+    Vérifiez les points suivants :
+
+    * Le tableau de bord d’Alex Morgan est rempli d’exemples de courses réalistes.
+    * Vous pouvez enregistrer une nouvelle course à partir du **+** flottant ou du bouton principal **Start a Run**.
+    * Les courses apparaissent dans **Recent Runs** et les statistiques de **This Week** se mettent à jour.
+    * Vous pouvez explorer les onglets Runs, Stats, Plan et Profile.
+    * Vous pouvez ajuster Preview à la largeur d’un téléphone pour vérifier la mise en page mobile.
+
+    Si quelque chose semble anormal, décrivez les symptômes à Agent et demandez-lui d’apporter la correction la plus minimale possible.
+
+    <Frame>
+      <img src="/assets/mirror/fitstart-preview-1b631e7ed180.png" alt="Prototype Pace en cours d’exécution dans Preview — le chat Agent est affiché à gauche de l’espace de travail et le tableau de bord Pace rempli à droite. Il s’agit de l’interface avec laquelle une personne découvrant l’application peut interagir." width="1440" height="900" data-path="images/fitstart/fitstart-preview.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Publier et demander des retours">
+    Publiez dès que le parcours principal fonctionne.
+
+    <Frame>
+      <img src="/assets/mirror/fitstart-publish-dialog-137f98d0f7cd.png" alt="Project Editor affichant deux options de publication : une carte Publier intégrée avec un champ de sous-domaine dans le chat Agent et une tuile Publishing dans le panneau Tools and files" width="1440" height="900" data-path="images/fitstart/fitstart-publish-dialog.png" />
+    </Frame>
+
+    Après la publication, ouvrez l’URL publique dans un nouvel onglet et vérifiez que l’expérience fonctionne correctement pour une personne qui découvre l’application avant de la partager.
+
+    <Frame>
+      <img src="/assets/mirror/pace-running-tracker-7c5b75e07856.png" alt="Prototype Pace publié ouvert dans un nouvel onglet de navigateur — prêt à être partagé avec des évaluateurs afin d’obtenir des retours ciblés" width="2880" height="1800" data-path="images/build-examples/pace-running-tracker.png" />
+    </Frame>
+
+    Partagez l’URL en proposant une tâche précise :
+
+    > En tant que coureur souhaitant suivre une semaine d’entraînement, essayez Pace. Enregistrez une course, explorez le tableau de bord et indiquez ce qui vous semble confus ou motivant.
+
+    De bons retours doivent vous aider à décider quoi construire ensuite. Ne demandez pas « Qu’en pensez-vous ? » si vous ne voulez pas de réponses vagues.
+  </Step>
+
+  <Step title="Collaborer avec des Teams">
+    Les prototypes de produit s’améliorent lorsque les membres de l’équipe peuvent examiner le même artefact et partager leurs retours dans leur contexte.
+
+    Invitez des collaborateurs selon le niveau de collaboration requis :
+
+    * Invitez au projet les personnes qui doivent seulement examiner ce prototype ou vous aider. Consultez [Inviter des membres de l’équipe](/fr/ko/build/invite-teammates).
+    * Invitez au workspace les personnes qui font partie de votre équipe et doivent accéder à plusieurs projets. Consultez [Workspaces d’équipe](/fr/ko/features/collaboration/team-workspaces).
+
+    <Frame>
+      <img src="/assets/mirror/agent-invite-dialog-2703a335500c.png" alt="Boîte de dialogue d’invitation ouverte depuis la barre supérieure du workspace — le champ de saisie du nom d’utilisateur ou de l’adresse e-mail est mis en évidence, prêt à inviter des membres de l’équipe au projet" width="700" height="400" data-path="images/fitstart/work-with-agent/agent-invite-dialog.png" />
+    </Frame>
+
+    Utilisez ensuite [Canvas](/fr/ko/design/canvas) lorsque les retours sont visuels. Ajoutez des notes directement au prototype, annotez les zones que vous souhaitez modifier et demandez à Agent d’utiliser ces notes lors de la mise à jour de l’application.
+
+    <AiPrompt>
+      Utilisez les annotations du Canvas sur Pace pour améliorer le prototype.<br />
+      Conservez le flux d’enregistrement des courses inchangé.<br />
+      Appliquez les notes uniquement à la section hero, à la carte de progression hebdomadaire et à la liste des courses récentes.<br />
+      Après la mise à jour, vérifiez que l’enregistrement d’une course met toujours à jour la progression d’aujourd’hui.
+    </AiPrompt>
+
+    <Frame>
+      <img src="/assets/mirror/agent-canvas-annotations-c88ab5856966.png" alt="Frame Pace dans Canvas — un rectangle, une flèche et une étiquette textuelle pointent vers l’emplacement du bouton « Log in with Strava button », à côté du bouton Log Run. Il s’agit du type de notes contextuelles que les collaborateurs peuvent laisser à l’intention d’Agent" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-canvas-annotations.png" />
+    </Frame>
+
+    Pour les chefs de produit, cela signifie que le prototype fonctionne comme un artefact partagé : les designers peuvent annoter les flux, les ingénieurs peuvent vérifier la faisabilité et les parties prenantes peuvent essayer la version publiée.
+  </Step>
+</Steps>
+
+<div id="section-2">
+  ## 🎉 Félicitations
+</div>
+
+Vous avez transformé une idée de produit en un prototype ciblé et partageable : un tableau de bord Pace fonctionnel que les membres de votre équipe et vos clients peuvent utiliser et sur lequel ils peuvent donner leur avis. La difficulté ne résidait pas dans ce prototype, mais dans l’apprentissage de la manière de ramener une idée vaste à un parcours testable, de recueillir des retours dans leur contexte et de déterminer ce qui mérite d’être développé ensuite.
+
+<div id="section-3">
+  ## Étapes suivantes
+</div>
+
+Utilisez les retours pour choisir l’une des étapes suivantes :
+
+<CardGroup cols={2}>
+  <Card title="Ajouter une base de données" icon="database" href="/fr/ko/build/add-database">
+    Enregistrez vos données de course, même après une actualisation.
+  </Card>
+
+  <Card title="Ajouter une authentification" icon="lock" href="/fr/ko/build/add-login">
+    Donnez à chaque coureur un compte pour suivre ses propres progrès.
+  </Card>
+
+  <Card title="Créer une application mobile avec Build" icon="mobile-screen" href="/fr/ko/build/mobile-app">
+    Emportez Pace avec vous grâce à un suivi optimisé pour mobile sur iOS ou Android.
+  </Card>
+
+  <Card title="Créer un tableau de bord à partir des données" icon="chart-line" href="/fr/ko/build/dashboard">
+    Transformez vos données de course en informations sur vos progrès.
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ### Développer en parallèle
+</div>
+
+Lorsque les questions d’orientation produit ne portent pas uniquement sur l’implémentation, explorer plusieurs idées simultanément vous permet de comparer les options plutôt que de vous engager trop tôt. Replit Agent prend en charge le travail en parallèle : vous pouvez demander à Agent de travailler simultanément sur plusieurs prototypes, fonctionnalités ou expériences, puis les examiner côte à côte.
+
+<Frame>
+  <img src="/assets/mirror/task-plan-sidebar-ecab81b06bb0.png" alt="Vue d’un fil de discussion montrant plusieurs tâches Agent exécutées en parallèle avec des indicateurs d’état" width="3430" height="1986" data-path="images/replitai/task-plan-sidebar.png" />
+</Frame>
+
+Pour savoir comment les tâches entrent dans la file d’attente, s’exécutent et se terminent, consultez le [système de tâches](/fr/ko/core-concepts/agent/task-system).
+
+Lorsque vous ne savez pas quelle direction privilégier, demandez à Agent de créer deux tâches parallèles. Pour Pace, vous pouvez comparer :
+
+* **Prototype axé sur la motivation** : séries, succès et recommandations encourageantes.
+* **Prototype axé sur l’analyse** : statistiques plus détaillées, tendances d’une semaine à l’autre et records personnels.
+
+<AiPrompt>
+  Créez deux tâches parallèles pour améliorer le prototype de produit Pace.<br />
+  La tâche 1 doit explorer une version axée sur la motivation, avec des séries, des succès et des recommandations encourageantes.<br />
+  La tâche 2 doit explorer une version axée sur l’analyse, avec des statistiques plus détaillées, des tendances d’une semaine à l’autre et des records personnels.<br />
+  Gardez les deux versions suffisamment légères pour pouvoir les tester aujourd’hui.<br />
+  Pour chaque tâche, définissez le parcours utilisateur, ce qu’il faut créer et comment je dois évaluer le résultat.
+</AiPrompt>
+
+Une fois les deux tâches terminées, comparez-les à l’aide de la même question :
+
+> Quelle version est la plus susceptible de me faire revenir demain, et pourquoi ?
+
+<div id="section-5">
+  ## Besoin d’aide supplémentaire ?
+</div>
+
+* **Si votre prototype comporte trop de fonctionnalités :** demandez à Agent de le simplifier pour un seul utilisateur cible et un seul parcours.
+* **Si la cible n’est pas clairement définie :** demandez à Agent de réécrire la section d’accueil pour un seul utilisateur cible.
+* **Si les données fictives masquent les risques :** demandez à Agent de dresser la liste de ce qui est réel et de ce qui est fictif.
+* **Si les retours sont vagues :** donnez à l’évaluateur une tâche et une question.
+* **Si la publication échoue :** consultez le [dépannage de la publication](/fr/ko/build/troubleshooting).
+
+<div id="section-6">
+  ## Articles associés
+</div>
+
+* [Créer et publier votre première application](/fr/ko/build/your-first-app)
+* [Vibe coding 101](/fr/ko/learn/foundations/vibe-coding-101)
+* [Inviter des membres de votre équipe](/fr/ko/build/invite-teammates)

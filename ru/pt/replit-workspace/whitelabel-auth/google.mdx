@@ -1,0 +1,85 @@
+---
+title: "Настройка Google OAuth"
+description: "Настройте Google как провайдер социальной авторизации для аутентификации вашего приложения"
+---
+
+В этом руководстве описано, как создать приложение Google OAuth в Google Cloud Console. Вы получите **Client ID** и **Client Secret**, а также настроите источники JavaScript и URI перенаправления, необходимые Clerk.
+
+<Note>
+  Эта страница посвящена только настройке на стороне провайдера в Google Cloud Console. Общий процесс настройки Clerk Auth — включая включение Google и ввод учётных данных в **панели Auth** — описан в разделе [Настройка учётных данных OAuth для провайдера SSO](/ru/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) документации Clerk Auth.
+</Note>
+
+<div id="pr-requisitos">
+  ## Предварительные требования
+</div>
+
+* Доступ к [Google Cloud Console](https://console.cloud.google.com/)
+* Опубликованное [приложение Replit](/ru/category/replit-deployments) — пользовательские учетные данные OAuth доступны только в среде **Production**
+* Откройте панель редактирования провайдера **Google**: **панель Auth** → вкладка **Configure** → раздел **SSO providers** → выберите среду **Production** → нажмите **Edit** рядом с **Google**
+
+<div id="passo-1-criar-um-app-oauth-do-google">
+  ## Шаг 1: Создайте OAuth-приложение Google
+</div>
+
+Перейдите в [Google Cloud Console](https://console.cloud.google.com/):
+
+<div id="criar-ou-selecionar-um-projeto">
+  ### Создайте или выберите проект
+</div>
+
+1. В раскрывающемся меню проектов выберите существующий проект или создайте новый.
+2. Вы будете перенаправлены на дашборд проекта.
+
+<div id="configurar-a-tela-de-consentimento-oauth">
+  ### Настройка экрана согласия OAuth
+</div>
+
+1. На левой боковой панели выберите значок меню (≡), затем — **APIs &amp; Services**
+2. Выберите **OAuth consent screen**
+3. Настройте экран согласия для своего App, указав необходимую информацию
+4. Сохраните изменения
+
+<div id="criar-credenciais-oauth">
+  ### Создание учетных данных OAuth
+</div>
+
+1. В разделе **APIs &amp; Services** выберите **Credentials**
+2. В верхней части страницы выберите **Create Credentials**, затем — **OAuth client ID**
+3. В качестве типа приложения выберите **Web application**
+4. Для **Authorized JavaScript origins** и **Authorized redirect URIs** укажите точные значения из раздела **Provider setup** на **панели Auth**. Добавьте все перечисленные значения, включая опубликованный домен и все пользовательские домены. О том, как их найти, см. в разделе [Настройка учетных данных OAuth для провайдера SSO](/ru/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+5. Выберите **Create**
+6. Сохраните **Client ID** и **Client Secret**
+
+<Warning>
+  Надёжно храните Client Secret и никогда не добавляйте его в систему контроля версий.
+</Warning>
+
+<Warning>
+  Вход через Google не работает во встроенных браузерах и веб-просмотрах внутри приложений. Пользователи должны использовать обычный веб-браузер.
+</Warning>
+
+<div id="soluo-de-problemas">
+  ## Устранение неполадок
+</div>
+
+<div id="incompatibilidade-de-uri-de-redirecionamento">
+  ### Несоответствие URI перенаправления
+</div>
+
+* Убедитесь, что URI перенаправления в Google Cloud Console в точности совпадает со значением, указанным в **Provider setup** на **панели Auth**
+* Убедитесь, что в URI нет завершающих косых черт или опечаток
+* Подождите несколько минут, пока изменения в настройках Google вступят в силу
+
+<div id="cliente-invlido">
+  ### Недопустимый клиент
+</div>
+
+* Ещё раз проверьте, правильно ли скопированы Client ID и Client Secret
+* Убедитесь, что нет лишних пробелов
+* Проверьте, настроен ли экран согласия OAuth
+
+<div id="no-est-funcionando-no-domnio-personalizado">
+  ### Не работает на пользовательском домене
+</div>
+
+* Добавьте записи пользовательского домена из раздела **Provider setup** на **панели Auth** в поля Authorized JavaScript origins и Authorized redirect URIs

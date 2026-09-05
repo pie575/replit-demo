@@ -1,0 +1,333 @@
+---
+title: "构建 Shopify 店面"
+description: "了解如何使用 Replit 设计并上线自定义 Shopify 店面。"
+---
+
+export const CANDLE_STORE_PROMPT = `为名为“Ember & Oak”的品牌打造一家销售手工浇注大豆蜡烛的在线商店。使用 Shopify 作为商店及其产品的后端。
+
+整体风格应温暖、宁静且高端，如同精品家居品牌。使用柔和的奶油色背景、深炭灰色文字和低饱和的琥珀色点缀。采用优雅的衬线体标题、充足留白和圆角柔和的产品卡片。
+
+从上到下：
+
+简洁的页眉：左侧是小型“Ember & Oak”文字标识，中间是几个链接（商店、香氛、品牌故事），右侧是购物车图标。
+
+主视觉区域：展示一张暖光下木桌上点燃蜡烛的大幅生活方式照片，配以类似“如家般温暖的光”的标题、一行副标题和“选购蜡烛”按钮。
+
+产品网格：展示每款蜡烛的照片、名称、香型和价格，并在每张卡片上提供“加入购物车”按钮。从已连接的 Shopify 商店读取产品。
+
+简短的“品牌故事”横幅，用一两句话介绍小批量手工浇注的蜡烛。
+
+简洁的页脚，包含文字标识和相同的链接。
+
+生成温暖舒适的蜡烛和家居摄影图片。让它看起来像真实的精品品牌，而不是模板。将产品网格和购物车接入你设置的 Shopify 商店——不要向我索要任何 Shopify API 密钥。`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "已复制！";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        复制提示词
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        在 Replit 上构建 ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+只需描述你想要的商店，即可设计并上线自定义 Shopify 店面。Agent 可在一次 Conversation 中预配 Shopify 商店、基于该商店构建前端并添加商品。准备好销售后，只需前往 Shopify 转移商店所有权并启用支付功能即可。
+
+本指南将带您从提示词开始，构建小型蜡烛商店 **Ember &amp; Oak**，直至店面发布上线。
+
+<Frame>
+  <img src="/assets/mirror/ember-and-oak-candles-a7ab5795c737.png" alt="完成的 Ember & Oak 蜡烛店面——采用温暖的奶油色和金色精品风格设计，包含点燃的蜡烛主视觉图、“如家般温暖的光”标题，以及带“加入购物车”按钮的大豆蜡烛商品网格" width="3452" height="1978" data-path="images/build-examples/ember-and-oak-candles.png" />
+</Frame>
+
+<PromptActions prompt={CANDLE_STORE_PROMPT} campaign="docs-ecommerce-store" />
+
+<div id="section">
+  ## 您将实现的目标
+</div>
+
+完成本指南后，您将拥有：
+
+* 一个由真实 Shopify 商店支持、采用自定义设计的蜡烛店面。
+* 在 Shopify 中创建并在店面展示的商品及价格。
+* 可将买家引导至 Shopify 结账页面的可用购物车。
+* 清晰的上线流程：转移商店所有权、启用支付功能并上线。
+
+<div id="section-2">
+  ## 学习内容
+</div>
+
+您将学习：
+
+* 如何描述您的商店，让 Agent 推荐并配置 Shopify。
+* 如何无需处理 API 密钥即可连接 Shopify。
+* 如何通过与 Agent 对话来添加和发布商品。
+* 如何优化设计和购买流程。
+* 如何将商店从开发阶段转变为可上线销售的店面。
+
+<div id="shopify">
+  ## 连接 Shopify
+</div>
+
+所有应用的构建者都可以使用 Shopify，并可直接在 Conversation 中完成连接。先描述你想创建的商店。
+
+<Steps>
+  <Step title="描述你的商店">
+    复制提示词并粘贴到 [replit.com](https://replit.com) 的提示词框中，或点击 **Build on Replit**，打开已预填提示词的 Replit。
+
+    <Frame>
+      <img src="/assets/mirror/describe-your-store-b5d724daee99.png" alt="Replit 首页提示词框中已输入 Ember & Oak 蜡烛商店的提示词，准备开始构建" width="1440" height="900" data-path="images/replitai/shopify/describe-your-store.png" />
+    </Frame>
+
+    <PromptActions prompt={CANDLE_STORE_PROMPT} campaign="docs-ecommerce-store" />
+
+    Agent 会识别出你正在销售实体商品，并推荐使用 Shopify 作为店面的后端。
+
+    <Frame>
+      <img src="/assets/mirror/connect-shopify-store-7f36389f976f.png" alt="Replit Agent 正在为 Ember & Oak 蜡烛商店切换至 Shopify 技能，显示“连接 Shopify”卡片和 Connect Shopify 按钮" width="3452" height="1984" data-path="images/replitai/shopify/connect-shopify-store.png" />
+    </Frame>
+  </Step>
+
+  <Step title="批准创建 Shopify 商店">
+    Agent 会请求为你的应用创建 Shopify 商店。批准后，Agent 会预配并连接一个归 Replit 所有的开发商店，无需额外配置。
+    为方便你日后转移商店所有权，你的电子邮件地址将与 Shopify 共享。
+
+    商店初始会受到密码保护，且在上线前无法接受真实付款，因此你可以安心自由地构建。
+  </Step>
+</Steps>
+
+<Note>
+  每个 Shopify 商店只能连接到一个应用。日后构建第二个商店时，Agent 会为该应用预配新的 Shopify 商店。有关连接器的完整详情，请参阅 [连接 Shopify](/zh/ko/features/integrations/shopify)。
+</Note>
+
+<div id="section-3">
+  ## 构建店面
+</div>
+
+连接 Shopify 后，Agent 会基于您的商店设计并构建店面。
+
+<Steps>
+  <Step title="让 Agent 构建前端">
+    Agent 会根据提示词创建店面，包括主视觉区、商品网格、购物车和辅助版块。完成后，右侧窗格会切换到 **Preview**，您可以滚动页面并点击查看设计。
+
+    <Frame>
+      <img src="/assets/mirror/storefront-preview-f5ecb9011a8c.png" alt="Agent 聊天旁的 Replit Preview 窗格中渲染的 Ember & Oak 店面，显示蜡烛主视觉区和商品网格" width="3452" height="1978" data-path="images/replitai/shopify/storefront-preview.png" />
+    </Frame>
+  </Step>
+
+  <Step title="添加第一个商品">
+    新商店的商品目录一开始为空。请 Agent 添加商品，它会在 Shopify 中创建商品并发布到店面。
+
+    <AiPrompt>
+      添加一款售价 $18 的薰衣草大豆蜡烛，附上简短温馨的描述，然后将其发布到店面。
+    </AiPrompt>
+
+    商品会在 Shopify 商店中创建，并显示在店面的商品网格中。
+
+    <Frame>
+      <img src="/assets/mirror/add-product-8b098e606340.png" alt="Agent 聊天正在添加薰衣草大豆蜡烛商品，新商品显示在 Ember & Oak 店面的商品网格中" width="3452" height="1978" data-path="images/replitai/shopify/add-product.png" />
+    </Frame>
+  </Step>
+
+  <Step title="填充商品目录">
+    继续描述并添加商品。Agent 会在 Shopify 中创建每件商品，并添加价格、描述和图片。
+
+    <AiPrompt>
+      再添加三款蜡烛：售价 $20 的 Cedar &amp; Sage、售价 $16 的 Vanilla Bean，以及售价 $22 的 Sea Salt。为每款添加简短描述并发布。
+    </AiPrompt>
+  </Step>
+</Steps>
+
+<Tip>
+  **进阶：**请 Agent 将商品按系列分组 (“用三款畅销商品创建 Holiday 系列”) 、添加尺寸或香型等商品变体，或跟踪库存，让店面显示库存状态。Shopify 会作为所有这些信息的记录系统。
+</Tip>
+
+<div id="section-4">
+  ## 优化设计和结账流程
+</div>
+
+你可以通过 Conversation 编辑店面的各个部分。完善外观后，请完整检查一遍购买流程。
+
+<Steps>
+  <Step title="完善设计">
+    说明你想更改的内容，Agent 就会更新店面。
+
+    <AiPrompt>
+      让主视觉区更具编辑感——增大标题、留出更多留白，并为按钮添加更柔和的琥珀色点缀。
+    </AiPrompt>
+  </Step>
+
+  <Step title="测试购物车和结账">
+    在 Preview 中将蜡烛加入购物车并开始结账。购物车会将买家引导至 Shopify 托管的结账页面。开发期间，商店会受到密码保护，因此结账预览中可能会显示密码页面——这是正常现象，并不表示出现了问题。
+  </Step>
+</Steps>
+
+<Tip>
+  **进阶：**让 Agent 添加商品详情页、购物车抽屉、搜索功能或推荐商品区域。店面是一个真正的 Replit 项目，因此凡是你能描述的内容都可以扩展——博客、心愿单或自定义着陆页——Shopify 会处理结账和订单。
+</Tip>
+
+<div id="section-5">
+  ## 上线
+</div>
+
+上线流程在 Shopify 中完成。请让 Agent 启动 Go Live 流程，然后完成需要由商家操作的步骤。
+
+<Steps>
+  <Step title="在 Shopify 中转移商店所有权">
+    所有权转移在 Shopify 中进行，也是唯一需要在 Replit 外完成的步骤。创建商店时，你的电子邮件地址已与 Shopify 共享，因此可以通过 Replit 提供的链接或 Shopify 发送的电子邮件转移所有权。
+
+    Shopify 会发送一封包含操作说明的 **Store owner invitation** 电子邮件。打开邮件并选择 **Get started**。
+
+    <Frame>
+      <img src="/assets/mirror/claim-store-email-a0d108f2191c.png" alt="Shopify 的“Store owner invitation”电子邮件，邀请你成为商店所有者，其中包含“Get started”按钮" width="856" height="1024" data-path="images/replitai/shopify/claim-store-email.png" />
+    </Frame>
+
+    使用现有的 Shopify 账户登录，或创建账户以接受邀请。
+
+    <Frame>
+      <img src="/assets/mirror/claim-store-create-account-99d2e132da19.png" alt="用于接受邀请的 Shopify“创建账户”页面，提供电子邮件、Google、Apple 和 Facebook 登录选项" width="3452" height="1978" data-path="images/replitai/shopify/claim-store-create-account.png" />
+    </Frame>
+
+    选择 **Claim store**，授权商店中的 Replit App 并开始免费试用。随后，你将以主所有者身份进入 Shopify 管理后台。
+
+    <Frame>
+      <img src="/assets/mirror/claim-store-4facb7c8b10c.png" alt="Replit“转移商店所有权”页面，其中包含用于开始免费 Shopify 试用的“Claim store”按钮" width="3452" height="1978" data-path="images/replitai/shopify/claim-store.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择套餐并启用付款">
+    选择 Shopify 套餐，并启用 Shopify Payments 或其他提供商。
+    Shopify 会收集处理付款所需的身份和银行信息，Replit 不会处理这些信息。
+  </Step>
+
+  <Step title="配置配送、税费和域名">
+    在 Shopify 中设置配送费率、审核税费，并可选择连接自定义域名。
+  </Step>
+
+  <Step title="上线并发布">
+    在 Shopify 中移除店面密码，向买家开放商店。返回 Replit，然后点击 **Publish**，将店面发布到公开 URL。
+  </Step>
+</Steps>
+
+<Note>
+  付款、身份验证、税费、配送和欺诈检查均由 Shopify 处理。有关完整的上线清单和连接器详情，请参阅 [连接 Shopify](/zh/ko/features/integrations/shopify#go-live-on-shopify)。
+</Note>
+
+<div id="section-6">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="连接 Shopify" icon="bag-shopping" href="/zh/ko/features/integrations/shopify">
+    连接器参考文档：了解 Shopify 连接的工作原理及完整的上线检查清单。
+  </Card>
+
+  <Card title="添加自定义域名" icon="globe" href="/zh/ko/build/add-custom-domain">
+    在上线前为你的商店设置品牌专属 URL。
+  </Card>
+
+  <Card title="优化 SEO" icon="magnifying-glass" href="/zh/ko/build/improve-seo">
+    帮助买家通过搜索找到你的商店。
+  </Card>
+
+  <Card title="上线着陆页" icon="rectangle-list" href="/zh/ko/build/landing-page">
+    构建聚焦的营销活动页面，为你的商店引流。
+  </Card>
+</CardGroup>
+
+<div id="section-7">
+  ## 相关内容
+</div>
+
+* [连接 Shopify](/zh/ko/features/integrations/shopify)
+* [添加自定义域名](/zh/ko/build/add-custom-domain)
+* [Agent 集成](/zh/ko/features/integrations/overview)

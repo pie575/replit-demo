@@ -1,0 +1,160 @@
+---
+title: "Lancer un site web pour un événement payant"
+description: "Créez, à partir de Notion, un programme, des pages pour les intervenants et le lieu, ainsi qu’une billetterie payante."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Ce n’est pas un connecteur natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Créez un site web complet pour un événement payant avec le programme, les intervenants, le lieu, l’itinéraire et le checkout.
+Enregistrez les participants dans Replit Database, acceptez les paiements avec Stripe, envoyez les e-mails de confirmation via
+Resend et exportez la liste des participants. Passez une commande de test avant de partager le lien.
+
+<div id="section">
+  ## À qui s’adresse cette solution
+</div>
+
+* Professionnels du marketing événementiel ayant besoin d’une page publique et de billets payants pour des conférences, des rencontres ou des lancements
+* Responsables de communauté devant modifier le programme dans l’application sans système de gestion de contenu distinct
+
+<div id="section-2">
+  ## Connecteur
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "Intervenants, programme et horaires des sessions",
+},
+{ id: "resend", name: "Resend", why: "E-mail de confirmation après l’achat" },
+{ id: "stripe", name: "Stripe", why: "Billets payants et checkout" },
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Préparez le nom, la date et le lieu de l’événement, le prix des billets et une base de données Notion pour les intervenants (nom, photo, sessions).
+Connectez Notion, Resend et Stripe. Agent crée le checkout dans
+l’application.
+
+<div id="agent">
+  ## Demander à Agent
+</div>
+
+<AiPrompt>
+  Créez un site web complet pour un événement payant à partir de cette page Notion[lien] :
+  programme, intervenants, lieu, itinéraire et checkout. Utilisez les noms,
+  photos, fonctions, biographies et horaires des sessions des intervenants dans Notion.
+  Facturez [prix] par billet avec Stripe. Enregistrez les participants dans Replit Database,
+  envoyez un e-mail de confirmation avec Resend et exportez la liste des participants.
+</AiPrompt>
+
+<div id="section-4">
+  ## Résultat attendu
+</div>
+
+Agent crée un site public et configure le checkout, les paiements, les e-mails de confirmation et la liste des participants.
+Passez une commande de test avant de partager le lien. Utilisez le mode test de Stripe et
+une carte de test, puis vérifiez que l’e-mail de confirmation est bien reçu,
+que le participant figure dans la liste et qu’il est inclus dans l’exportation avant de passer aux paiements réels.
+
+<div id="section-5">
+  ## Adaptez-le à vos besoins
+</div>
+
+<AiPrompt>
+  Ajoutez une page dédiée aux intervenants à partir de cette base de données Notion[lien]. Utilisez les noms,
+  les photos, les intitulés de poste, les présentations et les horaires des sessions. Synchronisez également
+  la page lorsque Notion est mis à jour.
+</AiPrompt>
+
+<AiPrompt>
+  Lorsque le nombre de participants atteint [n], arrêtez la vente des billets et affichez plutôt un formulaire de liste d’attente.
+</AiPrompt>
+
+<div id="section-6">
+  ## Résolution des problèmes
+</div>
+
+* **Vous ne recevez pas l’e-mail de confirmation :** vérifiez que Resend est connecté et que le domaine d’envoi est vérifié. Passez une commande de test, puis vérifiez dans le tableau de bord Resend que l’e-mail a bien été envoyé.
+* **Les intervenants ou les horaires sont incorrects :** indiquez à Agent votre base de données Notion (nom, photo, intitulé de poste, présentation, horaire de la session) et demandez-lui de synchroniser la page lorsque Notion est modifié.
+* **Le paiement ne fonctionne pas au checkout :** vérifiez que Stripe est connecté et que vous êtes bien en mode test. Passez une commande de test avant de partager le lien.
+
+<div id="section-7">
+  ## Documentation associée
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Concevoir une page de destination" href="/fr/ko/use-cases/design-landing-page">
+    Utilisez le même brief Notion pour une liste d’attente ou une page de lancement.
+  </Card>
+
+  <Card title="Créer des icônes et des bannières pour les réseaux sociaux" href="/fr/ko/use-cases/create-social-kit">
+    Pour les organisateurs d’événements qui ont aussi besoin de visuels de profil et de couverture.
+  </Card>
+</CardGroup>

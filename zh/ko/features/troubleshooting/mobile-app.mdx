@@ -1,0 +1,223 @@
+---
+title: "移动应用故障排查"
+description: "解决在 Replit 上使用 Expo 和 React Native 构建移动应用时的常见问题。"
+---
+
+在 Replit 上构建移动应用时，你可能会遇到与预览、打包和软件包依赖相关的问题。本指南先提供快速解决方案，再逐步深入到调试步骤，帮助你排查常见问题。
+
+<div id="section">
+  ## 快速解决方案
+</div>
+
+请先尝试以下方法，大多数问题都能就此解决。
+
+| 问题       | 尝试的操作                          |
+| -------- | ------------------------------ |
+| 手机上不显示更改 | 摇动手机打开 Expo 菜单，然后点按 **Reload** |
+| 预览中不显示更改 | 在控制台中按 **R** 重新打包              |
+| 应用卡住或无响应 | 在控制台中停止应用，然后重新启动               |
+
+<div id="section-2">
+  ## 常见问题
+</div>
+
+<AccordionGroup>
+  <Accordion title="更改没有在设备上显示">
+    如果你做了更改，但手机上看不到效果：
+
+    1. **摇动手机**打开 Expo 开发者菜单。
+    2. 点按 **Reload** 重新下载打包内容。
+
+    在网页预览中，在控制台按 **R** 即可触发重新打包。
+
+    如果更改仍未显示，可以尝试清除缓存 (参见下方[清除 Metro 缓存](#clear-the-metro-cache)) 。
+  </Accordion>
+
+  <Accordion title="Expo Go 中出现红色错误屏幕">
+    红色错误屏幕通常表示 JavaScript 错误或缺少模块。请仔细阅读错误信息，它一般会指向具体的文件和行号。
+
+    **常见原因：**
+
+    * 软件包未安装或版本不正确
+    * 模块在网页端可用但在原生端不可用 (或反之)
+    * 代码中存在语法错误
+
+    **可以尝试：**
+
+    1. 仔细阅读错误信息，它通常会准确说明问题所在。
+    2. 把错误信息发给 Agent，请它帮你修复。
+    3. 如果错误提到某个特定软件包，尝试重新安装依赖 (参见：[重新安装软件包](#reinstall-packages)) 。
+  </Accordion>
+
+  <Accordion title="应用在网页端正常但在手机上崩溃（或反之）">
+    某些软件包或功能在不同平台上的表现不同。React Native 会编译到 iOS、Android 和网页这三个目标平台。在网页端可用的库可能并不支持原生端，或者需要不同的配置。
+
+    **可以尝试：**
+
+    1. 查看软件包文档，确认它是否支持相应平台。
+    2. 询问 Agent：“这个软件包与 Expo Go 兼容吗？”
+    3. 如果该功能在移动端不受支持，可以考虑把它移到服务器端处理。
+
+    <Tip>
+      调研软件包时，留意“Expo compatible”字样，或在 [Expo SDK 文档](https://docs.expo.dev/versions/latest/)中确认受支持的模块。
+    </Tip>
+  </Accordion>
+
+  <Accordion title="二维码无法扫描，或应用无法连接">
+    **检查网络：**
+
+    * 手机和电脑必须连接同一个 WiFi 网络
+    * 部分公司或公共网络会阻止此类连接
+
+    **尝试隧道模式：**
+    如果你所处的网络有限制，隧道模式会通过 Expo 服务器转发流量。可以请 Agent 用隧道模式启动应用，或在 Shell 中运行 `npx expo start --tunnel`。
+
+    **重启 Expo Go：**
+    扫描之前，先彻底关闭 Expo Go 再重新打开。
+  </Accordion>
+
+  <Accordion title="构建耗时过长">
+    首次构建因为没有缓存，速度总是更慢，之后的构建应该会快很多。
+
+    **影响构建时间的因素：**
+
+    * 项目中的软件包数量
+    * 清除缓存后的首次运行
+    * 下载软件包时的网络速度
+
+    如果构建一直很慢，检查一下是否安装了不必要的软件包。
+  </Accordion>
+
+  <Accordion title="找不到模块的错误">
+    当出现 “Unable to resolve module” 或 “Module not found” 时：
+
+    1. 软件包可能未安装 —— 请 Agent 安装它。
+    2. 软件包已安装，但缓存已过期 —— 清除缓存。
+    3. 软件包可能不存在或名称有误 —— 检查软件包名称。
+
+    如果该模块本应存在，可以尝试[重新安装软件包](#reinstall-packages)。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-3">
+  ## 调试命令
+</div>
+
+当快速修复无效时，这些命令可以帮你重置各种缓存和状态。请在 Shell 中运行。
+
+<div id="metro">
+  ### 清除 Metro 缓存
+</div>
+
+Metro 是用于编译 React Native 代码的打包工具。清除缓存后会重新构建。
+
+在 Shell 中运行以下命令：
+
+```bash theme={null}
+npx expo start --clear
+```
+
+这样会清除打包器缓存并重启开发服务器。你会在输出中看到 &quot;Bundler cache is empty. Rebuilding.&quot; 这条消息。
+
+<Tip>
+  如果缓存问题频繁出现，可以在启动命令中加上 `-c`。让 Agent 更新 dev 命令，使其包含清除标志即可。
+</Tip>
+
+<div id="section-4">
+  ### 重新安装软件包
+</div>
+
+如果出现模块错误或版本不匹配的问题，重新安装软件包通常能解决。
+
+在 Shell 中运行以下命令：
+
+```bash theme={null}
+rm -rf node_modules && npm install
+```
+
+这样会删除所有已安装的软件包，并根据 `package.json` 从头重新安装。
+
+<Note>
+  如果你的项目使用其他软件包管理器 (例如 `bun` 或 `pnpm`) ，请使用相应的安装命令：`bun install` 或 `pnpm install`。
+</Note>
+
+<div id="section-5">
+  ### 检查版本不匹配
+</div>
+
+Expo Doctor 会扫描项目，查找包之间版本不匹配等常见问题。
+
+在 Shell 中运行以下命令：
+
+```bash theme={null}
+npx expo-doctor
+```
+
+请查看这些警告。如果系统建议修复，请谨慎评估——不要盲目升级软件包，因为新版本中的不兼容变更可能引发新的问题。
+
+<Warning>
+  只有在有明确理由时才更新软件包。&quot;顺手&quot;升级可能会因新版本包含不兼容变更而导致应用无法正常运行。
+</Warning>
+
+<div id="section-6">
+  ## 完全重置
+</div>
+
+当其他方法都不奏效时,完全重置会清除所有缓存并重新安装所有内容。
+
+<Accordion title="最后手段:完全重置命令">
+  此命令会清除所有缓存,并从头重新安装软件包。请仅在万不得已时使用。
+
+  ```bash theme={null}
+  rm -rf node_modules .expo && npm cache clean --force && npm install && npx expo start --clear
+  ```
+
+  **此命令的作用:**
+
+  1. `rm -rf node_modules` — 删除已安装的软件包
+  2. `rm -rf .expo` — 删除 Expo 的本地缓存
+  3. `npm cache clean --force` — 清除 npm 的全局缓存
+  4. `npm install` — 重新安装所有软件包
+  5. `npx expo start --clear` — 以全新的 Metro 缓存启动
+
+  执行之后,所有内容都会从头重新构建,因此下一次构建会耗时更久。
+</Accordion>
+
+<div id="section-7">
+  ### 清除设备缓存
+</div>
+
+如果重新加载后，手机上的 App 看起来仍停留在旧代码：
+
+* **iOS**：在 Expo Go 中进入 **Settings**，点按 **Clear Cache**
+* **Android**：进入 **Settings &gt; Apps &gt; Expo Go &gt; Storage &gt; Clear Cache**
+
+<div id="section-8">
+  ## 快速参考
+</div>
+
+| 问题           | 先尝试                      | 然后尝试                |
+| ------------ | ------------------------ | ------------------- |
+| 更改未生效        | 摇动手机 → Reload            | 清除 Metro 缓存         |
+| 打包器报错        | `npx expo start --clear` | 删除 node&#95;modules |
+| 找不到模块        | 重新安装依赖                   | 完全重置                |
+| 版本不匹配警告      | 运行 `npx expo-doctor`     | 评估建议的修复方案           |
+| 新装的软件包不起作用     | 重启服务器                    | 清除 Metro 缓存         |
+| 修改了 app.json | 重启服务器                    | —                   |
+
+<div id="section-9">
+  ## 获取更多帮助
+</div>
+
+如果问题仍未解决：
+
+* **询问 Agent**：描述遇到的错误以及你已经尝试过的方法。Agent 通常能够诊断并修复问题。
+* **查阅 Expo 文档**：[Expo 故障排查指南](https://docs.expo.dev/troubleshooting/overview/)涵盖了更多场景。
+* **搜索错误信息**：复制完整的错误消息进行搜索，很可能已经有人遇到过同样的问题。
+
+<div id="section-10">
+  ## 后续步骤
+</div>
+
+* 返回[原生移动应用](/zh/ko/features/artifact-types/building-mobile-apps)
+* 了解完整的发布流程：[构建并上线移动应用](/zh/ko/build/mobile-app)
