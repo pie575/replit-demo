@@ -1,0 +1,156 @@
+---
+title: "オンラインストアを構築する"
+description: "カタログをShopifyに取り込み、ストアフロントをReplitでデザインします。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+すでにお持ちのソースから商品情報をAgentに渡します。たとえばGoogleスプレッドシート
+(商品名、価格、説明、商品コード、在庫)とGoogleドライブの写真です。Agentは
+Shopifyストアをセットアップし、商品、価格、説明、画像を取り込み、決済とチェックアウトを
+接続します。ストアフロントのデザインとフロントエンドはShopifyテーマではなく、Replit上に
+構築されます。決済はShopifyチェックアウトを通じて行われるため、別途Stripeコネクタは
+必要ありません。
+
+## 最適な用途
+
+* Sheetsとドライブですでに管理しているカタログからストアを作りたい創業者。
+* Shopifyをコマースのバックエンドとして使い、カスタムのReplitストアフロントが必要なプロダクトデザイナー。
+
+## コネクタ
+
+<Connectors
+  items={[
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "商品リスト:商品名、価格、説明、商品コード、在庫",
+},
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "商品写真とブランド素材",
+},
+{
+  id: "shopify",
+  name: "Shopify",
+  why: "ストアのセットアップ、カタログの取り込み、チェックアウト、決済",
+},
+]}
+/>
+
+## 始める前に
+
+商品ごとに1行のシート(商品名、価格、説明、商品コード、在庫)と、Agentが行と紐づけられる
+ように名前を付けた写真を含むドライブフォルダを用意してください。Sheets、ドライブ、
+Shopifyを接続します。ストアがまだない場合、Agentはチャットから直接Shopifyをプロビジョニング
+できます。ストアを公開する前にテスト注文を行ってください。
+
+## エージェントへの指示
+
+<AiPrompt>
+  この商品ソース\[GoogleスプレッドシートとGoogleドライブのフォルダ]から、完全な
+  Shopifyストアをセットアップして。商品名、価格、説明、写真を含むすべての商品を
+  取り込んで。ストアフロントのフロントエンド(ホーム、コレクション、商品、カート)を
+  このReplitアプリでデザイン・構築して。カタログ、カート、チェックアウト、決済には
+  Shopifyを使って。顧客向けページにはShopifyテーマを使わないで。
+</AiPrompt>
+
+## 期待できること
+
+Agentはカタログを取り込み、Shopifyから商品を読み込んでShopifyチェックアウトへ顧客を
+誘導するReplitストアフロントを構築します。いくつかの商品をシート(価格、説明文、画像)
+と照合し、テスト注文を行ってください。Shopifyのテスト決済を使い、カート合計がシートと
+一致することを確認し、チェックアウトがShopify上で完結していることを確認してください。
+
+## 自分に合わせてカスタマイズする
+
+<AiPrompt>
+  ドライブの写真とシートの行を、商品コードのファイル名(CODE.jpg)で照合して。
+  写真がない行はスキップして。
+</AiPrompt>
+
+<AiPrompt>
+  シートのカテゴリ列からコレクションページを追加し、Replitストアフロントに
+  検索バーを付けて。
+</AiPrompt>
+
+## トラブルシューティング
+
+* **写真が商品と一致しない:** ドライブのファイルを商品コード(`CODE.jpg`)で命名し、写真がない行はスキップするようAgentに依頼してください。
+* **価格や説明文がシートと一致しない:** 商品ごとに1行(商品名、価格、説明、商品コード、在庫)になっているか確認し、取り込み後にいくつかの商品を抜き取りチェックしてください。
+* **チェックアウトがShopifyでない、またはストアフロントがテーマになっている:** 顧客向けページはReplit上に置く必要があります。決済はShopifyチェックアウトを通じて行われます。ストアを公開する前にテスト注文を行ってください。
+
+## 関連情報
+
+<CardGroup cols={2}>
+  <Card title="ランディングページをデザインする" href="/ja/use-cases/design-landing-page">
+    まず待機リストページが必要な創業者やプロダクトデザイナー向けです。
+  </Card>
+
+  <Card title="Figmaからライブアプリへ" href="/ja/use-cases/import-figma-design">
+    すでにFigmaでストアフロントを作成済みのプロダクトデザイナー向けです。
+  </Card>
+</CardGroup>

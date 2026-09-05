@@ -1,0 +1,66 @@
+---
+title: "データベース"
+description: "データベースに関するよくある質問への回答—無効化されたエンドポイントの修正、テーブルの復元、本番環境への移行、接続エラーなど。"
+---
+
+ここでは本番データベースについてよくある質問に回答します。詳細なリファレンスは [本番データベース](/ja/features/data-and-storage/development-and-production) および [SQL データベース](/ja/features/data-and-storage/sql-database) を参照してください。
+
+<AccordionGroup>
+  <Accordion title="データベースエンドポイントが無効になっています—「endpoint has been disabled」エラーを修正するには？">
+    このエラーは、データベースのコンピュートエンドポイントが一時停止されていることを意味します。一時停止を解除するには：
+
+    1. **Database** ペインを開き、ドロップダウンから **Development** を選択します。
+    2. **Unpause database** ボタンが表示された場合は、それを選択します。
+    3. ドロップダウンを **Production** に切り替え、**Unpause database** が表示されたら再度選択します。
+
+    ボタンが表示されない場合、競合する `DATABASE_URL` シークレットによって非表示になっている可能性があります。**Secrets** ペインを開き、`DATABASE_URL` エントリと **Database** ペインの接続文字列を比較し、競合するシークレットを更新または削除して一致させてください。
+
+    よくある原因は未払いの請求書（再発防止のために支払ってください）や公開中の一時的な一時停止（上記の一時停止解除手順で解決できます）です。[本番データベース](/ja/features/data-and-storage/development-and-production) を参照してください。
+  </Accordion>
+
+  <Accordion title="ステータスページに本番データベースの障害が表示されています—チケットを提出する必要がありますか？">
+    不要です。障害がすでに [status.replit.com](https://status.replit.com) に掲載されている場合、チームが対応中であり、チケットを提出しても修正が早まることはありません。アクティブなインシデントを開いて、進捗の通知を受け取るために更新を購読してください。
+
+    データベースの問題がステータスページに*掲載されていない*場合は、[Replit サポートにお問い合わせ](https://replit.com/support)ください。
+  </Accordion>
+
+  <Accordion title="削除またはドロップしたデータベーステーブルを復元するには？">
+    Replit は本番データベースのポイントインタイムリストアをサポートしています。復元ウィンドウはプランによって異なります—[Core](/ja/billing/plans/replit-core) では 7 日間、[Pro](/ja/billing/plans/replit-pro) では 28 日間です。
+
+    復元するには、**Database** ペインを開き、データベースに移動して復元設定を開き、希望のタイムスタンプを選択して確認します。復元ウィンドウ外の場合は、[Replit サポートにお問い合わせ](https://replit.com/support)ください。[本番データベース](/ja/features/data-and-storage/development-and-production) を参照してください。
+  </Accordion>
+
+  <Accordion title="データベースがフリーズしていて Unpause ボタンが表示されません">
+    競合するデータベース URL が **Unpause** ボタンを隠していることがよくあります。**Secrets** ペインを開き、`DATABASE_URL` エントリを見つけて、**Database** ペインの接続文字列と比較してください。異なる場合、シークレットが正しい URL を上書きしています—それを削除してリフレッシュし、**Database** ペインを再確認してください。
+
+    競合するシークレットを削除してもボタンが表示されない場合は、プロジェクト URL を添えて [Replit サポートにお問い合わせ](https://replit.com/support)ください。
+  </Accordion>
+
+  <Accordion title="アプリで「connection pool exhausted」エラーが発生しています—どういう意味ですか？">
+    アプリが同時に開いているデータベース接続数がプールの許容量を超えています。よくある原因：
+
+    * リクエストごとに接続が閉じられていない
+    * トラフィックの急増
+    * 接続を保持し続けるスロークエリ
+
+    ほとんどのフレームワークは、リクエストごとに新しい接続ではなく、共有の接続プールを 1 つ使用することを想定しています。
+
+    最も早い解決策として、新しい Agent チャットを開き、エラーを説明して、アプリがデータベース接続をどのように管理しているか確認するよう Agent に依頼してください。
+  </Accordion>
+
+  <Accordion title="開発データベースから本番データベースに移行するには？">
+    Replit は開発データベースと本番データベースを分離しているため、テストの変更がライブデータに影響しません。本番環境に対してマイグレーションを実行するには、マイグレーションコマンドをデプロイのビルドまたは事前デプロイステップに追加して、デプロイのたびに実行されるようにします。たとえば、Drizzle の場合は `drizzle-kit migrate` を使用します。本番環境の Shell からマイグレーションを手動で実行することもできます。
+
+    [公開時に本番データベースを作成する](/ja/features/data-and-storage/development-and-production) を参照してください。
+  </Accordion>
+
+  <Accordion title="請求が最新なのにデータベースが「endpoint disabled」と表示されます">
+    これが請求とは無関係に発生することがあります。手動で一時停止を解除してみてください。**Database** ペインを開き、**Development** を選択して **Unpause database** が表示されたら選択し、**Production** でも同様に繰り返します。
+
+    ボタンが表示されない場合や問題が繰り返し発生する場合は、プロジェクト URL を添えて [Replit サポートにお問い合わせ](https://replit.com/support)ください—手動での一時停止解除が必要な場合があります。[本番データベース](/ja/features/data-and-storage/development-and-production) を参照してください。
+  </Accordion>
+</AccordionGroup>
+
+## 解決しない場合は？
+
+データベースに関する質問がここで回答されていない場合は、[Replit サポートにお問い合わせ](https://replit.com/support)ください。

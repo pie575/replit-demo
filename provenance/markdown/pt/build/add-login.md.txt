@@ -1,0 +1,99 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Adicionar login
+
+> Deixe cada cliente da Velocity entrar para ver suas próprias reservas e carros salvos.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ao final, cada cliente da Velocity entrará e verá apenas suas próprias reservas e carros salvos.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-login/home-signed-in.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=39b4fc199ad8decfb31b44063c1689b0" alt="Tela inicial da Velocity após o login mostrando o nome do cliente no cabeçalho superior direito, a seção Minhas reservas com uma reserva futura e a linha de carros salvos abaixo" width="100%" data-path="images/velocity/add-login/home-signed-in.png" />
+</Frame>
+
+Você viu a Velocity em [Bem-vindo ao Replit](/pt/build/welcome) — um app premium de aluguel de supercars. No momento, qualquer pessoa que visita a URL pública pode ver todas as reservas. Ninguém aluga uma Lamborghini anonimamente. Adicione o login e cada cliente terá suas próprias reservas e carros salvos.
+
+## Peça ao Agent para adicionar o login
+
+Para a Velocity, use o Clerk. A integração do Clerk com o Replit dá ao seu app uma tela de login com sua própria marca, contas de clientes que existem dentro da Velocity (não contas Replit), e controle total sobre a aparência — adequado para uma marca premium de aluguel. O Agent provisiona tudo automaticamente, sem necessidade de cadastro no painel do Clerk e sem chaves para colar.
+
+<AiPrompt>
+  Adicione login à Velocity para que cada cliente tenha suas próprias reservas e carros salvos.<br />
+  Use o Clerk Auth.<br />
+  Mantenha as páginas de navegação de carros públicas para que os visitantes ainda possam explorar a frota sem uma conta.<br />
+  Exija login antes que alguém possa reservar ou salvar um carro nos favoritos.<br />
+  Após o login, mostre o nome do cliente no cabeçalho e uma seção "Minhas reservas" com apenas as reservas dele.<br />
+  Adicione um botão de sair.<br />
+  Me dê um checklist de teste usando dois clientes diferentes.
+</AiPrompt>
+
+O Agent provisionará um tenant Clerk para a Velocity, adicionará os componentes de login, protegerá o fluxo de reserva por trás dele, vinculará cada reserva ao cliente logado e adicionará o logout. Acompanhe a construção no chat do Agent.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-login/auth-modal.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=b5e0a93796910a63c0b7e4cc6ebcc64a" width="100%" data-path="images/velocity/add-login/auth-modal.png" />
+</Frame>
+
+## Teste com dois clientes
+
+Uma conta não é suficiente — você precisa de duas para provar que as reservas ficam separadas.
+
+1. Abra a Velocity no Preview e navegue pelos carros sem entrar. A frota ainda deve estar visível.
+2. Clique em Reservar em um carro. Você deve chegar à tela de login do Clerk.
+3. Cadastre-se com seu próprio e-mail e conclua uma reserva (ex.: uma reserva de fim de semana em um 911).
+4. Saia. A seção "Minhas reservas" deve desaparecer e o fluxo de reserva deve pedir login novamente.
+5. Abra o Preview em uma janela anônima e cadastre-se com um e-mail diferente. Reserve um carro diferente.
+6. Volte para sua primeira janela, entre e confirme que ainda vê sua própria reserva — não a do segundo cliente.
+
+Se os dois clientes virem as mesmas reservas, as reservas ainda não estão vinculadas à pessoa logada. Diga ao Agent o sintoma exato:
+
+<AiPrompt>
+  Ambos os clientes podem ver as reservas um do outro na Velocity.<br />
+  Vincule cada reserva e cada carro salvo ao cliente logado para que cada pessoa veja apenas os seus.<br />
+  Me mostre como verificar com duas contas de teste.
+</AiPrompt>
+
+## Publicar e entrar na URL pública
+
+Publique a Velocity novamente pelo chat do Agent ou pelo tile de Publicação, depois abra a URL pública em uma nova aba e entre. O Clerk é provisionado com ambientes de Desenvolvimento e Produção separados — o Agent conecta as credenciais de Produção ao app publicado automaticamente, então o login funciona na URL pública sem configuração adicional.
+
+A Velocity agora tem clientes reais. Cada um entra em uma garagem pessoal de reservas — ninguém mais as vê.
+
+## Melhorias a seguir
+
+<CardGroup cols={2}>
+  <Card title="Adicionar um banco de dados" icon="database" href="/pt/build/add-database">
+    Faça os carros, a disponibilidade e as reservas persistirem entre sessões.
+  </Card>
+
+  <Card title="Adicionar pagamentos" icon="credit-card" href="/pt/build/add-payments">
+    Cobre um depósito reembolsável quando um cliente reservar um carro.
+  </Card>
+</CardGroup>
+
+## Precisa de mais ajuda?
+
+* **O app inteiro está oculto:** peça ao Agent para manter a navegação de carros pública e proteger apenas as páginas de reserva e conta.
+* **Clientes veem as reservas uns dos outros:** peça ao Agent para vincular cada reserva e carro salvo ao cliente logado.
+* **O login funciona no Preview mas não após a publicação:** abra a URL pública em uma nova aba e diga ao Agent o erro exato que você vê. Certifique-se de que o Agent provisionou o ambiente Clerk de Produção.
+* **Você quer um login mais rápido e sem configuração para protótipos:** o Replit Auth usa as contas Replit dos seus clientes sem necessidade de gerenciar um tenant Clerk — consulte [Replit Auth](/pt/features/auth-and-identity/authentication).
+
+## Relacionado
+
+* [Clerk Auth](/pt/features/auth-and-identity/clerk-auth)
+* [Replit Auth](/pt/features/auth-and-identity/authentication)

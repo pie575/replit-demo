@@ -1,0 +1,216 @@
+---
+title: "Build your first app"
+description: "Start from a prompt, build a small app with Agent in Free Mode, test it in Preview, and improve it with a focused follow-up."
+sidebarTitle: "Build your first app"
+icon: "rocket"
+---
+
+export const FreeModePlanAvailability = `Free Mode is available on the Starter, Core, and Pro plans. Your Free Mode limits depend on your plan, and Core and Pro include an allowance that refreshes every ${FreeModeAllowanceRefreshPeriod}.`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Copied!";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Copy the prompt
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Build on Replit ↗
+      </button>
+    </div>;
+};
+
+export const GATHER_PROMPT = `Build a responsive workshop-discovery app called Gather.
+
+Visitors should be able to browse upcoming workshops, open event details, and submit an RSVP using realistic sample data.
+
+Success means the navigation works, submitting an RSVP shows a clear confirmation, and the layout works well on mobile and desktop.
+
+Do not add login, a database, payments, or external integrations yet.`;
+
+⏰ *Estimated time: 10 minutes*
+
+By the end of this guide, you will have built and improved a small app from a prompt using **Free Mode**.
+
+<Frame>
+  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="The finished Gather workshop app showing the My RSVPs view in Preview" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+</Frame>
+
+<PromptActions prompt={GATHER_PROMPT} campaign="docs-your-first-app" />
+
+## Before you start
+
+You need a [Replit account](https://replit.com). This guide uses **Free Mode**, which uses intelligent model routing to select the model. {FreeModePlanAvailability}
+
+The goal is to practice a repeatable prompting loop:
+
+1. Describe one useful outcome.
+2. Add observable success criteria.
+3. Set boundaries for what not to build yet.
+4. Test the result in Preview.
+5. Ask for one focused improvement.
+
+## Build the first version
+
+<Steps>
+  <Step title="Start a new Website">
+    Start a new conversation and choose **Website** as the artifact. You can select it from the **New** menu or from **Add attachment → Create something new → Website** in the prompt box.
+
+    Open the mode selector and choose **Free**.
+
+    <Tip>
+      You can also ask Replit to build a website directly in natural language. Selecting Website first makes the intended artifact explicit and adds a Website pill to the prompt.
+    </Tip>
+  </Step>
+
+  <Step title="Describe the outcome and success criteria">
+    Use this prompt:
+
+    <PromptActions prompt={GATHER_PROMPT} campaign="docs-your-first-app" />
+
+    <Frame>
+      <img src="/assets/mirror/01-prompt-free-mode-f5c56ce766c8.jpg" alt="The Gather prompt ready to send with the Website artifact selected and Free Mode enabled" width="1280" height="720" data-path="images/first-app-gather/01-prompt-free-mode.jpg" />
+    </Frame>
+
+    The prompt starts with one outcome: a workshop-discovery app. It then says what visitors must be able to do, defines observable success criteria, and postpones login, data, payments, and integrations.
+
+    Those boundaries keep the first build focused. You can add production capabilities after the core experience works.
+  </Step>
+
+  <Step title="Let Agent build in Free Mode">
+    Send the prompt. Agent plans the artifact, creates the app, starts it, and checks the result. Follow progress in chat and wait until Agent presents a Website artifact and Preview is running.
+
+    Free Mode may take a few minutes for a complete first build. If Replit recommends a higher mode for a more complex request, you can decide whether to escalate; this Gather build completes in Free Mode.
+
+    <Frame>
+      <img src="/assets/mirror/02-first-version-163a5fb49aac.jpg" alt="The first working Gather website in the default Build layout with Agent chat and Preview" width="1393" height="868" data-path="images/first-app-gather/02-first-version.jpg" />
+    </Frame>
+  </Step>
+
+  <Step title="Test the result in Preview">
+    Use the app like a visitor. Check that you can:
+
+    * Browse the workshop list.
+    * Open a workshop detail page.
+    * Submit an RSVP.
+    * See a clear confirmation after submitting.
+    * Use the main navigation.
+    * Resize Preview to a phone-sized width.
+
+    Compare the result with the success criteria in the prompt. If something is broken, describe the symptom to Agent instead of trying to diagnose the code yourself.
+  </Step>
+</Steps>
+
+## Improve the app with a focused prompt
+
+Once the core experience works, ask for one clear improvement at a time. For Gather, add a session-only view of submitted RSVPs:
+
+> Add a My RSVPs view and make submitted workshops appear there for the current session. Keep the existing visual style and do not add login or a database.
+
+<Frame>
+  <img src="/assets/mirror/03-refinement-prompt-94b96ae38acb.jpg" alt="A focused follow-up prompt asking Agent to add a session-only My RSVPs view in Free Mode" width="1393" height="868" data-path="images/first-app-gather/03-refinement-prompt.jpg" />
+</Frame>
+
+Test the RSVP flow again, then open **My RSVPs**. The submitted workshop should appear for the current browser session.
+
+<Frame>
+  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="The refined Gather app showing a submitted workshop in the My RSVPs view" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+</Frame>
+
+You have now completed the core Replit loop: **prompt, build, test, and refine**.
+
+## Grow your app
+
+The first prompt deliberately postpones production capabilities. Add them when the core experience is ready:
+
+<CardGroup cols={2}>
+  <Card title="Add login" icon="user" href="/build/add-login">
+    Give attendees accounts and private RSVP history.
+  </Card>
+
+  <Card title="Add a database" icon="database" href="/build/add-database">
+    Persist workshops and RSVPs across sessions.
+  </Card>
+
+  <Card title="Add payments" icon="credit-card" href="/build/add-payments">
+    Sell tickets for paid workshops.
+  </Card>
+
+  <Card title="Add integrations" icon="plug" href="/build/add-integrations">
+    Send confirmations or connect calendars and other services.
+  </Card>
+</CardGroup>
+
+When you are ready to share the app, follow [Publish your app](/build/publish-your-app).

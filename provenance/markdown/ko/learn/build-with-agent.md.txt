@@ -1,0 +1,961 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Build with Agent
+
+> Agent와 함께 작업하기 위한 다섯 가지 실용적인 습관: 구체적으로, 계획 세우기, 컨텍스트 추가, 검토 및 테스트, 체크포인트 사용.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const AgentInput = ({defaultPrompt = "", highlightPlan = false, highlightStart = false, showTypewriter = true}) => {
+  const AGENT_INPUT_TYPEWRITER_SCRIPT_ID = "replit-docs-typewriter-core";
+  const AGENT_INPUT_TYPEWRITER_SRC = "https://unpkg.com/typewriter-effect@2.18.2/dist/core.js";
+  const AGENT_INPUT_TYPEWRITER_PROMPTS = ["Build a project tracker for my team", "Design a landing page for my coffee shop", "Add Stripe payments to my app"];
+  const AGENT_INPUT_TYPING_SPEED = 40;
+  const AGENT_INPUT_DELETE_SPEED = 20;
+  const AGENT_INPUT_PAUSE_AFTER = 2000;
+  const AGENT_INPUT_START_DELAY = 500;
+  const getAgentInputTypewriterLoader = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriterLoader) {
+      window.__replitDocsAgentInputTypewriterLoader = {};
+    }
+    return window.__replitDocsAgentInputTypewriterLoader;
+  };
+  const ensureAgentInputTypewriterCore = () => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return Promise.resolve(null);
+    }
+    if (window.Typewriter) {
+      return Promise.resolve(window.Typewriter);
+    }
+    const loader = getAgentInputTypewriterLoader();
+    if (loader.promise) {
+      return loader.promise;
+    }
+    loader.promise = new Promise((resolve, reject) => {
+      const handleLoad = () => {
+        if (window.Typewriter) {
+          resolve(window.Typewriter);
+          return;
+        }
+        loader.promise = null;
+        reject(new Error("Typewriter core loaded without a global Typewriter export."));
+      };
+      const handleError = () => {
+        loader.promise = null;
+        reject(new Error("Failed to load typewriter core."));
+      };
+      const existingScript = document.getElementById(AGENT_INPUT_TYPEWRITER_SCRIPT_ID);
+      if (existingScript) {
+        existingScript.addEventListener("load", handleLoad, {
+          once: true
+        });
+        existingScript.addEventListener("error", handleError, {
+          once: true
+        });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = AGENT_INPUT_TYPEWRITER_SCRIPT_ID;
+      script.src = AGENT_INPUT_TYPEWRITER_SRC;
+      script.async = true;
+      script.addEventListener("load", handleLoad, {
+        once: true
+      });
+      script.addEventListener("error", handleError, {
+        once: true
+      });
+      document.head.appendChild(script);
+    });
+    return loader.promise;
+  };
+  const getAgentInputTypewriterRegistry = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriters) {
+      window.__replitDocsAgentInputTypewriters = new WeakMap();
+    }
+    return window.__replitDocsAgentInputTypewriters;
+  };
+  const findAgentInputContainer = node => node?.closest?.("[data-agent-input-container]") || null;
+  const getAgentInputElements = container => ({
+    textarea: container?.querySelector?.('[data-agent-input-role="textarea"]') || null,
+    startButton: container?.querySelector?.('[data-agent-input-role="start-button"]') || null,
+    pillsContainer: container?.querySelector?.('[data-agent-input-role="pills"]') || null
+  });
+  const getAgentInputPromptValue = container => {
+    const {textarea} = getAgentInputElements(container);
+    return textarea?.value?.trim() || "";
+  };
+  const updateAgentInputButtonState = container => {
+    const {startButton} = getAgentInputElements(container);
+    if (!startButton) {
+      return;
+    }
+    const hasText = getAgentInputPromptValue(container).length > 0;
+    startButton.style.opacity = hasText ? "1" : "0.4";
+    startButton.style.cursor = hasText ? "pointer" : "not-allowed";
+  };
+  const stopAgentInputTypewriter = (textarea, {placeholder, clearDemo = false} = {}) => {
+    if (typeof window === "undefined" || !textarea) {
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const record = registry?.get(textarea);
+    if (!record) {
+      if (placeholder) {
+        textarea.setAttribute("placeholder", placeholder);
+      }
+      return;
+    }
+    record.stopped = true;
+    if (record.startTimer) {
+      window.clearTimeout(record.startTimer);
+    }
+    if (record.writeFrame) {
+      window.cancelAnimationFrame(record.writeFrame);
+    }
+    if (record.typewriter?.stop) {
+      record.typewriter.stop();
+    }
+    textarea.removeEventListener("focus", record.handleFocus);
+    textarea.removeEventListener("pointerdown", record.handlePointerDown);
+    textarea.removeEventListener("input", record.handleInput);
+    if (clearDemo && textarea.value === record.pendingValue) {
+      textarea.value = "";
+    }
+    textarea.setAttribute("placeholder", placeholder || "");
+    updateAgentInputButtonState(record.container);
+    registry.delete(textarea);
+  };
+  const startAgentInputTypewriter = (container, {defaultPrompt, placeholder, showTypewriter}) => {
+    if (typeof window === "undefined" || typeof document === "undefined" || !container) {
+      return;
+    }
+    const {textarea} = getAgentInputElements(container);
+    if (!textarea) {
+      return;
+    }
+    if (!showTypewriter || defaultPrompt) {
+      stopAgentInputTypewriter(textarea, {
+        placeholder
+      });
+      textarea.setAttribute("placeholder", placeholder);
+      updateAgentInputButtonState(container);
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const existingRecord = registry.get(textarea);
+    if (existingRecord && !existingRecord.stopped) {
+      updateAgentInputButtonState(container);
+      return;
+    }
+    textarea.setAttribute("placeholder", "");
+    if (textarea.value) {
+      textarea.value = "";
+    }
+    updateAgentInputButtonState(container);
+    const record = {
+      container,
+      element: textarea,
+      pendingValue: "",
+      renderedValue: "",
+      stopped: false,
+      startTimer: null,
+      writeFrame: null,
+      typewriter: null,
+      handleFocus: null,
+      handlePointerDown: null,
+      handleInput: null
+    };
+    const queueValue = nextValue => {
+      record.pendingValue = nextValue;
+      if (record.writeFrame) {
+        return;
+      }
+      record.writeFrame = window.requestAnimationFrame(() => {
+        record.writeFrame = null;
+        if (record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        if (textarea.value !== record.pendingValue) {
+          textarea.value = record.pendingValue;
+        }
+        updateAgentInputButtonState(container);
+      });
+    };
+    const stopDemo = () => {
+      stopAgentInputTypewriter(textarea, {
+        placeholder,
+        clearDemo: true
+      });
+    };
+    record.handleFocus = stopDemo;
+    record.handlePointerDown = stopDemo;
+    record.handleInput = stopDemo;
+    registry.set(textarea, record);
+    textarea.addEventListener("focus", record.handleFocus, {
+      once: true
+    });
+    textarea.addEventListener("pointerdown", record.handlePointerDown, {
+      once: true
+    });
+    textarea.addEventListener("input", record.handleInput, {
+      once: true
+    });
+    record.startTimer = window.setTimeout(() => {
+      ensureAgentInputTypewriterCore().then(Typewriter => {
+        if (!Typewriter || record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        const typewriter = new Typewriter(null, {
+          loop: true,
+          delay: AGENT_INPUT_TYPING_SPEED,
+          deleteSpeed: AGENT_INPUT_DELETE_SPEED,
+          cursor: "",
+          skipAddStyles: true,
+          wrapperClassName: "",
+          cursorClassName: "",
+          onCreateTextNode: character => {
+            record.renderedValue += character;
+            queueValue(record.renderedValue);
+            return null;
+          },
+          onRemoveNode: () => {
+            record.renderedValue = record.renderedValue.slice(0, -1);
+            queueValue(record.renderedValue);
+          }
+        });
+        AGENT_INPUT_TYPEWRITER_PROMPTS.forEach(prompt => {
+          typewriter.typeString(prompt).pauseFor(AGENT_INPUT_PAUSE_AFTER).deleteAll(AGENT_INPUT_DELETE_SPEED).pauseFor(400);
+        });
+        record.typewriter = typewriter;
+        typewriter.start();
+      }).catch(() => {
+        stopAgentInputTypewriter(textarea, {
+          placeholder
+        });
+      });
+    }, AGENT_INPUT_START_DELAY);
+  };
+  if (typeof document !== "undefined" && !window.LZString) {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+    document.head.appendChild(script);
+  }
+  const placeholder = "Describe your idea, Replit will bring it to life...";
+  const outputTypes = [{
+    name: "Web",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clip-rule="evenodd" /><path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Animation",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Design",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" /><path fill-rule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20.53 5.47a.75.75 0 0 1 0 1.06l-11 11a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 1 1 1.06-1.06L9 15.94 19.47 5.47a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>';
+  if (typeof document !== "undefined" && !document.getElementById("agent-input-styles")) {
+    const style = document.createElement("style");
+    style.id = "agent-input-styles";
+    style.textContent = `
+      /* Theme variables - light mode */
+      [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #F6F6F4);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-border-default: var(--replit-docs-border, #DEDAD5);
+        --ai-border-strong: var(--replit-docs-border-strong, #CAC4BE);
+        --ai-text-secondary: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #858585);
+        --ai-text-primary: var(--replit-docs-text, #1D1D1D);
+        --ai-button-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-button-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-icon-default: var(--replit-docs-text-subtle, #858585);
+        --ai-icon-hover: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-shadow: 0 2px 6px #00000005;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-option-border: var(--replit-docs-border, #DEDAD5);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-pill-bg: #CDDCF1;
+        --ai-pill-text: var(--replit-docs-text-muted, #5C5C5C);
+      }
+
+      /* Theme variables - dark mode */
+      .dark [data-agent-input-container],
+      html.dark [data-agent-input-container],
+      [data-theme="dark"] [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #1E1E1F);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #222223);
+        --ai-border-default: var(--replit-docs-border, #39393D);
+        --ai-border-strong: var(--replit-docs-border-strong, #4A4A50);
+        --ai-text-secondary: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-text-primary: var(--replit-docs-text, #F5F5F5);
+        --ai-button-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-button-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --ai-icon-default: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-icon-hover: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-shadow: 0 2px 6px #00000020;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-option-border: var(--replit-docs-border, #39393D);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-pill-bg: #2A3A4D;
+        --ai-pill-text: #D0D8E4;
+      }
+
+      .agent-input-container {
+        box-sizing: border-box;
+      }
+
+      /* Entry animation */
+      @keyframes agent-input-fade-in-up {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      /* Hover state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:hover) [data-agent-input-role="inner"] {
+        border-color: #85C7FF !important;
+      }
+
+      /* Focus state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:focus-within) [data-agent-input-role="inner"] {
+        border-color: #0079F2 !important;
+      }
+
+      /* Icon button hover */
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-icon-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-icon-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-option-btn:not([data-selected="true"]):hover {
+          background: var(--ai-option-hover-bg);
+        }
+        [data-agent-input-container] .ai-plan-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-nav-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-pill-close:hover {
+          opacity: 0.7;
+        }
+      }
+      @keyframes plan-border-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      [data-agent-input-container] .ai-plan-wrap {
+        position: relative;
+        border-radius: 32px;
+        padding: 2px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-plan-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-plan-wrap .ai-plan-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        color: var(--ai-text-primary);
+        font-weight: 400;
+        border: none;
+        border-radius: 32px;
+        z-index: 1;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off::before {
+        animation: none;
+        background: transparent;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off .ai-plan-btn-highlight {
+        background: var(--ai-button-bg);
+        color: var(--ai-text-secondary);
+      }
+      /* Plan checkbox styles */
+      [data-agent-input-container] .ai-plan-checkbox-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: var(--border-radius-6, 6px);
+        background: var(--ai-button-bg);
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        color: var(--ai-text-secondary);
+        transition: background 120ms ease-out;
+        user-select: none;
+      }
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-plan-checkbox-label:hover {
+          background: var(--ai-button-bg-hover);
+        }
+      }
+      [data-agent-input-container] .ai-plan-checkbox-input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        accent-color: #0079F2;
+        cursor: pointer;
+      }
+      [data-agent-input-container] .ai-start-wrap {
+        position: relative;
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-start-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-start-wrap .ai-start-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        border: none;
+        border-radius: 6px;
+        z-index: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const getLink = (container, promptOverride) => {
+    if (typeof document === "undefined" || !window.LZString) return "";
+    const prompt = promptOverride || getAgentInputPromptValue(container);
+    if (!prompt) return "";
+    const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+    const utm = "utm_source=replit-docs&utm_medium=docs&utm_campaign=docs-intro-agent-input&utm_content=homepage-prompt-box";
+    return `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+  };
+  const handleStartClick = e => {
+    e.preventDefault();
+    const container = findAgentInputContainer(e.currentTarget);
+    const link = getLink(container);
+    if (link) window.open(link, "_blank");
+  };
+  const toggleOutputType = name => {
+    const btn = document.querySelector(`[data-option-name="${name}"]`);
+    const pillsContainer = document.getElementById("agent-input-pills");
+    if (!btn || !pillsContainer) return;
+    const isSelected = btn.dataset.selected === "true";
+    if (isSelected) {
+      btn.dataset.selected = "false";
+      btn.style.background = "var(--ai-option-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      const type = outputTypes.find(t => t.name === name);
+      if (iconEl && type) iconEl.innerHTML = type.iconSvg;
+      const pill = document.getElementById(`pill-${name}`);
+      if (pill) pill.remove();
+    } else {
+      document.querySelectorAll('[data-option-name][data-selected="true"]').forEach(prevBtn => {
+        const prevName = prevBtn.dataset.optionName;
+        prevBtn.dataset.selected = "false";
+        prevBtn.style.background = "var(--ai-option-bg)";
+        const prevIconEl = prevBtn.querySelector(".option-icon");
+        const prevType = outputTypes.find(t => t.name === prevName);
+        if (prevIconEl && prevType) prevIconEl.innerHTML = prevType.iconSvg;
+        const prevPill = document.getElementById(`pill-${prevName}`);
+        if (prevPill) prevPill.remove();
+      });
+      btn.dataset.selected = "true";
+      btn.style.background = "var(--ai-option-selected-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      if (iconEl) iconEl.innerHTML = checkSvg;
+      const type = outputTypes.find(t => t.name === name);
+      if (type) {
+        const pill = document.createElement("span");
+        pill.id = `pill-${name}`;
+        pill.style.cssText = "display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 8px;border-radius:32px;background:var(--ai-pill-bg);color:var(--ai-pill-text);font-size:14px;white-space:nowrap;cursor:default;";
+        pill.innerHTML = `<span style="display:flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">${type.iconSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}</svg></span><span>${name}</span><span class="ai-pill-close" style="display:flex;align-items:center;cursor:pointer;margin-left:2px" data-pill-remove="${name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12 5.7 16.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41Z"/></svg></span>`;
+        pill.querySelector(`[data-pill-remove="${name}"]`).addEventListener("click", () => toggleOutputType(name));
+        pillsContainer.appendChild(pill);
+      }
+    }
+  };
+  const PlusIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.25a.75.75 0 0 1 .75.75v6.25H19a.75.75 0 0 1 0 1.5h-6.25V19a.75.75 0 0 1-1.5 0v-6.25H5a.75.75 0 0 1 0-1.5h6.25V5a.75.75 0 0 1 .75-.75Z" />
+    </svg>;
+  const MicIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 9.25a.75.75 0 0 1 .75.75v2a7.75 7.75 0 0 1-7 7.713V22a.75.75 0 0 1-1.5 0v-2.287a7.75 7.75 0 0 1-6.99-7.328L4.25 12v-2a.75.75 0 0 1 1.5 0v2l.008.31A6.25 6.25 0 0 0 12 18.25l.31-.008a6.249 6.249 0 0 0 5.932-5.932l.008-.31v-2a.75.75 0 0 1 .75-.75Z" />
+      <path fillRule="evenodd" d="M12 1.25A3.75 3.75 0 0 1 15.75 5v7a3.75 3.75 0 1 1-7.5 0V5A3.75 3.75 0 0 1 12 1.25Zm0 1.5A2.25 2.25 0 0 0 9.75 5v7a2.25 2.25 0 0 0 4.5 0V5A2.25 2.25 0 0 0 12 2.75Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowUpIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 1 1-1.06 1.06l-5.72-5.72V19a.75.75 0 0 1-1.5 0V6.81l-5.72 5.72a.75.75 0 0 1-1.06-1.06l7-7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowLeftIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M4.47 11.47a.75.75 0 0 0 0 1.06l7 7a.75.75 0 1 0 1.06-1.06l-5.72-5.72H19a.75.75 0 0 0 0-1.5H6.81l5.72-5.72a.75.75 0 0 0-1.06-1.06l-7 7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowRightIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M19.53 11.47a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 1.06-1.06l7 7Z" clipRule="evenodd" />
+    </svg>;
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "28px",
+    height: "28px",
+    border: "none",
+    borderRadius: "6px",
+    background: "transparent",
+    cursor: "pointer",
+    color: "var(--ai-icon-default)",
+    padding: 0,
+    transition: "background 120ms ease-out"
+  };
+  const optionIconStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ai-option-border)",
+    borderRadius: "12px",
+    background: "var(--ai-option-bg)",
+    cursor: "pointer",
+    color: "var(--ai-text-secondary)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  const initAgentInput = container => {
+    if (!container) {
+      return;
+    }
+    updateAgentInputButtonState(container);
+    startAgentInputTypewriter(container, {
+      defaultPrompt,
+      placeholder,
+      showTypewriter
+    });
+    const ta = container.querySelector('[data-agent-input-role="textarea"]');
+    if (ta && ta.value) {
+      requestAnimationFrame(() => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+    }
+  };
+  return <div ref={initAgentInput} data-agent-input-container className="agent-input-container" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "734px",
+    alignSelf: "center",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "agent-input-fade-in-up 300ms ease-out forwards"
+  }}>
+      <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px"
+  }}>
+        {}
+        <div data-agent-input-role="inner" style={{
+    position: "relative",
+    borderRadius: "6px",
+    border: "1px solid var(--ai-border-strong)",
+    background: "var(--ai-surface-bg)",
+    transition: "border-color 120ms ease-out",
+    boxShadow: "var(--ai-shadow)"
+  }}>
+          {}
+          <div style={{
+    padding: "12px 12px 48px 12px"
+  }}>
+            <textarea data-agent-input-role="textarea" placeholder={placeholder} defaultValue={defaultPrompt} rows={1} onInput={e => {
+    const ta = e.currentTarget;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+    updateAgentInputButtonState(findAgentInputContainer(ta));
+  }} style={{
+    display: "block",
+    width: "100%",
+    minHeight: "21px",
+    maxHeight: "calc(14px * 1.5 * 10)",
+    padding: 0,
+    margin: 0,
+    border: "none",
+    outline: "none",
+    resize: "none",
+    fontSize: "14px",
+    lineHeight: "1.5",
+    color: "var(--ai-text-primary)",
+    background: "transparent",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    overflowY: "auto"
+  }} />
+          </div>
+          {}
+          <div style={{
+    position: "absolute",
+    left: "8px",
+    right: "8px",
+    bottom: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  }}>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    overflow: "hidden",
+    minWidth: 0
+  }}>
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Add attachment" type="button">
+                {PlusIcon}
+              </button>
+              <div id="agent-input-pills" data-agent-input-role="pills" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    overflow: "hidden"
+  }}></div>
+            </div>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flexShrink: 0
+  }}>
+              {highlightPlan ? <div className="ai-plan-wrap" onClick={e => {
+    const wrap = e.currentTarget;
+    wrap.classList.toggle("ai-plan-off");
+  }}>
+                  <label className="ai-plan-btn-highlight" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    height: "32px",
+    padding: "0 8px",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontFamily: "inherit",
+    transition: "background 120ms ease-out"
+  }}>
+                    <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" defaultChecked />
+                    <span>Plan</span>
+                  </label>
+                </div> : <label className="ai-plan-checkbox-label">
+                  <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" />
+                  <span>Plan</span>
+                </label>}
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Start voice input" type="button">
+                {MicIcon}
+              </button>
+              {highlightStart ? <div className="ai-start-wrap">
+                  <button data-agent-input-role="start-button" className="ai-icon-btn ai-start-btn-highlight" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    borderRadius: "6px",
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                    {ArrowUpIcon}
+                  </button>
+                </div> : <button data-agent-input-role="start-button" className="ai-icon-btn" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                  {ArrowUpIcon}
+                </button>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+Agent는 Replit의 AI 빌더이자 아이디어를 소프트웨어로 변환하는 동반자입니다. Agent는 변경사항을 계획하고, 코드를 작성하고, 동작을 설명하고, 이슈를 디버그하고, 앱을 개선할 수 있습니다.
+
+[Vibe coding 101](/ko/learn/foundations/vibe-coding-101)이 마인드셋을 설명하는 반면, 이 페이지는 Agent와 실제로 어떻게 작업하는지 설명합니다. [효과적인 프롬프팅](/ko/learn/effective-prompting)은 더 명확한 지시를 작성하는 방법을 설명합니다.
+
+Agent를 필드의 쿼터백으로 생각하세요: 상황을 읽고, 경로를 선택하고, 작업을 앞으로 진행시킵니다. 여러분은 코치입니다: 전략을 세우고, 플레이를 정하고, 결과를 검토하고, 다음 움직임을 결정합니다.
+
+Agent는 많은 것을 할 수 있지만, 여러분이 프로세스를 이끌 때 가장 잘 작동합니다: 구체적으로, 계획을 세우고, 컨텍스트를 추가하고, 검토 및 테스트하고, 필요할 때 체크포인트를 사용하세요.
+
+## Agent와 빌드하기 위한 다섯 가지 팁
+
+Agent와 작업할 때 이 습관들을 사용하세요:
+
+1. 구체적으로.
+2. 계획 세우기.
+3. 컨텍스트 추가.
+4. 검토 및 테스트.
+5. 체크포인트 사용.
+
+## 구체적으로
+
+Agent는 복잡한 작업을 처리할 수 있지만, 명확한 방향이 필요합니다.
+
+유용한 요청은 원하는 것, 중요한 것, 그리고 변경하지 말아야 할 것을 설명합니다. 모든 구현 세부사항을 설명할 필요는 없지만, Agent가 좋은 결정을 내릴 수 있을 만큼 충분한 방향을 제공해야 합니다.
+
+다음 대신:
+
+<AiPrompt>
+  내 앱을 더 좋게 만들어줘.
+</AiPrompt>
+
+이렇게 시도하세요:
+
+<AiPrompt>
+  가입 페이지를 개선하여 방문자가 계정을 만들기 전에 제품이 무엇을 하는지 이해할 수 있게 해줘.<br />
+  현재 색상 팔레트를 유지하고, 양식 필드는 그대로 두고, 기본 버튼을 더 눈에 띄게 만들어줘.
+</AiPrompt>
+
+두 번째 프롬프트는 Agent에게 목표, 집중 영역, 제약사항을 제공합니다.
+
+요청에 여러 부분이 있을 때 가장 중요한 것을 말하세요.
+
+<AiPrompt>
+  케이터링 요청을 관리하기 위한 간단한 관리자 뷰를 추가해줘.<br />
+  가장 중요한 부분은 새 요청을 볼 수 있고, 연락됨으로 표시하고, 상태별로 필터링하는 것입니다.<br />
+  첫 번째 버전은 간단하게 유지하세요.
+</AiPrompt>
+
+Agent가 그 작업을 단계로 나눌 수 있지만, 여러분의 방향이 성공이 어떤 것인지 알려줍니다.
+
+더 구체적인 지시의 예시는 [효과적인 프롬프팅](/ko/learn/effective-prompting)을 참조하세요.
+
+## 계획 세우기
+
+계획은 불확실성, 여러 단계, 트레이드오프, 또는 파일이 변경되기 전에 승인하고 싶은 것이 있을 때 도움이 됩니다.
+
+대화에서 Agent에게 계획을 만들도록 요청할 수 있습니다:
+
+<AiPrompt>
+  변경하기 전에 온라인 주문 추가 계획을 만들어줘.<br />
+  사용자 흐름, 필요한 데이터, 변경될 페이지나 컴포넌트, 위험 요소, 그리고 어떻게 테스트해야 하는지 포함해줘.
+</AiPrompt>
+
+파일을 변경하기 전에 Agent가 먼저 생각하고 승인을 기다리길 원할 때는 [Plan 모드](/ko/features/agent/plan-mode)를 사용하세요. 제출하기 전에 프롬프트 컴포저에서 **Plan**을 토글하세요.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-plan-mode-prompt.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=4eb27dd607f04e5559b2acb80d4489bf" alt="Plan 체크박스가 켜진 상태로 실행 중인 앱 프롬프트가 입력된 Replit 홈 프롬프트 박스" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
+</Frame>
+
+<AgentInput defaultPrompt="변경하기 전에 온라인 주문 추가 계획을 만들어줘. 사용자 흐름, 필요한 데이터, 변경될 페이지나 컴포넌트, 위험 요소, 그리고 어떻게 테스트해야 하는지 포함해줘." highlightPlan={true} showTypewriter={false} />
+
+Agent가 생각을 마치면 **지금 검토** 버튼이 있는 **작업 계획을 검토할 준비가 됨** 배너가 표시됩니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-plan-ready-banner.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=b2082775cc2f4da9243a88589eac5ab5" alt="Agent 패널 하단에 지금 검토 버튼이 있는 작업 계획을 검토할 준비가 됨 배너" width="560" height="550" data-path="images/fitstart/work-with-agent/agent-plan-ready-banner.png" />
+</Frame>
+
+## 컨텍스트 추가
+
+컨텍스트는 Agent가 무엇이 중요한지 이해하는 데 도움을 줍니다.
+
+텍스트, 스크린샷, 스케치, 파일, 데이터, 오류, 또는 Canvas 주석으로 컨텍스트를 추가할 수 있습니다. 문제를 가장 잘 설명하는 형식을 사용하세요.
+
+변경이 동작, 목표, 또는 제약사항에 관한 것일 때 텍스트 사용:
+
+<AiPrompt>
+  컨텍스트: 이 앱은 생일 케이크를 주문하는 부모를 위한 것입니다.<br />
+  양식을 짧게 유지하고, 픽업 세부사항을 명확하게 하고, 기업적인 느낌의 것은 피하세요.
+</AiPrompt>
+
+레이아웃을 말로 설명하기 어려울 때 스크린샷이나 스케치 사용:
+
+<AiPrompt>
+  이 스크린샷을 요청 양식의 레이아웃 방향으로 사용해줘.<br />
+  전체 구조는 맞추되 기존 필드와 제출 동작은 유지해줘.
+</AiPrompt>
+
+변경이 시각적이고 앱의 특정 부분을 가리키고 싶을 때 [Canvas](/ko/design/canvas) 주석 사용.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-canvas-annotations.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=db21c9df13df76c84d98d99cf7fc9730" alt="진행 카드를 가리키는 직사각형, 화살표, 텍스트 레이블이 있는 Canvas의 피트니스 앱 프레임, 양식 영역에 펜 스케치와 레이블" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-canvas-annotations.png" />
+</Frame>
+
+<AiPrompt>
+  내 Canvas 주석을 사용하여 히어로 섹션을 업데이트해줘.<br />
+  헤드라인, 이미지, 기본 버튼에만 메모를 적용해줘.<br />
+  케이터링 요청 양식은 변경하지 마세요.
+</AiPrompt>
+
+좋은 컨텍스트에는 변경하지 말아야 할 것도 포함됩니다. 그러면 Agent가 의도치 않게 다른 부분을 다시 작성하지 않고 한 영역을 개선할 수 있습니다.
+
+## 검토 및 테스트
+
+Agent가 빌드 전에 계획을 제안하고, 이후에 변경사항을 요약할 수 있습니다. 둘 다 읽으세요.
+
+작업 계획 카드에서 **보기**를 선택하여 계획을 엽니다. 확장된 계획은 Agent가 무엇을 빌드할 의도인지, 성공 기준, 범위에서 제외된 것, Agent가 따를 단계를 보여줍니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-plan-content.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=5106f59ceb7b41aa26e3bb8c22daa6bf" alt="What and Why, 완료 기준, 범위 외 항목, 번호가 매겨진 빌드 단계를 보여주는 확장된 작업 계획" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-content.png" />
+</Frame>
+
+Agent가 빌드하기 전에 계획을 검토하세요:
+
+* 이것이 올바른 문제를 해결하나요?
+* 빠진 것이 있나요?
+* 범위를 벗어난 것이 있나요?
+* 먼저 빌드할 더 작은 버전이 있나요?
+* 결과를 어떻게 테스트해야 하는지 설명하나요?
+
+계획이 너무 광범위하면 Agent에게 줄이도록 요청하세요.
+
+<AiPrompt>
+  이 계획은 너무 광범위합니다.<br />
+  오늘 테스트할 수 있는 가장 작은 버전으로 줄여줘.<br />
+  나머지는 향후 개선 목록으로 옮겨줘.
+</AiPrompt>
+
+Agent가 빌드한 후, 앱을 직접 테스트하세요. Preview를 열고 그것이 대상인 사람처럼 사용하세요.
+
+확인사항:
+
+* 누군가 주요 작업을 완료할 수 있나요?
+* 요청한 변경이 발생했나요?
+* 모바일에서도 앱이 여전히 작동하나요?
+* 중요한 동작이 깨졌나요?
+* Agent가 관련 없는 것을 변경했나요?
+* 결과가 계속 빌드할 만큼 충분히 좋은가요?
+
+무언가 잘못되었다면 본 것을 설명하세요.
+
+다음 대신:
+
+<AiPrompt>
+  양식을 수정해줘.
+</AiPrompt>
+
+이렇게 시도하세요:
+
+<AiPrompt>
+  케이터링 요청 양식을 제출하면 성공 메시지가 나타나지만 양식에 여전히 이전 텍스트가 표시됩니다.<br />
+  제출 후 양식을 지우고 성공 메시지가 계속 보이도록 해줘.
+</AiPrompt>
+
+구체적인 피드백이 Agent가 올바른 이슈를 수정하는 데 도움을 줍니다.
+
+## 체크포인트 사용
+
+체크포인트는 변경이 잘못된 방향으로 갔을 때 복구하는 데 도움을 줍니다.
+
+결과가 가깝다면 집중적인 피드백을 사용하세요:
+
+<AiPrompt>
+  가깝지만 양식이 너무 길어졌습니다.<br />
+  새 시각적 스타일은 유지하고, 선택적 메모 필드를 제거하고, 픽업 날짜를 더 읽기 쉽게 만들어줘.
+</AiPrompt>
+
+앱이 이전보다 나빠졌거나, 중요한 동작이 깨졌거나, Agent가 예상보다 더 많이 변경했을 때 체크포인트를 사용하세요.
+
+Agent 패널에서 **History**를 열어 체크포인트를 확인하세요. 각 체크포인트에는 변경사항과 함께 **여기서 롤백** 및 **변경사항** 컨트롤이 표시됩니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-checkpoints-history.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=fdc1aa8d372341fae140542f3adebad1" alt="'Plan 모드에서 Build 모드로 전환됨'이라는 레이블이 있는 체크포인트와 여기서 롤백 및 변경사항 버튼을 보여주는 Agent History 패널" width="720" height="450" data-path="images/fitstart/work-with-agent/agent-checkpoints-history.png" />
+</Frame>
+
+**여기서 롤백**을 선택하면 Agent가 롤백을 적용하기 전에 복원될 내용을 확인합니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-checkpoints-rollback-dialog.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=cb8fc415dac91353f209eea5f85aa06a" alt="대상 체크포인트와 파일, Agent 메모리, 작업, 데이터베이스 체크박스를 포함한 영향을 받을 내용을 나열하는 체크포인트 롤백 확인 대화 상자" width="900" height="880" data-path="images/fitstart/work-with-agent/agent-checkpoints-rollback-dialog.png" />
+</Frame>
+
+앞으로 수정할지 롤백할지 확실하지 않다면 Agent에게 비교를 도와달라고 요청하세요.
+
+<AiPrompt>
+  마지막 변경이 앱을 더 나쁘게 만들었습니다.<br />
+  현재 버전을 이전 작동 버전과 비교해줘.<br />
+  앞으로 수정하는 것이 더 안전한지 롤백하는 것이 더 안전한지, 그리고 이유를 알려줘.
+</AiPrompt>
+
+잘못된 방향으로 가는 것은 정상입니다. 체크포인트를 사용하면 더 안전한 버전으로 돌아갈 수 있는 능력을 잃지 않고 탐색할 수 있습니다.
+
+더 많은 복구 가이드는 [체크포인트 및 롤백](/ko/features/version-control/checkpoints-and-rollbacks)을 참조하세요.
+
+## 좋은 Agent 협업의 느낌
+
+다음과 같을 때 올바른 방향에 있습니다:
+
+* 요청이 목표와 제약사항을 설명합니다.
+* Agent의 계획이 검토할 만큼 충분히 명확합니다.
+* 말로 부족할 때 스크린샷, 파일, Canvas 메모를 추가합니다.
+* 변경 후 중요한 흐름을 테스트합니다.
+* 무언가 잘못되었을 때 집중적인 피드백을 제공합니다.
+* 잘못된 변경을 영원히 풀려고 하는 대신 체크포인트를 사용합니다.
+
+## 다음 단계
+
+<CardGroup cols={2}>
+  <Card icon="comment-dots" href="/ko/learn/effective-prompting">
+    Agent가 자신 있게 실행할 수 있는 더 명확한 지시 작성하는 방법을 알아보세요.
+  </Card>
+
+  <Card title="첫 번째 앱 빌드하기" icon="rocket" href="/ko/build/your-first-app">
+    첫 번째 프롬프트부터 집중적인 개선 작업까지 Agent와 함께 작업하는 연습을 하세요.
+  </Card>
+
+  <Card title="체크포인트 및 롤백" icon="rotate-left" href="/ko/features/version-control/checkpoints-and-rollbacks">
+    필요할 때 더 안전한 상태로 돌아가는 방법을 알아보세요.
+  </Card>
+</CardGroup>

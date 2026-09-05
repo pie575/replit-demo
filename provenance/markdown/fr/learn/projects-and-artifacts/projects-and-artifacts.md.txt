@@ -1,0 +1,247 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Projets et artefacts
+
+> Découvrez ce que sont les projets et les artefacts sur Replit, et décidez quand garder les artefacts dans un même projet ou créer des projets séparés.
+
+export const ArtifactGrid = () => {
+  if (typeof document !== "undefined" && !document.getElementById("artifact-grid-styles")) {
+    const style = document.createElement("style");
+    style.id = "artifact-grid-styles";
+    style.textContent = `
+      .artifact-grid-wrap {
+        --ag-bg: var(--replit-docs-bg, #F6F6F4);
+        --ag-icon-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ag-icon-border: var(--replit-docs-border, #DEDAD5);
+        --ag-text: var(--replit-docs-text-muted, #5C5C5C);
+        --ag-icon-color: var(--replit-docs-text-muted, #5C5C5C);
+      }
+      .dark .artifact-grid-wrap,
+      html.dark .artifact-grid-wrap,
+      [data-theme="dark"] .artifact-grid-wrap {
+        --ag-bg: var(--replit-docs-bg, #1E1E1F);
+        --ag-icon-bg: var(--replit-docs-bg-elevated, #222223);
+        --ag-icon-border: var(--replit-docs-border, #39393D);
+        --ag-text: var(--replit-docs-text-muted, #B8B8BE);
+        --ag-icon-color: var(--replit-docs-text-muted, #B8B8BE);
+      }
+      @keyframes ag-fade-in {
+        from { transform: translateY(8px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @media (hover: hover) {
+        .artifact-grid-wrap .ag-icon-btn:hover {
+          background: var(--ag-icon-border) !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const types = [{
+    name: "Web",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Design",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Animation",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Data Viz",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 14.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-1.5 0v-6a.75.75 0 0 1 .75-.75ZM12 8.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75ZM19 2.25a.75.75 0 0 1 .75.75v18a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75Z" />
+        </svg>
+  }, {
+    name: "3D Game",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M11.25 9.675A3.751 3.751 0 0 1 12 2.25a3.75 3.75 0 0 1 .75 7.425v4.575H19A2.75 2.75 0 0 1 21.75 17v2A2.75 2.75 0 0 1 19 21.75H5A2.75 2.75 0 0 1 2.25 19v-2A2.75 2.75 0 0 1 5 14.25h.25V13a.75.75 0 0 1 1.5 0v1.25h4.5V9.675ZM9.75 6a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0ZM4.116 16.116A1.25 1.25 0 0 1 5 15.75h14A1.25 1.25 0 0 1 20.25 17v2A1.25 1.25 0 0 1 19 20.25H5a1.25 1.25 0 0 1-1.244-1.126L3.75 19v-2c0-.331.132-.65.366-.884Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const rows = [types.slice(0, 4), types.slice(4, 7)];
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ag-icon-border)",
+    borderRadius: "12px",
+    background: "var(--ag-icon-bg)",
+    cursor: "default",
+    color: "var(--ag-icon-color)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  return <div className="artifact-grid-wrap" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+    padding: "32px",
+    background: "var(--ag-bg)",
+    borderRadius: "16px",
+    width: "100%",
+    maxWidth: "460px",
+    margin: "32px auto",
+    opacity: 0,
+    animation: "ag-fade-in 300ms ease-out forwards"
+  }}>
+      {rows.map((row, ri) => <div key={ri} style={{
+    display: "flex",
+    gap: "12px",
+    justifyContent: "center"
+  }}>
+          {row.map(type => <div key={type.name} style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "6px"
+  }}>
+              <div className="ag-icon-btn" style={iconBtnStyle}>
+                {type.icon}
+              </div>
+              <span style={{
+    fontSize: "11px",
+    color: "var(--ag-text)",
+    textAlign: "center",
+    lineHeight: "1.2"
+  }}>
+                {type.name}
+              </span>
+            </div>)}
+        </div>)}
+    </div>;
+};
+
+Un **projet** est le conteneur de tout ce que vous construisez sur Replit. Les **artefacts** sont les résultats publiables à l'intérieur — applications web, applications mobiles, présentations de diapositives, animations, visualisations de données, jeux 3D et designs.
+
+Lorsque vous construisez plus d'une chose, vous avez deux options : ajouter plusieurs artefacts à un seul projet ou créer des projets séparés. Le bon choix dépend de si vos applications partagent des données, de la logique et un cycle de déploiement. Cette page couvre les deux termes en profondeur et vous montre quand garder les artefacts dans un seul projet ou quand en créer des séparés.
+
+## Qu'est-ce qu'un projet ?
+
+Un projet est le conteneur qui contient votre code, vos données et tous les artefacts que vous créez. Lorsque vous dites à Agent ce que vous voulez, il configure un projet et construit les artefacts à l'intérieur.
+
+Pensez à un projet comme à un espace de travail sur votre bureau. Tout se trouve au même endroit et peut partager les mêmes informations, mais chaque pièce sert un objectif différent.
+
+Par exemple, si vous demandez à Agent de construire une application de suivi de fitness, il crée un projet avec un artefact d'application mobile ainsi que le backend, la base de données et le stockage dont il a besoin pour fonctionner.
+
+Concepts clés :
+
+* **Projet** : Le conteneur qui contient tout — votre code, vos données et tous vos artefacts.
+* **Artefact** : Un résultat publiable dans un projet (une application web, une présentation de diapositives, une vidéo, etc.).
+* **Ressources** : Chaque artefact bénéficie automatiquement d'un accès à un backend, une base de données et un stockage de fichiers — aucune configuration requise.
+
+Pour tout ce que vous pouvez faire avec un projet — gérer, filtrer, épingler, trier — consultez [Projets](/fr/features/projects-and-artifacts/projects).
+
+## Qu'est-ce qu'un artefact ?
+
+Les artefacts sont les éléments que vous pouvez publier sur Replit. Chacun est un résultat complet et autonome qui obtient sa propre URL partageable lorsque vous publiez.
+
+Tout le reste dans votre projet — fichiers, images, CSV, code — soutient vos artefacts mais ne peut pas être publié seul.
+
+<ArtifactGrid />
+
+| Type                                                                        | Ce que c'est                                                                                      |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **[Application web](/fr/features/artifact-types/web-apps)**                 | Sites web et applications web qui gèrent les utilisateurs, les bases de données, et plus encore.  |
+| **[Application mobile](/fr/features/artifact-types/building-mobile-apps)**  | Applications natives pour iPhone et Android.                                                      |
+| **[Présentation de diapositives](/fr/features/artifact-types/slide-decks)** | Présentations que vous pouvez présenter ou exporter.                                              |
+| **[Animation](/fr/features/artifact-types/animated-videos)**                | Graphiques animés et vidéos animées. Exportez en MP4.                                             |
+| **[Visualisation de données](/fr/features/artifact-types/data-apps)**       | Tableaux de bord interactifs et visualisations pour explorer des données et créer des graphiques. |
+| **Jeu 3D**                                                                  | Jeux 3D, simulations et expériences interactives.                                                 |
+| **[Design](/fr/design/canvas)**                                             | Directions visuelles et prototypes explorés sur le canvas de design.                              |
+
+Pour tout ce que vous pouvez faire avec les artefacts — passer de l'un à l'autre, en ajouter de nouveaux, la barre latérale Bibliothèque — consultez [Artefacts](/fr/features/projects-and-artifacts/artifacts).
+
+## Ce que les artefacts partagent dans un projet
+
+Lorsque des [artefacts](/fr/features/projects-and-artifacts/artifacts) se trouvent dans le même [projet](/fr/features/projects-and-artifacts/projects), ils partagent automatiquement :
+
+* **Base de données** : Un artefact écrit des données, les autres les lisent instantanément.
+* **Backend et API** : Logique serveur partagée, pas de code dupliqué.
+* **Stockage de fichiers** : Images, documents et téléchargements accessibles à tous les artefacts.
+* **Déploiement** : La publication déploie tout ensemble de manière synchronisée.
+
+Cela signifie que vous n'avez pas besoin de configurer des connexions ou de dupliquer du code entre les artefacts. Mais cela signifie également que vous ne pouvez pas publier un artefact sans publier les autres.
+
+## Guide rapide
+
+Voici les scénarios clés à considérer lorsque vous décidez d'ajouter des artefacts à un projet existant ou d'en créer un séparé.
+
+| **Utiliser plusieurs artefacts dans un projet**                                                 | **Utiliser des projets séparés**                                                                |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Les applications partagent les mêmes données et backend                                         | Les applications ne partagent pas de logique ou de données sous-jacentes                        |
+| Vous souhaitez que tout se déploie ensemble                                                     | Vous avez besoin de cycles de déploiement indépendants                                          |
+| Ils sont complémentaires (comme une application client et un tableau de bord admin)             | Ce sont des produits non liés ou pour des clients différents                                    |
+| Vous souhaitez que les modifications d'un artefact se reflètent automatiquement dans les autres | Le projet est de courte durée, comme une page de destination de campagne ou un site d'événement |
+
+## Exemples
+
+### Même projet : application web + application mobile pour un produit
+
+Un restaurant construit une application web pour que les clients puissent parcourir le menu et une application mobile pour que le personnel gère les commandes. Les deux se connectent à la même base de données d'articles du menu, de commandes et d'informations client.
+
+**Pourquoi un seul projet :** les applications partagent les mêmes données et backend. Lorsqu'un client passe une commande via l'application web, le personnel la voit immédiatement sur l'application mobile.
+
+### Même projet : application + tableau de bord admin + présentation investisseurs
+
+Une startup construit son produit principal, un panneau d'administration interne pour gérer le contenu et une présentation pour la levée de fonds — tout dans un seul projet.
+
+**Pourquoi un seul projet :** le tableau de bord admin gère les mêmes données que l'application affiche, et la présentation peut référencer des métriques en direct depuis le backend partagé.
+
+### Projets séparés : deux applications client non liées
+
+Un freelance construit une boutique e-commerce pour un client et un système de réservation pour un autre.
+
+**Pourquoi des projets séparés :** les applications n'ont pas de données ou de logique partagées. Chaque client a besoin d'un déploiement indépendant et vous ne voulez pas que les modifications de l'un affectent l'autre.
+
+### Projets séparés : page de destination de campagne à côté d'un produit principal
+
+Vous avez une application de production qui tourne toute l'année et une page de destination de courte durée pour une campagne marketing.
+
+**Pourquoi des projets séparés :** la page de campagne a son propre cycle de vie — vous la lancerez, la ferez tourner pendant quelques semaines et la retirerez. La garder séparée évite d'encombrer votre produit principal et vous permet de la publier ou de la retirer indépendamment.
+
+## Questions fréquemment posées
+
+<Accordion title="Puis-je déplacer un artefact vers un autre projet ?">
+  Pas actuellement. Si vous avez besoin de séparer un artefact, créez un nouveau [projet](/fr/features/projects-and-artifacts/projects) et demandez à Agent de le reconstruire là-bas.
+</Accordion>
+
+<Accordion title="Y a-t-il une limite au nombre d'artefacts qu'un projet peut avoir ?">
+  Un projet peut contenir un maximum de 7 artefacts, avec une limite de **1 application mobile par projet**. Cette limite existe car des artefacts supplémentaires consomment plus de mémoire, ce qui peut ralentir l'aperçu. Si vous avez besoin de plus d'artefacts, démarrez un autre [projet](/fr/features/projects-and-artifacts/projects).
+</Accordion>
+
+<Accordion title="Puis-je publier un seul artefact d'un projet ?">
+  Pas actuellement. La publication déploie tout ensemble. Si vous avez besoin d'un déploiement indépendant, utilisez des projets séparés.
+</Accordion>
+
+<Accordion title="Les artefacts partagent-ils des données entre eux ?">
+  Oui. Tous les artefacts d'un projet partagent la même base de données et les mêmes services backend. Si votre application web écrit des données, votre application mobile et votre tableau de bord de données peuvent les lire immédiatement.
+</Accordion>
+
+<Accordion title="Quelle est la différence entre un artefact et un fichier ?">
+  Les artefacts sont des éléments que vous pouvez publier — applications, diapositives, vidéos, etc. Les fichiers (comme les CSV, les images ou le code) sont des ressources dans votre projet qui soutiennent vos artefacts mais ne peuvent pas être publiés seuls.
+</Accordion>

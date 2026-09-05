@@ -1,0 +1,96 @@
+---
+title: "Projects and files"
+description: "Answers to common project questions—recovering deleted projects, exporting, sharing, connecting GitHub, secrets, and rolling back to a checkpoint."
+sidebarTitle: "Projects and files"
+icon: "folder"
+---
+
+These answers cover working with projects and files. For related reference, see [Secrets](/core-concepts/project-editor/app-setup/secrets), [Checkpoints and rollbacks](/features/version-control/checkpoints-and-rollbacks), and the [integrations overview](/features/integrations/overview).
+
+<AccordionGroup>
+  <Accordion title="How do I connect Resend or another email service to my Replit app?">
+    Open your project and go to **Tools → Connectors**, find the service (such as Resend), and connect it. After you authorize, the API key is saved as a secret in your project. If you're setting up a custom email domain, add the DNS records the service shows you at your DNS provider.
+
+    See the [integrations overview](/features/integrations/overview) for available connectors and [Add integrations](/build/add-integrations).
+  </Accordion>
+
+  <Accordion title="I accidentally deleted a project—can I recover it?">
+    Deleted projects can be restored for a limited time. Open a Shell in any project and run:
+
+    ```bash theme={null}
+    trash view
+    trash restore your-project-name
+    ```
+
+    After the retention window passes, deleted projects are permanently removed. If you're past it, [contact Replit Support](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="How do I download or export a Replit project?">
+    Select the three-dot menu at the top of the file tree and choose **Download as zip**. For large projects, the download may take a moment. If it fails, open a Shell and run `zip -r project.zip .`, then download `project.zip` from the file tree.
+  </Accordion>
+
+  <Accordion title="How do I share a project or add a collaborator?">
+    You have three options:
+
+    * **Read-only**—set the project's privacy to public so anyone with the link can view it.
+    * **Edit access by invite**—select **Invite**, enter a username or email, and set the permission level.
+    * **Join link**—create a join link from **Invite** so anyone with the link can join and edit.
+
+    Core supports up to 5 collaborators and Pro up to 15; collaborators don't need a paid plan to edit your project. See [Workspaces](/features/collaboration/workspaces).
+  </Accordion>
+
+  <Accordion title="How do I connect a GitHub repository to Replit?">
+    Link your GitHub account from your account's connected services, then open the [Git tool](/features/workspace-tools/git-interface) in your project and connect the repository. Turn on auto-sync in the Git pane for two-way syncing. To import an existing repository, see [Import from providers](/build/import-from-providers).
+
+    If Git sync stops working, reconnect GitHub from your connected services. A fine-grained personal access token gives a more reliable connection.
+  </Accordion>
+
+  <Accordion title="My Repl is running slowly or the editor is lagging—what can I try?">
+    For editor lag, try these:
+
+    * Hard-refresh with `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows).
+    * Close unused file tabs.
+    * Open the command palette with `Cmd+K` (Mac) or `Ctrl+K` (Windows), search for **Restart compute**, and select it.
+    * Try a different browser to rule out extensions.
+
+    For slow code execution rather than editor lag, check for heavy loops or memory limits. You can see CPU and memory usage in the resources panel at the bottom of the editor.
+  </Accordion>
+
+  <Accordion title="How do I use environment variables and secrets in my project?">
+    Open the **Secrets** tool (the lock icon), select **+ New secret**, and enter a key and value. Read it in your code with `process.env.API_KEY` (Node.js) or `os.environ["API_KEY"]` (Python).
+
+    Secrets in the development [Secrets](/core-concepts/project-editor/app-setup/secrets) pane are only available in the editor. For published apps, add the same keys in your deployment secrets—they're kept separate by design.
+  </Accordion>
+
+  <Accordion title="How do I use Account Secrets (the Vault)?">
+    [Account Secrets](/core-concepts/project-editor/app-setup/secrets) are available across all your projects—useful for keys you reuse. Add them from your account settings, and they'll be available in every project you own. If the same key exists in both Account Secrets and a project's Secrets pane, the project-level value takes priority.
+  </Accordion>
+
+  <Accordion title="How do I recover from a Git merge conflict or corrupted Git state?">
+    Open a Shell and run `git status` to see the conflicts.
+
+    <Warning>The next two commands discard uncommitted changes and can't be undone. Save anything you want to keep first—for example, copy edited files out of the project.</Warning>
+
+    To discard local changes and return to your last clean state, run `git checkout -- .`; to reset to the last commit, run `git reset --hard HEAD`.
+
+    If your `.git` folder is corrupted and Git commands fail, open a new Agent chat and paste the error—Agent can often repair the repository. See [Disaster recovery](/features/version-control/disaster-recovery).
+  </Accordion>
+
+  <Accordion title="How do I roll back my project to an earlier checkpoint?">
+    Replit saves [checkpoints](/features/version-control/checkpoints-and-rollbacks) as Agent works. In the Agent panel, find the message before the change you want to undo and select the rollback option next to it, then confirm.
+
+    <Note>
+      Replit no longer supports rolling a published app back to a previous version. To revert a published app, roll your project back to an earlier checkpoint (as described above), then publish again to redeploy that state. To recover a single file, open it, select its name, and use **Show history** to restore a previous version. See [File history](/features/version-control/file-history).
+    </Note>
+  </Accordion>
+
+  <Accordion title="How do I move a project to a different Replit account?">
+    Projects can't be transferred directly, but you can copy one. The easiest way is to share the project with the destination account and fork it there. Alternatively, download the project as a zip and re-upload it into a new Repl on the other account.
+
+    After copying, set up secrets, the database, and deployment configuration in the new project—those aren't included in the copy. For step-by-step instructions, including how to move your database data, see [Manually copy a project to another workspace](/teams/identity-and-access-management/manually-copy-projects).
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If your project question isn't answered here, [contact Replit Support](https://replit.com/support).

@@ -1,0 +1,237 @@
+---
+title: "Troubleshoot publishing"
+description: "Diagnose common issues when a Replit app works in Preview, fails to publish, or behaves differently at its public URL."
+icon: "triangle-exclamation"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Publishing turns your project into a public app. If publishing fails, or the public URL behaves differently from Preview, work through the problem in order.
+
+This page is both a Build recovery guide and a deployment troubleshooting reference. Start with the simplest question: does the app work in Preview?
+
+## What you'll achieve
+
+By the end of this page, you should know whether the issue is in your app, publishing setup, production Secrets, deployment type, port configuration, or network/DNS access.
+
+## Start with Preview
+
+Before publishing, verify that the app runs correctly in the Project Editor.
+
+Select **Run** at the top of the Project Editor and open Preview. If Preview does not display your app with a `replit.dev` URL, fix the app before publishing.
+
+Ask Agent to diagnose Preview first:
+
+<AiPrompt>
+  This app does not work in Preview.<br />
+  Check the run command, dependency installation, app errors, ports, and missing Secrets.<br />
+  Fix the smallest issue first and tell me how to verify Preview works before publishing.
+</AiPrompt>
+
+If Preview is broken, publishing will not fix it.
+
+## If Preview works but publishing fails
+
+When Preview works but publishing fails, check publishing-specific setup.
+
+### Check logs
+
+Open the **Logs** tab in the **Publishing** pane. Look for stack traces, missing packages, failed commands, missing environment variables, or startup errors.
+
+Paste the relevant error into Agent:
+
+<AiPrompt>
+  Publishing failed with this log output: \[paste error].<br />
+  Explain the likely cause.<br />
+  Tell me whether this is a command, dependency, Secret, port, build, or app error.<br />
+  Recommend the smallest fix and how I should verify it.
+</AiPrompt>
+
+### Check run and build commands
+
+Common mistakes include typos, incorrect flags, wrong entry files, or commands that only work locally.
+
+Review commands in the **Publishing** pane. If your app needs a build command and a start command, confirm both are correct.
+
+### Check production Secrets
+
+Secrets you set in the Project Editor do not automatically carry over to your published app. Add all production Secrets and environment variables in the **Publishing** pane.
+
+Missing Secrets can cause errors about undefined values, failed API calls, database connection failures, login errors, or payment failures.
+
+See [Secrets](/core-concepts/project-editor/app-setup/secrets).
+
+### Check long-running process behavior
+
+Published apps expect your program to keep running. If your program runs once and exits, the platform restarts it automatically.
+
+Make sure your application starts a long-running process such as a web server.
+
+### Check host and port configuration
+
+If you are running a web server, Deployments can automatically detect which port your server uses, but the server must listen on `0.0.0.0`. Listening only on `localhost` or `127.0.0.1` does not work for published apps.
+
+If you have [ports specified in your `.replit` config](/features/project-setup/configuration), automatic port detection is disabled. You must specify a port with `externalPort` set to `80` for the promotion step to pass. Verify your server listens on the specified `localPort`.
+
+Ask Agent to check this carefully:
+
+<AiPrompt>
+  Check whether this app is configured correctly for publishing.<br />
+  Verify that the server starts a long-running process, listens on 0.0.0.0, uses the expected port, and matches any .replit port configuration.<br />
+  Do not change app behavior beyond the publishing fix.
+</AiPrompt>
+
+### Check health check timing
+
+Before marking your published app as live, Replit sends an HTTP request to your app. If your homepage takes more than five seconds to respond, the health check can time out and publishing can fail at the final step.
+
+If startup is slow, ask Agent to reduce startup work, move expensive work behind a user action, or cache data where appropriate.
+
+## If publishing succeeds but the public URL is broken
+
+If Preview works and publishing succeeds, but the public URL is broken, compare Preview and production behavior.
+
+Check:
+
+* Production Secrets and environment variables.
+* Database connection settings.
+* Login callback or redirect URLs.
+* Payment webhook or redirect settings.
+* API allowlists or CORS settings.
+* Files that were written locally instead of stored in a database or storage service.
+* Mobile layout and browser differences.
+
+Ask Agent to compare environments:
+
+<AiPrompt>
+  The app works in Preview but not at the published URL.<br />
+  Help me compare Preview and production behavior.<br />
+  Check Secrets, database settings, API calls, login redirects, payment redirects, build output, and logs.<br />
+  Give me the safest next check.
+</AiPrompt>
+
+## Static deployment issues
+
+Static Deployments serve static files such as HTML, CSS, and JavaScript.
+
+If your app includes server-side behavior, API routes, authentication callbacks, database calls from the server, or long-running backend logic, it may not be a good candidate for Static Deployments. Change the deployment type to Autoscale in the **Publishing** pane instead.
+
+Static deployment issues often come from an incorrect public directory or choosing Static for an app that needs a server.
+
+## File and size limits
+
+Reserved VM and Autoscale Deployments support Replit Apps up to 8 GB. Static Deployments support up to 1 GB.
+
+To reduce app size, delete unnecessary files, avoid committing generated output, or use external storage for large assets.
+
+<Warning>
+  The file system in published apps is not persistent and resets every time you publish. For data persistence, use a database such as [SQL Database](/features/data-and-storage/sql-database).
+</Warning>
+
+If uploaded files or generated data disappear after publishing, store them in a database or storage service instead of the app filesystem.
+
+## Access issues with `replit.app` and `replit.dev` URLs
+
+If you have trouble accessing your app at its `replit.app` or `replit.dev` domain, web filters or network restrictions may be the cause.
+
+Try using public DNS resolvers like Google DNS (`8.8.8.8`) or Cloudflare DNS (`1.1.1.1`).
+
+### Change DNS settings
+
+<Tabs>
+  <Tab title="Windows">
+    1. Open the **Control Panel**.
+    2. Go to **Network and Sharing Center**.
+    3. Select **Change adapter settings** on the left.
+    4. Right-click your active network connection and select **Properties**.
+    5. Select **Internet Protocol Version 4 (TCP/IPv4)** and select **Properties**.
+    6. Choose **Use the following DNS server addresses**.
+    7. Enter a public DNS server IP address, such as `8.8.8.8` for Google DNS or `1.1.1.1` for Cloudflare DNS.
+    8. Select **OK** to save your changes.
+
+    For more detailed instructions, refer to the [Microsoft DNS configuration guide](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace).
+  </Tab>
+
+  <Tab title="macOS">
+    1. Open **System Preferences**.
+    2. Select **Network**.
+    3. Select your active network connection on the left.
+    4. Select **Advanced** in the lower-right corner.
+    5. Go to the **DNS** tab.
+    6. Select the **+** button to add a DNS server.
+    7. Enter a public DNS server IP address, such as `8.8.8.8` for Google DNS or `1.1.1.1` for Cloudflare DNS.
+    8. Select **OK** and then **Apply**.
+
+    For more detailed instructions, refer to the [Apple DNS configuration guide](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac).
+  </Tab>
+
+  <Tab title="Linux">
+    1. Edit the `/etc/resolv.conf` file to add public DNS servers. The exact method varies by distribution.
+    2. Add the following lines:
+
+    ```bash theme={null}
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+
+    For more information on configuring DNS across different distributions, refer to the [Debian Wiki network configuration guide](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers).
+  </Tab>
+</Tabs>
+
+### Clear DNS cache
+
+After changing DNS settings, clear the DNS cache to apply the new configuration:
+
+* **Windows**: Run `ipconfig /flushdns` in Command Prompt.
+* **macOS and Linux**: Run `sudo systemctl restart NetworkManager` in Terminal. The exact command may vary by distribution.
+
+<Note>
+  To enhance regional performance and stability, `replit.dev` URLs for your
+  Replit Apps may occasionally change during cluster migrations. Once migration
+  is complete, URLs remain stable for approximately one year unless you
+  explicitly request a location change.
+</Note>
+
+## Publish a Streamlit application
+
+Streamlit applications work with Replit Deployments. The easiest way to get started is with the [Streamlit template](https://replit.com/@replit/Streamlit?v=1).
+
+Alternatively, set the run command for publishing to:
+
+```bash theme={null}
+streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
+```
+
+If your application uses a different entry file, replace `main.py` with your filename.
+
+## You're done when
+
+* Preview works.
+* Publishing completes.
+* The public URL loads.
+* The main app flow works at the public URL.
+* Production Secrets and settings are configured.
+* Logs do not show hidden startup errors.
+
+## Related
+
+* [Replit Deployments](/learn/projects-and-artifacts/replit-deployments)
+* [Add a custom domain](/build/add-custom-domain)
+* [Custom domains](/features/publishing/custom-domains)
+* [Secrets](/core-concepts/project-editor/app-setup/secrets)
+* [SQL Database](/features/data-and-storage/sql-database)
+
+If you need additional help after trying these steps, visit the [Replit Community Hub](https://replit.com/community) for more resources.

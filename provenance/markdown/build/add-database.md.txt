@@ -1,0 +1,106 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Add a database
+
+> Make Velocity's cars, availability, and reservations stick around after refresh, restart, and publish.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+By the end, every Velocity car, availability slot, and reservation will still be there tomorrow.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-database/persisted-bookings.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=6ccc5fa405db4922759cb7f8fc0d3bbe" alt="Velocity after refresh showing the signed-in customer's My bookings list with two saved reservations and the fleet page with cars in the same order, both unchanged from before the refresh" width="1280" height="720" data-path="images/velocity/add-database/persisted-bookings.png" />
+</Frame>
+
+You added sign-in to Velocity in [Add login](/build/add-login). But the cars in the fleet and the reservations customers make still disappear when the page refreshes — they only live in the browser. Add a database so everything persists.
+
+## Tell Agent to save the data
+
+For Velocity, use Neon — Replit's managed Postgres database. Neon handles concurrent bookings cleanly, scales with real customer traffic, and Agent provisions it automatically with separate Development and Production environments. There's no Neon dashboard signup and no keys to paste.
+
+<AiPrompt>
+  Save Velocity's data to a database so cars, availability, and reservations don't disappear on refresh.<br />
+  Use Neon (Postgres).<br />
+  Save: each car (make, model, year, daily rate, photo, location), each car's availability calendar, and each reservation (pickup date, return date, car, customer).<br />
+  Attach every reservation to the signed-in customer so each person only sees their own.<br />
+  Prevent the same car from being booked on overlapping dates.<br />
+  Tell me what to test after the change.
+</AiPrompt>
+
+Agent will provision a Neon database, move the fleet and reservations from in-memory data into it, and add the overlap check so the same Lamborghini can't get double-booked.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-database/agent-db-connected.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=11a1d228d22617852eb346b3585ddad5" alt="Agent chat after the Neon migration showing the verification checklist — overlap-prevention, signed-out blocking, user-scoped bookings, invalid date rejection, bad-car rejection — and a Checkpoint made just now indicator, alongside the Velocity preview rendering with the persisted fleet" width="1280" height="720" data-path="images/velocity/add-database/agent-db-connected.png" />
+</Frame>
+
+## Test that everything sticks
+
+1. Sign in to Velocity in Preview and reserve a car for next Saturday.
+2. Refresh the page. The reservation should still be there in "My bookings."
+3. Restart the app from the Agent chat. The fleet and the reservation should both still be there.
+4. Try to reserve the same car on the same Saturday with a second account. Velocity should say the car isn't available and offer a different date or car.
+5. Sign out and sign back in. Your reservation should still be there.
+
+If a reservation disappears at any step, paste the exact symptom back to Agent:
+
+<AiPrompt>
+  I reserved a car in Velocity, but the reservation disappears after refresh.<br />
+  Check whether the reservation is being saved to the database or only stored in the page.<br />
+  Fix the smallest issue and tell me how to verify it.
+</AiPrompt>
+
+You can also ask Agent for a simple admin view to see what's in the database:
+
+<AiPrompt>
+  Show me a simple admin page in Velocity that lists every car and every reservation in the database, grouped by car.<br />
+  Only show it to me as the project owner.
+</AiPrompt>
+
+## Publish and confirm on the public URL
+
+Agent's Neon setup gives Velocity separate Development and Production environments out of the box. Publish Velocity again from the Agent chat or the Publishing tile, then open the public URL in a new tab. Replit wires the Production Neon credentials into the published deployment automatically — make a reservation on the public URL, refresh, and confirm it's still there.
+
+Velocity now remembers every car, every available date, and every reservation. The next refresh won't lose a single booking.
+
+## Improve it next
+
+<CardGroup cols={2}>
+  <Card title="Add payments" icon="credit-card" href="/build/add-payments">
+    Take a refundable deposit when a customer reserves a car.
+  </Card>
+
+  <Card title="Add integrations" icon="plug" href="/build/add-integrations">
+    Send each booking to the customer's calendar.
+  </Card>
+
+  <Card title="Create a dashboard from data" icon="chart-simple" href="/build/dashboard">
+    Turn the saved reservations into utilization charts.
+  </Card>
+</CardGroup>
+
+## Need further help?
+
+* **Reservations save in Preview but not on the public URL:** ask Agent to confirm the Production Neon credentials are wired into the published deployment.
+* **Data is hard to inspect:** ask Agent to add a simple admin view that lists everything in the database.
+* **You want to seed the fleet:** ask Agent to add a one-time script that loads your real cars into the database.
+* **You want a zero-setup database for a quick prototype:** use [Replit Database](/features/data-and-storage/sql-database) instead — it's built into every Repl with no separate provisioning.
+
+## Related
+
+* [Production databases](/features/data-and-storage/development-and-production)
+* [Replit Database](/features/data-and-storage/sql-database)

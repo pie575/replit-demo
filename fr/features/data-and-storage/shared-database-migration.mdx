@@ -1,0 +1,208 @@
+---
+title: "Corriger une application publiée utilisant une base de données partagée"
+description: "Instructions étape par étape pour mettre à jour une application publiée qui utilise encore une base de données créée à l'origine pour une autre application."
+---
+
+Certaines applications publiées plus anciennes peuvent encore être connectées à une base de données de développement qui a été créée à l'origine pour une application différente.
+
+Cela peut arriver avec des applications plus anciennes qui ont été forkées ou remixées sur Replit. Avec l'ancienne configuration Neon, un fork pouvait continuer à utiliser la connexion à la base de données de l'application d'origine. Dans le cadre du passage de Replit à l'isolation complète des bases de données de développement et de production, les anciennes bases de données de développement partagées sont supprimées et les applications publiées doivent migrer vers leurs propres bases de données de production.
+
+Utilisez ce guide si votre application publiée affiche des erreurs de connexion à la base de données, ou si `DATABASE_URL` dans le panneau Secrets pointe toujours vers `neon.tech`.
+
+<Warning>
+  L'ancienne base de données partagée sera arrêtée le **8 juin 2026**. Mettez à jour votre
+  application publiée avant cette date pour éviter les temps d'arrêt ou la perte définitive de données.
+</Warning>
+
+## Avant de commencer
+
+Votre application publiée a besoin de sa propre **base de données de production**. La base de données de développement affichée dans le panneau **Database** ne doit pas être utilisée directement par les applications publiées.
+
+<Frame>
+  <img src="/assets/mirror/dev-database-5c024a6c134e.png" alt="Panneau Database affichant la base de données de développement" width="955" height="767" data-path="images/databases/shared-database-migration/dev-database.png" />
+</Frame>
+
+Pour résoudre ce problème, commencez par déterminer dans quelle situation vous vous trouvez :
+
+* **Cas 1 :** Les données souhaitées sont déjà présentes dans la base de données affichée dans le panneau **Database** de votre application.
+* **Cas 2 :** Le panneau **Database** n'affiche pas les données dont vous avez besoin, car votre application publiée utilise encore l'ancienne base de données de développement partagée.
+
+## Comment savoir si votre application publiée utilise une base de données partagée ?
+
+Votre application publiée est concernée si l'une des conditions suivantes est vraie :
+
+* Votre application publiée affiche des erreurs de connexion à la base de données après la mise à niveau de la base de données
+* Votre application a été remixée depuis une autre application qui avait une base de données **avant le 9 janvier 2026**
+
+## Comment vérifier si votre application publiée utilise la base de données partagée de l'application source ?
+
+### Étape 1 : Ouvrez le panneau Database dans l'application source
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-showing-secrets-763dd4c4845f.png" alt="Panneau Secrets affichant DATABASE_URL" width="792" height="418" data-path="images/databases/shared-database-migration/secret-pane-showing-secrets.png" />
+</Frame>
+
+Obtenez la valeur depuis `NEON_DATABASE_URL` ou depuis `DATABASE_URL` si `NEON_DATABASE_URL` n'existe pas.
+
+<Info>
+  Toutes les applications concernées n'auront pas forcément `NEON_DATABASE_URL`. Si elle est absente, cela
+  signifie généralement que vous devez utiliser le `DATABASE_URL` actuel depuis les Secrets de
+  l'application publiée s'il pointe toujours vers `neon.tech`.
+</Info>
+
+### Étape 2 : Ouvrez le panneau Publish dans l'application publiée
+
+<Frame>
+  <img src="/assets/mirror/production-app-secrets-e4da45c53e36.png" alt="Secrets de l'application publiée affichant DATABASE_URL" width="1385" height="1225" data-path="images/databases/shared-database-migration/production-app-secrets.png" />
+</Frame>
+
+Pour vérifier l'URL de la base de données de votre application publiée :
+
+1. Ouvrez votre application dans Replit
+2. Ouvrez le panneau **Publishing**
+3. Ouvrez **Adjust Settings**
+4. Ouvrez **Secrets**
+5. Recherchez `DATABASE_URL`
+
+### Étape 3 : Comparez l'URL de la base de données de l'application source à l'étape 1 et de l'application remixée à l'étape 2
+
+Si elles sont identiques, votre application publiée utilise une base de données de développement Neon partagée depuis l'application source.
+
+## Comment copier les données de l'application source vers l'application publiée ?
+
+Après avoir confirmé que votre application publiée utilise la base de données de développement partagée de l'application source, l'étape suivante consiste à transférer les données nécessaires vers l'application publiée. Deux scénarios sont à considérer :
+
+* Cas 1 : Le panneau Database de l'application publiée contient déjà les données requises.
+* Cas 2 : Le panneau Database de l'application publiée ne contient pas les données requises.
+
+### Cas 1 : Le panneau Database affiche déjà les données dont vous avez besoin
+
+C'est le chemin le plus simple si les données dont vous avez besoin sont déjà visibles dans le panneau **Database** de votre application.
+
+#### Étape 1 : Confirmez que les données sont présentes
+
+<Frame>
+  <img src="/assets/mirror/my-data-12834f2ebfd6.png" alt="Base de données affichant les lignes de données" width="865" height="454" data-path="images/databases/shared-database-migration/my-data.png" />
+</Frame>
+
+Ouvrez le panneau **Database** dans l'application publiée et assurez-vous que les tables et les données dont vous avez besoin sont bien présentes.
+
+Si vous ne voyez pas les données dont vous avez besoin dans le panneau Database, faites une pause ici. Vous devrez suivre les étapes du [Cas 2](#cas-2--le-panneau-database-naffiche-pas-les-données-dont-vous-avez-besoin) pour migrer vos données correctement.
+
+#### Étape 2 : Publiez ou republiez avec une base de données de production
+
+1. Ouvrez votre application dans l'éditeur de projet
+2. Sélectionnez **Publish** ou **Republish**
+3. Activez **Create production database**
+4. Activez **Set up your production database with your current development data**
+5. Finalisez le flux de publication
+
+La publication crée une nouvelle version de votre application publiée et définit automatiquement son `DATABASE_URL` sur la nouvelle base de données de production. Vous n'avez pas besoin de mettre à jour ce secret manuellement pendant ce flux.
+
+<Frame>
+  <img src="/assets/mirror/production-database-settings-8855bf453da9.png" alt="Paramètres de publication affichant les options Create production database" width="1406" height="1207" data-path="images/databases/shared-database-migration/production-database-settings.png" />
+</Frame>
+
+<Warning>
+  La copie vers la production écrase toutes les données de production existantes. Consultez la documentation [Bases de données de production](/fr/features/data-and-storage/development-and-production) pour plus de détails sur la restauration ou la gestion de votre base de données de production.
+</Warning>
+
+#### Étape 3 : Vérifiez l'application publiée
+
+Ouvrez votre application publiée et confirmez que vos données sont accessibles et que l'application fonctionne correctement.
+
+### Cas 2 : Le panneau Database de l'application publiée n'affiche pas les données dont vous avez besoin
+
+Suivez ces étapes pour exporter les données si vous ne voyez pas les données nécessaires dans le panneau **Database** de votre application publiée.
+
+Si votre application publiée est encore connectée à une base de données d'une autre application, vous verrez un avertissement « external database detected » dans le panneau Database.
+
+<Frame>
+  <img src="/assets/mirror/external-database-detected-489d99632e74.png" alt="Panneau Database affichant external database detected" width="1403" height="1208" data-path="images/databases/shared-database-migration/external-database-detected.png" />
+</Frame>
+
+<Warning>
+  Si des utilisateurs utilisent encore votre application et enregistrent de nouvelles données, planifiez une courte
+  fenêtre de maintenance avant d'exporter les données.
+</Warning>
+
+#### Étape 1 : Exportez les données depuis l'ancienne base de données
+
+<Frame>
+  <img src="/assets/mirror/pg-dump-example-54c6c790ccb1.png" alt="Exemple de pg_dump" width="1252" height="450" data-path="images/databases/shared-database-migration/pg-dump-example.png" />
+</Frame>
+
+Ouvrez le **Shell** dans l'éditeur de projet et exécutez :
+
+```bash theme={null}
+pg_dump -Fc "database_url" --no-owner --no-privileges -f backup.dump
+```
+
+`database_url` est l'URL de la base de données obtenue à [l'Étape 1 : Ouvrez le panneau Database dans l'application source](#étape-1--ouvrez-le-panneau-database-dans-lapplication-source).
+
+### Étape 2 : Supprimez l'ancien `DATABASE_URL` des Secrets de votre application
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-eb253120f8a6.png" alt="Exemple de panneau des secrets" width="1410" height="1184" data-path="images/databases/shared-database-migration/secret-pane.png" />
+</Frame>
+
+1. Ouvrez l'outil **Secrets** dans l'éditeur de projet
+2. Trouvez l'ancien `DATABASE_URL`
+3. Supprimez-le
+4. Actualisez la page ou rouvrez le panneau **Database**
+
+Après cela, votre application devrait cesser de pointer vers l'ancienne base de données partagée et utiliser à nouveau sa base de données de développement actuelle.
+
+### Étape 3 : Importez les données dans la base de données de développement actuelle de votre application
+
+<Frame>
+  <img src="/assets/mirror/pg-restore-example-409ae4d7bf09.png" alt="Exemple de pg_restore" width="802" height="426" data-path="images/databases/shared-database-migration/pg-restore-example.png" />
+</Frame>
+
+Une fois le secret `DATABASE_URL` ancien supprimé, la base de données de développement actuelle de votre application devrait être à nouveau disponible en tant que `$DATABASE_URL` dans l'éditeur de projet.
+
+Retournez au **Shell** dans l'éditeur de projet et exécutez :
+
+```bash theme={null}
+pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+```
+
+Cela charge les données exportées dans la base de données de développement actuelle de votre application.
+
+### Étape 5 : Suivez le Cas 1 pour publier ou republier avec une base de données de production
+
+Une fois que le panneau **Database** affiche les données correctes, suivez le [Cas 1](#cas-1--le-panneau-database-affiche-déjà-les-données-dont-vous-avez-besoin) pour publier ou republier avec **Create production database** et copier ces données en production.
+
+### Étape 6 : Vérifiez l'application publiée
+
+<Frame>
+  <img src="/assets/mirror/successful-export-bfb997304cc1.png" alt="Export réussi" width="965" height="554" data-path="images/databases/shared-database-migration/successful-export.png" />
+</Frame>
+
+Ouvrez votre application publiée et confirmez que vos données sont accessibles et que l'application fonctionne correctement.
+
+## Résolution des problèmes
+
+### L'import échoue parce que les tables existent déjà
+
+La commande `pg_restore --clean --if-exists` ci-dessus supprime et recrée les objets correspondants du dump avant de les restaurer.
+
+### L'import échoue avec des erreurs de rôle ou de politique
+
+Si votre base de données utilise des rôles PostgreSQL personnalisés ou des politiques basées sur des rôles, l'import peut échouer parce que ces rôles n'existent pas encore dans la nouvelle base de données.
+
+La migration automatique Helium de Replit tente de recréer des stubs de rôles avant la restauration, mais le processus manuel ci-dessus ne le fait pas. Si vous rencontrez des erreurs liées aux rôles lors de `pg_restore`, [contactez le support](https://replit.com/support) pour obtenir de l'aide.
+
+### J'ai déjà corrigé l'application
+
+Si votre application publiée a déjà sa propre base de données de production et fonctionne correctement, vous n'avez rien d'autre à faire.
+
+## Besoin d'aide supplémentaire ?
+
+Si vous n'êtes pas sûr du cas qui s'applique à votre application, ou si vous rencontrez des problèmes pendant la migration, [contactez le support](https://replit.com/support).
+
+## Documentation connexe
+
+* [Mise à niveau de la base de données](/fr/features/data-and-storage/development-and-production#database-infrastructure-upgrade)
+* [Bases de données de production](/fr/features/data-and-storage/development-and-production)
+* [Base de données](/fr/features/data-and-storage/sql-database)

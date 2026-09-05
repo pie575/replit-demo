@@ -1,0 +1,391 @@
+---
+title: "App Storage JavaScript SDK"
+description: "公式JavaScript SDKを使用してReplit App Storageのファイルを管理する方法を学ぶ。"
+---
+
+このリファレンスガイドでは、`object-storage` ライブラリの `Client` クラスについて説明し、そのメソッドのコード例を提供します。
+
+## Client
+
+`Client` クラスはReplit App Storageとのやり取りを管理します。このクラスはバケット内のファイルを操作するメソッドを備えています。
+
+ライブラリからクラスをインポートするには、JavaScriptコードに次の行を追加します：
+
+```javascript theme={null}
+import { Client } from "@replit/object-storage";
+```
+
+次のコードを使用して、Replit Object Storageとやり取りする `Client` インスタンスを作成します：
+
+```javascript theme={null}
+const client = new Client();
+```
+
+## コンストラクタ
+
+**constructor**
+
+* **new Client**(`options?`): `Client`
+
+Replit App Storageとやり取りするための新しいClientインスタンスを作成します。
+
+**パラメータ**
+
+| 名前         | 型               | 説明                         |
+| :--------- | :-------------- | :------------------------- |
+| `options?` | `ClientOptions` | クライアントのセットアップに使用する設定オプション。 |
+
+**戻り値**
+
+`Client`
+
+## メソッド
+
+### copy
+
+* **copy**(`objectName`, `destObjectName`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+同じバケット内でオブジェクトをコピーします。
+このメソッドはコピー先パスに既存のオブジェクトがある場合に上書きします。
+
+**パラメータ**
+
+| 名前               | 型        | 説明                |
+| :--------------- | :------- | :---------------- |
+| `objectName`     | `string` | コピーするオブジェクトのフルパス。 |
+| `destObjectName` | `string` | オブジェクトのコピー先フルパス。  |
+
+**戻り値**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+***
+
+### delete
+
+* **delete**(`objectName`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+バケットからオブジェクトを削除します。
+
+**パラメータ**
+
+| 名前           | 型               | 説明               |
+| :----------- | :-------------- | :--------------- |
+| `objectName` | `string`        | 削除するオブジェクトのフルパス。 |
+| `options?`   | `DeleteOptions` | 削除操作の設定。         |
+
+**戻り値**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+***
+
+### downloadAsBytes
+
+* **downloadAsBytes**(`objectName`, `options?`): `Promise`\<`Result`\<`Buffer`, `RequestError`>>
+
+オブジェクトをダウンロードし、生の内容をバッファとして返します。
+
+**パラメータ**
+
+| 名前           | 型                 | 説明                   |
+| :----------- | :---------------- | :------------------- |
+| `objectName` | `string`          | ダウンロードするオブジェクトのフルパス。 |
+| `options?`   | `DownloadOptions` | ダウンロード操作の設定。         |
+
+**戻り値**
+
+`Promise`\<`Result`\<`Buffer`, `RequestError`>>
+
+***
+
+### downloadAsStream
+
+* **downloadAsStream**(`objectName`, `options?`): `Readable`
+
+オブジェクトの内容の読み取りストリームを作成します。
+ストリームはダウンロード中に発生したエラーをemitします。
+
+**パラメータ**
+
+| 名前           | 型                 | 説明                   |
+| :----------- | :---------------- | :------------------- |
+| `objectName` | `string`          | ダウンロードするオブジェクトのフルパス。 |
+| `options?`   | `DownloadOptions` | ダウンロード操作の設定。         |
+
+**戻り値**
+
+`Readable`
+
+### downloadAsText
+
+* **downloadAsText**(`objectName`, `options?`): `Promise`\<`Result`\<`string`, `RequestError`>>
+
+オブジェクトをダウンロードし、その内容を文字列として返します。
+
+**パラメータ**
+
+| 名前           | 型                 | 説明                   |
+| :----------- | :---------------- | :------------------- |
+| `objectName` | `string`          | ダウンロードするオブジェクトのフルパス。 |
+| `options?`   | `DownloadOptions` | ダウンロード操作の設定。         |
+
+**戻り値**
+
+`Promise`\<`Result`\<`string`, `RequestError`>>
+
+### downloadToFilename
+
+* **downloadToFilename**(`objectName`, `destFilename`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+オブジェクトをダウンロードし、ローカルファイルシステムの指定した場所に保存します。
+
+**パラメータ**
+
+| 名前             | 型                 | 説明                                   |
+| :------------- | :---------------- | :----------------------------------- |
+| `objectName`   | `string`          | ダウンロードするオブジェクトのフルパス。                 |
+| `destFilename` | `string`          | ダウンロードしたオブジェクトを書き込むローカルファイルシステム上のパス。 |
+| `options?`     | `DownloadOptions` | ダウンロード操作の設定。                         |
+
+**戻り値**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### exists
+
+* **exists**(`objectName`): `Promise`\<`Result`\<`boolean`, `RequestError`>>
+
+バケット内にオブジェクトが存在するか確認します。
+
+**パラメータ**
+
+| 名前           | 型        | 説明               |
+| :----------- | :------- | :--------------- |
+| `objectName` | `string` | 確認するオブジェクトのフルパス。 |
+
+**戻り値**
+
+`Promise`\<`Result`\<`boolean`, `RequestError`>>
+
+### getBucket
+
+* **getBucket**(): `Promise`\<`Bucket`>
+
+**戻り値**
+
+`Promise`\<`Bucket`>
+
+### init
+
+* **init**(`bucketId?`): `Promise`\<`Bucket`>
+
+**パラメータ**
+
+| 名前          | 型        |
+| :---------- | :------- |
+| `bucketId?` | `string` |
+
+**戻り値**
+
+`Promise`\<`Bucket`>
+
+### list
+
+* **list**(`options?`): `Promise`\<`Result`\<`StorageObject`\[], `RequestError`>>
+
+バケット内のすべてのオブジェクトのリストを返します。
+
+**パラメータ**
+
+| 名前         | 型             | 説明        |
+| :--------- | :------------ | :-------- |
+| `options?` | `ListOptions` | リスト操作の設定。 |
+
+**戻り値**
+
+`Promise`\<`Result`\<`StorageObject`\[], `RequestError`>>
+
+### mapUploadOptions
+
+* **mapUploadOptions**(`options?`): `undefined` | `UploadOptions`
+
+**パラメータ**
+
+| 名前         | 型               |
+| :--------- | :-------------- |
+| `options?` | `UploadOptions` |
+
+**戻り値**
+
+`undefined` | `UploadOptions`
+
+### uploadFromBytes
+
+* **uploadFromBytes**(`objectName`, `contents`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+インメモリのバイト表現を使用してオブジェクトをアップロードします。
+このメソッドは同じ名前の既存のオブジェクトを上書きします。
+
+**パラメータ**
+
+| 名前           | 型               | 説明                  |
+| :----------- | :-------------- | :------------------ |
+| `objectName` | `string`        | オブジェクトのアップロード先フルパス。 |
+| `contents`   | `Buffer`        | バイト形式のオブジェクトの生の内容。  |
+| `options?`   | `UploadOptions` | アップロード操作の設定。        |
+
+**戻り値**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### uploadFromFilename
+
+* **uploadFromFilename**(`objectName`, `srcFilename`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+ローカルファイルシステムからバケットにファイルをアップロードします。
+このメソッドは同じ名前の既存のオブジェクトを上書きします。
+
+**パラメータ**
+
+| 名前            | 型               | 説明                            |
+| :------------ | :-------------- | :---------------------------- |
+| `objectName`  | `string`        | オブジェクトのアップロード先フルパス。           |
+| `srcFilename` | `string`        | アップロードするローカルファイルシステム上のファイルパス。 |
+| `options?`    | `UploadOptions` | アップロード操作の設定。                  |
+
+**戻り値**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### uploadFromStream
+
+* **uploadFromStream**(`objectName`, `stream`, `options?`): `Promise`\<`void`>
+
+提供されたストリームから内容を読み取ってオブジェクトをアップロードします。
+ストリームはアップロード中に発生したエラーをemitします。このメソッドは同じ名前の既存のオブジェクトを上書きします。
+
+**パラメータ**
+
+| 名前           | 型               | 説明                       |
+| :----------- | :-------------- | :----------------------- |
+| `objectName` | `string`        | オブジェクトのアップロード先フルパス。      |
+| `stream`     | `Readable`      | オブジェクトの内容を読み取る読み取りストリーム。 |
+| `options?`   | `UploadOptions` | アップロード操作の設定。             |
+
+**戻り値**
+
+`Promise`\<`void`>
+
+### uploadFromText
+
+* **uploadFromText**(`objectName`, `contents`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+インメモリのテキスト表現を使用してオブジェクトをアップロードします。
+このメソッドは同じ名前の既存のオブジェクトを上書きします。
+
+**パラメータ**
+
+| 名前           | 型               | 説明                  |
+| :----------- | :-------------- | :------------------ |
+| `objectName` | `string`        | オブジェクトのアップロード先フルパス。 |
+| `contents`   | `string`        | テキスト形式のオブジェクトの内容。   |
+| `options?`   | `UploadOptions` | アップロード操作の設定。        |
+
+**戻り値**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+## メソッドの例
+
+以下のセクションでは、Replit Object Storage SDKを使用してファイルを管理するコード例を提供します。
+
+### オブジェクトをテキストとして取得する
+
+```javascript theme={null}
+const { ok, value: textValue, error } = await client.downloadAsText('file.json');
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### オブジェクトを生バイト表現として取得する
+
+```javascript theme={null}
+const { ok, value: bytesValue, error } = await client.downloadAsBytes('file.png');
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### ストリームからオブジェクトを取得する
+
+```javascript theme={null}
+const { ok, value: stream, error } = await client.downloadAsStream('file.json');
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### オブジェクトをファイルシステムにダウンロードする
+
+```javascript theme={null}
+const { ok, error } = await client.downloadToFilename('file.json', destFilename);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### バケット内のオブジェクトを一覧表示する
+
+```javascript theme={null}
+const { ok, value, error } = await client.list();
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### テキストからオブジェクトをアップロードする
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromText('file.json', data);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### バイトとしてオブジェクトをアップロードする
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromBytes('file.png', data);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### ファイルシステムからオブジェクトをアップロードする
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromFilename('file.json', srcFilename);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### ストリームからオブジェクトをアップロードする
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromStream('file.json', stream);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### バケットからオブジェクトを削除する
+
+```javascript theme={null}
+const { ok, error } = await client.delete('file.json');
+if (!ok) {
+    // ... handle error ...
+}
+```

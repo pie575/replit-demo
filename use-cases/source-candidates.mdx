@@ -1,0 +1,157 @@
+---
+title: "Source candidates"
+description: "From a job description, find matching engineers on GitHub, skip anyone already in Ashby, and draft outreach."
+sidebarTitle: "Source candidates"
+icon: "user-check"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ashby already screens inbound applications. This workflow is outbound: read the job
+description in Drive, find engineers who match on GitHub, skip anyone already in Ashby, and
+draft outreach for you to send. Agent logs new people as sourced with a short why-they-fit
+and a draft on the candidate. You review and send. Don't use this as the only hiring
+decision.
+
+## Best for
+
+* Technical recruiters who need a sourced list when inbound volume is too low.
+* Hiring managers who need GitHub-matched engineers without living in search all day.
+
+## Connectors
+
+<Connectors
+  items={[
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "Job description and must-have criteria",
+},
+{
+  id: "github",
+  name: "GitHub",
+  why: "Public repos, contributions, and profiles",
+},
+{
+  id: "ashby",
+  name: "Ashby",
+  why: "Skip existing candidates and log sourced people",
+},
+]}
+/>
+
+## Before you start
+
+Have a job description with must-haves vs nice-to-haves. Connect Drive, GitHub, and Ashby. Say location,
+seniority, and how many names you want. Don't use this as the only hiring decision.
+
+## Prompt the agent
+
+<AiPrompt>
+  Create a routine that runs every Monday at 9:00. From this job description
+  \[Drive link or paste], find 30 engineers on GitHub who match the must-haves.
+  Skip anyone already in Ashby. For each person, write a 3-line why-they-fit and
+  a short outreach draft. Don't send anything. Add new people to Ashby as
+  sourced, with the note and draft on the candidate.
+</AiPrompt>
+
+## What to expect
+
+Agent reads the job description, searches GitHub, skips anyone already in Ashby, and
+returns a shortlist with drafts. You review and send. First pass will be noisy.
+Tighten must-haves after you see it. Open three GitHub profiles from the list, check they
+match the must-haves, and confirm those people are not already in Ashby before you send
+anything.
+
+## Make it work for you
+
+<AiPrompt>
+  Only include people with recent commits in \[language / repo type] and \[n]+
+  years of relevant experience. Drop anyone who looks like a current customer or
+  competitor employee.
+</AiPrompt>
+
+<AiPrompt>
+  Rewrite outreach in my voice from these examples \[paste]. Keep it under 80
+  words. Don't mention that an agent wrote it.
+</AiPrompt>
+
+## Troubleshooting
+
+* **The shortlist is noisy:** tighten must-haves vs nice-to-haves after the first pass. Ask for recent commits in a specific language or repo type, and drop people who look like current customers or competitor employees.
+* **People already in Ashby still appear:** confirm Ashby is connected to the right workspace and that Agent is matching on email or GitHub username, not only display name.
+* **Outreach went out:** this workflow should only draft. If anything sent, stop the routine and tell Agent never to email or message candidates.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Generate release notes" href="/use-cases/generate-release-notes">
+    Same GitHub connector for what the team already shipped.
+  </Card>
+
+  <Card title="Build an investor pitch deck" href="/use-cases/pitch-deck-from-website">
+    Same Google Drive connector for hiring managers who also pitch the company.
+  </Card>
+</CardGroup>

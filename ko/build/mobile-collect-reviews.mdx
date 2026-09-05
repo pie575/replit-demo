@@ -1,0 +1,68 @@
+---
+title: "리뷰와 평점 수집하기"
+description: "각 스토어의 네이티브 리뷰 프롬프트를 사용해 만족한 플레이어에게 PixelGames 평가를 요청해보세요."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const reviewPrompt = "Ask players to rate PixelGames using the native review prompt right after they set a new high score in Blocks.";
+
+평점이 많아지면 앱의 순위가 올라가고 새로운 사용자에게 신뢰를 얻을 수 있습니다. 두 스토어 모두
+이를 위한 네이티브 프롬프트를 제공합니다. 앱 내에서 바로 평점을 요청하는 팝업입니다.
+
+## 적절한 순간에 리뷰 요청하기
+
+승리 후, 최고 점수 달성 시, 레벨 업 시에 리뷰를 요청하세요. 얼마나 자주 요청하는지보다 요청하는
+순간이 더 중요합니다.
+
+<AiPrompt>
+  {reviewPrompt}
+</AiPrompt>
+
+<Frame caption="새로운 최고 점수 달성 후의 PixelGames Game Over 화면, 평점을 요청하기에 이상적인 순간입니다.">
+  <img src="/assets/mirror/rate-app-dd66c937eaf7.webp" alt="새로운 최고 점수를 보여주는 PixelGames Game Over 화면" data-path="images/pixelgames/mobile/rate-app.webp" width="1516" height="852" data-path="images/pixelgames/mobile/rate-app.webp" />
+</Frame>
+
+iOS의 StoreKit과 Android의 Google Play In-App Review API는 모두, 코드가 얼마나 자주 요청하든
+실제로 표시되는 빈도에 제한을 둡니다.
+
+<Note>
+  5개 별점 리뷰를 남긴 후에만 게임을 잠금 해제하는 것처럼, 리뷰를 매수하거나 요구하지 마세요.
+  Apple과 Google 모두 인센티브가 있는 리뷰를 금지하며, 이를 위반하면 PixelGames가 거부되거나
+  삭제될 수 있습니다.
+</Note>
+
+## 문제 해결
+
+* **프롬프트가 전혀 나타나지 않음:** 때때로 발생하는 정상적인 현상입니다. 코드가 API를 몇 번
+  호출하든, 두 플랫폼 모두 시스템이 표시하는 빈도에 제한을 둡니다.
+* **테스트 중에는 매번 프롬프트가 표시됨:** TestFlight나 Internal Testing 빌드에서는 정상입니다.
+  연간 요청 제한은 실제 프로덕션 설치에만 적용됩니다.
+* **플레이어가 너무 자주 요청받는다고 불만을 제기함:** 실행할 때마다 표시되는 커스텀 팝업이 아니라
+  네이티브 API를 호출하고 있는지 확인하세요. 커스텀 팝업은 내장된 요청 제한을 우회합니다.
+
+## 다음 단계
+
+<CardGroup cols={2}>
+  <Card title="결제 추가하기" icon="credit-card" href="/ko/build/mobile-payments">
+    PixelGames의 콘텐츠에 대해 플레이어에게 요금을 부과해보세요.
+  </Card>
+</CardGroup>
+
+## 관련 항목
+
+* [App Store에 제출하기](/build/mobile-publish-ios)
+* [Google Play에 제출하기](/build/mobile-publish-android)

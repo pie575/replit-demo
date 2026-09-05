@@ -1,0 +1,160 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 후보자 소싱하기
+
+> 직무 기술서를 기반으로 GitHub에서 일치하는 엔지니어를 찾고, 이미 Ashby에 있는 사람은 건너뛰고, 아웃리치 초안을 작성합니다.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ashby는 이미 인바운드 지원자를 심사합니다. 이 워크플로는 아웃바운드용입니다:
+Drive의 직무 기술서를 읽고, GitHub에서 일치하는 엔지니어를 찾고, 이미 Ashby에
+있는 사람은 건너뛰고, 여러분이 보낼 아웃리치 초안을 작성합니다. Agent는
+새로운 사람을 짧은 적합성 이유와 후보자에 대한 초안과 함께 소싱됨으로
+기록합니다. 여러분이 검토하고 발송합니다. 이것만으로 채용 결정을 내리지
+마세요.
+
+## 다음과 같은 경우에 적합합니다
+
+* 인바운드 물량이 너무 적을 때 소싱된 목록이 필요한 테크니컬 리크루터.
+* 하루 종일 검색만 하지 않고도 GitHub로 매칭된 엔지니어가 필요한 채용 매니저.
+
+## 커넥터
+
+<Connectors
+  items={[
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "직무 기술서 및 필수 조건",
+},
+{
+  id: "github",
+  name: "GitHub",
+  why: "공개 저장소, 기여 내역, 프로필",
+},
+{
+  id: "ashby",
+  name: "Ashby",
+  why: "기존 후보자 건너뛰기 및 소싱된 사람 기록",
+},
+]}
+/>
+
+## 시작하기 전에
+
+필수 조건과 우대 조건이 구분된 직무 기술서를 준비하세요. Drive, GitHub, Ashby를
+연결하세요. 지역, 시니어리티, 원하는 인원수를 말해주세요. 이것만으로 채용
+결정을 내리지 마세요.
+
+## Agent에게 요청하기
+
+<AiPrompt>
+  매주 월요일 9시에 실행되는 루틴을 만들어 주세요. 이 직무 기술서 \[Drive
+  링크 또는 붙여넣기]를 기반으로, 필수 조건에 맞는 엔지니어 30명을 GitHub에서
+  찾아주세요. 이미 Ashby에 있는 사람은 건너뛰세요. 각 사람에 대해 3줄짜리
+  적합성 이유와 짧은 아웃리치 초안을 작성해 주세요. 아무것도 발송하지
+  마세요. 새로운 사람은 노트와 초안을 후보자에 담아 소싱됨으로 Ashby에
+  추가해 주세요.
+</AiPrompt>
+
+## 예상 결과
+
+Agent가 직무 기술서를 읽고, GitHub를 검색하고, 이미 Ashby에 있는 사람은
+건너뛰고, 초안이 담긴 숏리스트를 반환합니다. 여러분이 검토하고 발송합니다.
+첫 결과는 노이즈가 많을 수 있습니다. 확인 후 필수 조건을 조정하세요.
+목록에서 GitHub 프로필 세 개를 열어 필수 조건과 일치하는지 확인하고, 무엇을
+보내기 전에 그 사람들이 이미 Ashby에 없는지 확인하세요.
+
+## 나에게 맞게 조정하기
+
+<AiPrompt>
+  \[언어/저장소 유형]에 최근 커밋이 있고 관련 경력이 \[n]년 이상인 사람만
+  포함해 주세요. 현재 고객이나 경쟁사 직원처럼 보이는 사람은 제외해 주세요.
+</AiPrompt>
+
+<AiPrompt>
+  이 예시들 \[붙여넣기]을 참고해 제 말투로 아웃리치를 다시 작성해 주세요.
+  80단어 이내로 유지해 주세요. 에이전트가 작성했다는 언급은 하지 마세요.
+</AiPrompt>
+
+## 문제 해결
+
+* **숏리스트에 노이즈가 많음:** 첫 결과를 본 후 필수 조건과 우대 조건을 조정하세요. 특정 언어나 저장소 유형의 최근 커밋을 요청하고, 현재 고객이나 경쟁사 직원처럼 보이는 사람은 제외하세요.
+* **이미 Ashby에 있는 사람이 계속 나타남:** Ashby가 올바른 워크스페이스에 연결되어 있는지, Agent가 표시 이름뿐 아니라 이메일이나 GitHub 사용자명으로 매칭하고 있는지 확인하세요.
+* **아웃리치가 발송됨:** 이 워크플로는 초안만 작성해야 합니다. 무언가 발송되었다면 루틴을 중지하고 후보자에게 이메일이나 메시지를 절대 보내지 말라고 Agent에게 알려주세요.
+
+## 관련 문서
+
+<CardGroup cols={2}>
+  <Card title="릴리스 노트 생성하기" href="/ko/use-cases/generate-release-notes">
+    팀이 이미 출시한 내용을 위해 동일한 GitHub 커넥터를 사용합니다.
+  </Card>
+
+  <Card title="투자자 피치 덱 만들기" href="/ko/use-cases/pitch-deck-from-website">
+    회사를 홍보하기도 하는 채용 매니저를 위해 동일한 Google Drive 커넥터를 사용합니다.
+  </Card>
+</CardGroup>

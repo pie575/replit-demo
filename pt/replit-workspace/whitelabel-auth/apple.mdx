@@ -1,0 +1,112 @@
+---
+title: "Configure Apple OAuth"
+description: "Configure o Sign in with Apple para a autenticação do seu app"
+---
+
+Este guia apresenta o passo a passo para criar o App ID, o Services ID e a Chave Privada da Apple necessários para o Sign in with Apple. Você coletará um **Team ID**, um **Services ID**, um **Key ID** e uma **Private Key** para inserir no **painel Auth**.
+
+<Note>
+  Esta página cobre apenas a configuração do lado do provedor no portal de Desenvolvedores da Apple. Para o fluxo geral do Clerk Auth — incluindo ativar a Apple e inserir as credenciais no **painel Auth** — consulte [Configurando credenciais OAuth para um provedor SSO](/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) na documentação do Clerk Auth.
+</Note>
+
+## Pré-requisitos
+
+* Uma [conta de Desenvolvedor Apple](https://developer.apple.com/account) (requer inscrição no Apple Developer Program)
+* Um [app Replit publicado](/category/replit-deployments) — credenciais OAuth personalizadas estão disponíveis apenas no ambiente de **Produção**
+* O painel de edição do provedor **Apple** aberto em: **painel Auth** → aba **Configure** → seção **SSO providers** → selecione o ambiente **Production** → selecione **Edit** ao lado de **Apple**
+
+## Passo 1: Criar um Apple App ID
+
+1. Acesse o [portal de Desenvolvedores Apple](https://developer.apple.com/account)
+2. Vá para **Certificates, IDs & Profiles** e, em seguida, para **Identifiers**
+3. Selecione **App IDs** no menu suspenso
+4. Selecione o ícone **+** para registrar um novo identificador
+5. Selecione **App IDs** e, em seguida, **Continue**
+6. Escolha **App** e, em seguida, **Continue**
+7. Preencha:
+   * **Description**: Nome para o seu App ID
+   * **Bundle ID**: Seu identificador único
+8. Ative **Sign In with Apple** em Capabilities
+9. Selecione **Continue** e, em seguida, **Register**
+10. **Salve seu App ID Prefix** (mostrado no topo) — este é o seu **Team ID**
+
+## Passo 2: Criar um Apple Services ID
+
+1. Na página de Identifiers, selecione **Services IDs** no menu suspenso
+2. Selecione **+** para registrar um novo identificador
+3. Selecione **Services IDs** e, em seguida, **Continue**
+4. Preencha:
+   * **Description**: Nome para o seu Services ID
+   * **Identifier**: Seu identificador único (salve-o — este é o seu **Services ID**)
+5. Selecione **Continue** e, em seguida, **Register**
+
+### Configurar o Services ID
+
+1. Selecione o Services ID recém-criado
+2. Ative **Sign In with Apple**
+3. Selecione **Configure**
+4. Defina:
+
+   * **Primary App ID**: Selecione seu App ID do Passo 1
+   * **Domains and Subdomains**: Copie o valor mostrado em **Provider setup** no **painel Auth** (sem o prefixo de protocolo `https://`)
+   * **Return URLs**: Copie o valor mostrado em **Provider setup** no **painel Auth**
+
+   Consulte [Configurando credenciais OAuth para um provedor SSO](/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) para saber como encontrar esses valores.
+5. Selecione **Next**, depois **Done**, depois **Continue** e, por fim, **Save**
+
+## Passo 3: Criar uma Apple Private Key
+
+1. Na barra lateral do portal de Desenvolvedores Apple, selecione **Keys**
+2. Selecione **+** para registrar uma nova chave
+3. Insira um **Key Name**
+4. Ative **Sign In with Apple**
+5. Selecione **Configure** e, em seguida, selecione seu App ID do Passo 1
+6. Selecione **Save**, depois **Continue** e, em seguida, **Register**
+7. **Salve o Key ID**
+8. **Baixe** o arquivo de chave privada (.p8)
+
+<Warning>
+  Você só pode baixar a chave privada uma vez. Armazene-a em local seguro — não é possível baixá-la novamente.
+</Warning>
+
+## Passo 4: Configurar o Apple Private Email Relay
+
+O recurso Hide My Email da Apple permite que os usuários façam login sem revelar seu e-mail real. Para enviar e-mails a esses usuários, registre sua fonte de e-mail.
+
+1. Na barra lateral do portal de Desenvolvedores Apple, selecione **Services**
+2. Em **Sign in with Apple for Email Communication**, selecione **Configure**
+3. Selecione **+** para adicionar um Email Source
+4. Insira o valor de Email Source mostrado em **Provider setup** no **painel Auth**
+5. Selecione **Next**, depois **Register** e, em seguida, **Done**
+6. Aguarde a verificação de DNS (ícone de check verde)
+
+<Info>
+  Em algumas regiões (China, Índia), os Apple IDs podem estar vinculados a números de telefone em vez de e-mail. Se o seu app exigir e-mail para todos os usuários, o Sign in with Apple pode falhar para usuários nessas regiões.
+</Info>
+
+## Solução de problemas
+
+### Cliente inválido
+
+* Verifique se todas as credenciais foram inseridas corretamente
+* Certifique-se de que a Private Key inclui as linhas BEGIN e END
+* Verifique se o seu Services ID está configurado corretamente
+
+### URI de redirecionamento inválida
+
+* Verifique se a Return URL na configuração do Apple Services ID corresponde exatamente ao valor mostrado em **Provider setup** no **painel Auth**
+* Verifique se o domínio em Domains and Subdomains corresponde ao seu domínio publicado (sem `https://`)
+
+### E-mail relay não está funcionando
+
+* Verifique se o Email Source exibe um check verde no portal de Desenvolvedores Apple
+* Aguarde a propagação de DNS caso tenha sido adicionado recentemente
+
+### Não está funcionando no domínio personalizado
+
+* Adicione as entradas de domínio personalizado mostradas em **Provider setup** no **painel Auth** em Domains and Subdomains (sem `https://`) e em Return URLs
+
+## Recursos adicionais
+
+* [Documentação Sign in with Apple](https://developer.apple.com/sign-in-with-apple/)
+* [Guia do Private Email Relay Service](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)

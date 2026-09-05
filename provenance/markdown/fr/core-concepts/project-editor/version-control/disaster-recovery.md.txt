@@ -1,0 +1,123 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Récupération après sinistre Git
+
+> Apprenez à récupérer votre historique Git et votre code à l'aide du système de sauvegarde automatique de Replit.
+
+Replit sauvegarde automatiquement votre dépôt Git pour vous aider à récupérer en cas de problèmes comme les dossiers `.git` corrompus ou l'historique de commit perdu. Ce système de sauvegarde fonctionne en arrière-plan, de sorte que votre travail est protégé sans effort supplémentaire.
+
+## Comment ça fonctionne
+
+Chaque application Replit maintient une sauvegarde sécurisée de votre dépôt Git. Lorsque Replit Agent apporte des modifications au code ou que vous déployez votre application, elles sont automatiquement synchronisées avec cette sauvegarde. Si votre dépôt Git local devient corrompu ou inutilisable, vous pouvez restaurer votre historique de commit complet depuis la sauvegarde.
+
+<Info>
+  Le dépôt distant de sauvegarde est nommé `gitsafe-backup` et est géré automatiquement par Replit. Vous n'avez rien à configurer — il fonctionne déjà en arrière-plan.
+</Info>
+
+## Afficher votre historique de sauvegarde
+
+La façon la plus simple de voir votre historique de commit est via le [panneau Git](/fr/core-concepts/project-editor/version-control/git-interface). Ouvrez-le depuis la section Outils dans l'Éditeur de projet — il affiche votre historique de commit complet, y compris tous les points de contrôle Agent. Cela fonctionne pour la plupart des cas et ne nécessite aucune commande.
+
+Si vous avez besoin d'inspecter directement le dépôt distant gitsafe-backup, vous pouvez utiliser le Shell :
+
+```bash theme={null}
+git fetch gitsafe-backup main
+git log gitsafe-backup/main
+```
+
+Cela affiche votre historique de commit complet, y compris tous les points de contrôle Agent et les commits manuels. Vous pouvez l'utiliser pour vérifier que votre travail est sauvegardé ou pour trouver un commit spécifique à restaurer.
+
+## Récupération des problèmes Git
+
+Si vous rencontrez des erreurs Git ou si votre dépôt devient corrompu, commencez par le [panneau Git](/fr/core-concepts/project-editor/version-control/git-interface). Il peut résoudre la plupart des problèmes courants — comme réinitialiser à un commit précédent ou tirer depuis un dépôt distant — sans avoir besoin de commandes Shell.
+
+Pour les cas où le panneau Git ne peut pas aider (comme un dossier `.git` entièrement corrompu), utilisez les étapes basées sur le Shell ci-dessous.
+
+### Vérifier si la sauvegarde est disponible
+
+Tout d'abord, vérifiez que le dépôt distant de sauvegarde existe :
+
+```bash theme={null}
+git remote -v
+```
+
+Recherchez `gitsafe-backup` dans la sortie. S'il est présent, vous pouvez procéder à la récupération.
+
+### Restaurer votre dépôt
+
+<Warning>
+  Ce processus remplace votre dossier `.git` actuel par la version sauvegardée. Vos fichiers de travail restent inchangés, mais votre historique Git local sera remplacé par la sauvegarde.
+</Warning>
+
+<Steps>
+  <Step title="Sauvegarder votre configuration Git actuelle">
+    Sauvegardez votre fichier de configuration Git au cas où vous auriez des paramètres personnalisés :
+
+    ```bash theme={null}
+    cp .git/config .git_config_backup
+    ```
+  </Step>
+
+  <Step title="Cloner le dépôt de sauvegarde">
+    Créez un clone temporaire depuis la sauvegarde :
+
+    ```bash theme={null}
+    git clone --bare git://gitsafe:5418/backup.git /tmp/gitsafe-restore
+    ```
+  </Step>
+
+  <Step title="Remplacer votre dossier Git">
+    Déplacez votre dossier `.git` corrompu de côté et remplacez-le par la sauvegarde :
+
+    ```bash theme={null}
+    mv .git .git_corrupted_backup
+    mv /tmp/gitsafe-restore/ .git
+    ```
+  </Step>
+
+  <Step title="Restaurer votre configuration">
+    Recopiez votre configuration Git :
+
+    ```bash theme={null}
+    mv .git_config_backup .git/config
+    ```
+  </Step>
+</Steps>
+
+Après avoir effectué ces étapes, exécutez `git status` pour vérifier que votre dépôt fonctionne correctement.
+
+## Dépannage des problèmes courants
+
+### « fatal: repository not found » ou dépôt distant de sauvegarde manquant
+
+Le système de sauvegarde peut ne pas être activé pour les anciens projets. Contactez le support si vous avez besoin d'aide pour récupérer un ancien projet.
+
+### La récupération n'incluait pas les commits récents
+
+Les sauvegardes se synchronisent après chaque commit Agent. Si vous avez apporté des modifications mais ne les avez pas commitées, ces modifications ne seront pas dans la sauvegarde. Vérifiez votre répertoire de travail pour les fichiers non commités.
+
+### Les opérations Git sont lentes ou bloquées
+
+Si les opérations Git deviennent non réactives, vous pouvez avoir un fichier de verrouillage obsolète. Vous pouvez le supprimer en toute sécurité :
+
+```bash theme={null}
+rm -f .git/index.lock
+```
+
+## Prévenir la perte de données
+
+Bien que le système de sauvegarde protège automatiquement votre historique Git, vous pouvez prendre des mesures supplémentaires pour protéger votre travail :
+
+* **Committez fréquemment** : Faites de petits commits fréquents pour que votre progression soit continuellement sauvegardée
+* **Utilisez les points de contrôle** : Lors du travail avec [Replit Agent](/fr/core-concepts/agent), les points de contrôle créent automatiquement des commits aux étapes clés
+* **Connectez-vous à GitHub** : Pour les projets critiques, [connectez votre application à GitHub](/fr/getting-started/quickstarts/import-from-github) pour une couche supplémentaire de sauvegarde
+
+## Étapes suivantes
+
+Pour en savoir plus sur le contrôle de version sur Replit :
+
+* [Vue d'ensemble du contrôle de version](/fr/core-concepts/project-editor/version-control) : En savoir plus sur toutes les options de contrôle de version
+* [Utiliser le panneau Git](/fr/core-concepts/project-editor/version-control/git-interface) : Gérer Git visuellement sans ligne de commande
+* [Points de contrôle et retours en arrière](/fr/core-concepts/agent/checkpoints-and-rollbacks) : Comprendre comment fonctionnent les points de contrôle Agent

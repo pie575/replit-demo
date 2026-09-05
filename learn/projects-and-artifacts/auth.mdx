@@ -1,0 +1,78 @@
+---
+title: "Auth"
+description: "Learn what Auth is on Replit — how user accounts let your app save preferences, gate features, and personalize the experience, and how to choose between Replit Auth and Clerk Auth."
+sidebarTitle: "Auth"
+icon: "user-lock"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+<YouTubeEmbed videoId="cfpC1rzxspo" title="Add Auth to your Replit App" />
+
+Auth — short for **authentication** — is what gives your app the concept of a "user". Without auth, every visitor is anonymous and your app can't tell one person from another. With auth, each visitor signs in, your app knows who they are, and you can save data specific to them: their bookings, their saved cars, their preferences, their progress.
+
+Once auth is wired in, you can:
+
+* Save data per user — bookings, settings, content, history.
+* Gate features behind sign-in (a checkout, a profile page, an admin panel).
+* Personalize the experience by name, role, plan, or past behavior.
+* Track activity and usage by individual rather than by session.
+
+## How auth works in a Replit app
+
+Replit ships two built-in auth options. Both are provisioned by Agent — no separate dashboard signup, no copy-pasting of OAuth keys.
+
+* **[Replit Auth](/features/auth-and-identity/authentication)** — your users sign in with their existing **Replit accounts**. The sign-in page is Replit-branded. There's no setup beyond asking Agent to add it.
+* **[Clerk Auth](/features/auth-and-identity/clerk-auth)** — your app gets its own dedicated **Clerk tenant**. Users create accounts inside *your* app, not Replit. You control the branding, the login methods, and the look and feel of the sign-in screen.
+
+Both options handle the heavy lifting — sign-in pages, sessions, secure password handling, social logins — so your app code only has to ask, "who is the signed-in user?"
+
+## Replit Auth vs. Clerk Auth
+
+|                     | Replit Auth                                                       | Clerk Auth                                                       |
+| ------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **User accounts**   | Users sign in with a Replit account                               | Users create accounts within your app (no Replit account needed) |
+| **Branding**        | Replit-branded login page                                         | Fully customizable — your app's name, icon, and colors           |
+| **SSO credentials** | Uses Replit's shared OAuth apps                                   | Bring your own OAuth credentials per provider                    |
+| **Environments**    | Single environment                                                | Separate Development and Production environments                 |
+| **Best for**        | Quick setup, prototypes, apps where Replit branding is acceptable | Branded apps, professional and commercial products               |
+
+If you're building a prototype or an internal tool, Replit Auth is the fastest path. If you're building something with its own brand identity, especially something customer-facing or commercial, Clerk Auth is the better fit.
+
+## Add auth to your app
+
+You don't have to choose up front — you can start with one and migrate later. The fastest path is to tell Agent which one to use:
+
+* *"Add sign-in to my app. Use Replit Auth."*
+* *"Add sign-in to my app. Use Clerk Auth."*
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Replit Auth" icon="lock" href="/features/auth-and-identity/authentication">
+    Replit-branded sign-in with zero setup — users sign in with their Replit account.
+  </Card>
+
+  <Card title="Clerk Auth" icon="user-lock" href="/features/auth-and-identity/clerk-auth">
+    Your own branded auth tenant — fully customizable login, separate Dev/Prod environments.
+  </Card>
+
+  <Card title="Add login" icon="user-plus" href="/build/add-login">
+    Worked example: wire Clerk Auth into a real app and test it with two customers.
+  </Card>
+
+  <Card title="Migrate from Replit Auth to Clerk" icon="right-left" href="/features/auth-and-identity/migrate-auth-to-clerk">
+    Move an existing app from Replit Auth onto a Clerk tenant.
+  </Card>
+</CardGroup>

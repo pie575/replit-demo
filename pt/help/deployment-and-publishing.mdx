@@ -1,0 +1,102 @@
+---
+title: "Implantação e publicação"
+description: "Respostas às perguntas comuns sobre publicação—depurar publicações com falha, ler logs, corrigir erros de tempo de execução, reimplantar e alterar regiões."
+---
+
+Estas respostas abrangem publicação e implantações. Para solução de problemas passo a passo, veja [Solução de problemas de implantações](/pt/build/troubleshooting), e para tipos de implantação e monitoramento, veja [Implantações Autoscale](/pt/features/publishing/deployment-types#autoscale) e [Monitorando uma implantação](/pt/features/publishing/monitoring-a-deployment).
+
+<AccordionGroup>
+  <Accordion title="Minha publicação falha em &#x22;Creating Autoscale service&#x22;—como depuro?">
+    A maioria das falhas de publicação do Autoscale é corrigível assim que você lê os logs de implantação:
+
+    1. Abra **Publicação** e encontre a implantação com falha.
+    2. Selecione o menu de três pontos ao lado dela para abrir os logs.
+    3. Copie a saída do log, abra um novo chat do Agent, cole-a e pergunte o que está errado e como corrigir.
+
+    Se aparecer um erro `No run command configured` mesmo após ter configurado um, abra suas configurações de implantação, desconecte o comando de execução, adicione-o novamente, salve e publique novamente. Veja [Solução de problemas de implantações](/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Meu aplicativo mostra um Erro Interno do Servidor após publicar com sucesso—o que está errado?">
+    Se a publicação foi bem-sucedida mas o aplicativo ao vivo retorna um erro 500, o problema está no código do seu aplicativo e não na infraestrutura do Replit:
+
+    1. Abra **Publicação**, veja os logs e copie o texto completo do erro.
+    2. Abra um novo chat do Agent, cole os logs e pergunte o que está causando o erro.
+    3. Aplique a correção e publique novamente.
+
+    Se o Agent não conseguir encontrar o problema, abra **Publicação → Histórico**, encontre a última versão que funcionava e reimplante-a. Veja [Solução de problemas de implantações](/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Minha implantação está travada durante o build ou migração—o que devo fazer?">
+    1. Abra a paleta de comandos com `Cmd+K` (Mac) ou `Ctrl+K` (Windows), pesquise por **Restart compute** e selecione-a.
+    2. Abra **Publicação** e selecione **Publicar** para acionar uma nova implantação.
+    3. Se falhar novamente, abra os logs da implantação com falha no menu de três pontos, copie o log de build e cole-o em um novo chat do Agent para diagnóstico.
+
+    Se a implantação permanecer travada, [entre em contato com o Suporte do Replit](https://replit.com/support) com seus logs de build completos. Veja [Solução de problemas de implantações](/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Meu aplicativo está ao vivo, mas lento ou retornando timeouts—o que devo verificar?">
+    1. Verifique seus logs de implantação em busca de mensagens recorrentes de timeout ou falta de memória.
+    2. Verifique os recursos da sua implantação para limites de CPU ou memória—veja [Monitorando uma implantação](/pt/features/publishing/monitoring-a-deployment).
+    3. Abra um novo chat do Agent, cole os logs recentes e peça ao Agent para encontrar gargalos.
+
+    As causas comuns incluem consultas de banco de dados sem índices, operações síncronas bloqueantes e vazamentos de memória. Com [implantações Autoscale](/pt/features/publishing/deployment-types#autoscale), a primeira requisição após o dimensionamento para zero pode levar alguns segundos—isso é uma inicialização a frio normal.
+  </Accordion>
+
+  <Accordion title="Meu histórico de implantação mostra builds com falha—como descubro o que está errado?">
+    Abra **Publicação → Histórico**, selecione a implantação com falha e veja os logs de build. Encontre a primeira linha marcada como `ERROR` ou `FAILED`—geralmente essa é a causa raiz, e as linhas seguintes são efeitos secundários. Copie essa seção em um novo chat do Agent para diagnóstico. A maioria das falhas de build vem de dependências ausentes, um comando de execução incorreto ou uma migração de banco de dados com falha. Veja [Monitorando uma implantação](/pt/features/publishing/monitoring-a-deployment).
+  </Accordion>
+
+  <Accordion title="Meu aplicativo funciona na prévia do editor, mas não quando implantado—por quê?">
+    Isso é quase sempre uma diferença de configuração entre ambientes. Verifique se:
+
+    * Cada chave do seu painel de [Secrets](/pt/core-concepts/project-editor/app-setup/secrets) de desenvolvimento também está definida nos secrets de implantação—são ambientes separados.
+    * Seu `DATABASE_URL` aponta para o banco de dados de produção, não de desenvolvimento.
+    * Não há referências codificadas de `localhost` ou `127.0.0.1`; use caminhos relativos ou URLs baseadas em ambiente.
+
+    Em seguida, verifique seus logs de implantação em busca de erros específicos de produção. Veja [Solução de problemas de implantações](/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Minha implantação Autoscale continua reiniciando—o que significam SIGTERM ou Exit code 1?">
+    [As implantações Autoscale](/pt/features/publishing/deployment-types#autoscale) reiniciam regularmente por design. Um `SIGTERM` nos seus logs significa que o processo foi interrompido de forma controlada—isso é normal. `Exit code 1` significa que o processo travou por conta própria; verifique as linhas logo antes dele para ver o erro real.
+
+    Se as reinicializações forem frequentes o suficiente para afetar os usuários, procure rejeições de promise não tratadas, erros de falta de memória ou variáveis de ambiente ausentes que causem falha na inicialização.
+  </Accordion>
+
+  <Accordion title="Atualizei minhas variáveis de ambiente, mas meu aplicativo implantado não as está captando—por quê?">
+    O Replit mantém secrets de desenvolvimento e produção em armazenamentos separados, e alterar um não atualiza o outro. O painel de [Secrets](/pt/core-concepts/project-editor/app-setup/secrets) de desenvolvimento só está disponível no editor; seu aplicativo implantado lê a partir dos seus secrets de implantação.
+
+    Para atualizar uma variável no seu aplicativo ao vivo, defina-a nos seus secrets de implantação, depois abra **Publicação** e selecione **Publicar** para implantar novamente. Os novos valores entram em vigor quando a nova implantação inicia. Veja [Solução de problemas de implantações](/pt/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Como aciono uma reimplantação sem alterar meu código?">
+    Abra **Publicação** e selecione **Publicar**. O Replit compila e implanta seu código atual mesmo que nada tenha mudado—útil após atualizar um secret, após a retomada de um banco de dados ou para obter uma atualização de dependência.
+
+    Se seu aplicativo não responde e uma reimplantação completa parece pesada, abra a paleta de comandos com `Cmd+K` (Mac) ou `Ctrl+K` (Windows), pesquise por **Restart compute** e selecione-a.
+  </Accordion>
+
+  <Accordion title="Posso alterar a região de implantação do meu aplicativo após publicado?">
+    Não. Você não pode alterar a geografia de publicação de um app já publicado. Para mover o app, faça um remix dele e publique o remix na nova região. Veja [geografia do projeto](/pt/features/publishing/project-geography).
+
+    Você também não pode alterar a região do banco de dados no lugar. O app remixado pode receber um subdomínio `.replit.app` diferente, portanto conecte primeiro um [domínio personalizado](/pt/features/publishing/custom-domains) se precisar de uma URL estável e adicione novamente quaisquer secrets de implantação.
+  </Accordion>
+
+  <Accordion title="Por que uma verificação de PCI ou de segurança sinaliza o cookie GAESA no meu aplicativo publicado?">
+    A infraestrutura de veiculação do Google adiciona o cookie `GAESA` (afinidade de sessão do Google App Engine) aos aplicativos Replit publicados para rotear requisições para a instância correta. Seu valor é um identificador de roteamento opaco e não contém dados sensíveis ou de aplicativo.
+
+    Alguns scanners de segurança sinalizam o `GAESA` porque ele não define os atributos `Secure` ou `HttpOnly`. Seu aplicativo não cria esse cookie, e você não pode alterá-lo ou desativá-lo em um aplicativo publicado.
+
+    Se uma verificação de conformidade PCI ou de segurança relatar esse cookie, conteste a descoberta com o fornecedor da verificação como um falso positivo. Inclua o nome do cookie e explique que a infraestrutura do Google o define para roteamento de requisições. Seu aplicativo publicado não pode ler, alterar ou desativar esse cookie, e ele não contém dados sensíveis.
+
+    Conformidade para o aplicativo que você constrói é sua responsabilidade—veja o [modelo de responsabilidade compartilhada](/pt/features/security/shared-responsibility-model). Se o fornecedor da sua verificação precisar de mais detalhes, [entre em contato com o Suporte do Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Como coloco meu aplicativo offline ou cancelo a publicação?">
+    Abra **Publicação** e selecione a opção para desligar sua implantação, depois confirme. Seu aplicativo fica offline e para de incorrer em cobranças de implantação. Seus arquivos de projeto, código e banco de dados não são excluídos—apenas a implantação ao vivo para. As conexões de domínio personalizado vinculadas a esta implantação são removidas, portanto adicione-as novamente se republicar.
+
+    Se o custo for sua preocupação, observe que as [implantações Autoscale](/pt/features/publishing/deployment-types#autoscale) dimensionam para zero quando não há tráfego, portanto você pode não precisar desligar.
+  </Accordion>
+</AccordionGroup>
+
+## Ainda precisa de ajuda?
+
+Se sua dúvida sobre implantação não foi respondida aqui, [entre em contato com o Suporte do Replit](https://replit.com/support).

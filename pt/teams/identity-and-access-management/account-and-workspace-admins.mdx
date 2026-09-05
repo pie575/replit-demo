@@ -1,0 +1,139 @@
+---
+title: "Administradores de Conta e de Workspace"
+description: "Administradores de conta e administradores de workspace são funções distintas. Os administradores de conta gerenciam o faturamento e todos os workspaces da sua conta, enquanto os administradores de workspace gerenciam apenas os workspaces aos quais pertencem."
+sidebarTitle: "Administradores de Conta e de Workspace"
+icon: "user-shield"
+---
+
+<Info>
+  **Esta página aplica-se apenas ao plano Enterprise.** Funções separadas de administrador de conta e administrador de workspace existem somente no Enterprise.
+
+  No plano **Core** e **Pro**, sua conta tem um único **administrador de conta** (normalmente o proprietário da conta) e não existe uma função separada de administrador de workspace. Se você está no Core ou Pro, consulte [Gerenciando Membros](/pt/teams/identity-and-access-management/managing-members) e [Funções, Grupos e Acesso](/pt/teams/identity-and-access-management/groups-and-permissions) — a função **Administrador** descrita lá é o seu administrador de conta.
+</Info>
+
+No plano Enterprise, o Replit separa a responsabilidade administrativa em duas funções distintas: **administradores de conta** e **administradores de workspace**. Dividir essas funções permite que você dê a alguém controle total sobre um único workspace sem também conceder acesso ao faturamento e ao controle de toda a conta. Esta página explica o que cada função faz, como elas diferem e como configurá-las.
+
+## Como as duas funções se relacionam
+
+Sua **conta** Replit é a entidade de faturamento que possui sua assinatura, assentos e um ou mais **workspaces** (suas organizações) — contas Enterprise podem conter mais de um. As duas funções de administrador mapeiam nesses dois escopos:
+
+* **Administradores de conta** governam toda a conta. Eles controlam o faturamento e têm acesso administrativo em todos os workspaces da conta.
+* **Administradores de workspace** governam apenas o workspace (ou workspaces) específico ao qual pertencem. Eles não têm acesso ao faturamento e não têm controle sobre outros workspaces.
+
+Todo administrador de conta é automaticamente um administrador em todos os workspaces da conta, portanto, um administrador de conta é efetivamente um superconjunto de um administrador de workspace. Um administrador de workspace não é um administrador de conta e não pode gerenciar o faturamento ou outros workspaces.
+
+<CardGroup cols={2}>
+  <Card title="Administrador de conta" icon="building-shield">
+    Abrangência da conta. Gerencia faturamento, assentos, configurações de segurança e todos os workspaces da conta.
+  </Card>
+
+  <Card title="Administrador de workspace" icon="user-shield">
+    Escopo do workspace. Gerencia membros e recursos apenas nos próprios workspaces.
+  </Card>
+</CardGroup>
+
+## O que cada função pode fazer
+
+Ambas as funções administram workspaces — a diferença é *quais* workspaces. Um administrador de conta administra todos os workspaces da conta, enquanto um administrador de workspace administra apenas os workspaces aos quais pertence.
+
+| Capacidade                                                       | Administrador de conta | Administrador de workspace |
+| ---------------------------------------------------------------- | :--------------------: | :------------------------: |
+| Gerenciar membros nos workspaces que administra                  |           Sim          |             Sim            |
+| Gerenciar apps, grupos e recursos nos workspaces que administra  |           Sim          |             Sim            |
+| Visualizar e editar faturamento, métodos de pagamento e faturas  |           Sim          |             Não            |
+| Editar, cancelar ou restaurar a assinatura                       |           Sim          |             Não            |
+| Adicionar, remover e atribuir assentos                           |           Sim          |             Não            |
+| Definir limites de gastos e uso                                  |           Sim          |             Não            |
+| Criar novos workspaces                                           |           Sim          |             Não            |
+| Gerenciar outros administradores de conta                        |           Sim          |             Não            |
+| Administrar todos os workspaces da conta                         |           Sim          |             Não            |
+| Configurar SAML, SCIM, logs de auditoria e contatos de segurança |           Sim          |             Não            |
+
+Os administradores de workspace têm poder administrativo restrito aos seus próprios workspaces, enquanto os administradores de conta têm todo poder administrativo em toda a conta.
+
+<Note>
+  Faturamento, gerenciamento de assentos, alterações de assinatura e controles de segurança de toda a conta requerem um administrador de conta. Um administrador de workspace não pode realizar essas ações, mesmo dentro de seu próprio workspace.
+</Note>
+
+## Configurando administradores de conta
+
+Os administradores de conta são gerenciados na aba **Assentos** nas suas configurações. Adicionar um administrador de conta concede acesso administrativo em toda a conta e automaticamente torna essa pessoa administradora em todos os workspaces da conta.
+
+### Promover um membro a administrador de conta
+
+<Steps>
+  <Step title="Abrir a aba Assentos">
+    Nas suas configurações, abra a aba **Assentos**. Esta aba lista as pessoas na sua conta junto com sua função atual.
+  </Step>
+
+  <Step title="Promover o membro">
+    Encontre o membro que deseja promover, abra o menu de ações e selecione **Promover a administrador de conta**. A alteração entra em vigor imediatamente.
+  </Step>
+</Steps>
+
+### Rebaixar um administrador de conta
+
+Rebaixar um administrador de conta remove seu acesso a toda a conta e ao faturamento. Por padrão, o rebaixamento não o remove de seus workspaces — ele mantém o acesso ao workspace independentemente do status de administrador de conta.
+
+<Steps>
+  <Step title="Abrir a aba Assentos">
+    Nas suas configurações, abra a aba **Assentos**.
+  </Step>
+
+  <Step title="Rebaixar o administrador de conta">
+    Encontre o administrador de conta, abra o menu de ações e selecione **Rebaixar de administrador de conta**. A alteração entra em vigor imediatamente.
+  </Step>
+</Steps>
+
+Algumas regras protegem sua conta de perder o acesso administrativo:
+
+* Você não pode se rebaixar.
+* Você não pode remover o último administrador de conta. Sua conta deve sempre ter pelo menos um.
+* Você não pode rebaixar o proprietário de uma conta pessoal.
+
+### Administradores provisionados via SCIM
+
+Se você provisiona usuários por meio do [SCIM](/pt/teams/identity-and-access-management/scim), um usuário ao qual seu provedor de identidade atribui a função **Administrador** torna-se um **administrador de conta**. Para criar um administrador com escopo de workspace, atribua a função **Administrador de workspace** no Replit em vez de fazê-lo por meio do seu provedor de identidade.
+
+## Configurando administradores de workspace
+
+Atribua a função de administrador de workspace para dar a alguém controle administrativo total de um workspace específico sem conceder acesso a toda a conta ou ao faturamento. Isso é útil quando um líder de equipe deve gerenciar seu próprio workspace, mas não deve gerenciar a assinatura ou outras equipes.
+
+<Steps>
+  <Step title="Abrir a lista de membros do workspace">
+    Abra o workspace ao qual deseja atribuir um administrador e vá para a página **Membros**.
+  </Step>
+
+  <Step title="Definir a função do membro como Administrador de workspace">
+    Encontre o membro, abra o seletor de funções e escolha **Administrador de workspace**. O membro ganha acesso administrativo restrito apenas a esse workspace.
+  </Step>
+</Steps>
+
+<Note>
+  O acesso de um administrador de workspace se limita aos workspaces aos quais pertence. Eles não podem acessar o faturamento, gerenciar assentos ou administrar outros workspaces — essas ações requerem um administrador de conta.
+</Note>
+
+## Escolhendo a função correta
+
+* Atribua **administrador de conta** a pessoas que gerenciam o faturamento, a assinatura e os assentos, configuram as configurações de segurança ou precisam de supervisão em todos os workspaces.
+* Atribua **administrador de workspace** a pessoas que gerenciam uma única equipe ou workspace e devem gerenciar seus membros e recursos sem tocar no faturamento ou em outros workspaces.
+
+## Próximos passos
+
+<CardGroup cols={2}>
+  <Card title="Funções, Grupos e Acesso" icon="user-group" href="/pt/teams/identity-and-access-management/groups-and-permissions">
+    Saiba como funções e grupos personalizados controlam o acesso em toda a sua organização.
+  </Card>
+
+  <Card title="Gerenciando Membros" icon="users" href="/pt/teams/identity-and-access-management/managing-members">
+    Adicione, remova e atribua funções a membros da sua organização.
+  </Card>
+
+  <Card title="SCIM" icon="arrows-rotate" href="/pt/teams/identity-and-access-management/scim">
+    Automatize o provisionamento de usuários e a atribuição de funções pelo seu provedor de identidade.
+  </Card>
+
+  <Card title="Gerenciando Assentos" icon="chair" href="/pt/billing/teams-billing/managing-seats">
+    Controle sua capacidade de cobrança e o número de assentos que você paga.
+  </Card>
+</CardGroup>

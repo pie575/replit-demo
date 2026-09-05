@@ -1,0 +1,184 @@
+---
+title: "Centre de sécurité de projet"
+description: "Trouvez des vulnérabilités liées aux dépendances, au code et à la confidentialité dans votre projet grâce à des analyses automatiques et des revues de sécurité assistées par l'Agent."
+---
+
+<Frame>
+  <img src="/assets/mirror/security-scanner-hero-c49d2630d80e.png" alt="Centre de sécurité de projet affichant les résultats d'analyse de sécurité de l'Agent avec les vulnérabilités catégorisées par sévérité" style={{ display: 'block', margin: '0 auto' }} width="3402" height="2058" data-path="images/security-scanner/security-scanner-hero.png" />
+</Frame>
+
+<Note>
+  Nouveau dans la sécurité des dépendances ? Consultez les [Concepts de sécurité](/fr/core-concepts/security/concepts) pour les définitions de CVE, SBOM, exposition, Corriger avec l'Agent, Republier et Auto-Protection.
+</Note>
+
+## Comment les résultats sont catégorisés
+
+Les résultats des deux types d'analyse apparaissent dans le volet Sécurité, catégorisés par niveau de sévérité :
+
+* **Critique** : Vulnérabilités qui représentent un risque immédiat et doivent être traitées avant la publication. Les exemples incluent l'exécution de code à distance, l'injection SQL dans des points d'entrée exposés et les identifiants divulgués.
+* **Élevée** : Problèmes sérieux pouvant être exploités dans certaines conditions, tels que le cross-site scripting (XSS), les flux d'authentification non sécurisés ou les dépendances non corrigées avec des exploits connus.
+* **Moyenne** : Problèmes représentant un risque potentiel mais moins susceptibles d'être exploités, tels que les en-têtes de sécurité manquants ou les configurations CORS trop permissives.
+* **Faible / Informationnel** : Problèmes mineurs ou recommandations de bonnes pratiques, tels que l'utilisation d'API dépréciées ou les messages d'erreur verbeux en production.
+
+## Qu'est-ce que le Centre de sécurité de projet ?
+
+Le Centre de sécurité de projet est le hub central de votre projet pour trouver et corriger les vulnérabilités de sécurité et de confidentialité avant la publication. Ouvrez le volet **Sécurité** dans votre projet pour exécuter des analyses, examiner les résultats et envoyer les problèmes acceptés à l'Agent pour remédiation.
+
+Le Centre de sécurité de projet prend en charge deux types d'analyses :
+
+1. **Analyses automatiques des dépendances** : Analyses gratuites et légères qui vérifient les packages du projet par rapport aux enregistrements de vulnérabilités publiques
+2. **Analyses de sécurité par l'Agent** : Revues assistées par IA combinant l'analyse de modèle et les outils d'analyse statique de code pour auditer l'ensemble de votre base de code
+
+Les deux types d'analyse présentent les résultats dans le même volet Sécurité, organisés par sévérité afin que vous puissiez vous concentrer en priorité sur les problèmes les plus importants.
+
+## Analyses automatiques des dépendances
+
+Les analyses automatiques des dépendances auditent les packages dont dépend votre projet par rapport aux enregistrements de vulnérabilités publiques. Ces analyses sont **gratuites** et s'exécutent automatiquement. Lorsqu'une nouvelle entrée Common Vulnerabilities and Exposures (CVE) est divulguée, Replit la vérifie par rapport aux dépendances de votre projet et présente les correspondances dans le volet **Sécurité** — aucune nouvelle analyse manuelle n'est nécessaire.
+
+L'analyse des dépendances prend en charge Node.js/npm, Python, Go, Rust, PHP et Ruby. Par exemple, une analyse peut signaler une vulnérabilité connue dans un package obsolète comme `express@4.18.2`.
+
+<Frame>
+  <img src="/assets/mirror/fix-all-with-agent-dc1b72357f81.png" alt="Le bouton Tout corriger avec l'Agent sur la carte des analyses automatiques des dépendances dans le Centre de sécurité de projet" width="1440" height="900" data-path="images/project-security-center/fix-all-with-agent.png" />
+</Frame>
+
+### Auto-Protection
+
+L'Auto-Protection étend l'analyse automatique des dépendances. Lorsqu'une vulnérabilité correspondante est détectée, Replit Agent prépare et teste un correctif et vous envoie un lien direct par e-mail. L'Auto-Protection couvre uniquement les CVE de dépendances — pour les vulnérabilités dans le code de votre application, utilisez les [analyses de sécurité par l'Agent](#agent-security-scans).
+
+Pour chaque nouvelle vulnérabilité correspondant aux dépendances de votre projet, Replit :
+
+1. Vous envoie par e-mail un résumé avec un lien direct vers le volet **Sécurité** du projet affecté.
+2. Demande à Replit Agent de préparer et tester un correctif qui résout la vulnérabilité.
+3. Laisse le correctif en attente de votre vérification dans le volet **Sécurité**.
+
+Sélectionnez **Aller à la tâche** pour inspecter les modifications générées avant de les appliquer. Après avoir appliqué le correctif, la vulnérabilité s'affiche comme **en attente de republication** jusqu'à ce que vous publiiez une nouvelle version.
+
+Republiez toujours après avoir appliqué un correctif pour vous assurer que votre application en production est sécurisée.
+
+Replit envoie au maximum un e-mail par espace de travail pour chaque nouvelle vulnérabilité. L'e-mail résume tous les projets affectés dans cet espace de travail. Les administrateurs peuvent définir la sévérité minimale qui déclenche l'Auto-Protection — par exemple, critique uniquement.
+
+#### Activer l'Auto-Protection
+
+Les deux paramètres d'Auto-Protection sont **désactivés par défaut**. L'activation de l'Auto-Protection nécessite deux paramètres : un paramètre réservé aux administrateurs qui autorise Replit à préparer des correctifs, et un paramètre personnel qui contrôle si vous recevez des e-mails sur les nouvelles vulnérabilités.
+
+<Steps>
+  <Step title="Activer la préparation des correctifs (administrateurs uniquement)">
+    Allez dans **Paramètres** > **Compte** > **Avancé** et sélectionnez la sévérité minimale (faible, moyenne, élevée ou critique) à laquelle Replit doit préparer automatiquement les remédiations. Définir un seuil plus élevé signifie que Replit prépare uniquement des correctifs pour les vulnérabilités les plus graves.
+  </Step>
+
+  <Step title="Activer les e-mails de sécurité">
+    Allez dans **Paramètres** > **Personnalisation** > **Notifications par e-mail** et sélectionnez la sévérité minimale à laquelle vous souhaitez être notifié des nouveaux problèmes de sécurité. Élevée ou critique est typique.
+  </Step>
+</Steps>
+
+<Note>
+  Les remédiations préparées par l'Agent sont facturées comme tout autre travail de l'Agent, même lorsqu'elles sont préparées de manière proactive par l'Auto-Protection.
+</Note>
+
+## Analyses de sécurité par l'Agent
+
+Les analyses de sécurité par l'Agent vont au-delà des vérifications des dépendances pour effectuer un audit complet de l'ensemble de votre base de code. L'Agent de sécurité combine la revue basée sur un modèle avec des outils d'analyse statique comme [Semgrep](https://semgrep.dev/) et [HoundDog.ai](https://hounddog.ai) pour trouver des vulnérabilités que la correspondance de motifs seule manquerait.
+
+Les analyses de sécurité par l'Agent sont disponibles pour tous les développeurs Replit payants. Pour les projets plus importants, un audit approfondi peut prendre jusqu'à 15 minutes pour garantir une évaluation complète.
+
+### Ce que fait l'Agent de sécurité
+
+Lorsque vous démarrez une analyse de sécurité par l'Agent, l'Agent de sécurité effectue une revue complète de votre base de code :
+
+1. **Cartographie votre architecture** -- identifie les routes, API, flux de données et points d'entrée
+2. **Construit un modèle de menace** -- crée un plan de modélisation des menaces personnalisable pour votre application
+3. **Exécute l'analyse statique** -- utilise Semgrep et HoundDog.ai pour analyser les vulnérabilités au niveau du code et les problèmes de confidentialité
+4. **Analyse les résultats avec l'IA** -- évalue si les problèmes signalés sont réellement exploitables dans le contexte de votre application, réduisant considérablement les faux positifs
+5. **Génère un rapport de résultats** -- présente les risques identifiés pour votre examen
+
+Les analyses de sécurité par l'Agent couvrent un large éventail de catégories de vulnérabilités :
+
+* **Problèmes d'analyse statique (SAST)** : Modèles de code non sécurisés comme l'injection SQL, le cross-site scripting (XSS) et le cross-site request forgery (CSRF)
+* **Problèmes de confidentialité** : Données sensibles circulant vers des destinations risquées comme les journaux, les fichiers ou les API tierces
+* **Vulnérabilités architecturales** : Failles de sécurité dans la façon dont vos routes, API et flux de données sont structurés
+
+Par exemple, la revue peut signaler une requête de base de données non paramétrée :
+
+```javascript theme={null}
+const query = `SELECT * FROM users WHERE username = '${userInput}'`;
+```
+
+Ou du code qui journalise des données utilisateur sensibles :
+
+```javascript theme={null}
+logger.info("New signup", {
+  email: user.email,
+  phoneNumber: user.phoneNumber,
+  address: user.address,
+});
+```
+
+### Démarrer une analyse de sécurité par l'Agent
+
+<Steps>
+  <Step>
+    Ouvrez le volet **Sécurité** dans votre projet pour lancer le Centre de sécurité de projet.
+
+    <Frame>
+      <img src="/assets/mirror/review-security-button-9331149c28f7.png" alt="Le bouton Vérifier la sécurité dans le flux de publication du projet, qui ouvre le volet Sécurité" width="1440" height="900" data-path="images/project-security-center/review-security-button.png" />
+    </Frame>
+  </Step>
+
+  <Step>
+    Sélectionnez **Exécuter une analyse avec l'Agent**.
+
+    <Frame>
+      <img src="/assets/mirror/run-scan-with-agent-f54820ac154a.png" alt="Le bouton Exécuter une analyse avec l'Agent mis en évidence dans le Centre de sécurité de projet" width="1440" height="900" data-path="images/project-security-center/run-scan-with-agent.png" />
+    </Frame>
+  </Step>
+
+  <Step>
+    Personnalisez éventuellement l'invite de modélisation des menaces pour vous concentrer sur des zones spécifiques de votre application.
+
+    <Frame>
+      <img src="/assets/mirror/scan-options-c2cd398fa78b.png" alt="Le popover des options d'analyse avec un champ Ajouter du contexte pour restreindre l'analyse à des zones spécifiques du projet" width="1440" height="900" data-path="images/project-security-center/scan-options.png" />
+    </Frame>
+  </Step>
+
+  <Step>
+    Attendez que la revue se termine. Cela prend généralement quelques minutes, mais peut prendre jusqu'à 15 minutes pour les projets plus importants.
+  </Step>
+</Steps>
+
+Une fois la revue terminée, l'Agent de sécurité génère un rapport des risques identifiés. Vous pouvez examiner les détails des vulnérabilités, ignorer les résultats que vous comprenez et êtes prêt à accepter, ou réviser les résultats avant de les envoyer pour remédiation.
+
+Après avoir examiné les résultats, envoyez les problèmes acceptés à Replit Agent pour remédiation. L'Agent de sécurité organise les vulnérabilités en tâches séparées afin que l'Agent puisse travailler sur plusieurs correctifs en parallèle. Après l'application des correctifs, exécutez une autre analyse pour confirmer que les problèmes sont résolus.
+
+Après avoir corrigé le premier ensemble de résultats, exécutez une autre analyse. Les projets plus importants peuvent révéler des problèmes supplémentaires une fois que les résultats de sévérité plus élevée sont résolus.
+
+## Limitations et bonnes pratiques
+
+* **Confidentialité et gestion des données** : Toutes les analyses s'exécutent sur l'infrastructure Replit. Votre code et vos données ne sont pas envoyés à Semgrep, HoundDog.ai ou d'autres tiers. La configuration des analyses et les résultats restent attachés à votre application Replit.
+* **Prise en charge des langages** :
+  * L'analyse des dépendances prend en charge de nombreux écosystèmes populaires (notamment **Node.js/npm**, **Python**, **Go**, **Rust**, **PHP** et **Ruby**).
+  * La correction automatique des dépendances est actuellement concentrée sur **Node.js/npm**.
+* **Pas une revue de sécurité complète** : Utilisez les analyses en complément de la revue de code, des tests, de la revue des dépendances et des vérifications d'application en direct.
+* **Réexécuter après les modifications** : Exécutez à nouveau une analyse après :
+  * L'ajout ou la mise à jour de dépendances
+  * Des modifications majeures du code
+  * Avant la publication d'une nouvelle version
+
+## Vérifications à la publication
+
+Le paramètre **Bloquer la publication des vulnérabilités critiques** se trouve dans les paramètres avancés de l'onglet Déploiement (et du flux de redéploiement). Replit exécute toujours une analyse de sécurité avant la publication ; ce bouton détermine ce qui se passe lorsque l'analyse trouve un problème de sévérité critique :
+
+* **Activé** — la publication est bloquée jusqu'à ce que le problème soit résolu ou ignoré.
+* **Désactivé** — la publication se poursuit et le résultat est présenté pour votre examen.
+
+Activez-le pour vous assurer que rien de critique n'est mis en production sans votre vérification. Les organisations sur les plans entreprise peuvent rendre ce paramètre obligatoire pour chaque application.
+
+<Note>
+  Ce paramètre s'appelait auparavant « Analyse de sécurité avant la publication » et portait un tag **Bêta**. Il est maintenant sorti de la version bêta et renommé pour clarifier le comportement — l'analyse elle-même s'exécute toujours dans tous les cas.
+</Note>
+
+## Prochaines étapes
+
+* En savoir plus sur la [Publication](/fr/category/replit-deployments) et comment publier votre application Replit une fois les analyses réussies.
+* Explorez [Replit Agent](/fr/core-concepts/agent) pour corriger les problèmes de sécurité et de confidentialité directement depuis l'éditeur de projet.
+* Lisez [How Replit Secures AI-Generated Code](https://blog.replit.com/securing-ai-generated-code) pour en savoir plus sur l'approche de Replit en matière de sécurité.
+* Découvrez les [fonctionnalités de l'éditeur](/fr/core-concepts/project-editor/editor-and-tools) pour plus d'outils permettant d'améliorer la qualité du code, les performances et la fiabilité.

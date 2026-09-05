@@ -1,0 +1,59 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Domaines personnalisés et DNS
+
+> Réponses aux questions courantes sur les domaines personnalisés—connexion d'un domaine, dépannage SSL et vérification, et configuration de l'authentification Clerk.
+
+Ces réponses couvrent la connexion et le dépannage des domaines personnalisés. Pour la référence complète, consultez [Ajouter un domaine personnalisé](/fr/build/add-custom-domain) et [Domaines personnalisés](/fr/features/publishing/custom-domains).
+
+<AccordionGroup>
+  <Accordion title="Comment connecter un domaine personnalisé à mon application Replit ?">
+    Si vous avez acheté votre domaine via Replit, les enregistrements DNS sont gérés pour vous—ouvrez **Publication → Domaines** et suivez la configuration dans le produit. Consultez [Achat de domaine](/fr/build/domain-purchasing).
+
+    Pour connecter un domaine d'un registraire externe :
+
+    1. Ouvrez votre projet et accédez à **Publication → Domaines**.
+    2. Sélectionnez **Connecter votre propre domaine**, saisissez votre domaine et continuez.
+    3. Replit affiche un enregistrement A et un enregistrement TXT—copiez les deux.
+    4. Ajoutez les deux enregistrements chez votre fournisseur DNS.
+    5. Revenez sur Replit et lancez la vérification.
+
+    Quelques remarques importantes :
+
+    * Un enregistrement A et un enregistrement TXT sont tous deux requis pour SSL. Les CNAME apex (racine) ne sont pas pris en charge—utilisez un enregistrement A pour votre domaine racine.
+    * Les certificats génériques (`*.exemple.com`) ne sont pas pris en charge ; connectez chaque sous-domaine individuellement.
+    * Sur Cloudflare, définissez votre enregistrement A sur **DNS uniquement** (le nuage gris) afin que le mode proxy ne bloque pas la configuration SSL.
+    * Les modifications DNS peuvent prendre jusqu'à 48 heures pour se propager.
+
+    Consultez [Domaines personnalisés](/fr/features/publishing/custom-domains) pour la référence complète.
+  </Accordion>
+
+  <Accordion title="Mon domaine ne se vérifie pas ou SSL ne se provisionne pas—comment dépanner ?">
+    Effectuez ces vérifications dans l'ordre—la plupart des problèmes viennent de l'une d'entre elles :
+
+    1. **Attendez la propagation DNS.** Les modifications peuvent prendre jusqu'à 48 heures. Confirmez que vos enregistrements sont visibles globalement avec un outil de recherche DNS.
+    2. **Supprimez les enregistrements AAAA.** Les enregistrements IPv6 (AAAA) sur le même nom d'hôte que votre enregistrement A peuvent bloquer SSL.
+    3. **Supprimez les anciens enregistrements A en conflit.** Conservez un seul enregistrement A sur votre domaine racine pointant vers Replit.
+    4. **Configurez Cloudflare sur DNS uniquement.** Le nuage orange (mode proxy) interfère avec le provisionnement SSL.
+    5. **Déconnectez et reconnectez le domaine** dans **Publication → Domaines → Gérer** pour forcer un nouveau certificat, puis attendez quelques minutes et rechargez.
+    6. **Vérifiez les enregistrements CAA.** Si vous avez des enregistrements CAA, au moins un doit autoriser Let's Encrypt comme émetteur, car Replit émet des certificats via ce service.
+
+    Ces vérifications s'appliquent aux domaines enregistrés en externe. Si vous avez acheté votre domaine via Replit, [contactez le support Replit](https://replit.com/support). Consultez [Domaines personnalisés](/fr/features/publishing/custom-domains).
+  </Accordion>
+
+  <Accordion title="Comment configurer l'authentification Clerk sur un domaine personnalisé ?">
+    Quelques problèmes surviennent fréquemment lors de l'utilisation de l'[authentification Clerk](/fr/features/auth-and-identity/clerk-auth) sur un domaine personnalisé :
+
+    * **Avertissement "Enregistrements CNAME Clerk requis".** Il s'agit d'une exigence d'intégration Clerk et cela ne bloque pas la vérification ou SSL de votre domaine. Ouvrez **Publication → Domaines**, sélectionnez **Gérer**, trouvez la section de configuration DNS d'authentification et ajoutez chaque enregistrement CNAME répertorié exactement chez votre fournisseur DNS. Si la section n'apparaît pas, déconnectez et reconnectez le domaine.
+    * **Domaine bloqué sur Vérification après utilisation précédente de Clerk.** Si le domaine était attaché à une autre application Clerk, supprimez-le dans votre [tableau de bord Clerk](https://dashboard.clerk.com), puis déconnectez et reconnectez le domaine dans Replit.
+    * **Migration vers votre propre instance Clerk.** Le passage de Clerk géré par Replit à votre propre instance nécessite une étape manuelle—[contactez le support Replit](https://replit.com/support). Consultez [Puis-je apporter ma propre application Clerk ?](/fr/features/auth-and-identity/clerk-auth#puis-je-apporter-ma-propre-application-clerk-au-lieu-dutiliser-celle-gérée-par-replit)
+
+    Si vous êtes toujours bloqué, [contactez le support Replit](https://replit.com/support) avec votre nom de domaine, le nom de votre projet et ce que vous avez déjà essayé.
+  </Accordion>
+</AccordionGroup>
+
+## Vous avez encore besoin d'aide ?
+
+Si votre question sur les domaines n'est pas répondue ici, [contactez le support Replit](https://replit.com/support).

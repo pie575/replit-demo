@@ -1,0 +1,135 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# ポート
+
+> Replitアプリでネットワークポートを設定・管理する方法を学びましょう。
+
+Replitはプロジェクトをクラウド環境で実行するため、ポートはローカルコンピューターとは異なる動作をします。（TCPポートとは何かについての基本的な説明が必要な場合は、[こちらから始めてください](https://www.reddit.com/r/explainlikeimfive/comments/1t9s5a/eli5_what_are_ports_ex_tcp_port/)。）
+
+コンピューターでは、ポート管理のレイヤーが1つしかありません：プログラムはリッスンするポートを定義し、インターネットからコンピューターのそのポートにトラフィックが届くと、適切なプロセスにルーティングされます。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/computer.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=6e8edcd0ec3e450bdef6c32289d36dcc" alt="コンピューター" width="1323" height="786" data-path="images/ports/computer.png" />
+</Frame>
+
+`0.0.0.0`の部分はアドレスまたはホストです。プロセスが`0.0.0.0`でリッスンしている場合、すべてのネットワークインターフェースでリッスンするということを意味します。つまり、別のコンピューター（インターネット上）がコンピューターのIPアドレスにリクエストを送ると、それが見えます。したがって、0.0.0.0でリッスンすることは、それらのプロセスが公開インターネットからアクセス可能であることを意味します（コンピューターが接続されている場合）。
+
+ほとんどのプログラミングフレームワークは、開発中は`0.0.0.0`でリッスン\_しません\_。プライバシーとセキュリティのために、作業中に自分の作業を公開したくない場合があるからです。代わりに、別のアドレス（`127.0.0.1`、別名`localhost`）でリッスンします。これは、そのコンピューターのみがそのポートへのリクエストを行えることを意味します。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/computer-localhost.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=96a818c90fd879a814a647e18b506f7c" alt="Localhostポートはホストしているコンピューターでのみ見えます。" width="1467" height="786" data-path="images/ports/computer-localhost.png" />
+</Frame>
+
+Replitでは、実行中のプロセスをWebビューまたは外部リクエストからアクセス可能にするには、**外部ポート**を定義する必要があります。プロセスが通常使用する「内部ポート」は、Replitが提供するサンドボックス化されたクラウド環境の内部からのみ見えるためです。その内部ポートは、プログラムに正しいトラフィックを送信するために外部からアクセス可能なポートに接続する必要があります。プロセスが0.0.0.0のような公開可能なポートでリッスンしていても、外部ポートにバインドする必要があります。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/replit.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=9162e125c12faa1b6f896cc394957a85" alt="外部ポートはトラフィックを内部ポートに転送し、プログラムがリッスンします。" width="1641" height="870" data-path="images/ports/replit.png" />
+</Frame>
+
+Replitは外部ポートを特定の内部ポートにバインドすることでこれを行います。たとえば、上図では外部ポート`:80`が内部ポート`:3000`にバインドされています。これは、Replitアプリがポート80で受け取るトラフィックが内部ポート3000に送られることを意味します。
+
+この設定は.replit設定ファイルの\[\[ports]]セクションに記録されます。
+
+デフォルトでは、Replitは最初に開いたポートをデフォルトの外部ポート80にバインドします。これにより、そのプロセスがポートアドレスなしのドメインで利用可能になります（例：customdomain.com:3000/ではなくcustomdomain.com/）。追加で開かれた内部ポートは、他の利用可能な外部ポートにバインドされます（以下の完全なリストを参照）。
+
+## プレビュー
+
+Previewツールでは、WebビューがレンダリングしているExternal Portをドメインをクリックして別のポートを選択することで変更できます。また、「ギア」アイコンからネットワーキングツールを開いて詳細を確認することもできます。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/webview_dropdown.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=35f188e6a98287c45e1c5a4b811e9794" alt="Webビューのドメインをクリックすると表示するポートを選択できます。" width="862" height="534" data-path="images/ports/webview_dropdown.png" />
+</Frame>
+
+## デフォルトポート
+
+ポート:80はhttpトラフィックの「デフォルトポート」であるため、ルートドメインに送られたhttpトラフィックは自動的にポート80にルーティングされます。そのため、ポート80のURLにはポートパスが表示されません。`:80`以外のポートはドメインパスに表示されます（例：customdomain.com:4200/）。（ReplitはデフォルトでTLSを提供するため、技術的にはhttpsのデフォルトポートであるポート443を使用します。実際の目的では、これらは交換可能として扱えます。）
+
+## ネットワーキングツール
+
+ポート設定とネットワーキングの詳細については、ネットワーキングツールを開くことができます。Replitアプリで開かれているポートの状態、バインドされている外部ポート、設定の追加や削除ができます。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/networking_tool.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=61b24a896e5dc920ed70f3603228d33f" alt="ネットワーキングツールにポートの設定が表示されます。" width="1412" height="558" data-path="images/ports/networking_tool.png" />
+</Frame>
+
+## 公開
+
+AutoscaleとReserved VMのデプロイメントは単一の外部ポートの公開のみをサポートし、対応する内部ポートは`localhost`を使用できません。複数のポートを公開したり、localhostで単一ポートを公開したりすると、公開されたアプリが失敗します。Autoscaleデプロイメントが期待通りに動作するようにするための簡単な方法は、インターネットからやり取りしたいサービスのポートを除いて、設定内のすべての`externalPort`エントリを削除することです。
+
+## デバッグ
+
+期待通りに動作しない一般的な理由として、ポート設定は正しく見えても、プログラムが実際に別のポートを見ていることが挙げられます。たとえば、設定が次のような場合：
+
+```
+[[ports]]
+internalPort = 3000
+externalPort = 80
+```
+
+インターネットのポート80へのトラフィックは内部ポート3000に送られます。しかし、プログラムが実際にはポート3000ではなく別のもの（8080など）でリッスンしている場合、トラフィックが通っていないように見えます。これは、コードのポートを変更したが設定の対応するポートを変更しなかった場合や、あるプロジェクトから別のプロジェクトに設定をコピー＆ペーストした場合に起こる可能性があります。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/replit-wrong_port.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=42510d0331118fcf4a5cba7c812d09ee" alt="プログラムはリッスンするポートを変更できます。" width="1641" height="870" data-path="images/ports/replit-wrong_port.png" />
+</Frame>
+
+各フレームワークには異なるデフォルトポートがあります。たとえば、Flaskは5000、reactは3000、laravelは8000です。正しいポートが設定されていることを確認してください！
+
+## 設定
+
+Replitはポートが開かれたときにReplitアプリで開かれたポートを自動的に利用可能な外部ポートにバインドし、そのバインドを.replit設定ファイルに記録します。
+
+ただし、localhostで開く内部ポートに対してはデフォルトでこれが行われません。通常localhostで動作するサービスは、プロセスを実行しているコンピューターと同じコンピューターからのみアクセス可能であると想定しているためです（localhostポートは同じコンピューターでのみ見えます）。これは、そのようなサービスが公開インターネットからアクセス可能であることを前提に構築されたサービスほど安全でないことが多いことを意味します。
+
+これは常に`exposeLocalhost`設定オプションを公開したいポートに対して`true`に設定することで上書きできます。
+
+デフォルトでlocalhostポートを\_常に\_公開したい場合は、User Settingsツールの「ポートの自動転送」設定を「すべてのポート」に設定できます。
+
+すべてのReplitアプリのポート設定を手動で制御し、開かれたポートの設定を\_一切\_作成しない場合は、それを「しない」に設定できます。
+
+## サポートされているポート
+
+Replitアプリは最初のポートが開かれたときにデフォルトで外部ポート80を定義します。Replitアプリは3000、3001、3002、3003、4200、5000、5173、6000、6800、8000、8008、8080、8081を追加の外部ポートとして公開できます。
+
+ポート22と8283は内部で使用されているため、転送できません。
+
+## `[[ports]]` .replit設定
+
+タイプ：`{localPort, externalPort, exposeLocalhost}`
+
+`[[ports]]`設定では、Webアウトプットに公開するHTTPポートを設定できます。デフォルトでは、ホスト0.0.0.0で公開されているHTTPポートはReplitアプリのWebアウトプットとして公開されます。
+
+デフォルトポートを上書きせずに追加のポートを提供するには、.replitファイルに新しい\[\[ports]]エントリを追加します。localPortとexternalPortエントリの両方を指定する必要があります。以下に定義されているように.replitファイルに複数の\[\[ports]]エントリを追加することで複数の追加ポートを追加できます。
+
+### localPort
+
+Replitが外部ポートにバインドするポートを決定します。
+
+### externalPort
+
+そのローカルポートの公開アクセス可能なポートとして公開するポートを決定します。
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+特定のポートを\_一切\_公開したくない場合は、`localPort`設定を残したまま`externalPort`を追加しないだけで済みます：
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+```
+
+### exposeLocalhost
+
+`localhost`を使用している内部ポートを外部ポートにバインドできるかどうかを決定します。`true`、`false`、またはnullにできます。
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+exposeLocalhost = true
+```

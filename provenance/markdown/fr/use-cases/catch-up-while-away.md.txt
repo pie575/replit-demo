@@ -1,0 +1,153 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Se remettre à jour après une absence
+
+> Transformez Slack, e-mail et calendrier en un briefing de retour au travail.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Après une période d'absence, analysez Slack, Gmail et Calendar pour cette
+période et rédigez un briefing de retour au travail dans Notion : ce qui s'est
+passé, ce qui nécessite une décision, à quoi répondre en premier, et ce qui
+arrive cette semaine. L'Agent ne doit pas déverser chaque message, seulement ce
+qui a besoin de vous.
+
+## Idéal pour
+
+* Les fondateurs et managers qui ont besoin d'un briefing après des vacances ou une conférence, sans tout lire.
+* Toute personne qui prend une relève et a besoin d'un briefing exploitable par l'autre personne.
+
+## Connecteurs
+
+<Connectors
+  items={[
+{
+  id: "slack",
+  name: "Slack",
+  why: "Activité des canaux et messages directs pendant votre absence",
+},
+{ id: "gmail", name: "Gmail", why: "Fils qui nécessitent une réponse" },
+{
+  id: "google-calendar",
+  name: "Google Calendar",
+  why: "Réunions manquées ou à venir",
+},
+{ id: "notion", name: "Notion", why: "Enregistrer le briefing" },
+]}
+/>
+
+## Avant de commencer
+
+Indiquez à l'Agent les dates de votre absence et quels canaux Slack et
+calendriers comptent. Connectez Gmail, Slack, Calendar et Notion.
+
+## Invite à l'Agent
+
+<AiPrompt>
+  J'étais absent du \[dates]. Analyse Slack, Gmail et Calendar pour cette
+  période et rédige un briefing de retour au travail dans Notion : ce qui
+  s'est passé, ce qui nécessite une décision, à quoi je devrais répondre en
+  premier, et ce qui arrive cette semaine.
+</AiPrompt>
+
+## À quoi s'attendre
+
+L'Agent produit un court briefing : décisions en attente, fils à répondre, réunions à
+rattraper. Il ne doit pas déverser chaque message, seulement ce qui a besoin de vous.
+Examinez la période et les canaux utilisés avant d'agir. Ouvrez deux fils du briefing
+dans Slack ou Gmail et confirmez qu'ils ont vraiment besoin de vous. S'il a rédigé des
+réponses, envoyez-en une à vous-même d'abord.
+
+## Adaptez-le à vos besoins
+
+<AiPrompt>
+  Limite le briefing aux décisions et demandes qui me sont adressées. Ignore
+  les canaux d'annonces uniquement.
+</AiPrompt>
+
+<AiPrompt>
+  Rédige des réponses pour les 5 e-mails et fils Slack qui ont le plus besoin
+  de moi. Garde-les dans mon style.
+</AiPrompt>
+
+## Dépannage
+
+* **Le briefing déverse chaque message :** nommez les canaux Slack et calendriers qui comptent, et demandez à l'Agent de ne garder que les décisions et demandes qui vous sont adressées. Ignorez les canaux d'annonces uniquement.
+* **Il a manqué les jours de votre absence :** donnez des dates exactes, avec le fuseau horaire, et confirmez que Gmail, Slack et Calendar sont connectés au même compte que celui utilisé pendant votre absence.
+* **Les brouillons ne vous ressemblent pas :** collez quelques-unes de vos vraies réponses et demandez à l'Agent d'adopter ce style avant qu'il n'écrive quoi que ce soit que vous pourriez envoyer.
+
+## Voir aussi
+
+<CardGroup cols={2}>
+  <Card title="Suivre les abonnements" href="/fr/use-cases/track-subscriptions">
+    Le même connecteur Gmail pour les fondateurs et les opérations.
+  </Card>
+
+  <Card title="Surveiller les mentions de marque" href="/fr/use-cases/monitor-brand-mentions">
+    La même configuration Slack et Notion, pour les mentions publiques.
+  </Card>
+</CardGroup>

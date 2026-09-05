@@ -1,0 +1,150 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Replit MCP 서버
+
+> ChatGPT, Claude, Slack 또는 모든 MCP 클라이언트에서 Replit을 사용하여 Replit App을 생성, 업데이트, 게시하세요.
+
+Replit MCP는 [Model Context Protocol](https://modelcontextprotocol.io/)을 사용하여, 이미 사용 중인 AI 도구에서 Replit App을 생성, 검색, 확인, 업데이트, 게시할 수 있게 해줍니다.
+
+## ChatGPT, Claude, Slack에서 Replit 사용하기
+
+Replit은 ChatGPT, Claude, Slack에 네이티브로 연결됩니다. 연결 단계와 각 플랫폼에서 만들 수 있는 예시를 확인하려면 사용 중인 플랫폼을 선택하세요.
+
+<CardGroup cols={3}>
+  <Card title="ChatGPT" icon="https://mintcdn.com/replit/ULLdJVk-FThFx3Hf/images/icons/openai.svg?fit=max&auto=format&n=ULLdJVk-FThFx3Hf&q=85&s=3e591ab8189678eed0c8cb1985a4ba15" href="/ko/features/platforms/chatgpt" width="24" height="24" data-path="images/icons/openai.svg">
+    설정 → Apps & Connectors에서 Replit을 연결한 다음, 대화에서 바로 앱을 빌드하세요.
+  </Card>
+
+  <Card title="Claude" icon="https://mintcdn.com/replit/ULLdJVk-FThFx3Hf/images/icons/claude.svg?fit=max&auto=format&n=ULLdJVk-FThFx3Hf&q=85&s=239a017d980e5ea33ae0d6b13571b2ec" href="/ko/features/platforms/claude" width="24" height="24" data-path="images/icons/claude.svg">
+    커넥터 디렉터리에서 Replit을 연결한 다음, Claude에게 앱을 빌드하도록 요청하거나 디자인을 전달하세요.
+  </Card>
+
+  <Card title="Slack" icon="https://mintcdn.com/replit/ULLdJVk-FThFx3Hf/images/icons/slack.svg?fit=max&auto=format&n=ULLdJVk-FThFx3Hf&q=85&s=8d842525c111e3534251b55944402629" href="/ko/features/platforms/slack" width="24" height="24" data-path="images/icons/slack.svg">
+    워크스페이스에 Replit을 추가한 다음, Slackbot에게 아이디어로 동작하는 프로토타입을 빌드하도록 요청하세요.
+  </Card>
+</CardGroup>
+
+## MCP 클라이언트를 직접 연결하기
+
+MCP 클라이언트에 Replit 네이티브 통합이 없는 경우 직접 연결을 사용하세요.
+
+| 속성      | 값                                        |
+| ------- | ---------------------------------------- |
+| **URL** | `https://replit-mcp.com/server/mcp`      |
+| **전송**  | Streamable HTTP                          |
+| **인증**  | protected-resource discovery을 사용하는 OAuth |
+
+Streamable HTTP와 OAuth 인가를 지원하는 MCP 클라이언트에 서버 URL을 추가하세요. 클라이언트는 Replit의 protected-resource 메타데이터를 읽습니다. 그런 다음 Replit 로그인을 요청합니다.
+
+커스텀 OAuth 서버를 만들지 마세요. Replit MCP 서버가 클라이언트에 필요한 OAuth 메타데이터를 제공합니다.
+
+앱을 새로 생성하거나, 편집 권한이 있는 앱(공유받은 앱 포함)을 다룰 수 있습니다.
+
+### Replit MCP 설정하기
+
+Codex와 Claude Code는 예시입니다. 호환되는 모든 MCP 클라이언트에 Replit MCP를 추가할 수 있습니다.
+
+<Tabs>
+  <Tab title="Codex">
+    <Steps>
+      <Step title="MCP 목록 열기">
+        Codex에서 **Settings** → **Plugins** → **MCPs**를 엽니다.
+      </Step>
+
+      <Step title="Replit 추가하기">
+        커스텀 MCP를 추가합니다. `Replit`처럼 알아보기 쉬운 이름을 사용하세요. **Streamable HTTP**를 선택합니다. `https://replit-mcp.com/server/mcp`를 입력하고 저장합니다. bearer 토큰이나 커스텀 헤더는 추가하지 마세요.
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-add-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b55230326055b96644eca0cd1083ad87" alt="Replit, Streamable HTTP, Replit 엔드포인트, 빈 bearer 토큰 및 헤더 필드가 입력된 Codex 커스텀 MCP 양식" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replit 인증하기">
+        MCP 목록에서 **Replit**을 활성화하고 **Authenticate**를 선택합니다. 연결할 Replit 워크스페이스를 선택합니다. 그런 다음 **Allow**를 선택합니다.
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-authenticate-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=bc9f9186c8727e8a32ff632f6de8f427" alt="Replit이 활성화되어 있고 Authenticate 버튼이 있는 Codex MCP 목록" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-authenticate-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-authorize-replit-workspace.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=f55c986af7326bcbb528fdeaa1d60d9c" alt="일반적인 계정 및 워크스페이스 자리표시자, 워크스페이스 선택 항목, Allow 버튼이 포함된 Replit 인가 대화상자" width="1588" height="991" data-path="images/replitai/custom-mcp/codex-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Codex에서 Replit 사용하기">
+        Codex에 Replit 프로젝트를 생성, 확인, 업데이트하도록 요청하세요. 예를 들어 "최근에 업데이트한 내 Replit 프로젝트를 나열해줘"라고 요청합니다.
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-list-replit-projects.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=9108ae7d068f42f7d036ab3c32ba9ef7" alt="최근에 업데이트된 세 개의 Replit 프로젝트를 나열하는 Codex 응답" width="2000" height="951" data-path="images/replitai/custom-mcp/codex-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Claude Code">
+    <Steps>
+      <Step title="Replit 추가하기">
+        터미널에서 HTTP 전송 방식으로 서버를 추가합니다.
+
+        ```bash theme={null}
+        claude mcp add replit https://replit-mcp.com/server/mcp --transport http
+        ```
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-add-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b81bc9f93a87c4cbfd62c9a4dff41ac5" alt="HTTP 서버 명령과 일반적인 로컬 구성 경로로 Replit MCP를 추가한 후의 Claude Code 터미널" width="2000" height="1097" data-path="images/replitai/custom-mcp/claude-code-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replit 선택하기">
+        Claude Code를 시작하거나 다시 시작합니다. `/mcp`를 실행한 다음 `replit`을 선택합니다.
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b5dd66f1428a698eee19d89e1335e828" alt="로컬 replit 서버가 선택되어 있고 인증이 필요하다고 표시된 Claude Code MCP 목록" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replit 인증하기">
+        로컬 `replit` 서버에서 **Authenticate**를 선택합니다. Replit 로그인을 완료하고, 연결할 워크스페이스를 선택한 다음 **Allow**를 선택합니다.
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=9fb01839630ffef454f8fa88089c3481" alt="직접 연결되는 Replit 엔드포인트와 선택된 Authenticate가 표시된 Claude Code의 로컬 replit 서버 세부 정보" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=2814f71811da92d06d32a40d6ab90fe4" alt="일반적인 계정 및 워크스페이스 자리표시자, 워크스페이스 선택 항목, Allow 버튼이 포함된 Claude 인가 대화상자" width="1588" height="991" data-path="images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Claude Code에서 Replit 사용하기">
+        Claude Code에 Replit 프로젝트를 생성, 확인, 업데이트하도록 요청하세요. 예를 들어 "최근에 업데이트한 내 Replit 프로젝트를 나열해줘"라고 요청합니다.
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-list-replit-projects.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=3d4d4c3ef1ce4c5783f80aaaf3e7efc6" alt="일반적인 Replit 프로젝트와 자리표시자 URL을 나열하는 Claude Code 응답" width="2000" height="850" data-path="images/replitai/custom-mcp/claude-code-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## 도구
+
+| 도구                        | 필수 입력                         | 선택 입력                                                                     | 용도                                                                                                                                                                                                                      |
+| ------------------------- | ----------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_app_from_prompt`  | `appDescription`, `app_stack` | `userSpecifiedAppName`, `userQuotes`, `attachmentSummary`, `sourceReplId` | 새 앱을 시작합니다. `app_stack`은 `react_website`, `mobile_app`, `design`, `slides`, `animation`, `data_visualization`, `3d_game`, `document`, `spreadsheet` 중 하나입니다. `sourceReplId`를 설정하면 새 앱을 빈 프로젝트가 아닌 기존 앱의 비공개 사본으로 시작합니다. |
+| `search_apps`             | 없음                            | `query`, `url`, `updatedAfter`, `updatedBefore`, `limit`                  | 제목 키워드, URL, 또는 마지막 업데이트 시간으로 앱을 찾습니다. `limit`은 1부터 50까지입니다.                                                                                                                                                            |
+| `resolve_app_by_name`     | `name`                        | 없음                                                                        | 정확한 제목으로 앱 하나를 찾습니다.                                                                                                                                                                                                    |
+| `list_apps`               | 없음                            | `query`, `limit`                                                          | 편집 가능한 앱을 최근 활동 순으로 나열합니다. 기본 한도는 25이고 최대치는 50입니다.                                                                                                                                                                      |
+| `ask_question`            | `replId`, `question`          | 없음                                                                        | 앱을 변경하지 않고 Agent에 앱에 대해 질문합니다.                                                                                                                                                                                          |
+| `update_app_using_prompt` | `replId`, `changeDescription` | `userQuotes`, `attachmentSummary`                                         | 기존 앱에 대한 Agent 업데이트를 시작합니다.                                                                                                                                                                                             |
+| `publish_app`             | `replId`                      | 없음                                                                        | 앱을 게시하거나 최신 변경 사항을 다시 게시합니다.                                                                                                                                                                                            |
+| `get_publish_status`      | `replId`                      | 없음                                                                        | 앱이 게시되었는지 여부, 현재 게시 상태, 공개 URL을 확인합니다.                                                                                                                                                                                  |
+
+## 문제 해결
+
+| 문제                        | 해결 방법                                                                      |
+| ------------------------- | -------------------------------------------------------------------------- |
+| Replit이 인증을 요청함           | MCP 클라이언트에서 OAuth 로그인 흐름을 다시 완료하세요.                                        |
+| 앱을 찾을 수 없음                | 해당 앱을 편집할 수 있는지 확인하세요. 그런 다음 URL로 검색하거나 `list_apps`를 사용해 일치하는 앱 중에서 선택하세요. |
+| 생성, 업데이트, 게시 요청이 아직 실행 중임 | 재시도하기 전에 기다리세요. 게시의 경우 `get_publish_status`로 현재 결과를 확인하세요.                 |

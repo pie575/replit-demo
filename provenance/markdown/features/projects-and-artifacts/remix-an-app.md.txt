@@ -1,0 +1,222 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Remix an app
+
+> Create your own copy of a public Replit App or template to explore, customize, and build on in your workspace.
+
+export const RemixButton = ({replUrl = "https://replit.com/@sarahxli/Digital-Piano-Keys?v=1", label = "Remix this app", count = null}) => {
+  if (typeof document !== 'undefined' && !document.getElementById('remix-button-styles')) {
+    const style = document.createElement('style');
+    style.id = 'remix-button-styles';
+    style.textContent = `
+      /* Button container */
+      .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --btn-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --btn-text: var(--replit-docs-text, #1D1D1D);
+        --btn-border: var(--replit-docs-border, #DEDAD5);
+        --transition-duration: 120ms;
+        display: flex;
+        justify-content: center;
+      }
+
+      .dark .remix-btn-container,
+      html.dark .remix-btn-container,
+      [data-theme="dark"] .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-elevated, #222223);
+        --btn-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --btn-text: var(--replit-docs-text, #F5F5F5);
+        --btn-border: var(--replit-docs-border, #39393D);
+      }
+
+      /* Button base styles - matching template page exactly */
+      .remix-btn {
+        /* Layout */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        max-width: 400px;
+        min-width: 200px;
+        height: 36px;
+        padding: 0 16px;
+        gap: 8px;
+
+        /* Typography */
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5;
+        text-decoration: none;
+        white-space: nowrap;
+
+        /* Visual */
+        border-radius: 8px;
+        border: none;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        box-shadow: inset 0 0 0 1px var(--btn-border);
+
+        /* Interaction */
+        cursor: pointer;
+        user-select: none;
+        transition-property: background-color;
+        transition-duration: var(--transition-duration);
+        transition-timing-function: ease-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      /* Content (icon + label) - centered */
+      .remix-btn-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      /* Hover state */
+      @media (hover: hover) {
+        .remix-btn:hover {
+          background: var(--btn-bg-hover);
+        }
+      }
+
+      /* Active/pressed state */
+      .remix-btn:active {
+        background: var(--btn-bg-hover);
+        transform: scale(0.99);
+      }
+
+      /* Focus visible state */
+      .remix-btn:focus-visible {
+        outline: 2px solid #0079F2;
+        outline-offset: 2px;
+      }
+
+      /* Icon styles */
+      .remix-btn svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Label styles */
+      .remix-btn span {
+        font-weight: 600;
+      }
+
+      /* Animation */
+      @keyframes remix-btn-fade-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .remix-btn-container {
+        animation: remix-btn-fade-in 300ms ease-out;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleClick = e => {
+    e.preventDefault();
+    const url = replUrl.includes('replit.com') ? replUrl : `https://replit.com${replUrl}`;
+    window.open(url, '_blank');
+  };
+  const RemixIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMin">
+      <path d="M17.47 13.47a.75.75 0 0 1 1.06 0l4 4a.745.745 0 0 1 .118.16c.016.027.032.054.044.083.007.016.01.032.016.049a.744.744 0 0 1 .042.238.743.743 0 0 1-.037.223c-.007.02-.012.042-.02.062a.748.748 0 0 1-.163.245l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H15.95a4.753 4.753 0 0 1-3.886-2.09l-.351-.442a.75.75 0 0 1 1.172-.936l.36.45.04.055a3.251 3.251 0 0 0 2.68 1.463h4.224l-2.72-2.72a.75.75 0 0 1 0-1.06ZM17.47 1.47a.75.75 0 0 1 1.06 0l4 4a.756.756 0 0 1 .162.816.749.749 0 0 1-.162.244l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H16.02a3.25 3.25 0 0 0-2.674 1.372l-5.44 8.58a4.75 4.75 0 0 1-3.934 2.047L2 18.75a.75.75 0 0 1 0-1.5h1.979a3.25 3.25 0 0 0 2.673-1.373l5.442-8.578.02-.03a4.751 4.751 0 0 1 3.913-2.018l4.162-.001-2.72-2.72a.75.75 0 0 1 0-1.06ZM3.972 5.25a4.75 4.75 0 0 1 4.27 2.612.751.751 0 0 1-1.34.675 3.252 3.252 0 0 0-2.698-1.781l-.226-.006H2a.75.75 0 0 1 0-1.5h1.972Z" />
+    </svg>;
+  return <div className="remix-btn-container" style={{
+    margin: '16px 0'
+  }}>
+      <button onClick={handleClick} className="remix-btn" type="button" tabIndex={0}>
+        <RemixIcon />
+        <span>{label}</span>
+      </button>
+    </div>;
+};
+
+Remixing lets you start from existing apps created by the community. It's faster than building from scratch and a great way to learn from working code.
+
+<Tip>
+  New to Replit? Try [building your first app](/build/your-first-app) to learn how Agent works from scratch.
+</Tip>
+
+## What is a Remix
+
+A **Remix** is a new Replit App you create from an app that you currently have access to. When you remix a public app or template, you get your own copy to interact with and iteratively improve. Changes you make in your Remix don't affect the original app.
+
+Your Remix credits its source: it shows a **Remixed from** link back to the original, and the original's build prompt appears on its cover page.
+
+## What your Remix includes
+
+A Remix is a complete, working copy, with a clean separation from the original:
+
+* **All files and configuration** copy over, so the app runs exactly as the source did.
+* **The source's checkpoint history** comes along, labeled as history from the source app. You can roll back to any of those checkpoints; the conversation that produced them stays with the original.
+* **A brand-new Agent.** Your Remix starts with a fresh Agent and no inherited chat history.
+* **Secret names, not values.** If the app uses secrets (such as API keys), your Remix lists them so you know what to fill in, with empty values. Values copy only when you remix your own app.
+* **A fresh database.** Your Remix never connects to the original's database. If the original offers it, a **Copy data from original App** option copies the data itself; your changes still never touch the source.
+* **A fresh sign-in setup** for apps that use Replit Auth.
+
+Not copied: deployments, domains, and connector configurations, which you set up on your own copy. Remixes also start private, so nothing is shared until you choose to publish.
+
+## How to remix an app
+
+<Steps>
+  <Step title="Open the app's cover page">
+    Find an app you want to remix, such as one from the [community](https://replit.com/community/all). Its cover page shows a live preview and sharing options.
+  </Step>
+
+  <Step title="Remix the app">
+    Select **Remix this App** to start creating your own version.
+  </Step>
+
+  <Step title="Complete the app details">
+    In the **Remix App** dialog, give your copy a name and an optional description, then select **Remix App**. You can edit these details later.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/u7DyWVbaIRze6Cmd/images/getting-started/quickstart_remix_dialog.png?fit=max&auto=format&n=u7DyWVbaIRze6Cmd&q=85&s=d1d41a640ac0fc55679aa4081d5c5ff2" alt="Remix App dialog showing app name, description, and privacy settings" width="1222" height="1202" data-path="images/getting-started/quickstart_remix_dialog.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Explore your copy">
+    Your copy opens in your workspace and starts automatically. Navigate to the **Preview** tab to see it running.
+  </Step>
+</Steps>
+
+## Try it
+
+Create a Remix of the **Supercar showcase** template, one of the featured templates from [Start from a template](/design/start-from-a-template):
+
+<Frame>
+  <img src="https://mintcdn.com/replit/9Q_lVrxG2Dh35jz1/images/design/replit-design/templates/supercar-showcase.webp?fit=max&auto=format&n=9Q_lVrxG2Dh35jz1&q=85&s=3807a96319b4d974f30bda957f6bd92e" alt="The Supercar showcase template cover, a dark landing page with a silver supercar hero" width="1920" height="1080" data-path="images/design/replit-design/templates/supercar-showcase.webp" />
+</Frame>
+
+<RemixButton replUrl="https://replit.com/t/replit-gallery/repls/Apex-01/view" label="Remix this app" />
+
+## Build on your Remix
+
+Once your Remix opens in the workspace, use Agent to modify and extend it. Enter a prompt in the **Agent** tab describing the feature you want to add.
+
+To undo Agent's changes, select **Rollback to here** in the Checkpoint created after the change. Learn more about [Checkpoints and Rollbacks](/features/version-control/checkpoints-and-rollbacks).
+
+## Remix or build from a prompt?
+
+Both paths end in the same place: an app of your own that Agent helps you evolve. They start differently:
+
+|                    | Remix                                  | Build from a prompt                        |
+| ------------------ | -------------------------------------- | ------------------------------------------ |
+| Starting point     | A working app, copied exactly          | An app Agent creates from your description |
+| First result       | Immediate, and identical to the source | Takes longer, and output varies            |
+| Agent's first move | Waits for your direction               | Plans and builds from your prompt          |
+
+If an app close to what you want already exists, remix it: Agent's first turn works on a real, working app instead of starting from a blank slate. Build from a prompt when your idea doesn't resemble anything you can find.
+
+## Next steps
+
+* **Explore more remixes**: Browse the [community](https://replit.com/community/all) to find apps to remix and learn from
+* **Build from scratch**: Try [creating your own app](/build/your-first-app) with Agent to compare the experience
+* **Publish for remixing**: Share your enhanced version so others can build on your work

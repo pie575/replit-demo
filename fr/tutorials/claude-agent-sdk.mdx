@@ -1,0 +1,240 @@
+---
+title: "Créer et publier une application avec le Claude Agent SDK"
+description: "Apprenez à créer et publier des agents IA autonomes en utilisant le Claude Agent SDK et Replit, avec un exemple d'automatisation Todoist étape par étape."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Le [Claude Agent SDK](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/sdk) est Claude Code sous forme de bibliothèque. Il vous permet de créer programmatiquement les mêmes agents qui propulsent Claude Code, puis de les exécuter comme du code. Transformez les tâches répétitives en flux de travail automatisés et publiez-les sur Replit.
+
+<YouTubeEmbed videoId="jNpH_hOFvg4" title="Créer et publier une application Claude Agent SDK sur Replit" />
+
+Dans ce tutoriel, vous créez un agent qui organise une boîte de réception Todoist — en récupérant les tâches, en appliquant des étiquettes et en les triant dans des projets — puis vous le publiez pour qu'il s'exécute selon un planning.
+
+## Ce que vous apprendrez
+
+* Comment fonctionne le Claude Agent SDK et quand l'utiliser
+* Primitives essentielles : agents, outils, serveurs MCP, compétences et permissions
+* Comment créer un agent d'automatisation de tâches sur Replit en utilisant les [Intégrations](/fr/features/integrations/overview)
+* Comment publier votre agent selon un planning avec les [Déploiements planifiés](/fr/features/publishing/scheduled-deployments)
+
+## Prérequis
+
+* Un compte [Replit](https://replit.com) (plan Core ou Pro recommandé pour les Déploiements)
+* Une [clé API Anthropic](https://console.anthropic.com/)
+* Un compte [Todoist](https://todoist.com) (ou un autre service que vous souhaitez automatiser)
+
+## Comment fonctionne le Claude Agent SDK
+
+Un agent est une boucle : vous envoyez une invite, l'agent choisit des outils à exécuter, observe les résultats, et répète jusqu'à ce que la tâche soit terminée.
+
+Vous fournissez l'invite. Le SDK gère la boucle.
+
+Mais le SDK va plus loin. Il vous permet de créer des **architectures multi-agents** où un agent orchestrateur délègue des tâches à des sous-agents spécialisés, chacun avec leurs propres outils et fenêtres de contexte.
+
+<Tip>
+  Les architectures multi-agents maintiennent chaque agent concentré. Les sous-agents reçoivent uniquement les outils et le contexte dont ils ont besoin, ce qui évite la saturation du contexte et améliore les performances.
+</Tip>
+
+### Primitives essentielles
+
+| Primitive             | Ce qu'elle fait                                                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Boucle de requête** | La base : invite, choisir des outils, exécuter, observer, répéter                                                                  |
+| **Agents**            | Configurations spécialisées avec leurs propres outils et instructions                                                              |
+| **Outils**            | Actions que les agents peuvent effectuer — exécuter des commandes, appeler des API, modifier des fichiers                          |
+| **Serveurs MCP**      | Processus externes qui exposent des collections d'outils (lourds en contexte, chargés au démarrage)                                |
+| **Compétences**       | Fichiers d'instructions Markdown qui enseignent aux agents comment faire des choses (efficaces en contexte, chargées à la demande) |
+| **Permissions**       | Contrôles granulaires sur ce à quoi chaque agent peut accéder et exécuter                                                          |
+
+### Compétences vs. serveurs MCP
+
+Ce sont les deux principales façons d'étendre vos agents :
+
+**Les compétences** sont des fichiers Markdown avec des instructions que votre agent suit. Seule une brève description se charge jusqu'à l'invocation, gardant la fenêtre de contexte légère. Utilisez les compétences pour :
+
+* Les flux de travail et conventions (« comment déployer », « liste de contrôle de révision de code »)
+* Les matériaux de référence (modèles d'API, guides de style)
+* Les invites réutilisables déclenchées par nom
+
+**Les serveurs MCP** sont des processus qui exposent des outils. Toutes les descriptions d'outils se chargent au démarrage, les rendant lourds en contexte. Utilisez les serveurs MCP pour :
+
+* Se connecter à des services externes (Notion, Linear, bases de données)
+* Les actions qui nécessitent un accès API (créer des tâches, interroger des données)
+* Les outils qui *font* des choses, pas seulement des instructions
+
+<Info>
+  Les compétences définissent *comment* votre agent doit fonctionner. Les serveurs MCP définissent *ce à quoi* votre agent peut accéder. Les deux fonctionnent pour les agents de codage (comme Replit Agent) et les agents que vous construisez avec le SDK.
+</Info>
+
+### Quand utiliser le SDK vs. l'API
+
+| Cas d'utilisation                     | Choisir          |
+| ------------------------------------- | ---------------- |
+| Automatisation de tâches multi-étapes | Claude Agent SDK |
+| Flux de travail multi-agents          | Claude Agent SDK |
+| Applications de chat simples          | API Anthropic    |
+| Tâches à tour unique                  | API Anthropic    |
+
+## Créer un agent organisateur Todoist
+
+Cette procédure utilise un modèle Replit qui structure un projet Claude Agent SDK avec la bonne organisation — répertoires d'agents, d'outils, de serveurs MCP, de compétences et de permissions déjà en place.
+
+### Étape 1 : Remixer le modèle
+
+<Steps>
+  <Step title="Ouvrir le modèle">
+    Ouvrez le [modèle Claude Agent SDK](https://replit.com/@matt/Claude-Agent-SDK) sur Replit et sélectionnez **Remix** pour créer votre propre copie.
+  </Step>
+
+  <Step title="Nommer votre projet">
+    Donnez-lui un nom descriptif (par ex., « Mon agent Todoist ») et sélectionnez **Utiliser ce modèle**.
+  </Step>
+
+  <Step title="Examiner la structure du projet">
+    Une fois l'environnement chargé, ouvrez la barre latérale des fichiers. Activez **Afficher les fichiers cachés** si nécessaire pour voir la structure complète :
+
+    * `.agents/skills/` — Compétences qui enseignent à Replit Agent comment créer des applications Claude Agent SDK
+    * `src/agents/` — Définitions d'agents
+    * `src/mcpServers/` — Configurations des serveurs MCP
+    * `src/permissions/` — Définitions des permissions
+    * `src/skills/` — Compétences pour vos agents (fichiers Markdown)
+    * `src/tools/` — Définitions d'outils personnalisés
+  </Step>
+</Steps>
+
+<Tip>
+  Le modèle inclut une compétence qui enseigne à Replit Agent comment créer des applications Claude Agent SDK. Cela signifie qu'Agent comprend déjà le framework lorsque vous lui donnez des instructions.
+</Tip>
+
+### Étape 2 : Connecter Todoist via les Intégrations Replit
+
+Avant de donner des instructions à Agent, connectez le service avec lequel votre agent doit interagir.
+
+1. Allez sur **replit.com/integrations** dans votre compte Replit.
+2. Trouvez **Todoist** et connectez votre compte.
+3. Autorisez Replit à accéder à vos données Todoist.
+
+<Info>
+  Les Intégrations Replit gèrent OAuth et l'authentification pour vous. Votre agent peut accéder à l'API Todoist sans gérer directement les tokens. C'est plus simple que de configurer un serveur MCP séparé qui nécessite son propre flux OAuth.
+</Info>
+
+### Étape 3 : Demander à Agent de créer votre agent
+
+Passez Replit Agent en **Mode Plan** pour de meilleurs résultats — il examine le plan avant de construire, vous donnant la chance de vérifier l'approche.
+
+<AiPrompt>
+  Utilise la compétence Claude Agent SDK. Crée un agent qui examine ma boîte de réception Todoist et organise mes tâches en appliquant des étiquettes pertinentes ou des informations complémentaires.
+
+  Tu dois créer des outils qui permettent à l'agent d'interagir avec Todoist en utilisant le SDK.
+
+  Le résultat doit être un agent qui, lorsqu'il est déclenché, charge toutes les tâches et les projets disponibles, les peaufine, puis les organise de manière appropriée.
+
+  Assure-toi d'utiliser l'intégration Replit Todoist pour toute l'authentification. Utilise des outils personnalisés avec l'API REST Todoist plutôt que le serveur MCP Todoist, car le serveur MCP nécessite OAuth qui ne fonctionne pas dans ce contexte.
+
+  L'agent doit également récupérer une liste de projets et attribuer un projet pertinent à chaque élément dans ma boîte de réception, en vidant complètement la boîte de réception.
+</AiPrompt>
+
+<Note>
+  Les deux derniers paragraphes de cette invite ont été ajoutés après débogage. Être précis sur *comment* s'authentifier (Intégrations Replit, pas MCP OAuth) et *quel* doit être l'état final (boîte de réception complètement vidée) économise du temps d'itération.
+</Note>
+
+### Étape 4 : Examiner le plan et construire
+
+Lorsqu'Agent présente son plan, vérifiez qu'il inclut :
+
+1. **Des outils personnalisés** pour l'API Todoist (pas le serveur MCP Todoist)
+2. **Un agent organisateur** qui récupère les tâches, les étiquettes et les projets
+3. **Des permissions appropriées** limitées aux outils dont votre agent a besoin
+4. **Un point d'entrée** qui déclenche le flux de travail
+
+Une fois satisfait, approuvez le plan, réglez Agent sur **haute autonomie**, et laissez-le construire.
+
+### Étape 5 : Ajouter votre clé API Anthropic
+
+Le Claude Agent SDK nécessite une clé API Anthropic pour appeler Claude.
+
+1. Ouvrez le panneau **Secrets** dans l'Éditeur de projet.
+2. Ajoutez un secret nommé `ANTHROPIC_API_KEY` avec la valeur de votre clé API.
+
+<Info>
+  Si vous avez enregistré votre clé API Anthropic dans votre [coffre-fort Replit dans les Paramètres](https://replit.com/settings), elle est automatiquement disponible dans tous vos projets.
+</Info>
+
+### Étape 6 : Tester et déboguer
+
+Exécutez l'agent et vérifiez qu'il traite correctement votre boîte de réception Todoist. Problèmes courants à surveiller :
+
+* **« La boîte de réception est vide » alors qu'elle ne l'est pas** — Le format de réponse API pour détecter les tâches de la boîte de réception peut nécessiter un ajustement. Vérifiez que l'agent filtre les tâches par le projet boîte de réception, pas par une autre propriété.
+* **Les tâches reçoivent des étiquettes mais ne sont pas déplacées vers des projets** — Soyez explicite dans votre invite sur le fait que l'agent doit récupérer les projets disponibles et en attribuer un à chaque tâche.
+* **Erreurs d'authentification** — Vérifiez que l'intégration Todoist est connectée dans les Intégrations Replit et que votre code d'agent l'utilise (pas un flux OAuth séparé).
+
+<Tip>
+  Le débogage fait partie de la construction avec l'IA. Quand quelque chose ne fonctionne pas, examinez la sortie, identifiez *ce* que l'agent a fait différemment de ce qui était attendu, et fournissez une invite plus spécifique. Chaque correction vous enseigne ce qu'il faut inclure d'emblée la prochaine fois.
+</Tip>
+
+## Publier votre agent
+
+Une fois que votre agent fonctionne correctement, publiez-le pour qu'il s'exécute automatiquement.
+
+<Steps>
+  <Step title="Ouvrir l'onglet Publier">
+    Dans l'Éditeur de projet, sélectionnez l'onglet **Publier**.
+  </Step>
+
+  <Step title="Choisir le déploiement planifié">
+    Sélectionnez **Déploiement planifié** pour l'automatisation basée sur le temps. Entrez le planning souhaité (par ex., « Tous les jours à 17h PST »).
+  </Step>
+
+  <Step title="Vérifier la configuration">
+    Confirmez que la commande d'exécution pointe vers votre fichier de point d'entrée principal et que votre secret `ANTHROPIC_API_KEY` est inclus dans les secrets de déploiement.
+  </Step>
+
+  <Step title="Publier">
+    Sélectionnez **Publier**. Votre agent est maintenant en ligne et s'exécute selon le planning.
+  </Step>
+</Steps>
+
+Pour les agents qui doivent répondre à des événements (webhooks, messages entrants), utilisez plutôt un [Déploiement sur VM réservée](/fr/features/publishing/reserved-vm-deployments).
+
+## Étendre votre agent
+
+Une fois les bases en place, vous pouvez créer des agents plus sophistiqués sur Replit :
+
+* **Ajouter une mémoire persistante** — Utilisez la [Base de données Replit](/fr/features/data-and-storage/sql-database) pour stocker l'état entre les exécutions
+* **Stocker des fichiers** — Utilisez le [Stockage d'application](/fr/features/data-and-storage/object-storage) pour les données basées sur des fichiers
+* **Connecter plus de services** — Ajoutez plus d'[Intégrations](/fr/features/integrations/overview) (Slack, Linear, GitHub, Notion) pour des flux de travail multi-services
+* **Utiliser des compétences** — Ajoutez des fichiers de compétences Markdown pour donner à vos agents des connaissances spécialisées et des instructions
+
+## Prochaines étapes
+
+* Explorez la [documentation du Claude Agent SDK](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/sdk) pour la référence complète de l'API
+* Découvrez les [Agents et automatisations](/fr/features/agent/automations) pour créer des chatbots et des flux de travail événementiels sur Replit
+* Lisez sur les [Déploiements planifiés](/fr/features/publishing/scheduled-deployments) et les [Déploiements sur VM réservée](/fr/features/publishing/reserved-vm-deployments) pour les options de déploiement
+* Consultez le [modèle Claude Agent SDK](https://replit.com/@matt/Claude-Agent-SDK) pour commencer à construire

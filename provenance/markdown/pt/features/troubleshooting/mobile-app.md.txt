@@ -1,0 +1,204 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Solução de problemas de apps mobile
+
+> Resolva problemas comuns ao criar apps mobile com Expo e React Native no Replit.
+
+Ao criar apps mobile no Replit, você pode encontrar problemas com previews, bundling ou dependências de pacotes. Este guia ajuda você a resolver problemas comuns, começando com correções rápidas e avançando para etapas de depuração mais detalhadas.
+
+## Correções rápidas
+
+Tente estas primeiro — elas resolvem a maioria dos problemas:
+
+| Problema                            | O que tentar                                                  |
+| ----------------------------------- | ------------------------------------------------------------- |
+| Alterações não aparecem no telefone | Agite o telefone para abrir o menu Expo e toque em **Reload** |
+| Alterações não aparecem no preview  | Pressione **R** no console para fazer o rebundle              |
+| App travado ou sem resposta         | Pare e reinicie o app pelo console                            |
+
+## Problemas comuns
+
+<AccordionGroup>
+  <Accordion title="As alterações não aparecem no meu dispositivo">
+    Quando você faz alterações mas não as vê no telefone:
+
+    1. **Agite o telefone** para abrir o menu do desenvolvedor Expo
+    2. Toque em **Reload** para baixar o bundle novamente
+
+    No preview web, pressione **R** no console para acionar um rebundle.
+
+    Se as alterações ainda não aparecerem, tente limpar o cache (veja [Limpar o cache do Metro](#clear-the-metro-cache) abaixo).
+  </Accordion>
+
+  <Accordion title="Tela de erro vermelha no Expo Go">
+    Uma tela de erro vermelha geralmente indica um erro de JavaScript ou módulo ausente. Leia a mensagem de erro — ela frequentemente aponta para o arquivo e a linha específicos.
+
+    **Causas comuns:**
+
+    * Um pacote não está instalado ou está na versão errada
+    * Um módulo funciona na web mas não no nativo (ou vice-versa)
+    * Erro de sintaxe no seu código
+
+    **O que tentar:**
+
+    1. Leia a mensagem de erro com atenção — ela frequentemente diz exatamente o que está errado
+    2. Peça ao Agent para ajudar a corrigir o erro compartilhando a mensagem
+    3. Se o erro mencionar um pacote específico, tente reinstalar as dependências (veja [Reinstalar pacotes](#reinstall-packages))
+  </Accordion>
+
+  <Accordion title="O app funciona na web mas trava no telefone (ou vice-versa)">
+    Alguns pacotes ou recursos funcionam de forma diferente entre plataformas. O React Native compila para três alvos: iOS, Android e web. Uma biblioteca que funciona na web pode não suportar o nativo, ou pode precisar de configuração diferente.
+
+    **O que tentar:**
+
+    1. Verifique se o pacote suporta sua plataforma na documentação dele
+    2. Pergunte ao Agent: "Este pacote é compatível com o Expo Go?"
+    3. Considere mover a funcionalidade para o seu servidor se não for suportada no mobile
+
+    <Tip>
+      Ao pesquisar pacotes, procure por "Expo compatible" ou consulte a [documentação do Expo SDK](https://docs.expo.dev/versions/latest/) para módulos suportados.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="O QR code não escaneia ou o app não conecta">
+    **Verifique sua rede:**
+
+    * Seu telefone e computador devem estar na mesma rede WiFi
+    * Algumas redes corporativas ou públicas bloqueiam a conexão
+
+    **Tente o modo tunnel:**
+    Se você estiver em uma rede restrita, o modo tunnel roteia o tráfego pelos servidores do Expo. Peça ao Agent para iniciar o app com o modo tunnel, ou execute `npx expo start --tunnel` no shell.
+
+    **Reinicie o Expo Go:**
+    Feche completamente o Expo Go e reabra-o antes de escanear.
+  </Accordion>
+
+  <Accordion title="O build demora muito">
+    O primeiro build é sempre mais lento porque não há cache. Builds subsequentes devem ser mais rápidos.
+
+    **O que afeta o tempo de build:**
+
+    * Número de pacotes no seu projeto
+    * Primeira execução após limpar o cache
+    * Velocidade da rede ao baixar pacotes
+
+    Se os builds forem consistentemente lentos, verifique se há pacotes desnecessários instalados.
+  </Accordion>
+
+  <Accordion title="Erros de módulo não encontrado">
+    Quando você vê "Unable to resolve module" ou "Module not found":
+
+    1. O pacote pode não estar instalado — peça ao Agent para instalá-lo
+    2. O pacote pode estar instalado mas o cache está desatualizado — limpe o cache
+    3. O pacote pode não existir ou estar com nome incorreto — verifique o nome do pacote
+
+    Tente [reinstalar os pacotes](#reinstall-packages) se o módulo deveria existir.
+  </Accordion>
+</AccordionGroup>
+
+## Comandos de depuração
+
+Quando as correções rápidas não funcionam, esses comandos ajudam a redefinir vários caches e estados. Execute-os no Shell.
+
+### Limpar o cache do Metro
+
+O Metro é o bundler que compila seu código React Native. Limpar o cache força um build novo.
+
+No shell, execute:
+
+```bash theme={null}
+npx expo start --clear
+```
+
+Isso limpa o cache do bundler e reinicia o servidor de desenvolvimento. Você verá "Bundler cache is empty. Rebuilding." na saída.
+
+<Tip>
+  Se você estiver frequentemente enfrentando problemas de cache, pode adicionar `-c` ao seu comando de início. Peça ao Agent para atualizar o comando de dev para incluir a flag de limpeza.
+</Tip>
+
+### Reinstalar pacotes
+
+Se você estiver vendo erros de módulo ou incompatibilidades de versão, reinstalar os pacotes frequentemente ajuda.
+
+No shell, execute:
+
+```bash theme={null}
+rm -rf node_modules && npm install
+```
+
+Isso exclui todos os pacotes instalados e os reinstala do zero com base no seu `package.json`.
+
+<Note>
+  Se o seu projeto usar um gerenciador de pacotes diferente (como `bun` ou `pnpm`), use o comando de instalação apropriado: `bun install` ou `pnpm install`.
+</Note>
+
+### Verificar incompatibilidades de versão
+
+O Expo Doctor verifica seu projeto em busca de problemas comuns como incompatibilidades de versão entre pacotes.
+
+No shell, execute:
+
+```bash theme={null}
+npx expo-doctor
+```
+
+Revise a saída em busca de avisos. Se ele sugerir correções, avalie-as com cuidado — não atualize pacotes às cegas, pois isso pode introduzir novos problemas.
+
+<Warning>
+  Atualize pacotes apenas quando houver uma razão específica para fazê-lo. Atualizar "só porque" pode quebrar seu app se a nova versão tiver alterações incompatíveis.
+</Warning>
+
+## Reset completo
+
+Quando nada mais funciona, um reset completo limpa todos os caches e reinstala tudo.
+
+<Accordion title="Opção nuclear: Comando de reset completo">
+  Este comando remove todos os caches e reinstala os pacotes do zero. Use-o como último recurso.
+
+  ```bash theme={null}
+  rm -rf node_modules .expo && npm cache clean --force && npm install && npx expo start --clear
+  ```
+
+  **O que isso faz:**
+
+  1. `rm -rf node_modules` — Exclui os pacotes instalados
+  2. `rm -rf .expo` — Exclui o cache local do Expo
+  3. `npm cache clean --force` — Limpa o cache global do npm
+  4. `npm install` — Reinstala todos os pacotes
+  5. `npx expo start --clear` — Inicia com um cache Metro novo
+
+  Após executar isso, seu próximo build demorará mais, pois tudo será reconstruído do zero.
+</Accordion>
+
+### Limpar cache no seu dispositivo
+
+Se o app no seu telefone parecer travado com código antigo mesmo após recarregar:
+
+* **iOS**: No Expo Go, vá para **Settings** e toque em **Clear Cache**
+* **Android**: Vá para **Settings > Apps > Expo Go > Storage > Clear Cache**
+
+## Referência rápida
+
+| Problema                              | Tente primeiro            | Depois tente                  |
+| ------------------------------------- | ------------------------- | ----------------------------- |
+| Alterações não aparecem               | Agite o telefone → Reload | Limpar cache do Metro         |
+| Erros de bundler                      | `npx expo start --clear`  | Excluir node\_modules         |
+| Módulo não encontrado                 | Reinstalar dependências   | Reset completo                |
+| Avisos de incompatibilidade de versão | Execute `npx expo-doctor` | Avalie as correções sugeridas |
+| Novo pacote não funcionando           | Reinicie o servidor       | Limpar cache do Metro         |
+| app.json alterado                     | Reinicie o servidor       | —                             |
+
+## Obtendo mais ajuda
+
+Se você ainda estiver com dificuldades:
+
+* **Pergunte ao Agent**: Descreva o erro e o que você tentou. O Agent frequentemente consegue diagnosticar e corrigir problemas.
+* **Consulte os docs do Expo**: O [guia de solução de problemas do Expo](https://docs.expo.dev/troubleshooting/overview/) abrange cenários adicionais.
+* **Pesquise o erro**: Copie a mensagem de erro exata e pesquise — alguém provavelmente já encontrou o mesmo problema.
+
+## Próximos passos
+
+* Voltar para [Apps Mobile Nativos](/pt/features/artifact-types/building-mobile-apps)
+* Aprenda o fluxo completo de publicação: [Criar e lançar um app mobile](/pt/build/mobile-app)

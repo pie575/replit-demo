@@ -1,0 +1,142 @@
+---
+title: "SEO Rating"
+description: "Measure and improve your published app's search engine optimization with Replit's SEO rating and Agent."
+sidebarTitle: "SEO Rating"
+icon: "magnifying-glass-chart"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+When you publish a web app on Replit, a Search Engine Optimization (SEO) audit runs automatically against your live URLs and surfaces an SEO rating in the Publishing tool. If the rating has room to grow, a single click hands the specific issues to Agent so you can fix them in seconds.
+
+For most builders, the entire workflow is: publish your app, glance at the rating, and ask Agent to "optimize my SEO." This page explains what is happening underneath and how to get the most out of it.
+
+## What is SEO and why it matters
+
+Search engine optimization (SEO) is the practice of building your site so that search engines like Google can find, understand, and rank it. Strong SEO means your app shows up when people search for what you offer — without paying for ads.
+
+A handful of things drive most of your SEO outcomes: clear page titles and descriptions, semantic HTML, fast load times, mobile-friendly layouts, descriptive alt text on images, and a crawlable site structure. Search engines reward sites that are easy to read for both humans and machines.
+
+If you are launching a landing page, a marketing site, a blog, a directory, or anything else where discoverability matters, SEO is one of the highest-leverage things you can invest in early.
+
+## How Replit improves your SEO out of the box
+
+Replit handles a lot of the SEO foundations for you so you can focus on your content and product:
+
+* **Fast, globally distributed hosting**: Replit Deployments serve your app from infrastructure tuned for speed, and you can choose where your app runs with [Project geography](/features/publishing/project-geography).
+* **HTTPS by default**: Every published app gets a TLS certificate managed by Replit, which is a baseline ranking signal for search engines.
+* **Custom domains**: Connect your own domain to build trust and brand authority. See [Custom Domains](/features/publishing/custom-domains).
+* **Static Deployments for content sites**: For marketing pages, blogs, and documentation, [Static Deployments](/features/publishing/deployment-types#static) deliver pre-rendered HTML that search engines crawl easily.
+* **Agent writes SEO-aware code**: When Agent builds your pages, it produces semantic HTML, accessible markup, and meta tags by default — the same things SEO tools check for.
+* **The SEO rating**: An automatic post-publish audit so you always know where you stand, paired with a one-click handoff to Agent to fix what it finds.
+
+## The SEO rating
+
+After every successful publish, Replit runs a Lighthouse audit against the URLs in your deployment and stores the results. The Publishing tool then displays an overall SEO rating for your app.
+
+<Frame caption="The SEO Rating card, listing issues by category with severity and status">
+  <img src="/assets/mirror/seo-rating-29a64c65e000.png" alt="The SEO Rating card showing an Issues table with Severity and Status columns, grouped into AI Readiness, Crawlability & Discovery, Landing Page Rendering & Metadata, and Performance Proxies, with Run scan with Agent and Fix all with Agent buttons and a note that the rating is based on the published app's Lighthouse metrics" width="902" height="598" data-path="images/deployments/seo-score/seo-rating.png" />
+</Frame>
+
+### Where to find it
+
+Open the **Publishing** tool on a published app. The SEO rating appears on the deployment overview alongside your other build details. Hover the rating to see the specific action items Lighthouse flagged for each page.
+
+<Note>
+  If you don't see an SEO rating, your app is likely private or hasn't been
+  published recently. The rating only appears for public web-facing apps that
+  have been published.
+</Note>
+
+### How to read your rating
+
+Replit shows one of three ratings based on the Lighthouse audit:
+
+| Rating     | What it means                                                                   |
+| :--------- | :------------------------------------------------------------------------------ |
+| Healthy    | Your app follows SEO best practices. Keep an eye on it after major changes.     |
+| Needs Work | Several issues are limiting how well search engines can understand your app.    |
+| Weak       | Important SEO basics are missing. Fixing them usually takes only a few minutes. |
+
+If your app has multiple pages, the badge shows the **lowest** rating across every URL Replit crawled, so the worst page surfaces first instead of being averaged away.
+
+### When the rating is calculated
+
+The audit runs automatically after every successful publish. The rating usually appears within a minute or two of a deployment going live, and the Publishing tool refreshes the badge as soon as results land.
+
+### Supported deployment types
+
+The SEO rating is calculated for public web-facing deployments where search engines can crawl URLs:
+
+* [Autoscale Deployments](/features/publishing/deployment-types#autoscale)
+* [Reserved VM Deployments](/features/publishing/deployment-types#reserved-vm)
+* [Static Deployments](/features/publishing/deployment-types#static)
+
+Scheduled deployments and private deployments won't produce an SEO rating because they do not serve public web traffic.
+
+## Optimize SEO with Agent
+
+An **Optimize SEO with Agent** button appears next to your rating. Selecting it opens [SEO Agent](/features/publishing/seo-agent) in the Growth pane, where you can run a technical SEO audit, review the issues it finds, and apply one-click fixes.
+
+<Tip>
+  You can also skip the button entirely. Open Agent and say **"optimize my
+  SEO"** — Agent will pick up your latest results and start working through
+  them.
+</Tip>
+
+After Agent finishes its changes, republish your app. The SEO rating recalculates against the new build and the badge updates automatically.
+
+Common fixes Agent will apply:
+
+* Add or rewrite missing or generic `<title>` tags so each page has a unique, descriptive title
+* Add a meta description to every page
+* Add descriptive `alt` text to images
+* Set the `lang` attribute on the `<html>` element
+* Make sure links have discernible text (no "click here" or empty anchors)
+* Add a `robots.txt` and a `sitemap.xml`
+* Add a viewport meta tag for mobile rendering
+* Improve color contrast on text that fails accessibility checks
+* Add Open Graph and Twitter card meta tags so links to your app preview well on social platforms
+
+## Best practices for an SEO-optimized site on Replit
+
+Whether you ask Agent to handle these for you or write them yourself, these are the highest-impact things to get right on a Replit-built app:
+
+* **Give every page a unique title and meta description.** Aim for titles under 60 characters and descriptions around 150–160 characters.
+* **Use semantic HTML.** Wrap your layout in `<main>`, `<header>`, `<nav>`, and `<footer>`. Use `<h1>` once per page and step heading levels in order.
+* **Add alt text to every image.** Describe what the image shows, not just what it is.
+* **Generate a `sitemap.xml` and `robots.txt`.** Ask Agent to create both so search engines know what to crawl.
+* **Add Open Graph and Twitter card tags.** Control how your app looks when shared on social media.
+* **Use a custom domain.** A branded domain builds trust with both visitors and search engines. See [Custom Domains](/features/publishing/custom-domains).
+* **Pick the right deployment type.** For content-heavy sites, [Static Deployments](/features/publishing/deployment-types#static) deliver pre-rendered HTML that search engines parse instantly.
+* **Add structured data.** JSON-LD markup helps search engines show rich results for products, articles, FAQs, and events.
+* **Keep your app fast.** Optimize images, avoid render-blocking scripts, and lean on Replit's hosting to keep response times low.
+
+A simple way to apply most of these in one shot:
+
+<AiPrompt>
+  Audit my site for SEO best practices and apply the fixes. Add a sitemap,
+  robots.txt, Open Graph tags, structured data where it makes sense, and make
+  sure every page has a unique title and meta description.
+</AiPrompt>
+
+## Next steps
+
+* [SEO Agent](/features/publishing/seo-agent) — run a technical SEO audit and apply one-click fixes from the Growth pane.
+* [Custom Domains](/features/publishing/custom-domains) — connect your own domain to your published app.
+* [Static Deployments](/features/publishing/deployment-types#static) — the best deployment type for content-heavy, SEO-critical sites.
+* [Project geography](/features/publishing/project-geography) — choose where your app runs to keep response times low for your audience.
+* [Agent](/features/agent/overview) — learn more about working with Agent on your app.

@@ -1,0 +1,286 @@
+---
+title: "バイブコーディング101"
+description: "バイブコーディングの考え方を学ぶ：目標から始め、小さなスライスで構築し、コンテキストを管理し、結果をレビューし、フィードバックで改善します。"
+sidebarTitle: "バイブコーディング101"
+icon: "wand-magic-sparkles"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<YouTubeEmbed videoId="5OWurmg41tI" title="バイブコーディング101" />
+
+バイブコーディングは、アイデアからソフトウェアへと素早く移行する方法です。コードから始める代わりに、何が存在すべきかを説明することから始め、AIを使ってその方向を見ることができ、テストして改善できる動作するアプリに変えます。
+
+Replitはこのループのために作られています。アイデアを説明し、結果をプレビューし、フィードバックを与え、変更を加え、同じ場所から公開できます。
+
+このページはバイブコーディングの背後にある考え方についてです。次のページ、[Agentと構築する](/ja/learn/build-with-agent)では、Agentのツールの使い方を紹介します。[効果的なプロンプティング](/ja/learn/effective-prompting)ではより明確な指示の書き方を紹介します。
+
+## ソフトウェアはかつてチームのループだった
+
+ソフトウェアは通常チームによって構築されてきました。
+
+プロダクトマネージャーや創業者が何を構築すべきか、なぜかを定義します。デザイナーが体験を形作ります。開発者がアイデアを動作するソフトウェアに変えます。チームメイトがテスト、フィードバック、バグを見つけ、何を出荷する準備ができているかを決定します。
+
+そのコラボレーションは強力です。なぜなら各役割が異なる種類の判断力をもたらすからです。プロダクトが何が重要かを決定します。デザインがどのように感じるべきかを決定します。エンジニアリングがどのように機能すべきかを決定します。テストがそれが実際にそうであるかどうかを決定します。
+
+しかしループは遅くなりがちです。すべての変更がハンドオフを経なければなりません：アイデアを説明し、フローをデザインし、コードを書き、結果をレビューし、テストして改訂します。
+
+バイブコーディングはそのループを圧縮します。
+
+Replitを使うと、プロダクト構築プロセスのより多くの部分を自分で進めることができます。目標を定義し、最初のバージョンを生成し、テストし、フィードバックを与え、異なる人々とツールの間ですべてのステップが移動するのを待つことなく改善できます。
+
+## あなたの役割が変わる
+
+構築を始めるのにデベロッパーである必要はありません。
+
+バイブコーディングでは、あなたの役割はプロダクトリードに近くなります。何が存在すべきか、誰のためか、何が最も重要か、結果が十分に良いかどうかを決定します。
+
+Agentが実装を支援しますが、あなたが仕事をリードします。
+
+あなたがもたらすもの：
+
+* 目標
+* オーディエンス
+* センス
+* 制約
+* フィードバック
+* 何を出荷するかの決定
+
+Agentが支援すること：
+
+* アイデアを動作するソフトウェアに変える
+* 変更を加える
+* 動作を説明する
+* 問題をデバッグする
+* アプリを時間とともに改善する
+
+あなたがよくリードするほど、Agentはよく構築できます。
+
+## 5つの原則
+
+バイブコーディングは5つのシンプルな原則に従うと最もうまく機能します：
+
+1. 目標から始める。
+2. 小さなスライスで構築する。
+3. コンテキストを管理する。
+4. レビューしてテストする。
+5. フィードバックで改善する。
+
+最初の原則が方向を設定します。次の4つはループとして繰り返されます：スライスを構築し、適切なコンテキストを与え、レビューし、改善して、次のスライスを構築します。
+
+<Frame>
+  <svg viewBox="0 0 920 360" role="img" aria-label="バイブコーディングのプロセス：目標から始め、小さなスライスで構築し、コンテキストを管理し、レビューしてテストし、フィードバックで改善し、小さなスライスで構築に戻る" style={{ width: "100%", height: "auto" }}>
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
+      </marker>
+    </defs>
+
+    <rect x="24" y="38" width="164" height="88" rx="18" fill="none" stroke="currentColor" strokeWidth="2" />
+
+    <text x="106" y="72" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">1</text>
+    <text x="106" y="100" textAnchor="middle" fontSize="16" fill="currentColor">目標から</text>
+    <text x="106" y="120" textAnchor="middle" fontSize="16" fill="currentColor">始める</text>
+
+    <rect x="236" y="38" width="164" height="88" rx="18" fill="none" stroke="currentColor" strokeWidth="2" />
+
+    <text x="318" y="72" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">2</text>
+    <text x="318" y="100" textAnchor="middle" fontSize="16" fill="currentColor">小さなスライスで</text>
+    <text x="318" y="120" textAnchor="middle" fontSize="16" fill="currentColor">構築する</text>
+
+    <rect x="448" y="38" width="164" height="88" rx="18" fill="none" stroke="currentColor" strokeWidth="2" />
+
+    <text x="530" y="72" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">3</text>
+    <text x="530" y="100" textAnchor="middle" fontSize="16" fill="currentColor">コンテキストを</text>
+    <text x="530" y="120" textAnchor="middle" fontSize="16" fill="currentColor">管理する</text>
+
+    <rect x="660" y="38" width="164" height="88" rx="18" fill="none" stroke="currentColor" strokeWidth="2" />
+
+    <text x="742" y="72" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">4</text>
+    <text x="742" y="100" textAnchor="middle" fontSize="16" fill="currentColor">レビューして</text>
+    <text x="742" y="120" textAnchor="middle" fontSize="16" fill="currentColor">テストする</text>
+
+    <rect x="448" y="220" width="164" height="88" rx="18" fill="none" stroke="currentColor" strokeWidth="2" />
+
+    <text x="530" y="254" textAnchor="middle" fontSize="18" fontWeight="700" fill="currentColor">5</text>
+    <text x="530" y="282" textAnchor="middle" fontSize="16" fill="currentColor">フィードバックで</text>
+    <text x="530" y="302" textAnchor="middle" fontSize="16" fill="currentColor">改善する</text>
+
+    <path d="M188 82 H224" stroke="currentColor" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+
+    <path d="M400 82 H436" stroke="currentColor" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+
+    <path d="M612 82 H648" stroke="currentColor" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+
+    <path d="M742 126 C742 184 648 264 624 264" stroke="currentColor" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+
+    <path d="M448 264 C348 264 318 190 318 140" stroke="currentColor" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+
+    <text x="106" y="172" textAnchor="middle" fontSize="13" fill="currentColor">一度方向を設定する</text>
+    <text x="530" y="342" textAnchor="middle" fontSize="13" fill="currentColor">スライスが機能するまで2〜5を繰り返す</text>
+  </svg>
+</Frame>
+
+これらの原則は完璧な最初のプロンプトを書くことよりも重要です。最終的なアプリを一歩で完成させることはほとんどありません。目標はループを明確に動かし続けることです。
+
+## 目標から始める
+
+良いバイブコーディングセッションは良いプロダクトの会話のように始まります：
+
+誰のため？何ができるべき？何がこれを役立つものにするか？
+
+Replitに構築を依頼する前に、望む結果を説明してください。
+
+<AiPrompt>
+  地元のパン屋のシンプルなウェブサイトを構築してください。顧客が今日のスペシャルを見て、ケータリングについて知り、ケータリングリクエストを送信できるようにしてください。温かく、洗練されていて、モバイルで使いやすくしてください。
+</AiPrompt>
+
+これが機能するのは、タスクだけでなくプロダクトの目標をReplitに与えているからです。オーディエンス、コアアクション、最初のバージョンの雰囲気を説明しています。
+
+技術的な実装をまだ知る必要はありません。アプリが機能したときに何が真実であるべきかから始めましょう。
+
+## 小さなスライスで構築する
+
+スライスとは、試すのに十分なほど完成したプロダクトの小さな部分です。
+
+パン屋サイトの場合、最初のスライスは次のようなものかもしれません：
+
+* 今日のスペシャルを表示するホームページ
+* ケータリングリクエストフォーム
+* モバイルフレンドリーなレイアウト
+
+これでアイデアをテストするのに十分です。開いてクリックし、次に何を改善すべきかを決定できます。
+
+一度に製品全体を求めることは避けましょう。大きなリクエストはレビューしにくく、誤解しやすいです。小さなスライスにより、コントロールを失うことなく進歩できます。
+
+最初のスライスが機能したら、次のスライスを追加しましょう。
+
+<AiPrompt>
+  ケータリングリクエストフォームを送信した後に確認メッセージを追加してください。ページの残りは変更しないでください。
+</AiPrompt>
+
+この指示は小さく、明確で、テスト可能です。
+
+## コンテキストを管理する
+
+コンテキストとは、Replitがあなたの望みを理解するために使用する情報です。
+
+良いコンテキストには以下が含まれます：
+
+* アプリが誰のためか
+* どんな問題を解決するか
+* 今何を含めるべきか
+* 何を後回しにするか
+* 何を変更しないか
+* 例、スクリーンショット、スケッチ、ファイル、またはデータ
+* トーン、スタイル、またはブランドに関するメモ
+
+コンテキストの管理とは、適切なタイミングで適切な情報を与えることです。
+
+同じ機能を続けている場合は、Replitが以前の決定を使用できるように同じ会話に留まりましょう。別の機能を始めている場合や会話がノイジーになっている場合は、重要なことの短い要約で新しく始める方が良いかもしれません。
+
+例えば：
+
+<AiPrompt>
+  コンテキスト：このパン屋サイトは誕生日ケーキを注文する忙しい親のためです。フォームを短くし、受け取りの詳細を分かりやすくして、企業的に感じるものは避けてください。この変更では、ケータリングリクエストセクションのみを改善してください。
+</AiPrompt>
+
+単に言葉を追加しているのではありません。Replitの焦点を絞る手助けをしています。
+
+## レビューしてテストする
+
+Agentは構築できますが、結果が機能するかどうかを決めるのはあなたです。
+
+意味のある変更のたびに、アプリを開いてそれが対象とする人として使ってみてください。Agentが変更したと言ったことを読むだけでなく、フローを試してください。
+
+自問してください：
+
+* 誰かがメインのアクションを完了できるか？
+* ページは意味をなすか？
+* モバイルで機能するか？
+* 重要なものが壊れていないか？
+* Replitが変更すべきでなかったものを変更したか？
+* これは構築を続けるのに十分か？
+
+レビューとテストは、あなたのプロダクト判断が最も重要な場所です。ソフトウェアが意図に合っているかどうかを確認しています。
+
+## フィードバックで改善する
+
+スライスの最初のバージョンはドラフトです。それは普通のことです。
+
+バイブコーディングはフィードバックを通じて改善されます。Replitに何を保持し、何を変更し、何を削除し、次に何を試すかを伝えてください。
+
+次のプロンプトの代わりに：
+
+<AiPrompt>
+  より良くしてください。
+</AiPrompt>
+
+こう試してください：
+
+<AiPrompt>
+  ケータリングリクエストフォームをスキャンしやすくしてください。同じフィールドを維持しつつ、スペーシング、ラベル、送信ボタンを改善してください。スペシャルセクションは変更しないでください。
+</AiPrompt>
+
+良いフィードバックは具体的です。既に機能しているものを保護しながら、アプリの一部を改善します。
+
+スライスが機能したら、ループバックして次の小さなスライスを構築しましょう。
+
+変更が間違った方向に進んだ場合は、スコープを絞りましょう。
+
+<AiPrompt>
+  それは変更しすぎました。新しいボタンスタイルは維持しますが、元のレイアウトを戻してケータリングフォームのみを更新してください。
+</AiPrompt>
+
+フィードバックで改善することは、コントロールを失うことなくプロダクトを前進させ続ける方法です。
+
+## 良いバイブコーディングの感覚
+
+次のときは正しい軌道に乗っています：
+
+* 目標を平易な言葉で説明できる
+* 各変更がレビューするのに十分小さい
+* Agentが構築した後に何をテストするか分かる
+* Agentが何を知っているか推測するのではなくコンテキストを与える
+* Agentに何を変更するかだけでなく、何を保持するかも伝える
+* アプリがラウンドごとにより有用になる
+
+バイブコーディングはアイデアを渡して消えることを意味しません。アイデア、ソフトウェア、フィードバック、改善の間の距離を縮めることを意味します。
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="Agentと構築する" icon="robot" href="/ja/learn/build-with-agent">
+    プラン、Canvasアノテーション、スクリーンショット、チェックポイントなど、Agentのツールでこの考え方を適用する方法を学びます。
+  </Card>
+
+  <Card title="効果的なプロンプティング" icon="comment" href="/ja/learn/effective-prompting">
+    Agentが自信を持って行動できるより明確な指示の書き方を学びます。
+  </Card>
+</CardGroup>

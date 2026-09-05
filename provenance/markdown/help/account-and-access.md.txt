@@ -1,0 +1,117 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Account and access
+
+> Answers to common account questions—resetting passwords, recovering access, changing your email or username, deleting your account, appealing suspensions, and corporate network access.
+
+These answers cover account access and security. For account deletion details, see [Deleting your data](/legal-and-security-info/deleting-your-data); for suspensions, see the [strike system FAQ](/legal-and-security-info/strike-system-faq).
+
+<AccordionGroup>
+  <Accordion title="How do I reset my password?">
+    1. Go to [replit.com/forgot](https://replit.com/forgot).
+    2. Enter the email tied to your account.
+    3. Open the reset email from `notifications@replit.com`—check your spam folder if you don't see it.
+    4. Select the link and create a new password.
+
+    If you signed up with Google, GitHub, Facebook, or Apple, use the same page to create a standalone password. If the email doesn't arrive, confirm you're entering the exact email you signed up with.
+  </Accordion>
+
+  <Accordion title="I can't log in—how do I recover access to my account?">
+    Try these in order:
+
+    1. Reset your password at [replit.com/forgot](https://replit.com/forgot), and check your spam folder for the email.
+    2. If you signed up with Google, GitHub, or Apple, use the **Continue with \[provider]** button rather than the email and password form.
+    3. Confirm you're using the email you signed up with—you may have used a different one.
+
+    If none of these work, [contact Replit Support](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="I'm seeing someone else's projects, or I think my account was accessed without my permission">
+    Act quickly:
+
+    1. Reset your password at [replit.com/forgot](https://replit.com/forgot).
+    2. Sign out of other active sessions from your account security settings.
+    3. [Contact Replit Support](https://replit.com/support) with details of what you noticed.
+
+    If you're seeing projects that aren't yours, you may be signed in to the wrong account—check the account name in the top-right corner.
+  </Accordion>
+
+  <Accordion title="How do I change my email address or username?">
+    To change your username, run the `account > change-username` command in [CLUI](/features/workspace-tools/clui-graphical-cli) and submit your new username. You can change your username only once.
+
+    To change your email, go to **Settings → Profile**, then edit your email. If you can't complete identity verification, [contact Replit Support](https://replit.com/support) with your current and new email addresses.
+  </Accordion>
+
+  <Accordion title="How do I permanently delete my Replit account?">
+    Download anything you want to keep first—deletion can't be undone. On the web, cancel any active subscription, then go to **Settings → Profile** and request account deletion. On mobile, open **Account → More → Delete account** in the Replit app. See [Deleting your data](/legal-and-security-info/deleting-your-data).
+  </Accordion>
+
+  <Accordion title="I think I have two Replit accounts with the same email—how do I sort this out?">
+    This happens when you sign up one way (such as email) and later sign in another way (such as Google), creating a second account.
+
+    1. Try logging in with both methods to confirm there are two accounts.
+    2. Decide which to keep.
+    3. Copy any projects from the account you're closing—use **Download as zip** or fork them.
+    4. Delete the account you don't need from **Settings → Profile**.
+
+    If you're not sure which account holds your subscription or projects, [contact Replit Support](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="I get redirected to a different account than expected when I log in">
+    You likely have multiple accounts connected to the same login provider. Try logging in with a different method—email and password, or a different provider—to reach the account you want. If you need help identifying which method maps to which account, [contact Replit Support](https://replit.com/support) with your username.
+  </Accordion>
+
+  <Accordion title="My SSH connection to workspace.*.repl.co no longer works">
+    The `workspace.*.repl.co` SSH hostname has been retired. Open the [SSH](/features/workspace-tools/ssh) pane in your project and copy the current connection command—it uses a `*.replit.dev` address. Update any scripts or SSH config that still reference the old `repl.co` address.
+  </Accordion>
+
+  <Accordion title="My account has been suspended—why, and how do I appeal?">
+    Replit suspends accounts that violate its Terms of Service or community guidelines, and a billing dispute or chargeback can trigger an automatic hold. First, check your email (including spam) for a message explaining the reason.
+
+    If it's billing-related, resolve the outstanding invoice in **Settings → Billing**. If you believe the suspension was an error, [contact Replit Support](https://replit.com/support) with your username, your registered email, and a brief explanation. See the [strike system FAQ](/legal-and-security-info/strike-system-faq) and [trust and safety](/legal-and-security-info/trust-and-safety).
+  </Accordion>
+
+  <Accordion title="I can't sign up or my workspace won't load on my company network">
+    A corporate or school network can block Replit even when your account is fine. The usual symptoms are a sign-up button that spins forever, a blank workspace, repeated disconnects, or a Cloudflare "Attention Required!" 403 page. These happen when corporate security tools—SSL/TLS inspection appliances, header-rewriting proxies, or low-reputation shared egress IPs—interfere with the connections Replit relies on.
+
+    First, confirm the network is the cause:
+
+    1. Retry on a different network, such as a personal phone hotspot, using the same browser.
+    2. Try an incognito or private window, and a browser without managed extensions or policies.
+
+    If Replit works off the corporate network but not on it, ask your IT team to allowlist Replit. Allowlisting by domain is more reliable than by IP address, because Replit's IP addresses change. Ask them to allow these domains:
+
+    * `replit.com` and `*.replit.com`—the main site and static assets
+    * `*.replit.dev`—development URLs
+    * `*.replit.app`—published apps
+    * `*.repl.co`—legacy development URLs
+    * `replit-com-static.b-cdn.net`—fonts
+    * `replitcdn.b-cdn.net`—media
+
+    Replit uses persistent WebSocket connections, frequent API calls, and auth-token exchanges across these domains, so also ask your IT team to check the following:
+
+    * **SSL/TLS inspection**—add a certificate-inspection bypass for the domains above. Inspection proxies can silently fail on Replit's certificates and leave pages hanging with no visible error.
+    * **Header rewriting**—proxy rules that modify, strip, or inject HTTP headers break cross-domain API and authentication calls.
+    * **WebSocket traffic**—allow `wss://` connections to the domains above.
+    * **Browser policies**—Group Policy or MDM rules that block cookie persistence or third-party cookies for non-allowlisted domains can break sign-in.
+    * **DNS resolver**—confirm `replit.com` and a `*.replit.dev` hostname resolve, and compare against a public resolver such as `8.8.8.8` or `1.1.1.1`. Split-horizon or filtering resolvers sometimes return no record for development URLs.
+
+    If Replit still fails on the corporate network after your IT team applies these changes, [contact Replit Support](https://replit.com/support) with your username and the exact error or Cloudflare Ray ID you see.
+  </Accordion>
+
+  <Accordion title="A connector (Stripe, GitHub, Resend) stopped working—how do I reconnect it?">
+    Connectors use OAuth tokens that can expire or be revoked. To reconnect, open **Tools → Connectors**, disconnect the broken connector, then connect again and re-authorize. The token updates in your project [Secrets](/core-concepts/project-editor/app-setup/secrets) automatically.
+
+    If it reconnects but still fails, confirm your account with the third-party service is active and has the right permissions. See [Managing connectors](/replitai/managing-connectors) and the [integrations overview](/features/integrations/overview).
+  </Accordion>
+
+  <Accordion title="Can I transfer my Replit account to someone else?">
+    Accounts can't be transferred directly—an account is tied to the credentials that created it. To hand over a specific project instead, have the new owner create an account. Share the project with them and ask them to fork it into their account. To change the email on your current account, go to **Settings → Profile** and edit your email. Subscriptions can't be transferred—the new owner needs their own. For a business account handoff, [contact Replit Support](https://replit.com/support).
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If your account question isn't answered here, [contact Replit Support](https://replit.com/support).

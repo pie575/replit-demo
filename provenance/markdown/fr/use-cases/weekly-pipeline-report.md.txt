@@ -1,0 +1,148 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Générer un rapport de ventes hebdomadaire
+
+> Montrez les changements et tendances du pipeline commercial depuis HubSpot chaque semaine.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Récupérez le pipeline commercial de la semaine depuis HubSpot, comparez-le à la semaine
+précédente, et rédigez un court rapport : nouveaux deals, mouvements d'étape, deals repoussés,
+et prévisions. Placez le tableau dans Google Sheets et publiez les points marquants sur
+Slack pour que le standup porte sur le changement, pas sur un instantané figé.
+
+## Idéal pour
+
+* Les directeurs commerciaux qui ont besoin de standups du lundi avec du mouvement, pas un instantané figé.
+* Les responsables revenue operations qui ont besoin du changement de pipeline semaine par semaine au même endroit.
+
+## Connecteurs
+
+<Connectors
+  items={[
+{ id: "hubspot", name: "HubSpot", why: "Deals, étapes et montants" },
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "Tableau de tendance que vous pouvez auditer",
+},
+{ id: "slack", name: "Slack", why: "Livrer le rapport" },
+]}
+/>
+
+<Note>Fonctionne aussi avec Salesforce, Attio, Pipedrive, ou un autre CRM.</Note>
+
+## Avant de commencer
+
+Connectez HubSpot, Sheets et Slack. Précisez quel pipeline ou quelle équipe inclure.
+
+## Invite à l'Agent
+
+<AiPrompt>
+  Crée une routine qui s'exécute chaque lundi à 9h00. Récupère le pipeline de
+  la semaine depuis HubSpot. Rédige un rapport hebdomadaire montrant les
+  changements et tendances du pipeline : nouveaux deals, mouvements d'étape,
+  deals repoussés, et prévisions par rapport à la semaine précédente. Place
+  le tableau dans Google Sheets et publie les points marquants sur Slack.
+</AiPrompt>
+
+## À quoi s'attendre
+
+L'Agent compare cette semaine à la précédente et rédige un court récit accompagné d'une
+feuille. Vérifiez quelques montants de deals par rapport à HubSpot. Utilisez les points
+marquants Slack pendant le standup ; gardez la feuille pour la piste d'audit. Choisissez un
+nouveau deal et un deal repoussé, ouvrez-les dans HubSpot, et confirmez que l'étape, le
+montant, et la date de clôture correspondent à la feuille.
+
+## Adaptez-le à vos besoins
+
+<AiPrompt>
+  Signale les deals de plus de \[montant] qui n'ont pas bougé depuis 14 jours.
+</AiPrompt>
+
+<AiPrompt>
+  Ajoute une section « à risque » basée sur la date de clôture et la dernière
+  activité.
+</AiPrompt>
+
+## Dépannage
+
+* **Les montants de deals ne correspondent pas à HubSpot :** précisez quel pipeline ou quelle équipe inclure, et quel champ de montant utiliser (montant ou prévision pondérée). Vérifiez quelques deals par rapport à HubSpot avant de faire confiance à la feuille.
+* **Les deals repoussés semblent incorrects :** vérifiez les dates de clôture et les étapes dans HubSpot. Demandez à l'Agent de ne considérer un deal comme repoussé que lorsque la date de clôture a reculé ou que l'étape est revenue en arrière.
+* **Slack publie au mauvais endroit :** nommez le canal et précisez si vous voulez uniquement les points marquants ou un lien vers la feuille complète.
+
+## Voir aussi
+
+<CardGroup cols={2}>
+  <Card title="Surveiller la concurrence" href="/fr/use-cases/monitor-competitors">
+    Les mêmes alertes Slack pour les ventes avant qu'un changement de prix n'affecte un deal.
+  </Card>
+
+  <Card title="Créer un pitch deck pour investisseurs" href="/fr/use-cases/pitch-deck-from-website">
+    La même source Google Sheets pour les fondateurs qui construisent la diapositive financière investisseur.
+  </Card>
+</CardGroup>

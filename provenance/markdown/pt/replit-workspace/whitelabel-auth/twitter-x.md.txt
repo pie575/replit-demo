@@ -1,0 +1,102 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Configure X (Twitter) OAuth
+
+> Configure o X (antigo Twitter) como provedor de login social para a autenticação do seu app
+
+Este guia apresenta o passo a passo para criar um app OAuth do X no Portal de Desenvolvedores do X. Você coletará um **Client ID** e um **Client Secret** para inserir no **painel Auth**.
+
+<Note>
+  Esta página cobre apenas a configuração do lado do provedor no Portal de Desenvolvedores do X. Para o fluxo geral do Clerk Auth — incluindo ativar o X e inserir as credenciais no **painel Auth** — consulte [Configurando credenciais OAuth para um provedor SSO](/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) na documentação do Clerk Auth.
+</Note>
+
+## Pré-requisitos
+
+* Uma [conta de Desenvolvedor X](https://developer.twitter.com/) (nível gratuito disponível)
+* Um [app Replit publicado](/category/replit-deployments) — credenciais OAuth personalizadas estão disponíveis apenas no ambiente de **Produção**
+* O painel de edição do provedor **X** aberto em: **painel Auth** → aba **Configure** → seção **SSO providers** → selecione o ambiente **Production** → selecione **Edit** ao lado de **X**
+
+## Passo 1: Configurar o app de Desenvolvedor do X
+
+### Criar uma conta de desenvolvedor (se necessário)
+
+1. Acesse o [Portal de Desenvolvedores do X](https://developer.twitter.com/en/portal/dashboard)
+2. Solicite uma conta de desenvolvedor caso ainda não tenha uma
+3. Conclua a solicitação descrevendo seu caso de uso
+
+### Criar ou selecionar um app
+
+1. No Portal de Desenvolvedores do X, vá para **Projects & Apps**
+2. Use um app existente ou selecione **Add App**
+3. Insira um nome para o app e selecione **Next**
+4. Selecione **App settings**
+
+## Passo 2: Configurar a autenticação
+
+1. Role até **User authentication settings**
+2. Selecione **Set up**
+
+**App permissions:**
+
+Selecione o nível mínimo de permissão:
+
+* **Read** — Necessário para o perfil do usuário (mínimo)
+* **Write** — Para postar em nome dos usuários (opcional)
+* **Direct Messages** — Para acesso a DMs (opcional)
+
+<Warning>
+  As permissões devem corresponder aos escopos solicitados. Se o seu app solicitar `tweet.write`, mas você habilitou apenas Read, a autenticação falhará.
+</Warning>
+
+**Type of app:**
+
+Selecione **Web App, Automated App or Bot**
+
+**App info:**
+
+* **Callback URI / Redirect URL**: Copie o valor mostrado em **Provider setup** no **painel Auth**
+* **Website URL**: Copie o valor mostrado em **Provider setup** no **painel Auth**
+
+Consulte [Configurando credenciais OAuth para um provedor SSO](/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) para saber como encontrar esses valores.
+
+3. Selecione **Save**
+4. **Salve seu Client ID e Client Secret**
+
+<Warning>
+  Armazene seu Client Secret em local seguro. Se perdido, gerar um novo invalidará o anterior.
+</Warning>
+
+## Solução de problemas
+
+### Incompatibilidade de URI de redirecionamento
+
+* Verifique se a Callback URI corresponde exatamente ao valor mostrado em **Provider setup** no **painel Auth**
+* Verifique se há erros de digitação ou protocolos incorretos
+* Sem barras finais
+
+### Cliente inválido
+
+* Verifique novamente o Client ID e o Client Secret
+* Certifique-se de que não há espaços extras
+* Verifique se você está usando credenciais OAuth 2.0 (não OAuth 1.0a)
+
+### Erros de escopo/permissão
+
+* Verifique se os escopos correspondem às permissões habilitadas no Portal de Desenvolvedores do X
+* Certifique-se de que a permissão Read está habilitada no mínimo
+
+### App em modo de desenvolvimento
+
+* Os apps do X iniciam em modo de desenvolvimento com usuários limitados
+* Pode ser necessário solicitar acesso elevado para uso em produção
+
+### Não está funcionando no domínio personalizado
+
+* Atualize a Website URL e a Callback URI com os valores de domínio personalizado mostrados em **Provider setup** no **painel Auth**
+
+## Recursos adicionais
+
+* [Documentação OAuth 2.0 do X](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
+* [Escopos OAuth do X](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)

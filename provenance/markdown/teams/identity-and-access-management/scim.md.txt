@@ -1,0 +1,237 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# SCIM
+
+> Set up SCIM to automate provisioning from your identity provider, then manage how synced groups map to your Replit workspaces, roles, and account admins.
+
+## Introduction
+
+<Note>
+  SCIM is available exclusively for Enterprise customers. Contact our sales team at [sales@replit.com](mailto:sales@replit.com) to enable this feature for your organization.
+</Note>
+
+System for Cross-domain Identity Management ([SCIM](https://en.wikipedia.org/wiki/System_for_Cross-domain_Identity_Management)) is a standardized protocol that automates user provisioning and deprovisioning between your enterprise identity provider (IdP) and Replit.
+
+Once SCIM is active, you manage how your synced groups and members map to your Replit workspaces and roles directly in Replit — see [Managing workspace access](#managing-workspace-access).
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Automated member management" icon="user-plus">
+    Automatically provision and deprovision members based on your IdP's directory
+  </Card>
+
+  <Card title="Role synchronization" icon="shield">
+    Keep member roles and permissions in sync with your organizational structure
+  </Card>
+
+  <Card title="Bulk operations" icon="users">
+    Efficiently manage large teams with bulk group operations
+  </Card>
+
+  <Card title="Major IdP support" icon="plug">
+    Direct integration with Microsoft Entra ID, Okta, and other leading identity providers
+  </Card>
+</CardGroup>
+
+## Benefits
+
+SCIM integration provides several advantages for Enterprise teams:
+
+* **Enhanced security**: Leverage your existing identity management systems for robust access control
+* **Simplified administration**: Automatically manage team members through your identity provider
+* **Efficient onboarding**: Seamlessly provision large teams without manual intervention
+* **Consistent access control**: Maintain uniform access policies across your organization
+
+## Getting started
+
+<Steps>
+  <Step title="Enable SCIM">
+    Open **Settings** > **Advanced** > **Identity & Governance** to enable SCIM for your Enterprise organization.
+  </Step>
+
+  <Step title="Configure your IdP">
+    Access the SCIM onboarding portal directly from the Identity & Governance settings. The onboarding portal provides step-by-step instructions specific to your identity provider for synchronizing your user directory.
+  </Step>
+
+  <Step title="Test the integration">
+    Verify the connection by provisioning a test user.
+  </Step>
+
+  <Step title="Go live">
+    Begin using SCIM for automated member management, then assign your synced groups to workspaces in [SCIM workspace access](#managing-workspace-access).
+  </Step>
+</Steps>
+
+## Best practices
+
+* Document role allocations for existing Replit members before enabling SCIM.
+* Set a default workspace so every synced group receives at least **Viewer** access there; without a default workspace, a member has no role until you assign their group to a workspace.
+* Test your configuration by provisioning a small group of members before enabling bulk provisioning.
+* After initial sync, review and configure permissions for custom groups based on your organization's access control needs.
+* Dedicate role-control groups to control access levels of provisioned members, and use other push groups for categorization and bulk permission management.
+* Document your SCIM configuration for future reference.
+
+## Group synchronization
+
+All pushed groups from your IdP are synchronized to Replit with the members your IdP provisions for that group. When you push an "Engineering" group through SCIM, Replit creates a matching group containing those provisioned members.
+
+Group membership is automatically updated to reflect the membership in your IdP. You can use these synchronized groups for bulk editing member permissions, such as sharing an app with everyone in the "Engineering" group.
+
+### Use flat groups with Microsoft Entra ID
+
+<Warning>
+  Microsoft Entra ID provisions only the users who are immediate members of an explicitly assigned group. It does not expand nested groups. A user who belongs only to a subgroup is not added to the parent group in Replit. Microsoft Entra ID does not provision that user unless another assigned group lists them directly.
+</Warning>
+
+Use flat groups for SCIM provisioning by adding users directly to each group you assign to Replit. If you must keep nested groups in Microsoft Entra ID, assign every group that directly contains users to the Replit application. For details, see [Microsoft's guidance on assignment-based scoping](https://learn.microsoft.com/en-us/entra/identity/app-provisioning/how-provisioning-works#assignment-based-scoping).
+
+### Creating custom groups alongside SCIM
+
+You can create custom groups in Replit even when SCIM is enabled. Use custom groups to organize members around project work, one-off permission grants, or any structure that is not mirrored in your identity provider.
+
+* **SCIM groups remain locked.** Groups synced from your IdP can only be edited or removed through your identity provider.
+* **Custom groups are managed in Replit.** Organization admins can create, edit, and delete custom groups directly from the Groups page.
+* **Members can belong to both.** A member provisioned through SCIM can also be added to custom groups without affecting their IdP-managed roles.
+
+For detailed information about groups, see [Groups & Permissions](/teams/identity-and-access-management/groups-and-permissions).
+
+## Managing workspace access
+
+Once SCIM is active, use the in-product management surface to review and control how your synced groups map to workspaces and roles, and to designate the account admin group. Your IdP remains the source of truth for membership and provisioning; this surface governs how those synced groups and members map onto your Replit workspaces and roles — it does not add, remove, or re-provision members.
+
+### Structure your workspaces
+
+We generally recommend keeping your members in a **single workspace**, and only creating additional workspaces when there's a clear reason to separate them — for example, distinct business units that should not share members, groups, or budgets. Anyone who needs to collaborate should be in the same workspace.
+
+You can assign your synced groups to workspaces. Within a workspace, an assigned group appears as a **custom group** that you can use for workspace-level controls such as **group budgets** — for example, a 100K budget for the Revenue team.
+
+### Open SCIM workspace access
+
+1. Open the workspace switcher and select your Enterprise workspace.
+2. Open **Settings**, then select **Advanced**.
+3. Expand the **Identity & Governance** section and find the **Automatic member provisioning (SCIM)** card.
+4. When SCIM is **Active**, the management surface appears directly inside this card.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/ZuZntGh7lMGVTgZx/images/teams/identity-and-access-management/scim-workspace-access-overview.png?fit=max&auto=format&n=ZuZntGh7lMGVTgZx&q=85&s=80226c71411f274c8a867350b4cb4bda" alt="SCIM workspace access overview showing the Active SCIM card, the Account admin group block with the Engineering group designated, and the Workspaces tab listing workspaces with their group assignment chips." width="2342" height="1390" data-path="images/teams/identity-and-access-management/scim-workspace-access-overview.png" />
+</Frame>
+
+### Designate the account admin group
+
+Set this first. The **Account admin group** block at the top shows which IdP-synced group holds the account admin role across all of your workspaces, and has access to account-level settings, including SCIM management privileges.
+
+Select **Edit** to choose a different synced group. Designating a group is a cutover: the new group becomes the account admin group and the previous group's account admin role is revoked. Because account admins are powerful, the change requires confirmation before it takes effect.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/ZuZntGh7lMGVTgZx/images/teams/identity-and-access-management/scim-workspace-access-account-admin-group.png?fit=max&auto=format&n=ZuZntGh7lMGVTgZx&q=85&s=0c7dba77eb8011657956c382015d3258" alt="Account admin group dialog explaining that members of the selected IdP-synced group hold the account-admin role, with a radio list of synced groups (Engineering marked Current, plus others) and member counts." width="1674" height="2634" data-path="images/teams/identity-and-access-management/scim-workspace-access-account-admin-group.png" />
+</Frame>
+
+<Note>
+  Membership of the account admin group is managed entirely in your identity provider. To add or remove account admins, change who belongs to the designated group in your IdP — the surface reflects that membership but does not edit it.
+</Note>
+
+### View and manage workspace assignments
+
+The **Workspaces** tab lists every workspace in your organization alongside the synced groups assigned to it and each group's role.
+
+The **default workspace** — marked with a **Default** pill — is the baseline for provisioned access: every synced group automatically receives at least **Viewer** access there, so members always have somewhere to land. A workspace becomes the default only when an admin sets it; until then, members get access solely from the group assignments you make.
+
+* Use the search box to filter workspaces by name.
+* Each row shows its **group assignments** as chips in the form *Group · Role* (for example, *Engineering · Admin*). When a workspace has more assignments than fit on one row, a **+ N more** chip indicates the remainder.
+* The row's **⋮** menu lets you edit assignments or set or remove the workspace as the organization default.
+
+### Assign groups to workspaces and set roles
+
+Select **Edit assignments** from a workspace row's **⋮** menu to open the **Edit workspace access** dialog. Here you choose which synced groups have access to the workspace and the role each group receives:
+
+* **Admin** — full administrative access to the workspace's settings and resources.
+* **Member** — can create and edit Replit Apps.
+* **Viewer** — read-only access to apps and deployments.
+* **Guest** — can only access apps shared with them.
+
+The account admin group's grant is locked (shown with a lock icon) because it is managed as part of the account admin designation rather than per workspace.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/ZuZntGh7lMGVTgZx/images/teams/identity-and-access-management/scim-workspace-access-edit-assignments.png?fit=max&auto=format&n=ZuZntGh7lMGVTgZx&q=85&s=d7ee2420e538a53648dc37696d702cc7" alt="Edit workspace access dialog listing synced groups with checkboxes and per-group role selectors. The Engineering group is tagged as the account admin group with a locked Admin role, while the other groups show editable role selectors." width="1674" height="2154" data-path="images/teams/identity-and-access-management/scim-workspace-access-edit-assignments.png" />
+</Frame>
+
+### View group members and assigned workspaces
+
+The **User groups** tab is a table of your synced groups, with columns for the group **Name**, its **Assigned workspaces** (shown as *Workspace · Role* chips), and its **Member count**. The group designated as the account admin group is marked with an **Account admin group** chip. When you have many groups, the table is paginated — use the page controls at the bottom to move between pages.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/ZuZntGh7lMGVTgZx/images/teams/identity-and-access-management/scim-workspace-access-user-groups.png?fit=max&auto=format&n=ZuZntGh7lMGVTgZx&q=85&s=fee3caa8574badc64e74563c92e3d575" alt="User groups tab showing a table of synced groups (Engineering, Marketing, Sales, Design, Product) with assigned-workspace role chips and a member-count column. The Engineering group carries an Account admin group label, and a 'Page 1 of 2' pager appears at the bottom." width="2342" height="1710" data-path="images/teams/identity-and-access-management/scim-workspace-access-user-groups.png" />
+</Frame>
+
+Expand a group row to see its members in a **Name** and **Email** table. Members load on demand and are paginated, so for large groups you can page through the full membership rather than loading everyone at once.
+
+## Limitations
+
+* **Your IdP remains the source of truth.** Adding, removing, and provisioning members — and editing group membership — happens in your identity provider. Replit manages workspace and role *assignments* for groups that already exist in your synced directory.
+* **Microsoft Entra ID does not expand nested groups.** Use flat groups or assign every group that directly contains users to the Replit application, as described in [Use flat groups with Microsoft Entra ID](#use-flat-groups-with-microsoft-entra-id).
+* **The account admin group can be changed but not cleared.** You can designate a different account admin group, but there is no option to leave the organization without one.
+
+## FAQs
+
+### What happens to members who already have accounts on replit.com before SCIM was set up?
+
+When SCIM is enabled, existing members are handled in two ways:
+
+1. **Members provisioned through SCIM**:
+   * Their roles are updated to match those provided by your IdP.
+   * These members can only be added, removed, or have their roles changed through your IdP.
+   * To keep permissions synchronized, admins can no longer edit roles or invite new members within Replit.
+2. **Members not provisioned through SCIM**:
+   * These members remain unchanged and are considered "legacy" members.
+   * Their organization membership and role is not automatically removed, to prevent accidental deprovisioning.
+   * Legacy members can be removed through the Replit interface by organization admins if needed.
+
+<Warning>
+  After implementing SCIM, all members provisioned through your IdP must be managed through your identity provider to maintain synchronization. Only legacy members (those not provisioned through SCIM) can be deprovisioned directly in Replit.
+</Warning>
+
+### What roles can be provisioned with SCIM?
+
+SCIM users can be assigned to four roles:
+
+* **Admin**: Full access to organization settings and resources
+* **Member**: Standard access to create and edit Replit Apps
+* **Guest**: Limited access for external collaborators; can only edit apps explicitly shared with them
+* **Viewer**: Read-only access to published applications
+
+You configure the mapping between your IdP groups and Replit roles per workspace in [SCIM workspace access](#managing-workspace-access). For example, you might grant your "Engineering" group the Member role in one workspace and the Viewer role in another.
+
+### Can I add or remove members from SCIM workspace access?
+
+No. Membership and provisioning are managed in your identity provider. The surface manages how synced groups and members map to workspaces and roles. For day-to-day member management outside of SCIM, see [Managing Members](/teams/identity-and-access-management/managing-members).
+
+### How are roles different from groups?
+
+Groups are synced from your IdP. Roles (Admin, Member, Viewer, Guest) describe what a group can do in a specific workspace. The same group can hold different roles in different workspaces — for example, **Member** in one workspace and **Viewer** in another.
+
+### Does changing the account admin group affect other roles?
+
+Designating a new account admin group changes only the organization-wide account admin role. Other group-to-workspace assignments and their roles are unaffected. For more on how the account admin role works, see [Account and Workspace Admins](/teams/identity-and-access-management/account-and-workspace-admins).
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="SAML SSO" icon="key" href="/teams/identity-and-access-management/saml">
+    Learn about SAML single sign-on integration
+  </Card>
+
+  <Card title="Groups & Permissions" icon="shield" href="/teams/identity-and-access-management/groups-and-permissions">
+    Understand how to manage user roles and access
+  </Card>
+
+  <Card title="Account and Workspace Admins" icon="user-shield" href="/teams/identity-and-access-management/account-and-workspace-admins">
+    Learn what account admins and workspace admins can do
+  </Card>
+
+  <Card title="Viewer Seats" icon="eye" href="/teams/identity-and-access-management/viewer-seats">
+    Understand read-only viewer access and seats
+  </Card>
+</CardGroup>

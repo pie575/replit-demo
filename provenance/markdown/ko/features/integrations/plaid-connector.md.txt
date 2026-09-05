@@ -1,0 +1,182 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Plaid 연결하기
+
+> Plaid 커넥터를 설정해 빌더가 Agent를 사용해 Plaid Link로 금융 계정을 연결하는 앱을 빌드하고 잔액, 거래, 투자 데이터를 활용할 수 있게 하세요.
+
+export const WistiaEmbed = ({videoId, title = "Wistia video", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+  if (!videoId) {
+    return null;
+  }
+  const url = "https://fast.wistia.net/embed/iframe/" + videoId + "?seo=false&playerColor=" + playerColor + "&controlsVisibleOnLoad=" + controlsVisibleOnLoad;
+  return <Frame>
+      <iframe src={url} title={title} allow="autoplay; fullscreen" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Info>
+  Plaid 커넥터는 유료 Replit 플랜에서 사용할 수 있으며 [팀 워크스페이스](/ko/features/collaboration/team-workspaces#create-a-team-workspace)가 필요합니다.
+</Info>
+
+<WistiaEmbed videoId="fcqtulftwk" title="Replit과 Plaid로 어떻게 빌드했는지 확인해보세요" />
+
+Plaid는 앱을 금융 기관에 연결합니다. Plaid 커넥터를 사용하면 빌더는 연결된 기관이 지원하는 계정 잔액, 거래, 투자 데이터를 활용하는 앱을 만들 수 있습니다.
+
+설정은 두 부분으로 이루어집니다. 워크스페이스 관리자가 Replit에서 Plaid 자격 증명을 한 번 구성하면, 앱을 사용하는 각 사용자가 Plaid Link를 통해 자신의 금융 계정을 연결합니다. Plaid 접근 토큰은 사용자별로 범위가 지정되어 안전하게 저장되므로, 앱은 Plaid 시크릿을 직접 다루지 않고도 금융 데이터를 사용할 수 있습니다.
+
+## 빌드할 수 있는 것
+
+Plaid 커넥터를 사용해 다음과 같은 앱을 빌드할 수 있습니다.
+
+* 개인 재무 대시보드
+* 예산 관리 및 지출 분류 도구
+* 거래 검색 및 분석 앱
+* 지원되는 투자 계정을 위한 포트폴리오 추적기
+* 지출 패턴을 요약하는 재무 코치
+
+## 사전 준비 사항
+
+Replit에서 Plaid를 구성하기 전에 다음이 필요합니다.
+
+* [팀 워크스페이스](/ko/features/collaboration/team-workspaces#create-a-team-workspace) — Plaid는 팀 수준에서 구성됩니다
+* [Plaid 계정](https://dashboard.plaid.com/signup)
+* [Plaid 대시보드](https://dashboard.plaid.com/developers/keys)에서 발급받은 Plaid **Client ID**
+* 사용하려는 환경을 위한 Plaid **Secret**
+* Plaid `sandbox`와 `production` 중 어느 것을 사용할지에 대한 결정
+
+Plaid의 샘플 기관과 자격 증명으로 테스트하는 동안에는 `sandbox`를 사용하세요. 앱이 실제 금융 계정을 연결할 준비가 되면 `production`을 사용하세요.
+
+## Replit에서 Plaid 커넥터 구성하기
+
+워크스페이스 관리자가 Replit에 Plaid 자격 증명을 추가합니다. 커넥터가 구성되면 빌더는 Agent와 함께 Plaid 데이터를 사용할 수 있습니다.
+
+<Steps>
+  <Step title="Integrations 열기">
+    Replit에서 워크스페이스 또는 앱 설정을 열고 **Integrations**를 선택하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/integrations-panel.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=8bc11cb25ea92696a154d99240ae5278" alt="Avenger team Workspace Integrations panel showing Replit-managed integrations and the Connectors section, with the Add new connector button highlighted in the upper right" width="1440" height="900" data-path="images/replitai/plaid-connector/integrations-panel.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Plaid 커넥터 추가">
+    **Add new connector**를 선택한 다음 **Plaid**를 선택하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/plaid-connector-search.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=24449d0a433bb175808daf57cd0b19bb" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-search.png" />
+    </Frame>
+  </Step>
+
+  <Step title="환경 선택">
+    `sandbox` 또는 `production`을 선택하세요. 이는 사용하려는 Plaid Secret과 일치해야 합니다.
+  </Step>
+
+  <Step title="Plaid 자격 증명 입력">
+    Plaid 대시보드의 Plaid **Client ID**와 **Secret**을 붙여넣으세요.
+  </Step>
+
+  <Step title="클라이언트 이름 설정">
+    Plaid Link에 표시될 앱 이름을 입력하세요. 필드는 `My Plaid App`으로 미리 채워져 있으며, 사용자에게 표시할 이름으로 바꾸세요. Plaid가 올바르게 표시할 수 있도록 30자 이하로 유지하세요.
+  </Step>
+
+  <Step title="커넥터 저장">
+    **Configure**를 선택해 커넥터를 저장하세요. Replit은 자격 증명을 안전하게 저장하고 빌더가 Plaid 계정을 연결할 때 이를 사용합니다.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/plaid-config-dialog.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=2d6367edf76b21a6b520dfeee37a88df" alt="Enable Plaid configuration dialog with fields for Environment, Client Id, Client Secret, and Client Name, plus a Configure button to save" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-config-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+나중에 구성을 변경하려면 Integrations 패널에서 **Manage connectors**를 열고 Plaid 옆의 **Manage**를 선택하세요.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/plaid-connector-manage.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=8ae2a857432719ca0827c65ee8d1c193" alt="Plaid connector Manage panel with the saved Environment, Client Id, Client Secret, and Client Name, and an Update button to save changes" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-manage.png" />
+</Frame>
+
+조직 전체의 커넥터 관리에 대해서는 [커넥터 관리하기](/ko/replitai/managing-connectors)를 참고하세요.
+
+## Plaid Link로 로그인하기
+
+Plaid는 일반적인 OAuth 리디렉션 대신 [Plaid Link](https://plaid.com/docs/link/)를 사용합니다. 플로우를 시작하려면 Connectors 테이블에서 Plaid를 찾아 **Sign in**을 선택하세요. Replit은 연결을 확인하는 간단한 동의 화면을 표시한 후 Plaid Link를 엽니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/connect-plaid-consent.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=738d4366039cefb0e4671ba805133342" alt="Connect Plaid consent dialog with the Replit and Plaid logos, three reassurance bullets about connecting to Plaid, data use, and revocable permissions, and a Continue to Plaid button" width="1440" height="900" data-path="images/replitai/plaid-connector/connect-plaid-consent.png" />
+</Frame>
+
+그다음 Plaid Link는 각 사용자가 자신의 금융 기관을 선택하고 해당 기관으로 인증하는 임베드된 플로우를 엽니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/EnyLbFHisfL7qzsL/images/replitai/plaid-connector/plaid-link-picker.png?fit=max&auto=format&n=EnyLbFHisfL7qzsL&q=85&s=fb920d84d88c5d3b3d69344f1a5b8448" alt="Plaid Link institution picker titled Select your institution, with a search input and logos for major US banks including Chase, Bank of America, Wells Fargo, Citibank, US Bank, Capital One, PNC, USAA, American Express, TD, Regions, and Navy Federal, with a Sandbox mode banner at the bottom" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-link-picker.png" />
+</Frame>
+
+각 사용자는 자신의 계정을 연결합니다. Replit은 해당 사용자의 연결에 대한 결과 Plaid 접근 토큰을 저장하고 Agent나 앱이 Plaid 데이터를 요청할 때 이를 사용합니다.
+
+## Plaid 데이터로 빌드 시작하기
+
+Plaid가 연결되면, Agent에게 연결된 금융 데이터로 빌드해 달라고 요청하세요. 예를 들어:
+
+<AiPrompt>
+  사람들이 Plaid Link로 은행 계정을 연결하는 개인 재무 대시보드를 만들어줘. 계정 잔액, 카테고리별 월간 지출, 최근 가장 큰 거래 5건을 보여줘.
+</AiPrompt>
+
+<AiPrompt>
+  각 사용자가 Plaid Link를 통해 계정을 연결하는 예산 관리 앱을 만들어줘. 거래를 가져와서 판매자와 카테고리별로 그룹화하고 이번 달 예산을 초과했는지 보여줘.
+</AiPrompt>
+
+<AiPrompt>
+  사람들이 Plaid Link로 지원되는 투자 계정을 연결하는 포트폴리오 추적기를 만들어줘. 데이터가 있는 경우 보유 종목, 계정 잔액, 시간에 따른 변화를 보여줘.
+</AiPrompt>
+
+Plaid 데이터의 가용성은 연결된 기관과 Plaid 계정에 활성화된 Plaid 제품에 따라 달라집니다.
+
+## 문제 해결
+
+<AccordionGroup>
+  <Accordion title="Integrations에 Plaid가 나타나지 않습니다">
+    Plaid에는 유료 Replit 플랜이 필요합니다. 유료 플랜이지만 여전히 Plaid가 보이지 않으면 페이지를 새로고침하고 올바른 워크스페이스에 있는지 확인하세요.
+
+    설정에서 **This feature requires an enterprise plan**이 표시되면, 페이지를 새로고침하고 올바른 워크스페이스를 사용하고 있는지 확인하세요.
+
+    여전히 Plaid가 나타나지 않으면 Replit 지원팀에 문의해 팀에서 워크스페이스 구성을 확인할 수 있도록 하세요.
+  </Accordion>
+
+  <Accordion title="Plaid Link에 내 앱 이름 대신 This Application이 표시됩니다">
+    구성된 클라이언트 이름이 없거나 너무 길면 Plaid가 **This Application**을 표시할 수 있습니다. Plaid 커넥터 구성을 편집하고 30자 이하의 앱 이름을 사용하세요.
+  </Accordion>
+
+  <Accordion title="연결이 끊긴 것으로 표시됩니다">
+    금융 기관이 계정 소유자에게 다시 로그인하도록 요구하거나, 자격 증명이 변경되거나, 권한이 취소된 경우 Plaid 연결이 끊길 수 있습니다.
+
+    Integrations 또는 Connectors 패널에서 Plaid를 다시 연결하면 Plaid Link가 열리고 접근 권한이 복원됩니다.
+  </Accordion>
+
+  <Accordion title="샌드박스와 프로덕션 데이터가 일치하지 않습니다">
+    Plaid 샌드박스와 프로덕션은 서로 다른 자격 증명과 토큰을 사용합니다. 커넥터 환경이 입력한 Plaid Secret 및 테스트 중인 금융 계정 유형과 일치하는지 확인하세요.
+  </Accordion>
+</AccordionGroup>
+
+## 관련 문서
+
+* [Agent 통합](/ko/features/integrations/overview) — Replit 관리형 통합, 커넥터, 외부 통합, Agent 서비스 개요
+* [커넥터 관리하기](/ko/replitai/managing-connectors) — 워크스페이스를 위한 커넥터 구성 및 관리
+* [Plaid 문서](https://plaid.com/docs/) — Plaid API, Link, 제품 문서
+* [Plaid 대시보드](https://dashboard.plaid.com/developers/keys) — Plaid Client ID와 Secret 찾기
+* [Replit x Plaid](https://replit.com/partners/plaid) — 데모와 설정 자료가 있는 파트너 페이지

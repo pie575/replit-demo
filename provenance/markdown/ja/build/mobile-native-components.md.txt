@@ -1,0 +1,133 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# iOS ネイティブコンポーネントを使う
+
+> PixelGames でアラート、アクションシート、SF Symbols などのネイティブ iOS コンポーネントを使いましょう。
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const nativeAlertPrompt = `When a player tries to quit mid-game, show a native alert asking "Quit game? Your progress will be lost." with Cancel and Quit options.`;
+export const nativeActionSheetPrompt = "When a player taps to change their profile photo, show the native action sheet with Camera and Photo Library options, not a custom modal.";
+export const nativeSwitchesPrompt = "Add a Settings screen with native switches for sound effects and haptics.";
+export const sfSymbolsPrompt = "Use SF Symbols for the settings and leaderboard icons on iOS.";
+export const nativeShareSheetPrompt = "Let players share their high score using the native share sheet.";
+
+## これが重要な理由
+
+すべての iPhone にはすでにアラート、シェアシート、スイッチ、メニューが組み込まれており、プレイヤーは
+所有している他のあらゆるアプリでそれらを使っています。あなたのアプリが同じネイティブコンポーネントを使うと、
+プレイヤーはタップする前からその動作をすでに知っています。それが本物の iPhone アプリのように感じさせる理由です。
+
+以下は、アプリに追加できるネイティブコンポーネントのプロンプト例です: アラート、アクション
+シート、スイッチなど。
+
+## ネイティブアラート
+
+<AiPrompt>
+  {nativeAlertPrompt}
+</AiPrompt>
+
+これは実際の `UIAlertController` アラートをレンダリングします。iOS 自体が使うポップアップと同じスタイルです。
+確認すべき明確な決定が1つある場合はアラートを使ってください。
+
+<Frame caption="PixelGames のネイティブな Quit game アラート。">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/native-alert.png?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=dd73b103564765f4a4701082e37fba59" alt="Cancel と Quit のオプションを持つ「Quit game?」と尋ねるネイティブ iOS アラート" data-path="images/pixelgames/mobile/native-alert.png" width="1516" height="258" data-path="images/pixelgames/mobile/native-alert.png" />
+</Frame>
+
+## ネイティブアクションシート
+
+<AiPrompt>
+  {nativeActionSheetPrompt}
+</AiPrompt>
+
+アクションシートはアラートの兄弟のようなもので、単一の yes/no の決定ではなく、いくつかの明確な
+選択肢がある場合に使います。Android には独自のネイティブな同等物があり、Agent がプラットフォームごとに
+適切なものを自動的に選びます。
+
+<Frame caption="PixelGames のプロフィール写真を変更するためのネイティブアクションシート。">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/native-action-sheet.png?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=776916fcff3a32b3415a6cccfd683310" alt="Take a photo、Choose from library、Pick a pixel avatar のオプションを持つネイティブ iOS アクションシート" data-path="images/pixelgames/mobile/native-action-sheet.png" width="1516" height="418" data-path="images/pixelgames/mobile/native-action-sheet.png" />
+</Frame>
+
+## ネイティブスイッチ
+
+<AiPrompt>
+  {nativeSwitchesPrompt}
+</AiPrompt>
+
+iOS の Settings アプリ全体で使われているのと同じオン/オフスイッチで、すぐに見分けがつくため、
+プレイヤーはカスタムトグルのデザインを理解する必要がありません。
+
+<Frame caption="PixelGames の Settings における効果音とハプティクス用のネイティブスイッチ。">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/native-switch.png?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=eec2b4de1408a608e8ff15b3c90e1049" alt="効果音とハプティクスをオン/オフ切り替えるネイティブ iOS スイッチ" data-path="images/pixelgames/mobile/native-switch.png" width="1516" height="288" data-path="images/pixelgames/mobile/native-switch.png" />
+</Frame>
+
+## SF Symbols
+
+<AiPrompt>
+  {sfSymbolsPrompt}
+</AiPrompt>
+
+SF Symbols は Apple の組み込みアイコンセットです。シンボルは周囲のテキストサイズ、太さ、ダークモードに
+自動的に合わせられます。これはカスタムアイコンセットでは手動で構築する必要があることです。
+
+<Frame caption="Settings の効果音とバイブレーションのアイコンに使われた SF Symbols。">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/native-sf.png?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=d56437f19723910a46fe0822e032be91" alt="Sound effects と Vibration の設定の横にある SF Symbols アイコン" data-path="images/pixelgames/mobile/native-sf.png" width="1516" height="310" data-path="images/pixelgames/mobile/native-sf.png" />
+</Frame>
+
+<Note>
+  SF Symbols は iOS 専用です。Android 向けには一致するアイコンセットを Agent に選んでもらってください。
+  プラットフォーム間でアイコンがピクセル単位で同一にはなりませんが、それは想定通りです。
+</Note>
+
+## ネイティブシェアシート
+
+<AiPrompt>
+  {nativeShareSheetPrompt}
+</AiPrompt>
+
+Photos や Safari と同じシステムシェアシートを開くため、プレイヤーがすでにインストールしているアプリが
+一覧表示されます。
+
+<Frame caption="ネイティブシェアシートで PixelGames のハイスコアを共有する。">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/native-share.png?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=74cfd5dd061cbb5b128f300eb0c3126d" alt="PixelGames のハイスコアを共有しているネイティブ iOS シェアシート" data-path="images/pixelgames/mobile/native-share.png" width="1516" height="630" data-path="images/pixelgames/mobile/native-share.png" />
+</Frame>
+
+## トラブルシューティング
+
+* **アラートやアクションシートの代わりにカスタムモーダルが表示される:** Agent が JS でレンダリングされた
+  見た目だけの類似物ではなく、ネイティブ API を使っているか確認してください。見た目は似ていても動作は異なります。
+* **Android でアイコンがおかしく見える:** SF Symbols に関しては想定通りで、iOS 専用だからです。Agent に
+  どのフォールバックアイコンセットを使ったか確認してください。
+* **シェアシートに期待したアプリが含まれない:** これは OS とテストデバイスにインストールされているアプリに
+  よって制御されるもので、PixelGames が直接追加できるものではありません。
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="連絡先にアクセスする" icon="address-book" href="/ja/build/mobile-contacts">
+    シェアシートを招待リンクと組み合わせましょう。
+  </Card>
+
+  <Card title="スマートフォンでプレビューしてテストする" icon="mobile" href="/build/mobile-preview-testing">
+    ネイティブコンポーネントが実機で正しくレンダリングされることを確認しましょう。
+  </Card>
+</CardGroup>
+
+## 関連
+
+* [ハプティクスを追加する](/ja/build/mobile-haptics)

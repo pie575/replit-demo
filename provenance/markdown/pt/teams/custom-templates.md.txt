@@ -1,0 +1,319 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Templates Personalizados
+
+> Configure e gerencie templates personalizados no Replit Enterprise para padronizar como sua organização constrói com o Agent.
+
+## Primeiros passos
+
+O Replit é um ambiente de desenvolvimento em nuvem capaz de escrever e executar qualquer framework ou stack. Para construir um template personalizado, há dois caminhos recomendados:
+
+1. **[Importar](https://replit.com/import) de um provedor Git** — Importe sua stack inicial existente (ou uma que corresponda às suas preferências) do GitHub, GitLab ou Bitbucket.
+2. **Fazer fork do template em branco** — Faça fork do [template em branco](https://replit.com/@replit/Nothing?v=1) para começar do zero com um ambiente de desenvolvimento completamente vazio.
+
+Clientes construíram com sucesso templates correspondentes a Rust, Python, Java, C++ e muitas outras stacks — se funciona de alguma forma, pode funcionar no Replit.
+
+<Tip>
+  Recomendamos trabalhar com a equipe de **Field Engineering do Replit** ao criar seus primeiros templates. Eles têm ampla experiência na configuração de templates personalizados em uma ampla variedade de stacks e estão disponíveis para ajudar. Entre em contato com seu Executivo de Contas para se conectar.
+</Tip>
+
+Os templates personalizados permitem que os administradores Enterprise criem pontos de partida pré-configurados que aparecem diretamente na caixa de entrada do Agent para todos os membros da sua organização. Quando um desenvolvedor seleciona um template personalizado, o Agent faz um fork dele e usa a configuração, as instruções e as skills do template para guiar todo o trabalho subsequente. Nenhuma configuração extra necessária.
+
+<Note>
+  Os templates personalizados estão disponíveis exclusivamente no plano **Enterprise**. Apenas administradores da organização podem fixar e gerenciar templates.
+</Note>
+
+## Como os templates personalizados funcionam
+
+Um template personalizado é um Replit App padrão na sua organização que foi **fixado na caixa de entrada do Agent**. Quando um desenvolvedor o seleciona:
+
+1. O Agent cria um novo app fazendo um fork do template (todos os arquivos são copiados)
+2. O Agent pula a fase de planejamento e vai direto para o modo de construção
+3. O arquivo `custom_instruction/instructions.md` do template é injetado no contexto do Agent
+4. As [skills](/pt/features/agent/skills) personalizadas de `.agents/skills/` são descobertas e disponibilizadas
+5. O arquivo [`replit.md`](/pt/features/project-setup/replit-dot-md) fornece contexto contínuo do projeto
+
+Isso significa que os padrões, convenções e ferramentas da sua organização são incorporados desde a primeira interação.
+
+## Estrutura de arquivos do template
+
+Aqui está o layout recomendado para um template personalizado:
+
+```
+meu-template/
+├── .replit                              # Configuração do app (comandos de execução, portas, módulos)
+├── replit.md                            # Memória do Agent: visão geral e preferências do projeto
+├── custom_instruction/
+│   └── instructions.md                  # Instruções da empresa injetadas no prompt do Agent
+├── .agents/
+│   └── skills/
+│       └── minha-skill/
+│           └── SKILL.md                 # Skills personalizadas que o Agent pode invocar sob demanda
+└── ...                                  # O restante da estrutura do seu repositório
+```
+
+Cada arquivo serve a um propósito distinto. As seções abaixo explicam como configurar cada um.
+
+## Configurar um template personalizado
+
+### Criar o app base
+
+Crie um novo Replit App na sua organização. Configure o projeto com todos os arquivos, dependências e configurações que seus desenvolvedores precisam como ponto de partida. Isso inclui:
+
+* Scaffolding de código-fonte (componentes, utilitários, arquivos de configuração)
+* Dependências pré-instaladas (`package.json`, `requirements.txt`, etc.)
+* Configuração de ambiente no [arquivo `.replit`](/replit-app/configuration)
+
+### Configurar secrets compartilhados
+
+Se o seu template depende de chaves de API, tokens ou outras credenciais, adicione-os aos **Secrets** do template (no painel de Ferramentas) antes de fixá-lo. Quando um desenvolvedor cria um novo app a partir do template, todos os secrets são copiados para o novo app automaticamente, para que os desenvolvedores possam começar a trabalhar sem configurar credenciais.
+
+Documente cada secret em `custom_instruction/instructions.md` (ou em uma skill dedicada) para que os desenvolvedores saibam o que está disponível e para que cada chave é usada.
+
+<Warning>
+  Os secrets são copiados no momento do fork, não sincronizados dinamicamente. Se você rotacionar uma chave ou adicionar um novo secret ao template, os apps existentes que foram previamente forkados não são atualizados. Os desenvolvedores devem adicionar ou atualizar secrets manualmente nesses apps.
+</Warning>
+
+### Escrever instruções personalizadas
+
+Crie um arquivo em `custom_instruction/instructions.md` na raiz do projeto. Este é o arquivo mais importante do seu template — ele diz ao Agent como sua organização constrói software.
+
+<Warning>
+  O nome da pasta deve ser `custom_instruction` (singular), não `custom_instructions`.
+</Warning>
+
+O Agent injeta esse arquivo diretamente em seu prompt do sistema com um preâmbulo que o enquadra como orientação fornecida pela empresa. Escreva em Markdown e inclua:
+
+* **Padrões de arquitetura**: Como seus apps devem ser estruturados
+* **Padrões de código**: Convenções de nomenclatura, regras de organização de arquivos, expectativas de linting
+* **Uso de componentes**: Quais bibliotecas e componentes usar (e quais evitar)
+* **Padrões de API**: Como chamar seus serviços de backend, tratar autenticação, gerenciar erros
+* **Requisitos de testes**: Quais testes são esperados e como executá-los
+* **Diretrizes de deployment**: Configuração específica do ambiente e fluxos de deploy
+
+````markdown theme={null}
+# Padrões de Engenharia da Empresa
+
+## Arquitetura
+Todos os aplicativos web usam React com TypeScript. Use componentes funcionais
+com hooks exclusivamente. O gerenciamento de estado usa Zustand para estado local
+e React Query para estado do servidor.
+
+## Biblioteca de Componentes
+Use nosso pacote de sistema de design interno `@acme/ui`. Nunca use elementos
+HTML brutos para botões, inputs, formulários ou modais — sempre use o
+componente correspondente de `@acme/ui`.
+
+Importe componentes assim:
+```tsx
+import { Button, TextField, Modal } from '@acme/ui';
+```
+
+## Integração de API
+Todas as chamadas de API passam pelo pacote `@acme/api-client`. Nunca use
+fetch bruto ou axios diretamente. A autenticação é tratada automaticamente
+pelo cliente.
+
+## Testes
+Cada componente deve ter um arquivo de teste correspondente. Use Vitest
+para testes unitários e Playwright para testes de integração.
+````
+
+**Limite de tamanho**: O conteúdo é limitado a aproximadamente 25 KB. O conteúdo além desse limite pode ser progressivamente truncado. À medida que suas instruções crescem, mova o material de referência detalhado para [skills](/pt/features/agent/skills) em `.agents/skills/` em vez de manter tudo em `instructions.md`. As skills são carregadas sob demanda quando relevantes, portanto não contam para o limite de tamanho das instruções e mantêm suas instruções principais focadas em regras de alto nível.
+
+### Adicionar skills personalizadas
+
+Crie skills no diretório `.agents/skills/` para fluxos de trabalho especializados que o Agent deve seguir. Cada skill é um diretório contendo um arquivo `SKILL.md` com frontmatter YAML.
+
+```
+.agents/skills/
+├── usar-sistema-de-design/
+│   └── SKILL.md
+├── integracao-de-api/
+│   └── SKILL.md
+└── executar-testes/
+    └── SKILL.md
+```
+
+Cada `SKILL.md` precisa de um `name` e `description` em seu frontmatter:
+
+```markdown theme={null}
+---
+name: use-design-system
+description: Use when building UI components. Provides component patterns, theming rules, and accessibility requirements for the Acme design system.
+---
+
+# Sistema de Design Acme
+
+## Componentes disponíveis
+
+- `Button` — Variantes primária, secundária e ghost
+- `TextField` — Input de texto com suporte à validação
+- `Modal` — Overlay de diálogo com captura de foco
+...
+```
+
+| Campo         | Obrigatório | Detalhes                                                                |
+| ------------- | ----------- | ----------------------------------------------------------------------- |
+| `name`        | Sim         | Máximo de 64 caracteres. Apenas letras minúsculas, números e hífens.    |
+| `description` | Sim         | Máximo de 1.024 caracteres. Descreve o que a skill faz e quando usá-la. |
+| `enabled`     | Não         | Padrão `true`. Defina como `false` para desabilitar sem excluir.        |
+
+**Como as skills são carregadas**: O Agent vê apenas o `name` e a `description` em seu prompt. Ele lê o conteúdo completo do `SKILL.md` sob demanda quando a skill é relevante para a tarefa atual. Isso significa que a `description` é crítica — escreva-a para corresponder aos cenários onde o Agent deve usar a skill.
+
+As skills também podem incluir arquivos de suporte junto com `SKILL.md`:
+
+```
+.agents/skills/usar-sistema-de-design/
+├── SKILL.md
+├── references/
+│   └── component-api.md
+└── assets/
+    └── theme-tokens.json
+```
+
+Para mais sobre skills, consulte [Agent Skills](/pt/features/agent/skills) e [Usar uma skill](/pt/build/use-agent-skills).
+
+### Configurar replit.md
+
+Pré-preencha o `replit.md` na raiz do projeto com a visão geral da arquitetura do seu template. Esse arquivo é sempre carregado no contexto do Agent e serve como memória contínua do projeto.
+
+O arquivo deve ter estas quatro seções:
+
+```markdown theme={null}
+# Visão Geral
+Aplicativo de gerenciamento de tarefas construído com React, TypeScript e o sistema
+de design Acme. Usa backend Express.js com PostgreSQL.
+
+# Preferências do Usuário
+- Usar TypeScript para todos os arquivos
+- Preferir componentes funcionais com hooks
+- Seguir os padrões de código Acme
+
+# Arquitetura do Sistema
+- Frontend: React + TypeScript + @acme/ui
+- Backend: Express.js + TypeScript
+- Banco de dados: PostgreSQL com Drizzle ORM
+- Auth: Acme SSO via @acme/auth
+
+# Dependências Externas
+- @acme/ui: Sistema de design interno
+- @acme/api-client: Camada de integração de API
+- @acme/auth: SDK de autenticação
+```
+
+O Agent atualiza o `replit.md` à medida que o projeto evolui. Se o arquivo crescer além de aproximadamente 4.000 tokens, o Agent o resume automaticamente para mantê-lo focado e útil.
+
+Para mais detalhes, consulte [replit.md](/pt/features/project-setup/replit-dot-md).
+
+### Fixe o template na sua organização
+
+Depois que o seu template estiver pronto:
+
+1. Navegue até o app do template na sua organização
+2. Abra o menu de ações do app (menu de três pontos)
+3. Selecione **Fixar na caixa de entrada do Agent**
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-pin-to-agent.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=6633df41d207aa5e9215ce0f4f1e1683" alt="Menu de ações do app mostrando a opção Fixar na caixa de entrada do Agent" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  Apenas administradores da organização (membros da função `system_admins`) podem fixar e desafixar templates.
+</Note>
+
+Defina o acesso dos membros como **Somente leitura** para que os membros possam ver e usar o template fixado sem poder editá-lo.
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-members-read-only.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=76e9519d8881090d5dce7f7634acb701" alt="Diálogo de convite mostrando o acesso dos membros definido como Somente leitura" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+O template agora aparece como uma pílula selecionável abaixo da caixa de entrada do Agent para todos os membros da sua organização. Para removê-lo, abra o mesmo menu e selecione **Desafixar da caixa de entrada do Agent**.
+
+### Controlar o acesso ao template
+
+Fixar torna um template visível para todos os membros da organização. Para uma distribuição mais direcionada, use o botão **Convidar** no app do template para compartilhá-lo com [Grupos ou usuários individuais](/pt/teams/identity-and-access-management/groups-and-permissions) específicos. Isso permite limitar quais equipes ou pessoas podem ver e fazer fork do template, mantendo-o desafixado da caixa de entrada global da organização.
+
+## O que acontece quando um desenvolvedor seleciona um template
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-input-box.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=627369c01a5a109f15ca0c61968a8505" alt="Template aparecendo como uma pílula selecionável na caixa de entrada do Agent" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+Quando um membro da organização escolhe um template fixado na caixa de entrada do Agent:
+
+1. **Fork**: Um novo app é criado como uma cópia do template, com todos os arquivos incluídos
+2. **Pular planejamento**: O Agent ignora a conversa de planejamento inicial e vai diretamente para o modo de construção
+3. **Carregar instruções**: `custom_instruction/instructions.md` é lido e injetado no prompt do sistema do Agent como orientação fornecida pela empresa
+4. **Descobrir skills**: As skills em `.agents/skills/` são identificadas e listadas no contexto do Agent para carregamento sob demanda
+5. **Carregar contexto do projeto**: `replit.md` é lido e injetado no contexto do Agent (ou gerado automaticamente se estiver faltando)
+6. **Herdar configuração**: O arquivo `.replit`, as dependências e todos os arquivos do template são transferidos para o novo app
+
+O desenvolvedor pode imediatamente começar a fazer prompts ao Agent com seus requisitos específicos, e o Agent opera dentro das diretrizes estabelecidas pelo template.
+
+## Como os arquivos funcionam juntos
+
+Cada arquivo de configuração serve a uma função distinta:
+
+| Arquivo                              | Propósito                                   | Quando o Agent o lê                    | Mutável pelo Agent                         |
+| ------------------------------------ | ------------------------------------------- | -------------------------------------- | ------------------------------------------ |
+| `custom_instruction/instructions.md` | Padrões e regras da organização             | Sempre (injetado no prompt do sistema) | Não                                        |
+| `.agents/skills/*/SKILL.md`          | Fluxos de trabalho e padrões especializados | Sob demanda (quando relevante)         | Sim (o Agent também pode criar skills)     |
+| `replit.md`                          | Visão geral e preferências do projeto       | Sempre (injetado no prompt do sistema) | Sim (o Agent o atualiza ao longo do tempo) |
+| `.replit`                            | Configuração de runtime                     | Ao configurar o app                    | Sim                                        |
+
+**Distinção fundamental**: `custom_instruction/instructions.md` é sua fonte estática e autoritativa para os padrões organizacionais. `replit.md` é o documento vivo que o Agent mantém conforme o projeto evolui. As skills são material de referência sob demanda para fluxos de trabalho específicos.
+
+## Melhores práticas
+
+### Mantenha as instruções focadas
+
+Escreva `custom_instruction/instructions.md` para os padrões que mais importam. Foque em:
+
+* Decisões difíceis de reverter (arquitetura, modelos de dados)
+* Padrões que devem ser consistentes (uso de componentes, convenções de API)
+* Padrões que o desenvolvedor pode não conhecer (bibliotecas internas, convenções da equipe)
+
+Evite incluir changelogs, detalhes de implementação ou informações que mudam com frequência.
+
+### Escreva descrições de skills descobríveis
+
+O campo `description` no frontmatter do `SKILL.md` é o que o Agent usa para decidir quando carregar uma skill. Escreva descrições que correspondam às tarefas onde a skill é relevante:
+
+```yaml theme={null}
+# Bom — descreve quando usar
+description: Use when building forms or handling user input. Provides validation patterns, error display conventions, and accessible form layouts.
+
+# Menos eficaz — muito vago
+description: Form utilities and helpers.
+```
+
+### Organize skills por fluxo de trabalho
+
+Agrupe skills em torno de fluxos de trabalho em vez de categorias técnicas:
+
+| Abordagem                 | Exemplo                                      |
+| ------------------------- | -------------------------------------------- |
+| **Por fluxo de trabalho** | `build-a-form`, `connect-to-api`, `add-auth` |
+| **Por área técnica**      | `react-utils`, `api-helpers`, `auth-config`  |
+
+A abordagem por fluxo de trabalho ajuda o Agent a descobrir skills no momento certo.
+
+### Itere no seu template
+
+Os templates melhoram com o uso. Depois que sua equipe começar a construir com um template:
+
+1. Observe os padrões que o Agent erra e adicione-os a `instructions.md`
+2. Crie novas skills quando o Agent resolver um problema bem — capture a solução
+3. Atualize as dependências e configurações base conforme sua stack evolui
+4. Teste as alterações criando um novo app a partir do template para verificar a experiência
+
+### Atualizações de templates e apps existentes
+
+As alterações no app do template são refletidas nos **novos** apps criados a partir dele. Os apps existentes que foram previamente forkados do template são cópias independentes e não recebem atualizações.
+
+## Recursos relacionados
+
+* [Agent Skills](/pt/features/agent/skills) — Saiba como as skills funcionam e como criá-las
+* [Usar uma skill](/pt/build/use-agent-skills) — Guia prático para usar e criar skills
+* [replit.md](/pt/features/project-setup/replit-dot-md) — Personalize o comportamento do Agent com contexto a nível de projeto
+* [Sistemas de Design](/pt/teams/custom-design-system) — Configure o sistema de design da sua organização para o Agent
+* [Configuração de apps](/replit-app/configuration) — Configure seu arquivo `.replit`
+* [Frameworks de Desenvolvedor](/pt/features/project-setup/developer-frameworks) — Por que os templates iniciais de linguagem e framework foram removidos e como iniciar um projeto agora
+* [Visão geral Enterprise](/pt/category/teams) — Saiba mais sobre os recursos Enterprise

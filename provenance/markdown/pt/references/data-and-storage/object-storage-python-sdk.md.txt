@@ -1,0 +1,279 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# SDK Python do App Storage
+
+> Aprenda a usar o SDK Python oficial para gerenciar arquivos no Replit App Storage.
+
+Este guia de referência explica a classe `Client` do pacote `replit-object-storage-python` e fornece exemplos de código para seus métodos de classe.
+
+## Client
+
+A classe `Client` gerencia as interações com o Replit App Storage. Esta classe possui métodos para realizar operações em objetos em um bucket.
+
+Para importar a classe do pacote `replit.object_storage`, adicione a seguinte linha ao seu código Python:
+
+```python theme={null}
+from replit.object_storage import Client
+```
+
+Use o seguinte código para criar uma instância de `Client` que interage com o Replit App Storage:
+
+```python theme={null}
+client = Client()
+```
+
+<Tip>
+  Se seu app usa múltiplos buckets, crie uma instância de `Client` por bucket.
+</Tip>
+
+### \_\_init\_\_
+
+O método `init` inicializa uma instância da classe Client.
+
+```python theme={null}
+def __init__(bucket_id: Optional[str] = None)
+```
+
+**Argumento**:
+
+* `bucket_id` (Optional\[str]): O ID do bucket que o cliente gerencia. Quando omitido, o Client usa o bucket padrão associado ao Replit App ou Deployment.
+
+### copy
+
+O método `copy` copia um objeto dentro do mesmo bucket. Se um objeto existir no mesmo local, ele sobrescreve o original.
+
+```python theme={null}
+def copy(object_name: str, dest_object_name: str) -> None
+```
+
+**Argumentos**:
+
+* `object_name` (str) - O caminho completo do objeto de origem.
+* `dest_object_name` (str) - O caminho completo do destino do objeto.
+
+**Exceções**:
+
+* `ObjectNotFoundError` - Indica que o objeto de origem não existe no caminho especificado.
+
+### delete
+
+O método `delete` remove permanentemente um arquivo do App Storage.
+
+```python theme={null}
+def delete(object_name: str, ignore_not_found: bool = False) -> None
+```
+
+**Argumentos**:
+
+* `object_name` (str) - O nome do objeto a ser excluído.
+* `ignore_not_found` (bool) - Quando `True`, suprime o erro se o objeto não existir.
+
+**Exceções**:
+
+* `ObjectNotFoundError` - Indica que o objeto não existe.
+
+### download\_as\_bytes
+
+O método `download_as_bytes` recupera o conteúdo de um arquivo como `bytes`.
+
+```python theme={null}
+def download_as_bytes(object_name: str) -> bytes
+```
+
+**Argumento**:
+
+* `object_name` (str) - O nome do objeto a ser baixado.
+
+**Retorna**:
+
+* `bytes` - A representação bruta em bytes do conteúdo do objeto.
+
+**Exceções**:
+
+* `ObjectNotFoundError` - Indica que o objeto não existe.
+
+### download\_as\_text
+
+O método `download_as_text` faz o download do conteúdo de um arquivo como tipo `str`.
+
+```python theme={null}
+def download_as_text(object_name: str) -> str
+```
+
+**Argumento**:
+
+* `object_name` (str) - O nome do objeto de origem a ser recuperado.
+
+**Retorna**:
+
+* str: O conteúdo do objeto como uma string codificada em UTF-8.
+
+**Exceções**:
+
+* `ObjectNotFoundError` - Indica que o objeto não existe.
+
+### download\_to\_filename
+
+Faz o download do conteúdo de um objeto para um arquivo no disco local.
+
+```python theme={null}
+def download_to_filename(object_name: str, dest_filename: str) -> None
+```
+
+**Argumentos**:
+
+* `object_name` (str) - O nome do objeto de origem no App Storage a ser recuperado.
+* `dest_filename` (str) - O nome do arquivo de destino no disco local.
+
+**Exceções**:
+
+* `ObjectNotFoundError` - Indica que o objeto não existe.
+
+### exists
+
+O método `exists` verifica se um objeto existe.
+
+```python theme={null}
+def exists(object_name: str) -> bool
+```
+
+**Argumento**:
+
+* `object_name` (str) - O nome do objeto a ser verificado.
+
+**Retorna**:
+
+* `bool`: `True` se o objeto existir, False caso contrário.
+
+### list
+
+O método `list` lista os objetos no Bucket.
+
+```python theme={null}
+def list(end_offset: Optional[str] = None,
+         match_glob: Optional[str] = None,
+         max_results: Optional[int] = None,
+         prefix: Optional[str] = None,
+         start_offset: Optional[str] = None) -> List[Object]
+```
+
+**Argumentos**:
+
+* `end_offset` (Optional\[str]) - Filtra os resultados para objetos nomeados lexicograficamente antes de `end_offset`. Se `start_offset` estiver definido, os objetos listados
+  têm nomes entre `start_offset` (inclusivo) e `end_offset` (exclusivo).
+* `match_glob` (Optional\[str]) - Use um padrão glob para filtrar os resultados. Por exemplo: "foo\*bar" corresponde a "footbar", "foo baz bar" e "foobar".
+* `max_results` (Optional\[int]) - O número máximo de resultados a retornar na resposta.
+* `prefix` (Optional\[str]) - Filtra os resultados para objetos cujos nomes possuem o prefixo especificado.
+* `start_offset` (Optional\[str]) - Filtra os resultados para objetos cujos nomes são lexicograficamente iguais ou posteriores a `start_offset`.
+  Quando `end_offset` está definido, os objetos listados têm nomes entre `start_offset` (inclusivo) e `end_offset` (exclusivo).
+
+**Retorna**:
+
+* `List`(Object): Uma lista de objetos que correspondem aos parâmetros de consulta fornecidos.
+
+### upload\_from\_filename
+
+Use `upload_from_filename()` para fazer o upload de um objeto a partir de um arquivo de origem no disco local para o App Storage.
+
+```python theme={null}
+def upload_from_filename(dest_object_name: str, src_filename: str) -> None
+```
+
+**Argumentos**:
+
+* `dest_object_name` (str) - O nome do arquivo enviado.
+* `src_filename` (str) - O arquivo de origem a ser enviado.
+
+### upload\_from\_bytes
+
+O método `upload_from_bytes` faz o upload de um objeto a partir de dados `bytes`.
+
+```python theme={null}
+def upload_from_bytes(dest_object_name: str, src_data: bytes) -> None
+```
+
+**Argumentos**:
+
+* `dest_object_name` (str) - O nome do objeto a ser enviado.
+* `src_data` (str) - Os dados em `bytes` a serem enviados.
+
+### upload\_from\_text
+
+O método `upload_from_text` faz o upload de um objeto a partir de uma string.
+
+```python theme={null}
+def upload_from_text(dest_object_name: str, src_data: Union[bytes, str]) -> None
+```
+
+**Argumentos**:
+
+* `dest_object_name` (str) - O nome do objeto a ser enviado.
+* `src_data` (str) - Os dados de texto a serem enviados.
+
+### Tipos de exceção
+
+* Ao interagir com o Replit App Storage usando o `Client`, qualquer método pode retornar um dos seguintes erros:
+
+  * `BucketNotFoundError`: Indica que o nome do bucket configurado não corresponde a nenhum bucket no App Storage.
+
+  * `DefaultBucketError`: Indica ausência de configuração de bucket padrão.
+
+  * `ForbiddenError`: Indica permissões insuficientes para acessar o bucket.
+
+  * `TooManyRequestsError`: Indica que a operação está sendo limitada por excesso de requisições.
+
+  * `UnauthorizedError`: Indica que a autorização restringiu o acesso à operação.
+
+## Exemplos de métodos de classe
+
+As seções a seguir fornecem exemplos de código para gerenciar seus objetos usando o SDK do Replit App Storage.
+
+### Recuperar um arquivo como texto
+
+```python theme={null}
+client.download_as_text("file.json")
+```
+
+### Recuperar os bytes brutos de um arquivo
+
+```python theme={null}
+client.download_as_bytes("file.png")
+```
+
+### Baixar um arquivo para o sistema de arquivos local
+
+```python theme={null}
+client.download_to_filename("file.json", dest_filename)
+```
+
+### Listar objetos no bucket
+
+```python theme={null}
+client.list()
+```
+
+### Fazer upload de um arquivo a partir de texto
+
+```python theme={null}
+client.upload_from_text("file.json", data)
+```
+
+### Fazer upload de um arquivo como bytes
+
+```python theme={null}
+client.upload_from_bytes("file.png", data)
+```
+
+### Fazer upload de objetos a partir do sistema de arquivos
+
+```python theme={null}
+client.upload_from_filename("file.json", src_filename)
+```
+
+### Excluir um objeto do bucket
+
+```python theme={null}
+client.delete("file.json")
+```

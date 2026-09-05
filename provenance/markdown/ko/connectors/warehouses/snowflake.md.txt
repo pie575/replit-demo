@@ -1,0 +1,250 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Snowflake 커넥터
+
+> Replit Agent로 데이터 기반 애플리케이션을 구축하기 위한 Snowflake 커넥터를 설정하세요.
+
+<Info>
+  Snowflake 커넥터는 **Enterprise** 플랜에서만 사용 가능합니다.
+</Info>
+
+웨어하우스 커넥터를 사용하면 Replit Agent가 조직의 데이터 웨어하우스를 쿼리할 수 있습니다. Snowflake 커넥터를 사용하면 빌더는 자연어를 사용하여 대시보드, 보고 도구 및 데이터 애플리케이션을 만들 수 있으며 SQL 전문 지식이 필요하지 않습니다.
+
+설정은 Snowflake 관리자와 Replit 워크스페이스 관리자가 필요한 일회성 프로세스입니다. 구성이 완료되면 모든 조직 구성원이 로그인하여 Snowflake 데이터로 구축을 시작할 수 있습니다.
+
+이 가이드는 전체 설정을 안내합니다. 세 가지 역할이 관여합니다:
+
+1. **Snowflake 계정 관리자** — Snowflake에서 OAuth 통합을 만듭니다
+2. **Replit 워크스페이스 관리자** — Replit에서 커넥터를 구성합니다
+3. **빌더** — 로그인하고 구축을 시작합니다
+
+## Snowflake에서 OAuth 통합 만들기
+
+Snowflake 계정 관리자는 Replit이 Snowflake로 인증할 수 있게 하는 OAuth 보안 통합을 만듭니다.
+
+### 사전 요구 사항
+
+* Snowflake의 `ACCOUNTADMIN` 역할
+* Snowflake 워크시트에서 SQL을 실행할 수 있는 접근 권한
+
+### 설정 스크립트 실행
+
+<Steps>
+  <Step title="Snowflake에 로그인">
+    Snowflake 계정을 열고 `ACCOUNTADMIN` 역할을 사용하고 있는지 확인합니다. 오른쪽 상단의 역할 드롭다운에서 확인할 수 있습니다.
+  </Step>
+
+  <Step title="SQL 워크시트 열기">
+    왼쪽 사이드바에서 **워크시트**를 클릭하고 새 워크시트를 만듭니다.
+  </Step>
+
+  <Step title="OAuth 통합 스크립트 실행">
+    다음 SQL 스크립트를 복사하여 붙여넣고 실행합니다:
+
+    ```sql OAuth 통합 만들기 theme={null}
+    -- 기존 통합이 있는 경우 삭제
+    DROP INTEGRATION IF EXISTS REPLIT_OAUTH;
+
+    -- Replit용 OAuth 통합 만들기
+    CREATE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    <Warning>
+      리디렉션 URI는 정확히 `https://replit.com/connectors/oauth/callback`이어야 합니다. 다른 값을 사용하면 인증 중에 404 오류가 발생합니다.
+    </Warning>
+
+    <Note>
+      `BLOCKED_ROLES_LIST = ()`를 설정하면 통합 사용이 차단된 역할이 없도록 보장합니다. 이 설정이 없으면 연결 시 "잘못된 동의 요청" 또는 "역할 차단" 오류가 발생할 수 있습니다.
+    </Note>
+  </Step>
+
+  <Step title="OAuth 자격 증명 가져오기">
+    다음 쿼리를 실행하여 클라이언트 ID와 클라이언트 시크릿을 가져옵니다:
+
+    ```sql OAuth 자격 증명 가져오기 theme={null}
+    -- 통합 세부 정보 보기
+    DESCRIBE INTEGRATION REPLIT_OAUTH;
+
+    -- 클라이언트 ID 및 시크릿 가져오기
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+
+    출력에서 **클라이언트 ID**와 **클라이언트 시크릿**을 복사합니다. 다음 단계에서 필요합니다.
+  </Step>
+</Steps>
+
+## Replit에서 커넥터 구성
+
+Replit 워크스페이스 관리자가 Replit에 Snowflake 자격 증명을 추가합니다. 구성이 완료되면 조직의 모든 사람이 로그인할 수 있습니다.
+
+<Note>
+  이 단계에는 관리자 접근이 있는 Enterprise 플랜이 필요합니다.
+</Note>
+
+<Steps>
+  <Step title="통합 열기">
+    조직 설정으로 이동하여 **통합** 탭을 선택합니다.
+  </Step>
+
+  <Step title="Snowflake 커넥터 추가">
+    **새 커넥터 추가**를 클릭하고 **Snowflake**를 선택합니다.
+  </Step>
+
+  <Step title="자격 증명 입력">
+    이전 단계의 **클라이언트 ID**와 **클라이언트 시크릿**을 입력합니다.
+  </Step>
+
+  <Step title="범위 설정">
+    커넥터 범위를 `refresh_token`으로 설정합니다.
+
+    <Warning>
+      `refresh_token` 범위만 사용하세요. `session:role-any` 또는 `session:role:PUBLIC`과 같은 다른 범위는 "잘못된 범위" 오류를 일으킬 수 있습니다.
+    </Warning>
+  </Step>
+
+  <Step title="저장">
+    **저장**을 클릭하여 커넥터를 활성화합니다.
+  </Step>
+</Steps>
+
+## Snowflake에 로그인
+
+커넥터에 접근 권한이 있는 모든 조직 구성원이 로그인할 수 있습니다. Agent와 함께 사용하기 전에 **통합** 페이지에서 먼저 로그인하여 연결을 확인하세요.
+
+<Steps>
+  <Step title="Snowflake 커넥터 찾기">
+    Replit에서 **통합**으로 이동합니다. **커넥터** 아래에서 **Snowflake**를 찾습니다.
+  </Step>
+
+  <Step title="로그인 클릭">
+    Snowflake 커넥터에서 **로그인**을 클릭합니다.
+  </Step>
+
+  <Step title="Snowflake 계정 ID 입력">
+    OAuth 프롬프트에서 Snowflake 계정 ID를 요청합니다.
+
+    계정 ID를 찾으려면 Snowflake URL을 확인하세요:
+
+    ```
+    https://app.snowflake.com/myorg/myaccount
+    ```
+
+    `app.snowflake.com/` 뒤의 두 부분을 하이픈으로 연결합니다:
+
+    ```
+    myorg-myaccount
+    ```
+
+    <Note>
+      URL에서는 두 부분 사이에 `/`를 사용하지만, 계정 ID에서는 `-`를 사용합니다.
+    </Note>
+  </Step>
+
+  <Step title="인증">
+    Snowflake가 로그인 페이지로 리디렉션합니다. Snowflake 자격 증명을 입력하여 OAuth 흐름을 완료합니다.
+  </Step>
+</Steps>
+
+## Snowflake 데이터로 구축 시작
+
+연결 후 두 가지 방법으로 Agent와 함께 Snowflake 커넥터를 사용할 수 있습니다:
+
+* **슬래시 명령** — 프롬프트에 `/snowflake`를 입력하여 커넥터 사용
+* **자연어** — Agent에게 Snowflake 데이터를 직접 사용하도록 요청
+
+다음은 예시 프롬프트입니다:
+
+```
+내 Snowflake 데이터를 사용하여 대시보드를 만들어 주세요. 지역별 총 매출을
+막대 차트로, 분기별 트렌드 라인으로, 상위 10개 고객의 테이블로 표시해 주세요.
+다크 테마, 깔끔하고 모던하게.
+```
+
+Agent는 Snowflake 데이터에 대한 SQL 쿼리를 작성하고 실행하여 작동하는 애플리케이션을 구축합니다.
+
+## 문제 해결
+
+<AccordionGroup>
+  <Accordion title="잘못된 동의 요청 또는 역할 차단 오류">
+    Snowflake 통합에 기본적으로 차단된 역할이 있을 수 있습니다.
+
+    통합이 `BLOCKED_ROLES_LIST = ()`로 만들어졌는지 확인합니다. 이 설정 없이 이미 만든 경우 다음을 실행하세요:
+
+    ```sql 차단된 역할 수정 theme={null}
+    CREATE OR REPLACE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    오류가 계속되면 기본 역할이 차단되지 않았는지 확인하세요:
+
+    ```sql 기본 역할 설정 theme={null}
+    ALTER USER "YOUR_USERNAME" SET DEFAULT_ROLE = 'PUBLIC';
+    ```
+  </Accordion>
+
+  <Accordion title="인증 시 404 오류">
+    Snowflake 통합의 리디렉션 URI가 정확히 다음과 같은지 확인합니다:
+
+    ```
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    어떠한 불일치도 OAuth 흐름 중 404를 일으킵니다.
+  </Accordion>
+
+  <Accordion title="잘못된 범위 오류">
+    Replit의 커넥터 범위가 `refresh_token`으로만 설정되어 있는지 확인합니다. `session:role-any` 또는 `session:role:PUBLIC`과 같은 다른 범위를 제거하세요.
+  </Accordion>
+
+  <Accordion title="연결 실패 오류">
+    Replit의 클라이언트 ID와 클라이언트 시크릿이 Snowflake가 생성한 것과 일치하는지 확인합니다. 다음을 실행하여 다시 확인하세요:
+
+    ```sql 자격 증명 확인 theme={null}
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 관련 문서
+
+* [웨어하우스 커넥터 개요](/ko/connectors/warehouses/overview) — 지원되는 모든 웨어하우스 커넥터 개요
+* [Databricks 연결](/ko/connectors/warehouses/databricks) — 단계별 Databricks 설정
+* [커넥터 관리](/ko/replitai/managing-connectors) — 커넥터 관리 및 구성
+* [Snowflake — 맞춤형 클라이언트용 OAuth 구성](https://docs.snowflake.com/en/user-guide/oauth-custom) — Snowflake의 OAuth 문서

@@ -1,0 +1,204 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Mobile app troubleshooting
+
+> Fix common issues when building mobile apps with Expo and React Native on Replit.
+
+When building mobile apps on Replit, you may encounter issues with previews, bundling, or package dependencies. This guide helps you resolve common problems, starting with quick fixes and progressing to deeper debugging steps.
+
+## Quick fixes
+
+Try these first—they resolve most issues:
+
+| Problem                           | What to try                                                 |
+| --------------------------------- | ----------------------------------------------------------- |
+| Changes not showing on your phone | Shake your phone to open the Expo menu, then tap **Reload** |
+| Changes not showing in preview    | Press **R** in the console to rebundle                      |
+| App stuck or unresponsive         | Stop and restart the app from the console                   |
+
+## Common issues
+
+<AccordionGroup>
+  <Accordion title="Changes aren't appearing on my device">
+    When you make changes but don't see them on your phone:
+
+    1. **Shake your phone** to open the Expo developer menu
+    2. Tap **Reload** to redownload the bundle
+
+    On the web preview, press **R** in the console to trigger a rebundle.
+
+    If changes still don't appear, try clearing the cache (see [Clear the Metro cache](#clear-the-metro-cache) below).
+  </Accordion>
+
+  <Accordion title="Red error screen in Expo Go">
+    A red error screen usually indicates a JavaScript error or missing module. Read the error message—it often points to the specific file and line.
+
+    **Common causes:**
+
+    * A package isn't installed or is the wrong version
+    * A module works on web but not on native (or vice versa)
+    * Syntax error in your code
+
+    **What to try:**
+
+    1. Read the error message carefully—it often tells you exactly what's wrong
+    2. Ask Agent to help fix the error by sharing the message
+    3. If the error mentions a specific package, try reinstalling dependencies (see [Reinstall packages](#reinstall-packages))
+  </Accordion>
+
+  <Accordion title="App works on web but crashes on phone (or vice versa)">
+    Some packages or features work differently across platforms. React Native compiles to three targets: iOS, Android, and web. A library that works on web might not support native, or might need different configuration.
+
+    **What to try:**
+
+    1. Check if the package supports your platform in its documentation
+    2. Ask Agent: "Is this package compatible with Expo Go?"
+    3. Consider moving the functionality to your server if it's not supported on mobile
+
+    <Tip>
+      When researching packages, look for "Expo compatible" or check the [Expo SDK documentation](https://docs.expo.dev/versions/latest/) for supported modules.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="QR code won't scan or app won't connect">
+    **Check your network:**
+
+    * Your phone and computer must be on the same WiFi network
+    * Some corporate or public networks block the connection
+
+    **Try tunnel mode:**
+    If you're on a restricted network, tunnel mode routes traffic through Expo's servers. Ask Agent to start the app with tunnel mode, or run `npx expo start --tunnel` in the shell.
+
+    **Restart Expo Go:**
+    Close Expo Go completely and reopen it before scanning.
+  </Accordion>
+
+  <Accordion title="Build takes a long time">
+    The first build is always slower because there's no cache. Subsequent builds should be faster.
+
+    **What affects build time:**
+
+    * Number of packages in your project
+    * First run after clearing the cache
+    * Network speed when downloading packages
+
+    If builds are consistently slow, check if you have unnecessary packages installed.
+  </Accordion>
+
+  <Accordion title="Module not found errors">
+    When you see "Unable to resolve module" or "Module not found":
+
+    1. The package might not be installed—ask Agent to install it
+    2. The package might be installed but the cache is stale—clear the cache
+    3. The package might not exist or be misspelled—check the package name
+
+    Try [reinstalling packages](#reinstall-packages) if the module should exist.
+  </Accordion>
+</AccordionGroup>
+
+## Debugging commands
+
+When quick fixes don't work, these commands help reset various caches and states. Run them in the Shell.
+
+### Clear the Metro cache
+
+Metro is the bundler that compiles your React Native code. Clearing its cache forces a fresh build.
+
+In the shell, run:
+
+```bash theme={null}
+npx expo start --clear
+```
+
+This clears the bundler cache and restarts the development server. You'll see "Bundler cache is empty. Rebuilding." in the output.
+
+<Tip>
+  If you're frequently hitting cache issues, you can add `-c` to your start command. Ask Agent to update the dev command to include the clear flag.
+</Tip>
+
+### Reinstall packages
+
+If you're seeing module errors or version mismatches, reinstalling packages often helps.
+
+In the shell, run:
+
+```bash theme={null}
+rm -rf node_modules && npm install
+```
+
+This deletes all installed packages and reinstalls them from scratch based on your `package.json`.
+
+<Note>
+  If your project uses a different package manager (like `bun` or `pnpm`), use the appropriate install command: `bun install` or `pnpm install`.
+</Note>
+
+### Check for version mismatches
+
+Expo Doctor scans your project for common issues like version mismatches between packages.
+
+In the shell, run:
+
+```bash theme={null}
+npx expo-doctor
+```
+
+Review the output for warnings. If it suggests fixes, evaluate them carefully—don't blindly upgrade packages, as this can introduce new issues.
+
+<Warning>
+  Only update packages when there's a specific reason to do so. Upgrading "just because" can break your app if the new version has incompatible changes.
+</Warning>
+
+## Full reset
+
+When nothing else works, a full reset clears all caches and reinstalls everything.
+
+<Accordion title="Nuclear option: Full reset command">
+  This command removes all caches and reinstalls packages from scratch. Use it as a last resort.
+
+  ```bash theme={null}
+  rm -rf node_modules .expo && npm cache clean --force && npm install && npx expo start --clear
+  ```
+
+  **What this does:**
+
+  1. `rm -rf node_modules` — Deletes installed packages
+  2. `rm -rf .expo` — Deletes Expo's local cache
+  3. `npm cache clean --force` — Clears npm's global cache
+  4. `npm install` — Reinstalls all packages
+  5. `npx expo start --clear` — Starts with a fresh Metro cache
+
+  After running this, your next build will take longer as everything rebuilds from scratch.
+</Accordion>
+
+### Clear cache on your device
+
+If the app on your phone seems stuck with old code even after reloading:
+
+* **iOS**: In Expo Go, go to **Settings** and tap **Clear Cache**
+* **Android**: Go to **Settings > Apps > Expo Go > Storage > Clear Cache**
+
+## Quick reference
+
+| Problem                   | Try first                | Then try                 |
+| ------------------------- | ------------------------ | ------------------------ |
+| Changes not showing       | Shake phone → Reload     | Clear Metro cache        |
+| Bundler errors            | `npx expo start --clear` | Delete node\_modules     |
+| Module not found          | Reinstall dependencies   | Full reset               |
+| Version mismatch warnings | Run `npx expo-doctor`    | Evaluate suggested fixes |
+| New package not working   | Restart the server       | Clear Metro cache        |
+| Changed app.json          | Restart the server       | —                        |
+
+## Getting more help
+
+If you're still stuck:
+
+* **Ask Agent**: Describe the error and what you've tried. Agent can often diagnose and fix issues.
+* **Check Expo docs**: The [Expo troubleshooting guide](https://docs.expo.dev/troubleshooting/overview/) covers additional scenarios.
+* **Search the error**: Copy the exact error message and search—someone has likely encountered it before.
+
+## Next steps
+
+* Return to [Native Mobile Apps](/features/artifact-types/building-mobile-apps)
+* Learn the full publishing flow: [Build and launch a mobile app](/build/mobile-app)

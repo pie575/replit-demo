@@ -1,0 +1,168 @@
+---
+title: "역할, 그룹 및 액세스"
+description: "역할과 그룹으로 멤버 액세스를 제어하세요. 역할은 기본 액세스 수준(Admin, Member, Guest, Viewer)을 제공하며, Enterprise 플랜에서만 사용 가능한 커스텀 그룹은 세밀한 액세스 제어를 제공합니다."
+sidebarTitle: "역할, 그룹 및 액세스"
+icon: "user-group"
+---
+
+기본 역할과 커스텀 그룹으로 구성된 포괄적인 시스템을 통해 조직의 리소스 및 애플리케이션 액세스를 관리하세요. 이 방식은 조직의 보안과 구조를 유지하면서 누가 무엇에 액세스할 수 있는지 세밀하게 제어할 수 있습니다.
+
+## 기능
+
+Replit Enterprise는 두 가지 보완적인 시스템을 통해 포괄적인 액세스 제어를 제공합니다.
+
+<CardGroup cols={2}>
+  <Card title="Admin" icon="shield-check">
+    조직 설정과 모든 리소스에 대한 완전한 관리 권한
+  </Card>
+
+  <Card title="Member" icon="users">
+    다른 모든 멤버를 볼 수 있으며 앱과 프로젝트를 생성 가능
+  </Card>
+
+  <Card title="Guest" icon="user-plus">
+    공유된 앱과 리소스에만 제한된 액세스
+  </Card>
+
+  <Card title="Viewer" icon="eye">
+    앱과 배포에 대한 읽기 전용 액세스
+  </Card>
+</CardGroup>
+
+주요 기능:
+
+* **기본 역할**: 모든 조직 멤버에게 기본 액세스 제어를 제공하는 네 가지 내장 액세스 수준
+* **커스텀 그룹** *(Enterprise 전용)*: 기본 역할의 한계를 넘어 세밀한 액세스 제어를 위한 특화 그룹 생성
+* **유연한 액세스 제어**: 역할과 그룹을 사용하여 다양한 앱과 리소스에 정밀한 액세스 부여
+* **간편한 멤버 관리**: 간단한 관리 제어로 그룹 간 멤버 추가, 제거, 이전
+
+## 사용 방법
+
+### 역할
+
+모든 조직 멤버는 조직 내 기본 액세스 수준을 정의하는 역할을 가져야 합니다. 관리자는 새 멤버를 추가할 때 역할을 할당하여 첫날부터 적절한 액세스 제어를 보장합니다.
+
+네 가지 기본 역할은 서로 다른 수준의 액세스를 제공합니다:
+
+* **Admin**: 조직 설정, 청구, 멤버 관리를 포함한 조직의 모든 가능한 작업에 액세스할 수 있습니다.
+* **Member**: Replit 앱을 생성하고 편집하며 다른 모든 조직 멤버를 볼 수 있지만, 민감한 관리 작업은 수행할 수 없습니다.
+* **Guest**: 가장 낮은 액세스 수준으로, 자신과 공유된 앱만 편집할 수 있습니다. 외부 협업자(예: 외부 계약업체)에게 적합한 역할입니다. [SSO](/ko/teams/identity-and-access-management/saml)가 활성화된 Enterprise 조직에서 Guest는 SSO 도메인 외부의 이메일을 사용해야 합니다. 내부 사용자는 Member 또는 Admin으로 추가할 수 있습니다.
+* **Viewer**: 앱과 배포에 대한 읽기 전용 액세스 권한을 가지며, 편집 권한 없이 가시성만 필요한 이해관계자에게 이상적입니다.
+
+<Note>
+  Enterprise에서 Guest 역할은 고정되어 있습니다. 추가된 후에는 Guest를 Member나 Admin으로 승격하거나 Viewer로 변경할 수 없습니다. Guest를 다른 역할로 변경하려면 해제 후 원하는 역할로 다시 초대하세요. SCIM 관리 워크스페이스의 Guest는 identity provider를 통해 관리됩니다.
+</Note>
+
+<Info>
+  **Enterprise 전용:** Enterprise에서 Admin 역할은 두 가지 별개의 역할로 나뉩니다—**account admin**(청구 및 계정 전체 제어)과 **workspace admin**(속한 워크스페이스 범위). 각각의 차이와 설정 방법은 [Account and Workspace Admins](/ko/teams/identity-and-access-management/account-and-workspace-admins)를 참조하세요. Core 및 Pro에서는 단일 Admin(account admin)이 있습니다.
+</Info>
+
+### 커스텀 그룹
+
+<Info>
+  커스텀 그룹은 **Enterprise** 플랜에서만 사용 가능합니다.
+</Info>
+
+커스텀 그룹은 기본 역할을 넘어 더 많은 액세스 제어를 제공합니다. 선택된 조직 멤버에게 특정 액세스를 부여하는 그룹을 만들어 기본 역할 액세스를 유지하세요.
+
+<Note>
+  IdP 그룹을 Replit에 동기화하여 대량 사용자 액세스 관리를 쉽게 하는 방법에 대해서는 [SCIM](https://docs.replit.com/teams/identity-and-access-management/scim)을 참조하세요.
+</Note>
+
+그룹 목록은 사이드바의 "Groups" 탭에서 확인할 수 있습니다. 각 그룹 카드에는 그룹 이름, 색상이 있는 아이콘, 그룹 멤버 수가 표시됩니다. 멤버는 최소한 뷰어 액세스 권한이 있는 그룹만 볼 수 있습니다.
+
+<Frame>
+  <img src="/assets/mirror/groups-view-26b478914733.png" alt="그룹 보기" width="2992" height="1696" data-path="images/teams/identity-and-access-management/groups-view.png" />
+</Frame>
+
+#### 그룹 생성하기
+
+관리자는 그룹 페이지에서 무제한으로 커스텀 그룹을 만들 수 있습니다. 오른쪽 상단의 **Add** 버튼을 선택하여 생성 모달을 열면:
+
+* **그룹 이름 지정**: 그룹 이름만 필수 입력 항목입니다.
+* **시각적 식별자 추가**: 그룹을 구분할 색상과 아이콘 선택
+* **멤버 할당**: 조직 멤버를 개별적으로 또는 일괄적으로 그룹에 추가
+* **액세스 부여**: 이후 각 앱의 **Invite** 버튼을 통해 그룹에 특정 앱 액세스 부여 가능
+
+<Frame>
+  <img src="/assets/mirror/creating-a-custom-group-12741b699c41.png" alt="이름 필드와 색상 선택기가 있는 커스텀 그룹 생성 모달" width="2992" height="1696" data-path="images/teams/identity-and-access-management/creating-a-custom-group.png" />
+</Frame>
+
+그룹 생성 후 멤버를 추가하고 조직 권한을 설정할 수 있는 그룹 상세 화면이 로드됩니다.
+
+#### 그룹 관리하기
+
+그룹 카드를 선택하여 관리 인터페이스에 액세스하세요. 그룹 관리에는 멤버 추가, 제거 및 권한 설정이 포함됩니다.
+
+<Frame>
+  <img src="/assets/mirror/group-members-view-1ca06f5bdac3.png" alt="그룹 멤버 보기" width="2992" height="1696" data-path="images/teams/identity-and-access-management/group-members-view.png" />
+</Frame>
+
+**그룹에 멤버 추가하기:**
+
+그룹에 멤버를 추가하려면 오른쪽 상단의 **Add** 버튼을 선택하세요. 추가하려는 사람이 조직에 속해 있지 않고 사용 가능한 시트가 부족한 경우 이 작업이 비활성화됩니다.
+
+<Frame>
+  <img src="/assets/mirror/adding-a-group-member-670c216b2806.png" alt="사용자 이름 또는 이메일 검색 필드가 있는 그룹 멤버 추가 대화상자" width="2992" height="1696" data-path="images/teams/identity-and-access-management/adding-a-group-member.png" />
+</Frame>
+
+사용자 이름 또는 이메일로 새 멤버를 검색할 수 있습니다. 새 멤버가 조직에 속해 있지 않은 경우 작업을 확인하는 경고가 표시됩니다.
+
+<Frame>
+  <img src="/assets/mirror/non-member-warning-a6d5df22c6c3.png" alt="그룹에 조직 외부 멤버를 추가할 때 표시되는 경고 대화상자" width="2992" height="1696" data-path="images/teams/identity-and-access-management/non-member-warning.png" />
+</Frame>
+
+새 멤버를 추가하면 그룹 멤버 목록에 표시됩니다. 즉시 그룹에서 사용 가능한 Replit 앱 및 기타 리소스에 액세스할 수 있습니다.
+
+**그룹에서 멤버 제거하기:**
+
+그룹 멤버를 제거하려면 멤버 행 오른쪽의 휴지통 아이콘을 선택하세요. 점 세 개 버튼을 사용하여 작업 메뉴를 열고 **Remove from group**을 선택할 수도 있습니다. 확인 모달이 열립니다.
+
+<Frame>
+  <img src="/assets/mirror/removing-a-group-member-8d88a7b24f2e.png" alt="그룹 멤버 제거 확인 대화상자" width="2992" height="1696" data-path="images/teams/identity-and-access-management/removing-a-group-member.png" />
+</Frame>
+
+커스텀 그룹에서 멤버를 제거하면 기본 역할 액세스는 유지되지만 그룹 특정 액세스는 사라집니다.
+
+#### 그룹 권한 설정하기
+
+그룹에 조직 권한을 할당하여 그룹 멤버가 조직에서 가져야 할 액세스 수준을 정의하세요. 그룹 권한을 설정하려면 생성된 그룹을 선택하고 왼쪽 탐색에서 **permissions** 탭을 선택하세요.
+
+사용 가능한 권한 수준:
+
+* **Owner**: 조직 삭제를 포함한 모든 조직 작업 수행 가능
+* **Billing manager**: 조직의 결제 정보 업데이트, 시트 추가 및 제거, 지출 한도 설정 가능
+* **Manager**: 그룹 생성 및 관리, 조직 멤버 추가 및 제거, 청구 정보 조회 가능
+* **Editor**: 새 앱 생성 및 사용 정보 조회 가능
+* **Viewer**: 조직에 대한 기본 정보 조회 가능
+
+이러한 그룹 권한은 앱별 액세스와 별개이며, 앱별 액세스는 Access 기능을 통해 개별 앱에서 관리합니다.
+
+그룹이 액세스할 수 있는 앱은 그룹을 선택하여 확인할 수 있습니다. 왼쪽 탐색에서 **permissions**를 선택한 다음 **Apps**로 이동하세요.
+
+### 앱 액세스 제어
+
+Replit의 Access 기능을 사용하여 앱에 액세스하고 협업할 수 있는 사람을 제어하세요. 역할과 그룹에 액세스를 할당하여 조직의 보안을 유지하면서 적합한 멤버와 특정 앱을 공유하세요.
+
+#### 앱 액세스 설정하기
+
+<Accordion title="앱 액세스 관리 방법">
+  앱에서 오른쪽 상단의 **Invite**(**Publish** 왼쪽)를 선택하여 Access 패널을 열 수 있습니다.
+</Accordion>
+
+Access 패널에는 사용 가능한 모든 역할이 표시되며 커스텀 그룹을 검색할 수 있습니다:
+
+* **기본 역할**: Admin, Members, Guests, Viewers가 Access 패널에 자동으로 표시됩니다.
+* **커스텀 그룹**: 검색 기능을 사용하여 특정 커스텀 그룹을 찾아 앱 액세스를 부여하세요.
+
+#### 액세스 수준
+
+세밀한 제어를 위해 각 역할과 그룹에 다른 액세스 수준을 할당할 수 있습니다:
+
+* **Owner**: 앱 삭제 및 관리 제어를 포함한 완전한 액세스
+* **Publisher**: 코드 편집, 앱 재게시, 앱 리소스 및 설정 관리 가능
+* **Editor**: 게시 권한 없이 코드 편집 및 앱 리소스 조회 가능
+* **Viewer**: 코드에 대한 읽기 전용 액세스와 자신의 용도로 앱 포크 가능
+* **None**: 앱 검색, 조회, 편집 불가
+
+협업 요구 사항과 보안 필요에 따라 각 역할이나 그룹에 적절한 액세스 수준을 선택하세요.

@@ -1,0 +1,110 @@
+---
+title: "Banco de Dados"
+description: "Aprenda como usar o banco de dados SQL integrado do Replit para armazenar e recuperar dados do seu app."
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+O Replit Database usa um banco de dados SQL totalmente gerenciado que permite adicionar armazenamento de dados persistente ao seu Replit App diretamente do Project Editor.
+
+<Note>
+  A maneira mais rápida de começar é pedir ao **Agent** para adicionar um banco de dados ao seu app. O Agent configurará a integração, criará o esquema do banco de dados e atualizará seu app para armazenar e recuperar dados.
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/database-editor-cbaa1fe049f8.jpg" alt="captura de tela do editor de banco de dados" width="1389" height="871" data-path="images/databases/database-editor.jpg" />
+</Frame>
+
+## Recursos
+
+A ferramenta Replit Database oferece os seguintes recursos:
+
+* **Ferramentas de banco de dados**: execute consultas, gerencie o esquema do banco de dados e visualize dados com as ferramentas SQL integradas
+* **Viagem no tempo**: restaure seu banco de dados para qualquer checkpoint do **Agent**. Veja [Recuperação de dados](/pt/features/data-and-storage/data-recovery)
+* **Armazenamento gratuito**: inclui 20 GB de armazenamento gratuito para cada Replit App.
+* **Variáveis de ambiente**: use variáveis de ambiente no seu Replit App para acessar o banco de dados com segurança
+
+<Info>
+  Antes de 4 de dezembro de 2025, o banco de dados de desenvolvimento era hospedado no Neon e tinha algumas diferenças cruciais. Veja [Desenvolvimento e produção](/pt/features/data-and-storage/development-and-production#banco-de-dados-de-desenvolvimento-legado) para mais detalhes.
+</Info>
+
+## Uso
+
+<YouTubeEmbed videoId="zbyRuoPNIc8" title="Como usar bancos de dados no Replit" />
+
+Você pode acessar a ferramenta Replit Database diretamente no Project Editor.
+As seções a seguir orientam você na configuração e no gerenciamento do seu Database.
+
+<Accordion title="Como acessar a ferramenta Database">
+  1. Abra o painel **Tools** e selecione **Database** em **Replit Cloud**.
+  2. A visão inicial lista seus bancos de dados. Selecione um, como **Development Database**, para abri-lo.
+</Accordion>
+
+A ferramenta Database é organizada em torno da sua lista de bancos de dados. A visão inicial mostra cada banco de dados com seu uso de armazenamento, além do seu **Billing Period** e **Hours of Compute Used** atuais. Abrir um banco de dados dá a você três abas:
+
+* **Overview**: As tabelas do seu banco de dados.
+* **My Data**: Navegue e edite linhas, ou execute consultas SQL.
+* **Settings**: A string de conexão, o uso de armazenamento e os detalhes de conexão.
+
+### Adicionar um banco de dados
+
+Todos os Replit Apps vêm com um banco de dados por padrão. Você pode acessá-lo selecionando a ferramenta <img class="icon-svg" src="/assets/mirror/postgres-c4cb2a1e2de3.svg" alt="Ícone de banco de dados PostgreSQL" width="24" height="24" data-path="images/icons/postgres.svg" /> **Database** no Project Editor.
+
+Você pode integrar o banco de dados ao seu Replit App pedindo ao **Agent** para adicionar um banco de dados PostgreSQL ao seu Replit App,
+incluindo detalhes sobre quais dados seu Replit App deve armazenar. O Agent criará o esquema do banco de dados
+e atualizará seu app para se comunicar com o banco de dados.
+
+### Recursos de segurança
+
+Quando você adiciona uma integração de banco de dados usando **Agent**, ele adiciona um mapeador objeto-relacional (ORM)
+que gerencia todas as comunicações com o banco de dados com segurança integrada.
+
+Essa camada de ORM, combinada com a implementação de boas práticas de segurança do Agent, protege seu app contra
+exploits através dos seguintes recursos:
+
+* **Validação de esquema**: verifica se os dados estão em conformidade com os formatos esperados
+* **Sanitização de dados**: limpa automaticamente a entrada do criador para evitar ataques de injeção SQL
+
+## Legacy Development Database
+
+Antes de 4 de dezembro de 2025, o banco de dados de desenvolvimento era hospedado no <a href="https://neon.com/" target="_blank">Neon</a>.
+Esse banco de dados agora está descontinuado, e todos os novos bancos de dados de desenvolvimento são hospedados na infraestrutura de banco de dados própria do Replit.
+
+Você pode verificar se o seu banco de dados de desenvolvimento é hospedado no Neon verificando a variável de ambiente `DATABASE_URL` [environment variable](#ver-credenciais-de-conexão-e-uso).
+
+<Info>
+  Se `DATABASE_URL` contém `neon.tech/neondb`, então o seu banco de dados de desenvolvimento ainda está hospedado no Neon.
+  Caso contrário, se contém `helium/heliumdb`, seu banco de dados de desenvolvimento agora está hospedado no Replit.
+</Info>
+
+As seguintes são as principais diferenças entre o banco de dados de desenvolvimento legado do Neon e o novo banco de dados de desenvolvimento do Replit:
+
+| **Recurso**                   | **Replit (atual)**                                                                                                                                                   | **Neon (legado)**                                                                                                                                         |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hospedagem**                | Hospedado na infraestrutura própria do Replit                                                                                                                        | Hospedado no Neon (provedor terceirizado)                                                                                                                 |
+| **Faturamento**               | Incluído gratuitamente em cada Replit App                                                                                                                            | Cobrança baseada em uso. Veja [Publishing and Database Billing](/pt/billing/about-usage-based-billing#databases) para mais detalhes.                      |
+| **Capacidade de restauração** | Restaure seu banco de dados para qualquer checkpoint usando o [recurso de rollback](/pt/features/version-control/checkpoints-and-rollbacks/)                         | Restauração para um ponto no tempo (PITR) — recupere para qualquer ponto dentro da janela de retenção de backup.                                          |
+| **Segurança de conexão**      | Acessível apenas a partir do seu app; nunca exposto publicamente.                                                                                                    | Usava uma string de conexão completa — se exposta, qualquer pessoa poderia acessar e modificar seu banco de dados.                                        |
+| **Comportamento ao remixar**  | [Remixar](/pt/features/projects-and-artifacts/remix-an-app) cria um novo banco de dados de desenvolvimento com dados copiados, para isolamento e segurança.          | Remixar reutilizava o mesmo banco de dados para todas as cópias, então alterações em remixes podiam afetar o app original.                                |
+| **Criação do banco de dados** | Criado automaticamente para cada Replit App.                                                                                                                         | Exigia configuração explícita.                                                                                                                            |
+| **Fluxo de publicação**       | Implantar ou publicar requer a criação de um [banco de dados de produção](/pt/features/data-and-storage/development-and-production) para isolamento entre ambientes. | Desenvolvimento e produção compartilhavam o mesmo banco de dados, então alterações não intencionais no desenvolvimento podiam afetar os apps em produção. |
+
+<Warning>
+  Se o seu app foi bifurcado ou remixado enquanto usava o banco de dados legado do Neon, seu app publicado ainda pode referenciar a URL do banco de dados do app original. Após a [atualização do banco de dados](/pt/features/data-and-storage/development-and-production), essa conexão compartilhada deixará de funcionar. Veja [Fix a published app using a shared database](/pt/features/data-and-storage/shared-database-migration) para saber como atualizar seu app publicado.
+</Warning>
+
+* [Desenvolvimento e produção](/pt/features/data-and-storage/development-and-production): Seus dois bancos de dados, a atualização de infraestrutura e a comparação com o Neon legado.
+* [Trabalhe com seus dados](/pt/features/data-and-storage/work-with-your-data): Navegue, edite e consulte seus dados.
+* [Detalhes de conexão](/pt/features/data-and-storage/connection-details): Credenciais e ferramentas externas.
+* [Recuperação de dados](/pt/features/data-and-storage/data-recovery): Restaure dados de desenvolvimento ou produção.

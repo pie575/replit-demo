@@ -1,0 +1,246 @@
+---
+title: "Replitで開く"
+description: "アプリやウェブサイトから訪問者がビルドを始められる「Replitで開く」ボタンの作成方法を説明します。"
+---
+
+export const CreateUrlLinkBuilder = () => {
+  if (typeof document !== 'undefined' && !window.LZString) {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js';
+    document.head.appendChild(script);
+  }
+  const getLink = () => {
+    if (typeof document === 'undefined' || !window.LZString) {
+      return 'https://replit.com/?stack=Design&prompt=';
+    }
+    const promptEl = document.getElementById('create-url-prompt');
+    const stackEl = document.querySelector('input[name="stack-mode"]:checked');
+    const referrerEl = document.getElementById('create-url-referrer');
+    const prompt = promptEl?.value || '';
+    const stack = stackEl?.value || 'Design';
+    const referrer = referrerEl?.value || '';
+    if (!prompt.trim()) {
+      return '';
+    }
+    const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+    let url = `https://replit.com/?stack=${stack}&prompt=${encoded}`;
+    if (referrer.trim()) {
+      url += `&referrer=${encodeURIComponent(referrer)}`;
+    }
+    return url;
+  };
+  const updateOutputs = () => {
+    if (typeof document === 'undefined') return;
+    const link = getLink();
+    const badgeUrl = 'https://replit.com/badge?caption=Build%20with%20Replit';
+    const emptyPlaceholder = 'Enter a prompt above to generate a link';
+    const badgeMarkdown = link ? `[![Build with Replit](${badgeUrl})](${link})` : emptyPlaceholder;
+    const outputEl = document.getElementById('create-url-output');
+    const badgeMarkdownEl = document.getElementById('create-url-badge-markdown');
+    if (outputEl) outputEl.textContent = link || emptyPlaceholder;
+    if (badgeMarkdownEl) badgeMarkdownEl.textContent = badgeMarkdown;
+  };
+  const handleBadgeClick = e => {
+    e.preventDefault();
+    const link = getLink();
+    if (link) {
+      window.open(link, '_blank');
+    }
+  };
+  return <div className="space-y-4">
+      <div>
+        <label htmlFor="create-url-prompt" className="block text-sm font-medium mb-1">
+          Prompt
+        </label>
+        <textarea id="create-url-prompt" onInput={updateOutputs} placeholder="Create a todo app with a clean, modern design" rows={4} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-2">Stack mode</label>
+        <div className="flex gap-4">
+          <label className="flex items-center cursor-pointer">
+            <input type="radio" name="stack-mode" value="Design" defaultChecked onChange={updateOutputs} className="mr-2" />
+            <span className="text-sm">Design</span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input type="radio" name="stack-mode" value="Build" onChange={updateOutputs} className="mr-2" />
+            <span className="text-sm">Build</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <label htmlFor="create-url-referrer" className="block text-sm font-medium mb-1">
+          Referrer <span className="text-gray-500 font-normal">(optional)</span>
+        </label>
+        <input id="create-url-referrer" type="text" onInput={updateOutputs} placeholder="Your website or app name" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+        <p className="mt-1 text-xs text-gray-500">
+          The name or URL of the page containing this link. Used for
+          attribution.
+        </p>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Generated link</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="create-url-output">
+            https://replit.com/?stack=Design&amp;prompt=
+          </code>
+        </pre>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Badge preview</label>
+        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-md">
+          <a href="#" onClick={handleBadgeClick} style={{
+    cursor: 'pointer'
+  }}>
+            <img src="https://replit.com/badge?caption=Open%20in%20Replit" alt="Open in Replit badge" noZoom />
+          </a>
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Badge markdown</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="create-url-badge-markdown">
+            [![Open in
+            Replit](https://replit.com/badge?caption=Open%20in%20Replit)](https://replit.com/?stack=Design&amp;prompt=)
+          </code>
+        </pre>
+      </div>
+    </div>;
+};
+
+<Frame caption="このバッジをクリックすると、自動的にReplitが開き、プロンプトと設定が入力されます。">
+  <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
+    <a href="https://replit.com/?stack=Build&prompt=A4Jw9gtsAuQ&referrer=replit-docs" target="_blank">
+      <img src="https://replit.com/badge?caption=Open%20in%20Replit" alt="Replitで開く" noZoom />
+    </a>
+  </div>
+</Frame>
+
+## リンクの作成
+
+リンクを作成するには、以下の形式を使用します。
+
+```
+https://replit.com/?stack=Build&prompt=A4Jw9gtsAuQ&referrer=replit-docs
+```
+
+### URLパラメータ
+
+URLには以下のパラメータを含めてください。
+
+| パラメータ      | 型      | 説明                                                                                                                                                      | 必須/任意 |
+| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `stack`    | string | 使用するビルドモード。`Design`または`Build`のいずれか。`Design`はビジュアルプロトタイピング用の[Canvas](/ja/design/canvas)を開きます。`Build`はフルアプリ開発用の[Agent](/ja/features/agent/overview)を開きます。 | 必須    |
+| `prompt`   | string | ビルドするアプリを説明するテキスト。**[LZ-string](https://pieroxy.net/blog/pages/lz-string/index.html)を使って圧縮**します。非圧縮のプロンプトは最大50,000文字まで使用できます。                           | 必須    |
+| `referrer` | string | このリンクを含むページの名前またはURL。アトリビューション用。                                                                                                                        | 任意    |
+
+<Note>
+  `prompt`パラメータはURLに追加する前にLZ-string圧縮を使って圧縮する必要があります。これによりURLがブラウザの長さ制限内に収まり、正しく解析されます。
+</Note>
+
+### インタラクティブなリンクビルダー
+
+以下のツールを使って**Replitで開く**リンクを生成します。プロンプトを入力し、スタックモードを選択すると、LZ-string圧縮が適用されたリンクが自動的に生成されます。
+
+<CreateUrlLinkBuilder />
+
+### プロンプトの圧縮
+
+有効な**Replitで開く**リンクを作成するには、LZ-string圧縮を使ってプロンプトを圧縮する必要があります。方法は以下の通りです：
+
+#### JavaScript/TypeScript
+
+```javascript theme={null}
+import LZString from 'lz-string';
+
+const prompt = 'Create a todo app with a clean, modern design';
+const compressed = LZString.compressToEncodedURIComponent(prompt);
+const url = `https://replit.com/?stack=Design&prompt=${compressed}`;
+```
+
+#### Python
+
+```python theme={null}
+import lzstring
+
+prompt = "Create a todo app with a clean, modern design"
+compressed = lzstring.LZString().compressToEncodedURIComponent(prompt)
+url = f"https://replit.com/?stack=Design&prompt={compressed}"
+```
+
+<Tip>
+  圧縮された文字列がURL安全であることを保証するために`compressToEncodedURIComponent`を使用してください。
+</Tip>
+
+### 例
+
+**基本プロンプトのCanvas**
+
+```
+https://replit.com/?stack=Design&prompt=AoUwTgzg9gdghgGwAQAcpgC4DMoIJZRIR4YgB0QA
+```
+
+**詳細プロンプトのビルドモード**
+
+```
+https://replit.com/?stack=Build&prompt=LIQw1gpgBCUE4HsQBMC2IAOUMBsQDt8BLfAcygBcEEcoB3ACwjmg0WQFcBjCqdfEKWYBnKFwJiWICtALIoANyLCOIHEQBe0AI6q4MuDgCe2dt16IU6DMIB0UAJL4uODsmjI4g0iABGOaHE4ZFEAMwQ4KBIiCiJpIgUIYQAaUyIImJMKQRSYfHkuGgixBGQScl8siBBUewARJKJSfCjeOhiGGFMEUKThdIFaWNQIdXxoJQg6PIKAglTUUuYWgFUHWyA&referrer=replit%20docs
+```
+
+## スタックモード
+
+### Canvas
+
+`stack=Design`を使用すると、プロンプトが[Canvas](/ja/design/canvas)で開きます。Canvasは以下に最適化されています：
+
+* ビジュアルデザインとUIプロトタイピング
+* レイアウトとスタイリングの高速な反復
+* デザインモックアップの作成
+* フロントエンド重視の開発
+
+### ビルドモード
+
+`stack=Build`を使用すると、プロンプトが[Agent](/ja/features/agent/overview)で開きます。Agentは以下に最適化されています：
+
+* フルスタックアプリケーション開発
+* バックエンドロジックとAPI
+* データベース統合
+* 複雑な機能と特性
+
+## ベストプラクティス
+
+* 最良の生成結果を得るために、プロンプトは簡潔でコア機能に焦点を当てます。
+* ビルドしたいものを説明する明確で説明的な言語を使用します。
+* ユースケースに応じて適切な`stack`モードを選択します（UI/UXはDesign、フルアプリはBuild）。
+* 共有する前に圧縮されたURLが正しく解析されることをテストします。
+* プロンプトを作成する際は対象者の技術レベルを考慮します。
+
+### ユーザー認証
+
+Replitの認証状態に関係なく、アプリを作成する前に入力が必要です。通常、これはプロンプトを送信することを意味します。
+
+### エラー処理
+
+URLが不正または無効なパラメータの場合、Replitはプロンプトを入力しません。考えられる原因：
+
+* 必須パラメータ（`stack`または`prompt`）の欠落
+* 無効な`stack`値（`Design`または`Build`でなければならない）
+* `prompt`パラメータの解凍失敗
+* ブラウザの「URLが長すぎます」エラー（ただし圧縮によって軽減されます）
+
+### セキュリティに関する考慮事項
+
+<Warning>
+  **Replitで開く**リンクは、意図しない動作やセキュリティの脆弱性を持つアプリを作成するために使用される可能性があります。信頼できるソースからのリンクのみクリックしてください。
+</Warning>
+
+**Replitで開く**リンクを共有する際：
+
+* 公開する前にプロンプトを慎重に確認する
+* 生成されるアプリのセキュリティへの影響を考慮する
+* プロンプトに機密情報を含めることを避ける
+* リンクが何を作成するかについて透明性を保つ
+
+## 関連リソース
+
+* [Canvasドキュメント](/ja/design/canvas)
+* [Agentドキュメント](/ja/features/agent/overview)
+* [Replit AIインテグレーション](/ja/features/integrations/overview)

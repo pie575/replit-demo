@@ -1,0 +1,106 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 데이터베이스 추가
+
+> 새로 고침, 재시작, 배포 후에도 Velocity의 차량, 가용성, 예약이 유지되도록 합니다.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+이 작업이 끝나면 모든 Velocity 차량, 가용 슬롯, 예약이 내일도 그대로 있게 됩니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-database/persisted-bookings.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=6ccc5fa405db4922759cb7f8fc0d3bbe" alt="새로 고침 후 Velocity — 로그인한 고객의 My bookings 목록에 저장된 두 개의 예약이 표시되고, 차량 페이지의 차량들이 새로 고침 전과 동일한 순서로 유지됨" width="1280" height="720" data-path="images/velocity/add-database/persisted-bookings.png" />
+</Frame>
+
+[로그인 추가](/ko/build/add-login)에서 Velocity에 로그인을 추가했습니다. 하지만 차량 목록의 차량들과 고객이 만든 예약들은 페이지를 새로 고침하면 사라집니다 — 브라우저에만 존재하기 때문입니다. 데이터베이스를 추가해서 모든 것이 유지되도록 하세요.
+
+## Agent에게 데이터 저장 요청
+
+Velocity에는 Neon — Replit의 관리형 Postgres 데이터베이스를 사용합니다. Neon은 동시 예약을 깔끔하게 처리하고, 실제 고객 트래픽에 맞게 확장되며, Agent가 별도의 개발 및 프로덕션 환경으로 자동 프로비저닝합니다. Neon 대시보드에 가입하거나 키를 붙여넣을 필요가 없습니다.
+
+<AiPrompt>
+  새로 고침 시 차량, 가용성, 예약이 사라지지 않도록 Velocity의 데이터를 데이터베이스에 저장하세요.<br />
+  Neon (Postgres)을 사용하세요.<br />
+  저장 대상: 각 차량 (제조사, 모델, 연식, 일일 요금, 사진, 위치), 각 차량의 가용성 달력, 각 예약 (픽업 날짜, 반납 날짜, 차량, 고객).<br />
+  각 예약을 로그인한 고객에게 연결해서 각 사람이 자신의 것만 볼 수 있게 하세요.<br />
+  날짜가 겹치는 경우 같은 차량을 중복 예약하지 못하도록 하세요.<br />
+  변경 후 테스트할 내용을 알려주세요.
+</AiPrompt>
+
+Agent가 Neon 데이터베이스를 프로비저닝하고, 차량 목록과 예약을 인메모리 데이터에서 데이터베이스로 옮기고, 같은 람보르기니가 이중 예약되지 않도록 중복 확인을 추가합니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-database/agent-db-connected.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=11a1d228d22617852eb346b3585ddad5" alt="Neon 마이그레이션 후 Agent 채팅 — 검증 체크리스트(중복 방지, 로그아웃 차단, 사용자 범위 예약, 잘못된 날짜 거부, 잘못된 차량 거부)와 방금 만든 Checkpoint 표시기, 그리고 유지된 차량 목록이 렌더링되는 Velocity 미리보기가 나란히 표시됨" width="1280" height="720" data-path="images/velocity/add-database/agent-db-connected.png" />
+</Frame>
+
+## 모든 것이 유지되는지 테스트
+
+1. Preview에서 Velocity에 로그인하고 다음 토요일 차량을 예약합니다.
+2. 페이지를 새로 고침합니다. "My bookings"에 예약이 그대로 있어야 합니다.
+3. Agent 채팅에서 앱을 재시작합니다. 차량 목록과 예약이 모두 그대로 있어야 합니다.
+4. 두 번째 계정으로 같은 토요일에 같은 차량을 예약해 봅니다. Velocity가 차량을 이용할 수 없다고 말하고 다른 날짜나 차량을 제안해야 합니다.
+5. 로그아웃하고 다시 로그인합니다. 예약이 여전히 있어야 합니다.
+
+어느 단계에서든 예약이 사라지면 정확한 증상을 Agent에게 다시 전달하세요.
+
+<AiPrompt>
+  Velocity에서 차량을 예약했지만 새로 고침 후 예약이 사라집니다.<br />
+  예약이 데이터베이스에 저장되는지, 아니면 페이지에만 저장되는지 확인해 주세요.<br />
+  가장 작은 문제를 수정하고 확인 방법을 알려주세요.
+</AiPrompt>
+
+데이터베이스에 있는 내용을 보기 위한 간단한 관리자 뷰를 Agent에게 요청할 수도 있습니다.
+
+<AiPrompt>
+  Velocity에서 데이터베이스의 모든 차량과 예약을 차량별로 그룹화하여 나열하는 간단한 관리자 페이지를 보여주세요.<br />
+  프로젝트 소유자인 저에게만 표시해 주세요.
+</AiPrompt>
+
+## 배포하고 공개 URL에서 확인
+
+Agent의 Neon 설정은 Velocity에 별도의 개발 및 프로덕션 환경을 기본으로 제공합니다. Agent 채팅이나 Publishing 타일에서 Velocity를 다시 배포한 다음, 새 탭에서 공개 URL을 엽니다. Replit이 프로덕션 Neon 자격 증명을 배포된 앱에 자동으로 연결합니다 — 공개 URL에서 예약을 하고, 새로 고침하고, 예약이 그대로 있는지 확인하세요.
+
+이제 Velocity가 모든 차량, 모든 가용 날짜, 모든 예약을 기억합니다. 다음 새로 고침에서도 예약이 사라지지 않습니다.
+
+## 다음 개선 사항
+
+<CardGroup cols={2}>
+  <Card title="결제 추가" icon="credit-card" href="/ko/build/add-payments">
+    고객이 차량을 예약할 때 환불 가능한 보증금을 받습니다.
+  </Card>
+
+  <Card title="통합 추가" icon="plug" href="/ko/build/add-integrations">
+    각 예약을 고객의 캘린더에 전송합니다.
+  </Card>
+
+  <Card title="데이터로 대시보드 만들기" icon="chart-simple" href="/ko/build/dashboard">
+    저장된 예약을 활용도 차트로 변환합니다.
+  </Card>
+</CardGroup>
+
+## 추가 도움이 필요하신가요?
+
+* **Preview에서는 예약이 저장되지만 공개 URL에서는 안 됨:** Agent에게 프로덕션 Neon 자격 증명이 배포된 앱에 연결되어 있는지 확인하도록 요청하세요.
+* **데이터 확인이 어려움:** Agent에게 데이터베이스의 모든 내용을 나열하는 간단한 관리자 뷰를 추가하도록 요청하세요.
+* **차량 목록을 초기 데이터로 채우고 싶음:** Agent에게 실제 차량을 데이터베이스에 로드하는 일회성 스크립트를 추가하도록 요청하세요.
+* **빠른 프로토타입을 위한 설정 없는 데이터베이스를 원함:** 대신 [Replit Database](/ko/features/data-and-storage/sql-database)를 사용하세요 — 별도 프로비저닝 없이 모든 Repl에 내장되어 있습니다.
+
+## 관련 문서
+
+* [프로덕션 데이터베이스](/ko/features/data-and-storage/development-and-production)
+* [Replit Database](/ko/features/data-and-storage/sql-database)

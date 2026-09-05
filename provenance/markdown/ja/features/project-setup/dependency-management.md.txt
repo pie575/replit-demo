@@ -1,0 +1,137 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 依存関係管理
+
+> 異なる言語でReplitアプリのパッケージと依存関係をインストール・管理する方法を学びましょう。
+
+Replitは、Replitアプリのパッケージをインストール・管理するためのいくつかの方法を提供しています。[Shell](/ja/features/workspace-tools/shell)を使ってパッケージをインストールしたり、[Agent](/ja/features/agent/overview/)に任せたり、Replitアプリの実行時に不足している依存関係を自動的に検出してインストールさせたりできます。
+
+## Shellを使ったパッケージのインストール
+
+プロジェクトエディターで**Shell**ツールを開き、使用する言語のパッケージマネージャーに応じたコマンドを実行してください：
+
+<CodeGroup>
+  ```bash Node.js (npm) theme={null}
+  npm install <package-name>
+  ```
+
+  ```bash Node.js (pnpm) theme={null}
+  pnpm add <package-name>
+  ```
+
+  ```bash Python (poetry) theme={null}
+  poetry add <package-name>
+  ```
+
+  ```bash Python (pip) theme={null}
+  pip install <package-name>
+  ```
+
+  ```bash Ruby theme={null}
+  bundle add <gem-name>
+  ```
+</CodeGroup>
+
+Replitの[ユニバーサルパッケージマネージャー（UPM）](https://github.com/replit/upm/)を使用して、サポートされている言語全体でパッケージをインストールすることもできます：
+
+```bash theme={null}
+upm add <package-name>
+```
+
+特定のバージョンをインストールするには：
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+サポートされているすべての言語とパッケージマネージャーについては、[UPM：サポートされている言語](https://github.com/replit/upm/#supported-languages)を参照してください。
+
+## Agentを使ったパッケージのインストール
+
+チャットで直接[Agent](/ja/features/agent/overview/)にパッケージのインストールを依頼できます。例えば：
+
+* 「axiosパッケージをインストールして」
+* 「プロジェクトにFlaskとSQLAlchemyを追加して」
+* 「TailwindCSSをセットアップして」
+
+Agentはプロジェクトに適したパッケージマネージャーを使ってパッケージをインストールし、関連する設定ファイルを更新します。
+
+## 自動インポート検出
+
+Replitは**Run**を選択するたびにコードを自動的に分析し、不足している依存関係を確認します。まだインストールされていないパッケージをコードでインポートしている場合、Replitはそれを検出して最新バージョンを自動的にインストールします。
+
+たとえば、`main.py`に`import flask`を追加すると、次に**Run**を選択したとき、**Console**に**Flask**がインストールされていることを示すメッセージが表示されます。
+
+<Note>
+  自動インポート検出は、[.replit](/ja/features/project-setup/configuration#replit-file)ファイルの`packager.features.guessImports`設定で構成できます。
+</Note>
+
+### 自動検出の上書き
+
+間違ったパッケージが検出された場合や特定のバージョンが必要な場合は、Shellで正しいインストールコマンドを実行してください。例えば：
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+また、[.replit](/ja/features/project-setup/configuration#replit-file)ファイルで自動検出から特定のパッケージやパスを除外することもできます：
+
+## Pythonパッケージマネージャー
+
+Python Replitアプリを作成すると、デフォルトのパッケージマネージャーは**poetry**です。これは`pip install`が依存関係を管理しないことを意味します。代わりに、Shellで`poetry add <package>`または`upm add <package>`を使用してください。
+
+### poetryからpipへの切り替え
+
+`pip`の使用を好む場合は、以下の手順に従ってください：
+
+<Steps>
+  <Step>
+    Shellを開いて実行します：
+
+    パッケージングインフラがpipに切り替わるようにロックファイルを削除します：
+
+    ```bash theme={null}
+    rm poetry.lock
+    ```
+  </Step>
+
+  <Step title="依存関係の移動">
+    `pyproject.toml`の`[tool.poetry.dependencies]`セクションから`requirements.txt`に依存関係を移します。たとえば、`flask = "^3.0.2"`は`flask>=3.0.2,<4`になります。
+  </Step>
+
+  <Step title="pyproject.tomlのクリーンアップ">
+    `pyproject.toml`から`[tool.poetry...]`セクションを削除します。
+  </Step>
+</Steps>
+
+これらの変更後、パッケージングインフラはすべての将来の操作に`pip`を使用し、自動インポート検出は引き続き期待どおりに機能します。
+
+## NixによるシステムDependencies
+
+Replitは[Nix](https://nixos.org/)との統合によりすべてのプログラミング言語をサポートします。標準的な言語パッケージを超えたシステムレベルの依存関係が必要な場合は、[replit.nix](/ja/features/project-setup/configuration#replit-nix-file)ファイルに追加できます。
+
+### Nixパッケージ
+
+`replit.nix`を直接編集してシステムレベルの依存関係を追加します。利用可能なパッケージは[search.nixos.org](https://search.nixos.org/packages)で検索できます。
+
+### モジュール
+
+モジュールは、プログラミング言語、フォーマッター、パッケージャーのサポートを組み合わせます。Replitアプリの基盤を提供します。テンプレートやGitHubリポジトリからReplitアプリを作成すると、Replitは必要なモジュールを自動的にインストールします。
+
+モジュールやその他のNix設定は[.replit](/ja/features/project-setup/configuration#replit-file)ファイルを使用してカスタマイズできます。
+
+## パッケージャーの設定
+
+[.replit](/ja/features/project-setup/configuration#replit-file)ファイルでパッケージ管理の動作を細かく調整できます：
+
+| 設定                                    | 説明                           | デフォルト   |
+| ------------------------------------- | ---------------------------- | ------- |
+| `packager.language`                   | パッケージ操作に使用する言語               | 自動検出    |
+| `packager.features.guessImports`      | 実行時に不足しているパッケージを自動検出してインストール | `true`  |
+| `packager.features.packageSearch`     | パッケージ検索サポートを有効化              | `true`  |
+| `packager.features.enabledForHosting` | ホスティング時にパッケージインストールを必要とする    | `false` |
+| `packager.afterInstall`               | パッケージインストール後に実行するコマンド        | —       |
+| `packager.ignoredPaths`               | インポート検出で無視するパス               | `[]`    |
+| `packager.ignoredPackages`            | 自動検出から除外するパッケージ              | `[]`    |

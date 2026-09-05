@@ -1,0 +1,50 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Plan a custom auth migration
+
+> Plan a safe migration from a custom authentication system to Clerk Auth while preserving your app's user data and access rules.
+
+Use this page when your app has its own authentication system, user store, or session logic. Moving to [Clerk Auth](/features/auth-and-identity/clerk-auth) is a data and identity migration, not only a code change. Without a plan, returning users can appear to have lost access to their existing data.
+
+<Note>
+  **Using Replit Auth?** The automated migration flow is only for eligible Replit Auth apps. Follow [Migrate from Replit Auth to Clerk](/features/auth-and-identity/migrate-auth-to-clerk) instead.
+
+  Replit does not automatically migrate a custom authentication system. This page provides planning and validation guidance, not an automated import procedure.
+</Note>
+
+## Plan identity continuity
+
+* Identify the stable value that connects a person to your app data today. It might be a user ID, email address, username, or a separate account record.
+* Inventory every table and service that depends on that value, including ownership, permissions, subscriptions, preferences, and audit records.
+* Decide how the new identity system will resolve each existing local record before you change sign-in behavior.
+* Define how brand-new users will be assigned and linked to local records after cutover.
+
+<Warning>
+  Do not assume that a provider's user ID, an email address, or a new account created at first sign-in will match your existing records. Verify the mapping with representative accounts before cutover.
+</Warning>
+
+## Account credentials and sessions
+
+* Inventory your password hashes, OAuth identities, MFA factors, verification state, and active sessions separately. They may have different portability and security requirements.
+* Validate any password migration against your chosen provider's current documentation before processing real accounts. If a credential cannot be migrated safely, plan a password-reset or account-linking flow.
+* Do not assume OAuth identities or active sessions transfer automatically. Plan how existing users will sign in again and how you will prevent duplicate accounts.
+* Keep authorization and app-specific data in your local data model unless you have explicitly planned a replacement. Authentication and authorization often need separate migration work.
+
+## Test before cutover
+
+* Test in a non-production environment with representative, non-sensitive accounts and data.
+* Sign in as an existing account, then open pages that read user-specific data such as a dashboard, profile, or saved items.
+* Verify authorization rules, account recovery, sign-out, and a new-account flow.
+* Monitor for duplicate records and access failures during cutover. Keep a rollback plan until your validation is complete.
+
+## Get help
+
+* If you need to migrate a custom authentication system to Replit-managed Clerk Auth, [contact Replit Support](https://replit.com/support) before changing production account data.
+* If you manage authentication with another provider, use that provider's current migration documentation and validate your identity mapping before cutover.
+
+## Additional resources
+
+* [Clerk Auth overview](/features/auth-and-identity/clerk-auth) — How Clerk Auth works on Replit
+* [Migrate from Replit Auth to Clerk](/features/auth-and-identity/migrate-auth-to-clerk) — Use the eligible-app migration flow for Replit Auth

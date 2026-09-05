@@ -1,0 +1,157 @@
+---
+title: "Build an online store"
+description: "Import your catalog into Shopify and design the storefront in Replit."
+sidebarTitle: "Build an online store"
+icon: "store"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Give Agent your products from a source you already have: a Google Sheet (name, price,
+description, product code, stock) and photos in Google Drive. Agent sets up the Shopify store,
+imports products, prices, descriptions, and images, and wires checkout and payments.
+The storefront design and frontend live in Replit, not in a Shopify theme. Payments go
+through Shopify checkout, so you don't need a separate Stripe connector.
+
+## Best for
+
+* Founders who need a store from a catalog they already keep in Sheets and Drive.
+* Product designers who need a custom Replit storefront with Shopify as the commerce backend.
+
+## Connectors
+
+<Connectors
+  items={[
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "Product list: names, prices, descriptions, product codes, stock",
+},
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "Product photos and brand assets",
+},
+{
+  id: "shopify",
+  name: "Shopify",
+  why: "Store setup, catalog import, checkout, and payments",
+},
+]}
+/>
+
+## Before you start
+
+Have a Sheet with one row per product (name, price, description, product code, stock) and a Drive
+folder of photos named so Agent can match them to rows. Connect Sheets, Drive, and Shopify.
+Agent can provision Shopify from chat if you don't have a store yet. Place a test order
+before you share the store.
+
+## Prompt the agent
+
+<AiPrompt>
+  From this product source \[Google Sheet and Drive folder], set up a complete
+  Shopify store: import every product with name, price, description, and photos.
+  Design and build the storefront frontend in this Replit app (home, collection,
+  product, cart). Use Shopify for catalog, cart, checkout, and payments. Don't
+  use a Shopify theme for the customer-facing pages.
+</AiPrompt>
+
+## What to expect
+
+Agent imports the catalog into Shopify, then builds a Replit storefront that reads products
+from Shopify and sends customers to Shopify checkout. Spot-check a few products against the
+Sheet (price, copy, image) and place a test order. Use Shopify test payments, confirm the
+cart total matches the Sheet, and check that checkout stays on Shopify.
+
+## Make it work for you
+
+<AiPrompt>
+  Match Drive photos to Sheet rows by product-code filename (CODE.jpg). Skip any
+  row that has no photo.
+</AiPrompt>
+
+<AiPrompt>
+  Add collection pages from the Sheet's category column, and a search bar on the
+  Replit storefront.
+</AiPrompt>
+
+## Troubleshooting
+
+* **Photos don't match products:** name Drive files by product code (`CODE.jpg`) and ask Agent to skip any row that has no photo.
+* **Prices or copy don't match the Sheet:** confirm one row per product (name, price, description, product code, stock) and spot-check a few items after import.
+* **Checkout isn't Shopify, or the storefront is a theme:** the customer-facing pages should live in Replit. Payments go through Shopify checkout. Place a test order before you share the store.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Design a landing page" href="/use-cases/design-landing-page">
+    For founders and product designers who need a waitlist page first.
+  </Card>
+
+  <Card title="Go from Figma to a live App" href="/use-cases/import-figma-design">
+    For product designers who already have the storefront in Figma.
+  </Card>
+</CardGroup>

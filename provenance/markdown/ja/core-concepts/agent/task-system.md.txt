@@ -1,0 +1,133 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# タスクシステム
+
+> Agentは作業をタスクに分割し、バックグラウンドで実行して、メインバージョンに適用できるようにレビューします。
+
+## タスクシステムとは？
+
+**タスク**はAgentが計画・実行できる作業の単位です。タスクにより、Agentは大きな目標を小さな部品に分割でき、それぞれの部品がアプリに変更を加える前にレビューできます。
+
+Agentは2つの場所で作業できます：**メインスレッド**と**バックグラウンドタスク**。メインスレッドは、何を望むかを説明し、方向性を絞り込み、メインバージョンに何を適用するかを決める会話です。バックグラウンドタスクは、Agentがプロジェクトの分離されたコピーで独立して作業する別のスレッドです。
+
+方向性と意思決定にはメインスレッドを使用してください。並行して行える実行にはバックグラウンドタスクを使用してください。バックグラウンドタスクは、レビューして適用するまでメインバージョンを変更しません。
+
+タスクシステムはAgentがその作業を整理する方法です。構築したいものを説明すると、Agentはリクエストを個別のタスクに分割し、**下書き**、**進行中**、**準備完了**、**完了**の列を持つボードに配置できます。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/L22mbBMLs80H8_c8/images/replitai/task-board-progress.png?fit=max&auto=format&n=L22mbBMLs80H8_c8&q=85&s=3b4ef2fbede2d057e40c138956ccd74d" alt="下書き、進行中、準備完了、完了の列にタスクが整理されているタスクボード" width="3456" height="1984" data-path="images/replitai/task-board-progress.png" />
+</Frame>
+
+各タスクは進捗するにつれて左から右に移動するため、計画されているもの、Agentが取り組んでいるもの、レビュー待ちのもの、完了したものを一目で確認できます。バックグラウンドタスクはプランに基づいて自動的にキューに入れられるため、メインスレッドを混雑させることなく作業が進みます。
+
+タスクが準備完了になると、変更をレビューしてメインバージョンに適用するか、望ましくない場合は却下します。
+
+## バックグラウンドタスクの仕組み
+
+<Steps>
+  <Step title="タスクを計画する">
+    メインスレッドで会話を開始するか、新しいスレッドを作成してそこで計画します。Agentはプロジェクトをレビューし、最もインパクトの大きいものを特定し、各タスクの詳細な計画（何をするか、「完了」とはどういう状態か）を書き上げます。
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/L22mbBMLs80H8_c8/images/replitai/task-describe-idea.png?fit=max&auto=format&n=L22mbBMLs80H8_c8&q=85&s=bfeb272f42640f20c393dda187f3f817" alt="メインスレッドで構築したいものを説明し、Agentがタスクを提案・実行している" width="3430" height="1986" data-path="images/replitai/task-describe-idea.png" />
+    </Frame>
+  </Step>
+
+  <Step title="レビューして承認する">
+    Agentはタスクのセットを提案し、それぞれにタイトル、説明、**プランを表示**で確認できる詳細な計画があります。全リストをレビューして選択します：
+
+    * **タスクを承認する**：すべてのタスクを開始してバックグラウンドに送信
+    * **プランを修正する**：開始前にAgentにタスクを調整させる
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/L22mbBMLs80H8_c8/images/replitai/task-accept-plans.png?fit=max&auto=format&n=L22mbBMLs80H8_c8&q=85&s=e788fc99c5fce2644d144f88419ba00c" alt="「タスクを承認する」と「プランを修正する」オプションがある4つの提案タスクを表示するタスクプラン作成ダイアログ" width="3430" height="1986" data-path="images/replitai/task-accept-plans.png" />
+    </Frame>
+  </Step>
+
+  <Step title="タスクが実行開始される">
+    承認されると、タスクはプロジェクトの分離されたコピーで実行を開始します。Coreは一度に1つのバックグラウンドタスクを実行し、Proは最大10個の同時バックグラウンドタスクをサポートします。変更を適用するまでメインバージョンはそのままです。進捗は2つの方法で追跡できます：
+
+    * **スレッドビュー**：各タスクはライブステータスインジケーター付きの独自のスレッドで実行されるため、任意のタスクの会話を追跡したり参加したりできます
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/L22mbBMLs80H8_c8/images/replitai/task-plan-sidebar.png?fit=max&auto=format&n=L22mbBMLs80H8_c8&q=85&s=46aa76922ec245592fba29347bebc5c7" alt="ステータスインジケーター付きで複数のタスクが並行して実行されているスレッドビュー" width="3430" height="1986" data-path="images/replitai/task-plan-sidebar.png" />
+    </Frame>
+
+    * **ボードビュー**：**下書き**、**進行中**、**準備完了**、**完了**のステータス別にすべてのタスクを整理する列ベースのボード
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/L22mbBMLs80H8_c8/images/replitai/task-board-active.png?fit=max&auto=format&n=L22mbBMLs80H8_c8&q=85&s=601835c79a1f6f89abdafcfa0fbe577c" alt="下書き、進行中、準備完了、完了の列にタスクが整理されているボードビュー" width="3430" height="1986" data-path="images/replitai/task-board-active.png" />
+    </Frame>
+  </Step>
+
+  <Step title="レビューして適用する">
+    タスクが完了すると、Agentは実行内容（作業ログ、テスト結果、変更のライブプレビュー）を表示します。次のアクションを決定します：
+
+    * **メインバージョンに変更を適用する**：タスクの作業をプロジェクトにマージ
+    * **却下する**：望ましくない場合は変更を破棄
+
+    Agentは複数のタスクから変更を適用する際、コンフリクトの解決を自動的に処理します。
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/L22mbBMLs80H8_c8/images/replitai/task-review-apply.png?fit=max&auto=format&n=L22mbBMLs80H8_c8&q=85&s=4801afb66f05f46e919c8900c2963735" alt="Agentの作業ログ、テスト結果、変更の適用ボタンを表示するタスクレビュー画面" width="3456" height="1984" data-path="images/replitai/task-review-apply.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## タスクについて詳しく学ぶ
+
+<CardGroup cols={3}>
+  <Card title="タスクボード" icon="table-columns" href="/ja/features/agent/task-board">
+    ボードから下書き、進行中、準備完了、完了のタスクをレビューする。
+  </Card>
+
+  <Card title="タスクライフサイクル" icon="rotate" href="/ja/features/agent/task-lifecycle">
+    タスクの状態、キューに入れられた作業、変更の適用、アーカイブ、キャンセルを理解する。
+  </Card>
+
+  <Card title="フォローアップタスク" icon="list-check" href="/ja/features/agent/follow-up-tasks">
+    提案された次のタスクを開始し、多くのフォローアップを一度に管理する。
+  </Card>
+</CardGroup>
+
+## 構築できるもの
+
+タスクシステムはあらゆるプロジェクトで機能します。特に効果的なパターンをいくつか紹介します：
+
+* **大きな機能を小さな部品に分けてリリース**：認証、ダッシュボード、APIレイヤーを別々のタスクに分割して、Agentが明確に進められるようにする
+* **複雑なプロジェクトを計画する**：大きな機能を依存関係のある明確なスコープのタスクに分解し、自信を持って実行する
+* **異なるデザインの方向性を比較する**：別々のタスクを使って複数のUIアプローチを試し、最良の結果を選ぶ
+
+## よくある質問
+
+<Accordion title="構築方法を変える必要がありますか？">
+  いいえ。メインスレッドはまったく同じように動作します。Agentは役立つときにバックグラウンドで自動的にタスクを作成します。[Planモード](/ja/features/agent/plan-mode)を使ってタスクを明示的に確認・管理することもできます。
+</Accordion>
+
+<Accordion title="タスクが一度に1つずつ実行されているのはなぜですか？">
+  Coreは一度に1つのバックグラウンドタスクを実行します。Proは最大10個の同時バックグラウンドタスクをサポートします。プランの上限に達すると、追加のタスクはキューに入れられ、スロットが空くと開始されます。
+</Accordion>
+
+<Accordion title="バックグラウンドタスクを適用する際、Agentはコンフリクトをどのように処理しますか？">
+  AgentはAI支援のコンフリクト解決を使用します。各タスクが何を達成しようとしていたかを理解し、変更をインテリジェントに適用します。何かおかしいと思ったら、スレッドでAgentに修正を依頼できます。
+</Accordion>
+
+<Accordion title="タスクは互いに依存できますか？">
+  はい。Agentは依存関係を自動的に検出します。例えば、ダッシュボードを構築するタスクは、データベーススキーマを作成するタスクに依存します。依存タスクは前提条件が完了するまで待機します。
+</Accordion>
+
+<Accordion title="アーカイブとキャンセルの違いは何ですか？">
+  **アーカイブ**は計画セッションに適用されます：まだ構築を開始していない下書き。アーカイブされた計画セッションは保存され、**完了**列から復元できます。
+
+  **キャンセル**は計画から構築に移行したタスクに適用されます。キャンセルするとタスクが停止し、その作業が破棄され、キャンセルされたタスクは復元できません。代わりに新しいタスクを開始してください。
+</Accordion>
+
+## 利用可能な機能
+
+| 機能            | Core | Pro |
+| ------------- | ---- | --- |
+| タスク計画         | ✅    | ✅   |
+| バックグラウンドタスク   | ✅    | ✅   |
+| 同時バックグラウンドタスク | 1    | 10  |

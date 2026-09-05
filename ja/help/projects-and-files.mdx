@@ -1,0 +1,94 @@
+---
+title: "プロジェクトとファイル"
+description: "プロジェクトに関するよくある質問への回答—削除されたプロジェクトの回復、エクスポート、共有、GitHub の接続、シークレット、チェックポイントへのロールバックなど。"
+---
+
+ここではプロジェクトとファイルの操作についてよくある質問に回答します。関連するリファレンスは [Secrets](/ja/core-concepts/project-editor/app-setup/secrets)、[チェックポイントとロールバック](/ja/features/version-control/checkpoints-and-rollbacks)、および [インテグレーションの概要](/ja/features/integrations/overview) を参照してください。
+
+<AccordionGroup>
+  <Accordion title="Resend や他のメールサービスを Replit アプリに接続するには？">
+    プロジェクトを開いて **Tools → Connectors** に移動し、サービス（Resend など）を見つけて接続します。認証後、API キーはプロジェクトのシークレットとして保存されます。カスタムメールドメインをセットアップする場合は、サービスが表示する DNS レコードを DNS プロバイダーに追加してください。
+
+    利用可能なコネクターについては [インテグレーションの概要](/ja/features/integrations/overview) を、[インテグレーションの追加](/ja/build/add-integrations) も参照してください。
+  </Accordion>
+
+  <Accordion title="誤ってプロジェクトを削除しました—回復できますか？">
+    削除されたプロジェクトは一定期間内に復元できます。任意のプロジェクトで Shell を開き、次のコマンドを実行してください：
+
+    ```bash theme={null}
+    trash view
+    trash restore your-project-name
+    ```
+
+    保持期間が過ぎると、削除されたプロジェクトは完全に削除されます。期間を過ぎている場合は、[Replit サポートにお問い合わせ](https://replit.com/support)ください。
+  </Accordion>
+
+  <Accordion title="Replit プロジェクトをダウンロードまたはエクスポートするには？">
+    ファイルツリーの上部にある三点メニューを選択し、**Download as zip** を選択してください。大きなプロジェクトの場合、ダウンロードに少し時間がかかることがあります。失敗する場合は、Shell を開いて `zip -r project.zip .` を実行し、ファイルツリーから `project.zip` をダウンロードしてください。
+  </Accordion>
+
+  <Accordion title="プロジェクトを共有したり、コラボレーターを追加するには？">
+    3 つのオプションがあります：
+
+    * **読み取り専用**—プロジェクトのプライバシーをパブリックに設定して、リンクを持つ誰でも閲覧できるようにします。
+    * **招待による編集アクセス**—**Invite** を選択し、ユーザー名またはメールアドレスを入力して権限レベルを設定します。
+    * **参加リンク**—**Invite** から参加リンクを作成して、リンクを持つ誰でも参加・編集できるようにします。
+
+    Core は最大 5 人のコラボレーターをサポートし、Pro は最大 15 人をサポートします。コラボレーターはプロジェクトを編集するために有料プランは不要です。[ワークスペース](/ja/features/collaboration/workspaces) を参照してください。
+  </Accordion>
+
+  <Accordion title="GitHub リポジトリを Replit に接続するには？">
+    アカウントの連携サービスから GitHub アカウントをリンクし、プロジェクトの [Git ツール](/ja/features/workspace-tools/git-interface) を開いてリポジトリを接続します。双方向同期のために Git ペインで自動同期を有効にしてください。既存のリポジトリをインポートするには、[プロバイダーからのインポート](/ja/build/import-from-providers) を参照してください。
+
+    Git 同期が停止した場合は、連携サービスから GitHub を再接続してください。きめ細かい個人アクセストークンを使用すると、より安定した接続が得られます。
+  </Accordion>
+
+  <Accordion title="Repl の動作が遅い、またはエディターが遅延しています—何を試せますか？">
+    エディターの遅延には、以下を試してください：
+
+    * Mac では `Cmd+Shift+R`、Windows では `Ctrl+Shift+R` でハードリフレッシュします。
+    * 未使用のファイルタブを閉じます。
+    * コマンドパレットを Mac では `Cmd+K`、Windows では `Ctrl+K` で開き、**Restart compute** を検索して選択します。
+    * 別のブラウザを試して、拡張機能の問題を排除します。
+
+    エディターの遅延ではなくコードの実行が遅い場合は、重いループやメモリの制限を確認してください。エディターの下部にあるリソースパネルで CPU とメモリの使用状況を確認できます。
+  </Accordion>
+
+  <Accordion title="プロジェクトで環境変数とシークレットを使用するには？">
+    **Secrets** ツール（鍵アイコン）を開き、**+ New secret** を選択してキーと値を入力します。コードで `process.env.API_KEY`（Node.js）または `os.environ["API_KEY"]`（Python）として読み込んでください。
+
+    開発の [Secrets](/ja/core-concepts/project-editor/app-setup/secrets) ペインのシークレットはエディターでのみ使用できます。公開済みアプリの場合は、デプロイメントシークレットに同じキーを追加してください—設計上、別々に管理されています。
+  </Accordion>
+
+  <Accordion title="Account Secrets（Vault）を使用するには？">
+    [Account Secrets](/ja/core-concepts/project-editor/app-setup/secrets) はすべてのプロジェクトで利用できます—再利用するキーに便利です。アカウント設定から追加すると、所有するすべてのプロジェクトで使用できるようになります。Account Secrets とプロジェクトの Secrets ペインの両方に同じキーが存在する場合は、プロジェクトレベルの値が優先されます。
+  </Accordion>
+
+  <Accordion title="Git のマージコンフリクトや破損した Git 状態から回復するには？">
+    Shell を開いて `git status` を実行してコンフリクトを確認します。
+
+    <Warning>次の 2 つのコマンドはコミットされていない変更を破棄し、元に戻すことはできません。保存したいものは先にコピーしてください—たとえば、編集したファイルをプロジェクト外にコピーしてください。</Warning>
+
+    ローカルの変更を破棄して最後のクリーンな状態に戻すには `git checkout -- .` を実行します。最後のコミットにリセットするには `git reset --hard HEAD` を実行します。
+
+    `.git` フォルダーが破損していて Git コマンドが失敗する場合は、新しい Agent チャットを開いてエラーを貼り付けてください—Agent がリポジトリを修復できることがよくあります。[ディザスターリカバリー](/ja/features/version-control/disaster-recovery) を参照してください。
+  </Accordion>
+
+  <Accordion title="プロジェクトを以前のチェックポイントにロールバックするには？">
+    Replit は Agent が作業する際に [チェックポイント](/ja/features/version-control/checkpoints-and-rollbacks) を保存します。Agent パネルで元に戻したい変更の前のメッセージを見つけて、その横のロールバックオプションを選択して確認します。
+
+    <Note>
+      Replit は公開済みアプリを以前のバージョンにロールバックする機能をもはやサポートしていません。公開済みアプリを元に戻すには、（上記の説明のとおり）プロジェクトを以前のチェックポイントにロールバックし、再度公開してその状態を再デプロイしてください。単一のファイルを回復するには、ファイルを開いてファイル名を選択し、**Show history** を使用して以前のバージョンを復元します。[ファイル履歴](/ja/features/version-control/file-history) を参照してください。
+    </Note>
+  </Accordion>
+
+  <Accordion title="プロジェクトを別の Replit アカウントに移動するには？">
+    プロジェクトを直接転送することはできませんが、コピーすることができます。最も簡単な方法は、プロジェクトを移動先のアカウントと共有し、そちらでフォークすることです。あるいは、プロジェクトを ZIP としてダウンロードして、別のアカウントの新しい Repl にアップロードすることもできます。
+
+    コピー後、新しいプロジェクトでシークレット、データベース、デプロイメント設定をセットアップしてください—これらはコピーに含まれません。データベースデータの移動方法を含む詳しい手順は、[別のワークスペースへプロジェクトを手動でコピーする](/ja/teams/identity-and-access-management/manually-copy-projects)を参照してください。
+  </Accordion>
+</AccordionGroup>
+
+## 解決しない場合は？
+
+プロジェクトに関する質問がここで回答されていない場合は、[Replit サポートにお問い合わせ](https://replit.com/support)ください。

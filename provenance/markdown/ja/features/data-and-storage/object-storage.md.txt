@@ -1,0 +1,219 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Appストレージ
+
+> Appストレージを使って画像、動画、ドキュメントなどのファイルアップロードをホスト・管理する方法を説明します。
+
+Appストレージは、Replitの組み込みオブジェクトストレージで、アプリが画像、動画、ドキュメントなどのアップロードを簡単にホスト・保存できます。
+バケットはファイルなどのオブジェクトを格納するコンテナです。ユーザーまたはアプリケーションがコンテンツに対して実行できるアクションを制限するアクセスポリシーが含まれています。
+
+<Info>
+  <strong>オブジェクトストレージ</strong>を<strong>Appストレージ</strong>に名称変更しました。機能に変更はなく、既存のバケット、権限、プログラマティックアクセスは引き続き動作します。
+</Info>
+
+Appストレージを使って、以下のようなアプリを構築できます：
+
+* **写真共有プラットフォーム**：ビルダーが画像をアップロード、保存、表示できる
+* **動画ストリーミングサービス**：動画のアップロードを処理して視聴者にコンテンツを提供する
+* **ドキュメント管理システム**：安全なアクセスでビルダーのファイルを保存・整理する
+* **ポートフォリオサイト**：確実に読み込まれるメディアファイルで作品を紹介する
+* **ファイルバックアップサービス**：重要なファイルのクラウドストレージをビルダーに提供する
+
+<Frame>
+  <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/cloud-services/object-storage-overview.jpg?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=c53aad8c878144b598254a49ae090bc2" alt="Appストレージツールのスクリーンショット" width="1920" height="1080" data-path="images/cloud-services/object-storage-overview.jpg" />
+</Frame>
+
+<Note>
+  **Agent**にAppストレージをアプリに追加するよう依頼し、アプリが扱うファイルの種類を指定してください。Agentがインテグレーションを設定し、必要なバケットを作成し、認証やアクセス制御などの高度な機能を使ってファイルのアップロード、保存、取得ができるようにアプリを更新します。
+</Note>
+
+Appストレージツールを使うと、開発環境と本番環境の間、または他のReplit Appとの間でデータをシームレスに共有できます。
+
+## 機能
+
+<Info>
+  AppストレージはGoogle Cloud Storage（GCS）を使用しています。
+  これにより、業界をリードする稼働時間、可用性、セキュリティの恩恵を受けられます。
+</Info>
+
+AppストレージはReplit Appに以下の機能を提供します：
+
+* **永続的なクラウドストレージ**：発行済みアプリとユーザーがアクセスし続けられるファイルを保存する
+* **スケーラブルなファイル処理**：ストレージ制限を気にせず増大するデータニーズを処理する
+* **アプリ間のデータ共有**：分散アーキテクチャのために複数のReplit App間でバケットを共有する
+* **プログラマティックアクセス**：直感的なAPIを使ってファイルをアップロード、ダウンロード、管理する
+* **拡張されたAgentインテグレーション**：Agentにより高度な設定でAppストレージを設定し、既存のセットアップを確認し、認証とアクセス制御を含む完全なバックエンドとフロントエンドコードを生成させる
+
+Replit AppでAppストレージを使う方法の例：
+
+* ビルダーのプロフィール画像とメディアアップロードを保存する
+* Eコマースサイトの商品画像を提供する
+* フォーム送信のドキュメントアップロードを処理する
+* ファイル共有とコラボレーション機能を作成する
+* メディアライブラリを持つコンテンツ管理システムを構築する
+
+<Tip>
+  **拡張されたAgentインテグレーション**：[Replit Agent](/ja/features/agent/overview)にAppストレージをアプリに自動的に追加するよう依頼できます！Agentはオブジェクトストレージの設定、構成の確認、認証やアクセス制御などの高度な機能を含む完全なバックエンドとフロントエンドコードの生成が可能です。プロンプトで「Appストレージ」または「ファイルストレージ」と言うだけです。
+
+  <AiPrompt>Add App Storage to my app to store files</AiPrompt>
+  <AiPrompt>Create a photo gallery app with App Storage for images</AiPrompt>
+  <AiPrompt>Set up App Storage with authentication for user file uploads</AiPrompt>
+
+  [Agentインテグレーション](/ja/features/integrations/overview#data-storage--management)の詳細と利用可能なAppストレージのプロンプトをすべて確認してください。
+</Tip>
+
+## 使い方
+
+<Note>
+  Replit AppはバケットとそのオブジェクトにアクセスするためにGoogle Cloud Storageで認証する必要があります。
+  自動的に認証するには公式のReplit Appストレージクライアントライブラリを使用してください。
+</Note>
+
+プロジェクトエディターからAppストレージツールに直接アクセスできます。
+
+<Accordion title="Appストレージツールへのアクセス方法">
+  左側の**ツールドック**から：
+
+  1. <img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/workspace-all-tools-button.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=579643854fb13c402de516695e52c554" alt="全ツールアイコン" width="16" height="16" data-path="images/icons/workspace-all-tools-button.svg" /> **全てのツール**を選択してプロジェクトエディターのツール一覧を表示します。
+  2. <img class="icon-svg" src="https://mintcdn.com/replit/rJldsgYVucXB_6kW/images/icons/object-storage-monoochrome-icon.svg?fit=max&auto=format&n=rJldsgYVucXB_6kW&q=85&s=ab89fc1e797b8471d0a9b6c6231a93ae" alt="Appストレージアイコン" width="16" height="16" data-path="images/icons/object-storage-monoochrome-icon.svg" /> **Appストレージ**を選択します。
+
+  **検索バー**から：
+
+  1. 上部の<img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/workspace-search-icon.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=d3feed840da2d19e1ee4873d137114dc" alt="虫眼鏡アイコン" width="16" height="16" data-path="images/icons/workspace-search-icon.svg" />虫眼鏡を選択して検索ツールを開きます。
+  2. 「App Storage」と入力してツールを見つけ、結果から選択します。
+</Accordion>
+
+新しいストレージバケットをReplit Appに関連付けるには、バケットを作成します。
+
+<Accordion title="バケットの作成方法">
+  **Appストレージ**ツールから：
+
+  1. **新しいバケットを作成**をクリックします。
+  2. **名前**フィールドにバケットの名前を入力して**バケットを作成**を選択します。
+
+  Appストレージタブは以下のスクリーンショットのようになります：
+
+  <Frame>
+    <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/databases/object-storage-empty-bucket.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=d3ac92cbf149819e34c5a770bc71401b" alt="Appストレージツールのスクリーンショット" width="2790" height="1218" data-path="images/databases/object-storage-empty-bucket.png" />
+  </Frame>
+
+  追加のバケットを作成するには、**Appストレージ**タブの左上のバケットドロップダウンメニューを開いて**新しいバケットを作成**を選択します。
+</Accordion>
+
+以下のセクションでは、Appストレージツールのバケットとオブジェクトの管理オプションを説明します。
+
+### バケットを選択する
+
+ストレージバケットを切り替えるには、**Appストレージ**タブの左上隅のドロップダウンメニューを選択します。
+
+選択されたバケットには、以下のスクリーンショットに示すように名前の横にチェックマークが表示されます：
+
+<Frame>
+  <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/databases/select-bucket.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=e383ae2e2e2c6d4af43922242a6068b8" alt="バケット選択メニューのスクリーンショット" width="1852" height="704" data-path="images/databases/select-bucket.png" />
+</Frame>
+
+### バケットIDにアクセスする
+
+**Appストレージ**タブの上部のドロップダウンから**設定**ビューを選択することで**バケットID**を表示できます。
+バケットIDはバケットを一意に識別するもので、コードが操作を実行するために参照する必要があります。
+
+複数のバケットがある場合は、左上隅のドロップダウンメニューから正しいバケットを選択してください。
+
+以下のスクリーンショットは「FileVault Bucket One」バケットのバケットIDを示しています：
+
+<Frame>
+  <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/databases/bucket-id.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=dd5593bef5878a96c6972f3cbf94e30d" alt="Appストレージツールのスクリーンショット" width="1596" height="428" data-path="images/databases/bucket-id.png" />
+</Frame>
+
+### オブジェクトのアップロードとダウンロード
+
+選択したバケットにオブジェクトをアップロードするには：
+
+1. **Appストレージ**タブの**オブジェクト**ビューに移動します。
+2. <img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/upload-file.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=8fc9609ec9b854c24c1873e0d544317c" alt="ファイルアップロードアイコン" width="16" height="16" data-path="images/icons/upload-file.svg" /> **ファイルをアップロード**、またはフォルダのすべてのファイルをアップロードするには<img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/upload-folder.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=e35e5e61344451e0e49ddadfd0948b54" alt="フォルダアップロードアイコン" width="16" height="16" data-path="images/icons/upload-folder.svg" /> **フォルダをアップロード**を選択します。
+   次に、ファイルダイアログから1つ以上のファイルを選択します。
+   または、バケットの内容が一覧表示されているエリアにファイルやフォルダをドラッグします。
+
+選択したバケットからオブジェクトをダウンロードするには：
+
+1. **Appストレージ**タブの**オブジェクト**ビューに移動します。
+2. ダウンロードするファイルの右側にある<img class="icon-svg" src="https://mintcdn.com/replit/rJldsgYVucXB_6kW/images/icons/download-icon.svg?fit=max&auto=format&n=rJldsgYVucXB_6kW&q=85&s=2d532a1cef651ec0c2f06cff8a349b06" alt="ダウンロードアイコン" width="16" height="16" data-path="images/icons/download-icon.svg" />ダウンロードアイコンを選択します。
+
+### フォルダでオブジェクトを整理する
+
+選択したバケットにフォルダを作成するには：
+
+1. **Appストレージ**タブの**オブジェクト**ビューに移動します。
+2. **オブジェクト**ビューで<img class="icon-svg" src="https://mintcdn.com/replit/rJldsgYVucXB_6kW/images/icons/create-folder.svg?fit=max&auto=format&n=rJldsgYVucXB_6kW&q=85&s=2c57fa06e09e39c6a127a42d5c858eb8" alt="フォルダ作成アイコン" width="16" height="16" data-path="images/icons/create-folder.svg" /> **フォルダを作成**を選択します。
+3. フォルダの名前を入力します。
+
+**オブジェクト**ビューのフォルダにオブジェクトを追加するには、オブジェクトを目的のフォルダにドラッグします。
+
+オブジェクトを親フォルダに移動するには、オブジェクトリストの上のヘッダー上にドラッグしてオブジェクトリストの上のフォルダ名に移動します。
+以下のアニメーションは「product\_demo.mov」ファイルを「videos」フォルダから親「Objects」フォルダに移動する様子を示しています：
+
+<Frame>
+  <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/databases/object-move.webp?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=c8a78e46338a230c91fdff178165a39e" alt="ファイルを親フォルダに移動するアニメーション" width="800" height="440" data-path="images/databases/object-move.webp" />
+</Frame>
+
+### オブジェクトまたはバケットを削除する
+
+<Warning>
+  削除操作は取り消せません。続行する前に重要なデータをバックアップしてください。
+</Warning>
+
+オブジェクトを永久に削除するには：
+
+1. **Appストレージ**タブの**オブジェクト**ビューに移動します。
+2. 削除するオブジェクトの横にある<img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/trash-icon.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=031a29f126332bebd5b6a74de4f16e40" alt="ゴミ箱アイコン" width="16" height="16" data-path="images/icons/trash-icon.svg" />ゴミ箱アイコンを選択します。
+3. 確認ダイアログで削除を確認します。
+
+バケットとそれに含まれるすべてのオブジェクトを削除するには：
+
+1. **Appストレージ**タブの**設定**ビューに移動します。
+2. 左上のバケットドロップダウンメニューで削除するバケットを選択します。
+3. <img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/trash-icon.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=031a29f126332bebd5b6a74de4f16e40" alt="ゴミ箱アイコン" width="16" height="16" data-path="images/icons/trash-icon.svg" /> **バケットを削除**を選択します。
+4. 確認ダイアログで削除を確認します。
+
+### バケットアクセス管理
+
+Replitは作成したすべてのバケットをアカウントに接続し、すべてのReplit Appで利用可能にします。バケットを作成したReplit Appは自動的にアクセス権を受け取ります。
+
+特定のバケットにアクセスできるReplit Appを制御することで、データを効率的かつ安全に共有できます。
+
+アカウントの別のアプリからReplit Appにバケットへのアクセスを許可するには：
+
+1. Appストレージタブの左上のバケットメニューから<img class="icon-svg" src="https://mintcdn.com/replit/X_IP1EeHGm0cA2VA/images/icons/workspace-search-icon.svg?fit=max&auto=format&n=X_IP1EeHGm0cA2VA&q=85&s=d3feed840da2d19e1ee4873d137114dc" alt="虫眼鏡アイコン" width="16" height="16" data-path="images/icons/workspace-search-icon.svg" />
+   **既存のバケットを追加**を選択します。
+2. **バケットを選択**ダイアログで追加するバケットを選択して**バケットをReplに追加**を選択します。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/databases/choose-bucket-dialog.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=5059d4d2490bbe37db80abdb5ac68d84" alt="バケット選択ダイアログのスクリーンショット" width="1115" height="457" data-path="images/databases/choose-bucket-dialog.png" />
+</Frame>
+
+Replit Appのバケットへのアクセスを取り消すには：
+
+1. **Appストレージ**タブの**設定**ビューに移動します。
+2. タブの左上のバケットドロップダウンからバケット名を選択します。
+3. **ReplからバケットAIで削除**を選択し、確認ダイアログで削除を確認します。
+
+### Appストレージへのプログラマティックアクセス
+
+Replit AppからAppストレージにアクセスするには、以下のライブラリのいずれかを使用します：
+
+* Replit Appストレージ SDK（JavaScriptとPythonで利用可能）
+* <a href="https://cloud.google.com/storage/docs/reference/libraries" target="_blank">Google Cloud Storageクライアントライブラリ</a>
+
+クライアントライブラリの使用方法については、以下のリソースを参照してください：
+
+* [JavaScript Appストレージ SDK](/ja/features/sdks/object-storage-javascript-sdk/)：JavaScript SDK のクライアントリファレンス
+* [Python Appストレージ SDK](/ja/features/sdks/object-storage-python-sdk/)：Python SDK のクライアントリファレンス
+* [Google Cloud Python SDKサンプルアプリ](https://replit.com/@matt/GCS-Python-Uploads?v=1)：Google Cloud Python SDKを使ってオブジェクトを管理するためにこのアプリをリミックスします
+
+## 請求とリソース使用量
+
+Appストレージの使用量を監視するには、<a href="https://replit.com/usage/" target="_blank">使用量</a>ページに移動します。
+
+Appストレージの料金の詳細については、[Appストレージの請求](/ja/billing/object-storage-billing)を参照してください。

@@ -1,0 +1,329 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Crie um site com Notion
+
+> Aprenda a criar um site que usa o Notion como Sistema de Gerenciamento de Conteúdo (CMS) com o Replit Agent.
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+## Crie um blog com Notion usando o Replit Agent
+
+O Notion é uma ferramenta poderosa para organizar informações e se destaca como um Sistema de Gerenciamento de Conteúdo (CMS). Ao integrar o Notion com o Replit, você pode gerenciar o conteúdo do seu site — como posts de blog, itens de portfólio ou listagens de produtos — diretamente do seu espaço de trabalho no Notion.
+
+O Replit, com o suporte do [Replit Agent](/pt/features/agent/overview), cuida da programação, hospedagem e publicação, permitindo que você vá da ideia a um aplicativo publicado rapidamente. Criar prompts eficazes é fundamental para guiar o Agent; para um guia completo, consulte [Prompting eficaz com o Replit AI](/pt/learn/effective-prompting) e [Como fazer vibe coding de forma eficaz](/pt/learn/build-with-agent).
+
+<YouTubeEmbed videoId="AOYqTONf07o" title="Vibe coding de um site personalizado com o Notion como CMS" />
+
+Este tutorial orienta você na criação de um blog minimalista que busca seus posts de uma tabela do Notion. Você irá:
+
+* Usar o Replit Agent para gerar o aplicativo inicial
+* Conectar seu app do Replit a um banco de dados do Notion
+* Aprender a guiar a IA e solucionar problemas comuns usando técnicas eficazes de prompting
+* Publicar seu blog para o mundo ver
+
+<Frame caption="Resultado final: um blog minimalista com Notion">
+  <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/final-app.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=8189975b31f2c1c47e9e8577df926bd6" alt="Captura de tela do aplicativo de blog final com Notion, com design minimalista" width="3840" height="2160" data-path="images/tutorials/notion-cms/final-app.png" />
+</Frame>
+
+O tutorial seguirá em grande parte o vídeo acima, mas com contexto e etapas adicionais para ajudá-lo a entender o processo.
+
+## Pré-requisitos
+
+Para seguir este tutorial, você precisará de:
+
+* Uma conta no Replit
+* Uma conta no Notion
+* Familiaridade com as interações básicas do Replit Agent. Se você é novo no Agent, confira a [documentação do Replit Agent](/pt/features/agent/overview).
+
+## Etapa 1: Prepare seu banco de dados no Notion
+
+Antes de criar prompts para o Agent, configure sua fonte de conteúdo no Notion. Isso envolve pensar de forma procedural sobre o que seu blog precisa, semelhante ao planejamento de um produto.
+
+<Steps>
+  <Step title="Crie uma integração no Notion">
+    1. No Notion, vá para **Configurações e membros** (geralmente na barra lateral superior esquerda).
+    2. Navegue até **Conexões** (anteriormente "Integrações").
+    3. Selecione **Desenvolver ou gerenciar integrações**.
+    4. Selecione **+ Nova integração**.
+
+    <Frame caption="Criando uma nova integração no Notion">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/new-integration-1.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=36613d11085fa2589511be942ce03218" alt="Portal do desenvolvedor do Notion mostrando o botão Nova integração" width="3794" height="2168" data-path="images/tutorials/notion-cms/new-integration-1.png" />
+    </Frame>
+
+    5. Nomeie sua integração (ex.: "Minha Integração de Blog no Replit").
+    6. Associe-a ao espaço de trabalho desejado no Notion.
+
+    <Frame caption="Configurando sua integração no Notion">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/new-integration-2.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=649a346838203ef40f1293f69125916f" alt="Tela de configuração de integração do Notion com nome e seleção de espaço de trabalho" width="3796" height="2168" data-path="images/tutorials/notion-cms/new-integration-2.png" />
+    </Frame>
+
+    7. Para "Tipo de integração", escolha **Integração interna**.
+    8. Selecione **Enviar**.
+    9. Copie seu **Segredo de integração interna** (token) e salve-o com segurança. Esta é sua chave de API do Notion.
+
+    <Frame caption="Obtendo seu Segredo de integração">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/new-integration-3.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=22cb64a8c057b70293b955b0edcdb55d" alt="Página de segredos de integração do Notion mostrando o token de integração" width="3796" height="2168" data-path="images/tutorials/notion-cms/new-integration-3.png" />
+    </Frame>
+
+    10. Em **Recursos**, certifique-se de que "Ler conteúdo" está habilitado. Para este tutorial, apenas leitura é suficiente. Se posteriormente quiser gravar dados no Notion, habilite "Inserir conteúdo" e "Atualizar conteúdo".
+
+    <Info>
+      Crie uma nova integração para cada projeto para gerenciar permissões de forma granular. Esta é uma prática recomendada de segurança.
+    </Info>
+
+    Para instruções mais detalhadas, consulte a [documentação oficial do Notion sobre como criar uma integração](https://developers.notion.com/docs/create-a-notion-integration).
+
+    Você pode acessar diretamente o painel de integrações do Notion em [notion.so/my-integrations](https://notion.so/my-integrations).
+  </Step>
+
+  <Step title="Crie uma página do Notion com um banco de dados">
+    1. Crie uma nova página no Notion para o conteúdo do seu blog.
+    2. Nesta página, adicione um novo banco de dados do tipo **Tabela**.
+    3. Nomeie sua tabela (ex.: "Posts do Blog").
+    4. Defina colunas para seus posts. **Especifique** isso claramente em sua mente, pois em breve você contará ao Agent sobre elas:
+       * `Title` (Texto, propriedade de título padrão)
+       * `Body` (Texto, para o conteúdo principal do post)
+       * `Slug` (Texto, para identificadores amigáveis para URL)
+       * `PublishedDate` (Data, ou use "Hora de criação" / "Hora da última edição")
+       * `ReadingTime` (Texto ou Número, ex.: "5 min de leitura")
+       * `Description` (Texto, resumo curto para pré-visualizações)
+
+    <Frame caption="Exemplo de configuração do banco de dados do Notion para posts de blog">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/blog-posts.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=18b381c19ccdddc74a2c67a523400d60" alt="Banco de dados do Notion configurado com colunas para posts de blog" width="3840" height="2160" data-path="images/tutorials/notion-cms/blog-posts.png" />
+    </Frame>
+
+    5. Adicione alguns posts de exemplo. Você pode usar os recursos de IA do Notion para ajudar a gerar conteúdo!
+  </Step>
+
+  <Step title="Conecte sua integração à página">
+    1. Abra a página do Notion que contém seu banco de dados.
+    2. Clique no menu **•••** (três pontos) no canto superior direito.
+
+    <Frame caption="Acesse o menu de integração no Notion">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/add-integration.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=20d1052e1ec46366a2727cce6bcf0c50" alt="Menu de conexões do Notion mostrando como adicionar sua integração à página" width="3840" height="2160" data-path="images/tutorials/notion-cms/add-integration.png" />
+    </Frame>
+
+    3. Selecione **+ Adicionar conexões**.
+    4. Pesquise e selecione a integração que você criou (ex.: "Minha Integração de Blog no Replit").
+
+    <Frame caption="Adicionando sua integração à página do Notion">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/add-integration-menu.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=f3c0325b2e9e8de79b8b7b126974b636" alt="Página do Notion mostrando o menu de três pontos para adicionar integrações" width="3840" height="2160" data-path="images/tutorials/notion-cms/add-integration-menu.png" />
+    </Frame>
+
+    5. Confirme a conexão. Isso permite que o Replit (via token de integração) acesse esta página e seu banco de dados.
+  </Step>
+</Steps>
+
+## Etapa 2: Crie prompts para o Replit Agent
+
+Com o Notion configurado, vamos fazer o Replit Agent construir a base do nosso blog. **Planeje antes de criar o prompt**: um esboço claro dos recursos leva a prompts mais focados.
+
+<Steps>
+  <Step title="Abra o Replit Agent">
+    Navegue até a página inicial do Replit e abra o **Agent**.
+  </Step>
+
+  <Step title="Escreva seu prompt">
+    Forneça ao Agent um prompt detalhado. **Simplifique** sua linguagem, mas seja **específico** sobre requisitos, restrições e resultados desejados. Aqui está um exemplo:
+
+    ```text theme={null}
+    Ajude-me a criar um blog extremamente minimalista usando o Notion como CMS.
+    O blog deve buscar posts de uma página do Notion.
+    A tabela na página do Notion tem as seguintes colunas: Title, Body, Slug, PublishedDate, ReadingTime, Description.
+    Você deve gerar um slug para cada post com base em seu título se a coluna Slug estiver vazia.
+    Deixe o tema do blog preto com texto branco. Mantenha-o extremamente minimal.
+    Os posts devem ser listados na página inicial, e clicar em um post deve navegar para uma página que exibe o conteúdo completo do post.
+    ```
+
+    <Tip>
+      Para mais dicas sobre como criar prompts eficazes, consulte nosso guia sobre [Prompting eficaz com o Replit AI](/pt/learn/effective-prompting).
+      Você também pode **mostrar** ao Agent o que você quer fornecendo uma URL para raspar para ideias iniciais de estilo ou conteúdo (ex.: seu portfólio pessoal) adicionando: `Raspe o conteúdo de [URL] para inspiração de design inicial e texto de espaço reservado.`
+    </Tip>
+
+    O Agent gerará um plano. Revise-o para garantir que esteja alinhado com suas expectativas e, em seguida, aprove-o. Este é seu primeiro **ponto de verificação** no processo de construção assistido por IA.
+  </Step>
+
+  <Step title="Revise a pré-visualização inicial">
+    O Agent então gerará uma pré-visualização visual. Verifique se o layout básico e o estilo estão indo na direção certa. Os ajustes virão depois.
+  </Step>
+</Steps>
+
+## Etapa 3: Conecte o Replit ao Notion com Secrets
+
+O Agent provavelmente precisará dos seus dados de integração com o Notion para buscar dados.
+
+<Steps>
+  <Step title="Adicione Secrets no Replit">
+    Normalmente, você precisará de:
+
+    1. `NOTION_API_KEY`: Seu Segredo de integração interna da Etapa 1.
+    2. `NOTION_DATABASE_ID`: O ID do seu banco de dados do Notion.
+
+    **Como encontrar o ID do banco de dados do Notion:**
+
+    * Abra sua página do Notion com o banco de dados em um navegador.
+    * A URL pode ser `https://www.notion.so/seu-espaço-de-trabalho/TÍTULO_DA_PÁGINA-ID_DA_PÁGINA?v=ID_DA_VISUALIZAÇÃO_DO_BANCO_DE_DADOS`. O `ID_DA_PÁGINA` geralmente é o ID do banco de dados se o banco de dados for o elemento principal da página.
+    * **De forma mais confiável**: Clique no menu **•••** na visualização do seu banco de dados, selecione **Copiar link para a visualização** e cole-o. O link `https://www.notion.so/seu-espaço-de-trabalho/ID_DO_BANCO_DE_DADOS?v=ID_DA_VISUALIZAÇÃO` contém o `ID_DO_BANCO_DE_DADOS` antes de `?v=`.
+
+    Vá para a ferramenta **Secrets** (ícone 🔒) no Editor de projeto. Adicione estas informações:
+
+    * Chave: `NOTION_API_KEY`, Valor: `[Seu_Segredo_de_Integração_do_Notion]`
+    * Chave: `NOTION_DATABASE_ID`, Valor: `[Seu_ID_do_Banco_de_Dados_do_Notion]`
+
+    <Frame caption="Adicionando seus secrets do Notion ao Replit">
+      <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/add-secrets.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=d96b903522fbf7e189c77d3c1901352e" alt="Ferramenta Secrets do Replit com chave API do Notion e ID do banco de dados adicionados" width="3840" height="2160" data-path="images/tutorials/notion-cms/add-secrets.png" />
+    </Frame>
+
+    O Agent deve usar esses secrets automaticamente e tentar se conectar. O aplicativo provavelmente será reiniciado.
+  </Step>
+</Steps>
+
+## Etapa 4: Depurando e refinando com o Agent
+
+Construir com IA é iterativo. Espere erros ou imperfeições. É aqui que guiar a IA de forma eficaz — muitas vezes chamado de "vibe coding" — é fundamental. Para uma análise mais aprofundada dessa habilidade, confira nosso tutorial sobre [Como fazer vibe coding de forma eficaz](/pt/learn/build-with-agent). **Domine o contexto** fornecendo apenas informações relevantes para cada etapa de depuração.
+
+<Tip>
+  Mantenha o **Console** no Editor de projeto aberto. Ele fornece mensagens de erro e logs valiosos.
+</Tip>
+
+<Frame caption="Depurando seu app do Notion usando o Console do Replit">
+  <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/console-debug.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=7cc562bec25b26e5302b74793f002c00" alt="Console do Replit mostrando mensagens de erro durante a depuração da integração com o Notion" width="3840" height="2160" data-path="images/tutorials/notion-cms/console-debug.png" />
+</Frame>
+
+Aqui estão cenários comuns e como abordá-los com **depuração metódica**:
+
+### Cenário 1: "Falha ao carregar posts" ou erros de propriedade
+
+#### Sintoma
+
+O aplicativo executa mas não exibe posts. Erros no Console podem mencionar "Não foi possível encontrar propriedade de classificação com o nome ID created\_time" ou outras incompatibilidades de colunas.
+
+#### Causa
+
+O Agent pode assumir nomes de colunas ou propriedades (ex.: `created_time` para classificação) que não existem ou têm nomes diferentes no seu banco de dados do Notion.
+
+#### Solução de problemas
+
+1. **Verifique o Banco de Dados do Notion**: Certifique-se de que os nomes das colunas no seu banco de dados correspondem exatamente às expectativas do Agent ou ao seu prompt. Se o Agent busca `created_time` e você tem `PublishedDate`, há uma incompatibilidade.
+2. **Solicite ao Agent com o erro (princípio de Depuração)**: Copie o erro *exato* do console e **selecione** trechos de código relevantes se você os tiver identificado. Forneça este contexto focado ao Agent:
+   ```text theme={null}
+   Há um erro ao buscar posts. Console: "Não foi possível encontrar propriedade de classificação com o nome ID created_time".
+   Meu banco de dados do Notion usa 'PublishedDate'. Use isso para classificação/busca. Aqui está o código suspeito de `services/notion.js`: [trecho de código]
+   ```
+3. **Itere (princípio de Experimentação)**: Se a correção do Agent falhar, forneça mais detalhes. "Posts ainda não carregando. Erro persiste. Mostre-me o código para buscar/classificar posts do Notion." Se você adicionou uma coluna como `created_time` no Notion como uma solução rápida, pode posteriormente pedir ao Agent: "Remova a dependência de 'created\_time', use 'PublishedDate' em vez disso." Lembre-se de usar os **Checkpoints** do Agent para salvar estados funcionais.
+
+### Cenário 2: Exibição ou formatação incorreta de dados
+
+#### Sintoma
+
+Os dados aparecem, mas incorretamente (ex.: tempo de leitura errado na página inicial, mas correto na página do post; problemas de renderização do Markdown).
+
+#### Solução de problemas
+
+1. **Seja específico (princípio de Especificação)**: Descreva o problema e a localização claramente:
+   ```text theme={null}
+   Na página inicial, o tempo de leitura do post está incorreto, mas está correto nas páginas de posts individuais.
+   Além disso, exiba 'PublishedDate' na página inicial para cada resumo de post.
+   ```
+2. **Problemas de Markdown (princípio de Demonstração)**: Se o Markdown "Body" do Notion renderizar incorretamente (ex.: espaços extras, erros de formatação):
+   * Inspecione o conteúdo bruto no Notion; sua formatação pode introduzir caracteres sutis.
+   * Solicite ao Agent claramente. Você pode até **demonstrar** um exemplo:
+     ```text theme={null}
+     Problema de renderização do Markdown: No post X, texto em negrito como '**isso**' aparece como ' ** isso **' e não renderiza. Garanta que a análise do Markdown trate esses casos ou remova espaços em branco. Exemplo de renderização correta para negrito: **Isso é negrito**.
+     ```
+   * Testar com Markdown comprovadamente bom (ex.: do ChatGPT colado no Notion) pode isolar se o problema é nos dados de origem ou na lógica de renderização.
+
+### Fluxo geral de depuração
+
+1. **Observe**: Note o erro ou comportamento incorreto.
+2. **Prompt de alto nível (Simplificar)**: Descreva o problema ao Agent claramente.
+3. **Verifique o Console/DevTools (Depurar)**: Procure erros detalhados.
+4. **Itere e forneça contexto (Selecionar, Demonstrar)**: Se a correção do Agent falhar, forneça mais contexto (mensagem de erro, código relevante, seu objetivo, tentativas feitas).
+5. **Mudanças incrementais (Checkpoint)**: Peça ao Agent para corrigir uma coisa por vez. Use os **Checkpoints** no Agent para salvar o progresso.
+6. **Reverter**: Se os prompts piorarem as coisas, reverta para um **Checkpoint** funcionando e tente uma nova abordagem.
+
+<Note>
+  Não hesite em examinar o código gerado pelo Agent. Mesmo sem expertise no idioma, muitas vezes você pode identificar problemas lógicos ou entender o fluxo de dados, ajudando-o a escrever prompts melhores. Arquivos como `notionService.js` geralmente tratam chamadas à API do Notion.
+</Note>
+
+## Etapa 5: Melhorias adicionais
+
+Assim que a funcionalidade principal funcionar, peça ao Agent para adicionar recursos. Use linguagem positiva e direta (princípio de **Instrução**). Aqui estão algumas ideias:
+
+<AccordionGroup>
+  <Accordion title="Implementar cache e pré-busca">
+    Peça ao Agent: "Implemente cache e pré-busca de posts do Notion para um site super-rápido."
+    Isso reduz as chamadas à API do Notion e acelera o carregamento das páginas.
+  </Accordion>
+
+  <Accordion title="Melhorar o estilo">
+    Peça ao Agent: "Adicione um efeito de hover nos links de posts do blog na página inicial." ou "Melhore a tipografia do post para melhor legibilidade."
+    Pequenos ajustes visuais melhoram significativamente a experiência do usuário. Você pode **demonstrar** ao Agent exemplos de estilos que você gosta.
+  </Accordion>
+
+  <Accordion title="Configurar estratégia de atualização de dados">
+    Considere com que frequência buscar novos dados do Notion. Para blogs simples, no carregamento da página ou na reinicialização do servidor pode ser suficiente.
+    Para conteúdo dinâmico, peça ao Agent: "Explore opções para atualizar automaticamente os posts do Notion a cada hora." Isso pode envolver polling em segundo plano (adiciona complexidade, mas mantém o conteúdo atualizado).
+  </Accordion>
+</AccordionGroup>
+
+## Etapa 6: Publique seu site
+
+Satisfeito com seu site? Hora de compartilhá-lo!
+
+1. Selecione **Publicar** no Editor de projeto (canto superior direito).
+2. Revise as configurações de publicação (nome do projeto, nível). Para mais detalhes, consulte [Implantações](/pt/learn/projects-and-artifacts/replit-deployments).
+3. Selecione **Publicar**.
+
+<Frame caption="Publicando seu site com Notion">
+  <img src="https://mintcdn.com/replit/0ixNWaRF232g0Gwn/images/tutorials/notion-cms/deploy.png?fit=max&auto=format&n=0ixNWaRF232g0Gwn&q=85&s=3f5a9b1b5946fc3461fc8e93f29dcac9" alt="Interface de publicação do Replit mostrando como publicar seu site com Notion" width="3840" height="2160" data-path="images/tutorials/notion-cms/deploy.png" />
+</Frame>
+
+O Replit constrói, agrupa e publica seu aplicativo em uma URL pública.
+
+## O que você aprendeu
+
+Seguindo este tutorial, você aprendeu a:
+
+* Configurar o Notion como um CMS com uma integração e banco de dados estruturado
+* Criar prompts para o Replit Agent construir um aplicativo web conectado ao Notion, aplicando princípios como **planejamento, especificação e simplificação**
+* Gerenciar chaves de API com segurança usando Secrets do Replit
+* Depurar e refinar iterativamente um aplicativo gerado por IA usando técnicas como **fornecer contexto, demonstrar exemplos e usar checkpoints**
+* Publicar seu site com Notion no Replit
+
+Para informações detalhadas sobre checkpoints e reversões, consulte [Checkpoints e Reversões](/pt/features/version-control/checkpoints-and-rollbacks).
+
+Construir com IA como o Replit Agent é colaborativo. Pensamento procedural, instruções claras e depuração metódica são fundamentais para transformar ideias em realidade rapidamente.
+
+## Próximos passos
+
+Continue desenvolvendo seu site com Notion:
+
+<AccordionGroup>
+  <Accordion title="Experimente com tipos de conteúdo">
+    Tente adicionar conteúdo diverso do Notion: galerias de imagens, vídeos incorporados ou itens categorizados.
+  </Accordion>
+
+  <Accordion title="Aproveite os recursos avançados do Notion">
+    Explore fórmulas, rollups e relações do Notion para estruturas de dados complexas. Trabalhe com o Agent para exibir esses dados ricos no seu site do Replit.
+  </Accordion>
+
+  <Accordion title="Combine com outras integrações do Replit">
+    Aprimore seu aplicativo mesclando dados do Notion com outras ferramentas do [Replit AI](/pt/build/welcome) ou [integrações do Agent](/pt/features/integrations/overview). Por exemplo, use o Replit Auth para conteúdo privado ou o OpenAI para resumos gerados por IA a partir de dados do Notion no seu aplicativo.
+  </Accordion>
+</AccordionGroup>
+
+Boas criações! Mal podemos esperar para ver o que você cria.

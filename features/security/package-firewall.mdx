@@ -1,0 +1,73 @@
+---
+title: "Package Firewall"
+description: "Package Firewall blocks malicious and compromised packages at install time, before any code reaches your app. On by default, powered by Socket."
+sidebarTitle: "Package Firewall"
+icon: "shield-check"
+---
+
+<Frame>
+  <img src="/assets/mirror/blocked-package-message-04011660ce75.png" alt="The Agent chat showing a form-data install blocked by Replit's security policy, with an explanation of the package's known vulnerability" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
+</Frame>
+
+<Note>
+  New to dependency security? See [Security concepts](/features/security/concepts) for definitions of CVE, SBOM, exposure, Fix with Agent, Republish, and Auto-Protect.
+</Note>
+
+Package Firewall blocks malicious and compromised packages at the network level, before they are ever installed into your app. It is part of [Replit Auto-Protect](/features/security/concepts#auto-protect), the set of protections turned on by default for every builder, and is powered by [Socket](https://socket.dev), a software supply-chain security company.
+
+When you or the Agent run an install command like `npm install` or `pip install`, the request passes through Package Firewall first. Clean packages install as usual and you won't notice a thing. Packages that Socket has flagged as malicious or compromised are blocked before any code reaches your environment.
+
+Package Firewall is **on by default for every builder, with nothing to set up and nothing to migrate**. It protects new and existing apps alike, and there is no setting to configure.
+
+<Frame>
+  <img src="/assets/mirror/auto-protect-layers-a65bc848b675.png" alt="The Replit Auto-Protect panel showing three protections enabled by default: WAF Firewall, Package Firewall powered by Socket, and SSL/TLS Encryption" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
+</Frame>
+
+## Why install-time protection matters
+
+Most supply-chain tools only scan dependencies at publish time, long after a package is already installed. For ordinary vulnerabilities that can be enough. Malware is different: it does its damage the instant it is installed — stealing secrets, opening backdoors, or exfiltrating your environment variables. By the time a publish-time scan flags it, the attack has already run.
+
+Package Firewall closes that window. By blocking malicious packages before they download, it stops the attack before a single line of malicious code runs.
+
+## How it works
+
+1. You or the Agent run an install command, such as `npm install <package>` or `pip install <package>`.
+2. The request passes through Package Firewall, which checks the package against Socket's threat intelligence.
+3. If the package is clean, the install runs normally with no perceptible difference.
+4. If the package is malicious or compromised, the install is blocked before any code reaches your environment.
+
+When something is blocked, you get a clear message about what was stopped and why, including the vulnerability or policy that triggered the block. The Agent sees the same signal, so it can suggest a safe alternative — like fixing a misspelled package name — or hand the decision back to you.
+
+### Supported package managers
+
+Package Firewall protects installs across:
+
+* **JavaScript** — npm, yarn, and pnpm
+* **Python** — pip
+* **Go** — Go modules
+
+## What Package Firewall catches
+
+Package Firewall blocks both outright malware and compromised or known-vulnerable versions of otherwise legitimate packages — including widely used ones. Many of these vulnerabilities were disclosed after the training cutoff of the models that recommend them, so a model can confidently suggest a dependency version that was known-good in its training data but has since been flagged. These risks have names in the field:
+
+* **Typosquats** — a malicious package with a name one keystroke away from a real one, such as `reqeusts` instead of `requests`. You ask for the wrong package and download malware.
+* **Slopsquats** — a model hallucinates a package name that doesn't exist, an attacker registers that exact name, and waits for the next agent to install it.
+* **Stale recommendations** — a real package with a disclosed vulnerability that the model recommends because it was known-good before its training cutoff.
+
+This last category is why Package Firewall matters most for AI-built apps: an agent can confidently reach for a dependency that is no longer safe, and Package Firewall stops the install before that code runs.
+
+## How Package Firewall fits with Replit's other security tools
+
+Package Firewall is one of three complementary layers. Each protects a different point in your app's lifecycle, so use them together rather than choosing between them.
+
+| Layer                          | When it runs                | What it does                                                                                                                                                                                                |
+| ------------------------------ | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Package Firewall**           | At install time             | Blocks malicious and compromised packages before they download (prevention).                                                                                                                                |
+| **Automatic dependency scans** | After install, continuously | Detect newly disclosed CVEs in your installed dependencies, with optional Agent-prepared patches. See the [Project Security Center](/features/security/project-security-center#automatic-dependency-scans). |
+| **Security Agent**             | Before you publish          | Audits your entire codebase for code, dependency, and privacy vulnerabilities. See [Agent security scans](/features/security/agent-security-scans).                                                         |
+
+## Next steps
+
+* Review findings for a single project in the [Project Security Center](/features/security/project-security-center).
+* Audit dependencies across every project in the [Workspace Security Center](/features/security/workspace-security-center).
+* Read [How Replit Secures AI-Generated Code](https://blog.replit.com/securing-ai-generated-code) for more on Replit's approach to security.

@@ -1,0 +1,278 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Exemples d'automations
+
+> Exemples d'automations réelles construites avec Replit Agent utilisant des connecteurs comme Linear, Jira, Gmail, Slack, Discord et plus encore.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Replit Agent peut construire des automations full-stack qui connectent vos outils, réagissent aux événements et s'exécutent selon un planning — le tout à partir d'un seul prompt. Combiné avec les [Connecteurs](/replitai/integrations) et les [Déploiements](/fr/category/replit-deployments), vous pouvez remplacer le code de liaison fragile et les plateformes no-code coûteuses par de vraies applications dont vous êtes propriétaire et que vous contrôlez.
+
+## Ce que vous pouvez automatiser
+
+Les automations sur Replit vont au-delà des simples déclencheurs. Parce qu'Agent construit de vraies applications avec du code complet, vous pouvez :
+
+* **Réagir aux événements** de n'importe quel service avec prise en charge des webhooks (Linear, Jira, GitHub, Confluence, Discord et plus encore)
+* **Exécuter selon un planning** avec des automations basées sur cron (digests quotidiens, rapports hebdomadaires, synchronisation périodique)
+* **Chaîner plusieurs services** ensemble dans une seule automation (un événement Jira déclenche un SMS via Twilio, un fichier Google Drive crée une page Notion)
+* **Ajouter un traitement IA** à n'importe quel workflow — résumer, classifier, extraire ou générer du contenu en utilisant des intégrations IA intégrées
+* **Déployer et oublier** — les automations s'exécutent 24/7 sur l'infrastructure cloud de Replit sans serveurs à gérer
+
+La différence clé par rapport aux plateformes d'automation traditionnelles : vous obtenez le code source complet. Vous pouvez personnaliser la logique, ajouter la gestion des erreurs, étendre les fonctionnalités et versionner vos automations comme n'importe quel autre projet logiciel.
+
+## Fonctionnement des automations
+
+La plupart des automations suivent un schéma simple :
+
+1. **Déclencheur** — Un événement se produit (webhook, planning cron ou interrogation API)
+2. **Traitement** — Votre application reçoit l'événement, applique la logique et appelle optionnellement l'IA pour la résumé ou l'analyse
+3. **Action** — Votre application appelle un autre service pour envoyer un message, créer un enregistrement ou mettre à jour des données
+
+Agent gère l'ensemble du processus de construction : mise en place des points de terminaison webhook, configuration des plannings cron, authentification auprès des services via les [Connecteurs](/replitai/integrations) et déploiement de votre automation.
+
+<Tip>
+  Pour démarrer, sélectionnez **Agents & Automations** depuis la page d'accueil Replit et décrivez ce que vous souhaitez automatiser. Consultez le [guide de démarrage](/fr/core-concepts/agent/agents-and-automations) pour une présentation détaillée.
+</Tip>
+
+## Exemples par intégration
+
+Voici des automations réelles construites et fonctionnant sur Replit. Utilisez-les comme source d'inspiration ou comme prompts de départ pour vos propres automations.
+
+### Gestion de projet
+
+<AccordionGroup>
+  <Accordion title="Linear : Notifications par e-mail pour les commentaires d'issues" icon="diagram-project">
+    Quand un commentaire est ajouté à une issue Linear qui vous est assignée, recevez une notification par e-mail pour ne jamais manquer les retours sur vos tâches.
+
+    **Services :** Linear, E-mail
+
+    <AiPrompt>
+      Quand un commentaire est ajouté à une issue Linear qui m'est assignée, envoie-moi un e-mail
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Jira : Digest e-mail alimenté par l'IA pour les nouvelles issues" icon="jira">
+    Quand une issue est créée dans votre espace de travail Jira, recevez un e-mail avec un résumé généré par l'IA mettant en évidence les détails et le contexte clés.
+
+    **Services :** Jira, E-mail, IA
+
+    <AiPrompt>
+      Quand une issue est créée dans mon espace de travail, envoie-moi un e-mail avec un résumé IA
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Jira + Twilio : Alertes SMS pour les issues critiques" icon="message-sms">
+    Quand une issue Jira critique est créée, recevez une notification SMS immédiate via Twilio pour pouvoir répondre aux problèmes urgents même lorsque vous n'êtes pas à votre bureau.
+
+    **Services :** Jira, Twilio
+
+    <AiPrompt>
+      Quand une issue Jira critique est créée, envoie-moi un SMS via Twilio
+    </AiPrompt>
+
+    <Note>
+      Cette automation utilise un webhook Jira pointant vers l'URL webhook de votre application. Agent configure le point de terminaison — vous configurez le webhook Jira pour qu'il pointe vers celui-ci.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Asana + Slack : Notifications de date d'échéance" icon="list-check">
+    Quand une tâche Asana vous est assignée avec une date d'échéance cette semaine, envoyez automatiquement une notification Slack pour tenir votre équipe informée.
+
+    **Services :** Asana, Slack
+
+    <AiPrompt>
+      Quand une tâche Asana m'est assignée avec une date d'échéance cette semaine, envoie une notification Slack
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Todoist + Google Sheets : Journalisation de la productivité" icon="table">
+    Quand vous complétez une tâche Todoist, enregistrez-la automatiquement dans une feuille Google pour suivre votre productivité au fil du temps.
+
+    **Services :** Todoist, Google Sheets
+
+    <AiPrompt>
+      Quand je complète une tâche Todoist, enregistre-la dans ma feuille Google de productivité
+    </AiPrompt>
+
+    <Note>
+      Il s'agit d'une automation basée sur cron qui vérifie périodiquement les tâches complétées et les enregistre.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+### Communication et notifications
+
+<AccordionGroup>
+  <Accordion title="Gmail + Google Agenda : Motivation quotidienne et agenda" icon="calendar">
+    Chaque matin à 7h, recevez un e-mail Gmail avec une citation motivante et votre agenda complet pour la journée — un briefing personnel pour bien commencer votre matinée.
+
+    **Services :** Gmail, Google Agenda
+
+    <AiPrompt>
+      Construis-moi une automation qui chaque jour à 7h m'envoie un e-mail Gmail avec une citation motivante et mon agenda pour la journée
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Confluence + Slack : Notifications de mise à jour de pages" icon="file-lines">
+    Quand une page Confluence dans un espace spécifique est mise à jour, notifiez automatiquement votre équipe sur Slack pour que tout le monde reste synchronisé sur les changements de spécifications.
+
+    **Services :** Confluence, Slack
+
+    <AiPrompt>
+      Quand une page Confluence dans « Spécifications produit » est mise à jour, notifie l'équipe produit sur Slack
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Discord : Message de bienvenue pour les nouveaux membres" icon="discord">
+    Quand un nouveau membre rejoint votre serveur Discord, envoyez-lui automatiquement un message de bienvenue avec des ressources d'intégration et des liens de démarrage.
+
+    **Services :** Discord
+
+    <AiPrompt>
+      Quand un nouveau membre rejoint mon serveur Discord, envoie-lui un message de bienvenue avec des ressources d'intégration
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Spotify + Discord : Partage de playlists" icon="spotify">
+    Quand vous créez une nouvelle playlist Spotify, partagez-la automatiquement sur votre serveur Discord pour que votre communauté découvre vos dernières sélections musicales.
+
+    **Services :** Spotify, Discord
+
+    <AiPrompt>
+      Quand je crée une nouvelle playlist Spotify, partage-la sur mon serveur Discord
+    </AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+### Documents et gestion de fichiers
+
+<AccordionGroup>
+  <Accordion title="Google Drive + Notion : Document partagé vers notes" icon="google-drive">
+    Quand un document est partagé avec vous dans Google Drive, créez automatiquement une page Notion avec les points clés et les faits saillants extraits par l'IA.
+
+    **Services :** Google Drive, Notion, IA
+
+    <AiPrompt>
+      Quand un document est partagé avec moi dans Google Drive, crée une page Notion avec les points clés
+    </AiPrompt>
+
+    <Note>
+      Il s'agit d'une automation basée sur cron qui vérifie périodiquement les documents récemment partagés.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Box : Faits saillants par e-mail pour les documents partagés" icon="box">
+    Quand un document est partagé ou qu'une note est créée dans Box, recevez un e-mail avec les points forts générés par l'IA pour évaluer rapidement si cela nécessite votre attention.
+
+    **Services :** Box, E-mail, IA
+
+    <AiPrompt>
+      Quand un document est partagé ou qu'une note est créée dans Box, envoie-moi les points forts par e-mail
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Dropbox : Résumé par e-mail pour les fichiers partagés" icon="dropbox">
+    Quand un fichier est partagé avec vous dans Dropbox, recevez un résumé par e-mail avec les points clés extraits par l'IA.
+
+    **Services :** Dropbox, E-mail, IA
+
+    <AiPrompt>
+      Quand un fichier est partagé avec moi dans Dropbox, envoie-moi un résumé par e-mail avec les points clés
+    </AiPrompt>
+
+    <Note>
+      Il s'agit d'une automation basée sur cron qui vérifie périodiquement les fichiers récemment partagés.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+### CRM et support client
+
+<AccordionGroup>
+  <Accordion title="HubSpot : Insights IA pour les nouveaux contacts" icon="hubspot">
+    Quand un nouveau contact est créé dans HubSpot, recevez un e-mail avec des insights générés par l'IA sur le contact pour vous aider à préparer votre prise de contact.
+
+    **Services :** HubSpot, E-mail, IA
+
+    <AiPrompt>
+      Quand un contact HubSpot est créé, envoie-moi un e-mail avec des insights IA
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Zendesk : Résumé par e-mail pour les tickets assignés" icon="ticket">
+    Quand un ticket Zendesk vous est assigné, recevez un résumé par e-mail avec les détails clés pour prioriser et répondre plus rapidement.
+
+    **Services :** Zendesk, E-mail
+
+    <AiPrompt>
+      Quand un ticket m'est assigné, envoie-moi un résumé par e-mail
+    </AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+## Construire vos propres automations
+
+Ces exemples sont des points de départ. Parce qu'Agent construit de vraies applications, vous pouvez combiner n'importe quels services et ajouter une logique personnalisée :
+
+* **Workflows multi-étapes** : Chaînez trois services ou plus ensemble (par ex., issue Jira créée → résumé par IA → notification Slack → journalisation dans Google Sheets)
+* **Logique conditionnelle** : Ajoutez des filtres et des conditions (par ex., notifier uniquement pour les issues prioritaires, journaliser uniquement les tâches de projets spécifiques)
+* **Traitement amélioré par IA** : Ajoutez la résumé, la classification, l'analyse de sentiment ou la génération de contenu à n'importe quelle automation
+* **Plannings personnalisés** : Exécutez des automations toutes les heures, tous les jours à une heure spécifique, chaque semaine ou selon n'importe quel planning cron
+
+<AiPrompt>
+  Quand une issue Jira prioritaire est créée dans le projet « Backend », résume-la avec l'IA, envoie une notification Slack à #engineering et enregistre-la dans une feuille Google
+</AiPrompt>
+
+## Services pris en charge
+
+Les automations fonctionnent avec n'importe quel service disponible via les [Connecteurs](/replitai/integrations), notamment :
+
+<CardGroup cols={3}>
+  <Card title="Gestion de projet" icon="diagram-project">
+    Linear, Jira, Asana, Todoist
+  </Card>
+
+  <Card title="Communication" icon="comments">
+    Slack, Discord, Twilio, Gmail, Outlook
+  </Card>
+
+  <Card title="Documents" icon="file">
+    Google Drive, Google Docs, Notion, Confluence, Box, Dropbox
+  </Card>
+
+  <Card title="CRM & support" icon="building">
+    HubSpot, Salesforce, Zendesk
+  </Card>
+
+  <Card title="Productivité" icon="table">
+    Google Sheets, Google Agenda, Spotify
+  </Card>
+
+  <Card title="Fournisseurs IA" icon="wand-magic-sparkles">
+    OpenAI, Anthropic, Gemini, Perplexity
+  </Card>
+</CardGroup>
+
+Vous pouvez également vous connecter à n'importe quel service avec une API publique en utilisant des [intégrations externes](/replitai/integrations#external-integrations) avec des clés API.
+
+## Étapes suivantes
+
+* [Démarrer avec Agents & Automations](/fr/core-concepts/agent/agents-and-automations) — configurez votre première automation
+* [Parcourir les Connecteurs disponibles](/replitai/integrations) — consultez tous les services que vous pouvez connecter
+* [En savoir plus sur les Déploiements](/fr/category/replit-deployments) — comprendre comment les automations s'exécutent 24/7
+* [Explorer les fonctionnalités Agent](/fr/core-concepts/agent) — découvrez ce qu'Agent peut construire d'autre pour vous

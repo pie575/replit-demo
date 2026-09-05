@@ -1,0 +1,92 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Réseau et erreurs d'application
+
+> Réponses aux erreurs courantes des applications déployées—403 Interdit, Application failed to respond, CORS, 502 Bad Gateway et problèmes de requêtes sortantes.
+
+Ces réponses couvrent les erreurs que vous pouvez rencontrer sur une application déployée. Pour un dépannage plus large, consultez [Dépannage des déploiements](/fr/build/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="Mon application déployée renvoie des erreurs 403 Interdit—comment y remédier ?">
+    Une erreur 403 sur une application déployée provient généralement de l'une de ces causes :
+
+    * **En-têtes de requête trop volumineux**—un trop grand nombre de cookies peut rendre les en-têtes suffisamment grands pour être rejetés à la périphérie. Effacez les cookies de votre navigateur pour le domaine et testez à nouveau.
+    * **Authentification manquante**—la requête n'inclut pas le jeton de connexion ou la session requis.
+    * **Une restriction d'accès**—votre application peut être configurée pour bloquer certains trafics. Consultez les [déploiements privés](/fr/features/publishing/private-deployments) et les [jetons d'accès externes](/fr/features/deployment-customization/external-access-tokens).
+
+    Pour un diagnostic détaillé, collez vos journaux de déploiement dans un nouveau chat Agent.
+  </Accordion>
+
+  <Accordion title="Mon application affiche &#x22;Application failed to respond&#x22;—qu'est-ce que cela signifie ?">
+    Le processus de votre application n'écoute pas sur le port attendu par Replit. Replit transmet le port correct via la variable d'environnement `PORT`, donc liez-vous à elle plutôt qu'à une valeur codée en dur :
+
+    ```js theme={null}
+    const PORT = process.env.PORT || 3000;
+    ```
+
+    ```python theme={null}
+    port = int(os.environ.get("PORT", 3000))
+    ```
+
+    Votre application peut également s'être plantée avant la liaison—vérifiez vos journaux de déploiement pour les erreurs de démarrage. Avec les [déploiements Autoscale](/fr/features/publishing/deployment-types#autoscale), la première requête après une période de calme peut prendre quelques secondes (un démarrage à froid), ce qui est normal.
+  </Accordion>
+
+  <Accordion title="Comment corriger les erreurs CORS dans mon application Replit déployée ?">
+    Une erreur CORS signifie que votre frontend et votre backend sont sur des origines différentes et que le backend n'a pas été configuré pour le permettre. S'ils font partie de la même application, utilisez des URL relatives comme `/api/endpoint` pour éviter entièrement les problèmes CORS.
+
+    Sinon, configurez votre backend pour autoriser l'origine de votre frontend. Pour Express, par exemple :
+
+    ```js theme={null}
+    const cors = require("cors");
+    app.use(cors({ origin: "https://your-frontend.replit.app" }));
+    ```
+
+    N'autorisez que les origines spécifiques dont vous avez besoin avant le déploiement. Consultez [Dépannage des déploiements](/fr/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon application fonctionne localement mais renvoie des erreurs réseau une fois déployée">
+    Les applications déployées échouent lorsque l'environnement de production diffère de votre configuration locale. Vérifiez trois choses :
+
+    1. **URL localhost codées en dur**—remplacez `localhost:3000` ou `127.0.0.1` par des chemins relatifs ou des URL basées sur l'environnement, puis redéployez.
+    2. **Secrets de production manquants**—confirmez que chaque clé requise est définie dans vos secrets de déploiement. Consultez [Secrets](/fr/core-concepts/project-editor/app-setup/secrets).
+    3. **Migrations non exécutées en production**—exécutez les migrations en attente contre la base de données de production avant de déployer.
+
+    Si les erreurs persistent, [contactez le support Replit](https://replit.com/support) avec votre message d'erreur et les étapes que vous avez essayées.
+  </Accordion>
+
+  <Accordion title="Comment déboguer une erreur 502 Bad Gateway sur mon application déployée ?">
+    Une erreur 502 signifie généralement que le processus de votre application s'est planté ou a renvoyé une sortie que le serveur ne pouvait pas utiliser. Vérifiez vos journaux de déploiement pour les erreurs de plantage juste avant que les erreurs 502 n'apparaissent—les rejets de promesses non gérés et les exceptions non capturées peuvent faire planter un processus Node.js silencieusement.
+
+    Ajoutez un gestionnaire pour mettre en évidence les plantages :
+
+    ```js theme={null}
+    process.on("uncaughtException", (err) => console.error("Uncaught:", err));
+    ```
+
+    Une fois que vous pouvez voir l'erreur sous-jacente dans vos journaux, collez-la dans un nouveau chat Agent pour obtenir de l'aide pour la corriger.
+  </Accordion>
+
+  <Accordion title="Mon application ne peut pas effectuer de requêtes vers des API externes—que dois-je vérifier ?">
+    Confirmez d'abord si la requête est bloquée plutôt qu'échouant dans votre code. Ouvrez vos journaux de déploiement et recherchez des messages concernant des requêtes sortantes bloquées ou redirigées.
+
+    Causes courantes et solutions :
+
+    * **URL autoréférencées**—si votre backend appelle sa propre URL publique (telle que `fetch("https://myapp.replit.app/api/")`), utilisez un chemin relatif comme `fetch("/api/")` à la place.
+    * **Requêtes pendant la phase de construction**—effectuez des appels sortants à l'exécution, pas pendant la construction.
+    * **Restrictions réseau**—sur un réseau d'entreprise ou scolaire, les connexions sortantes peuvent être bloquées ; vérifiez auprès de votre administrateur réseau.
+
+    Si aucune de ces raisons ne s'applique et que les requêtes sont toujours bloquées, [contactez le support Replit](https://replit.com/support) avec les lignes de journal pertinentes.
+  </Accordion>
+
+  <Accordion title="L'URL de mon application a changé après que j'ai republié—puis-je récupérer mon ancien sous-domaine ?">
+    Le sous-domaine `.replit.app` est dérivé du nom de votre projet et n'est pas garanti de rester le même lorsque vous dépubliez et republicez, surtout si le projet a été renommé.
+
+    La solution permanente est un [domaine personnalisé](/fr/features/publishing/custom-domains), qui reste le même à travers les redéploiements. Pour essayer de restaurer l'ancien sous-domaine, assurez-vous que le nom de votre projet correspond à l'original (renommez-le si nécessaire) et republicez—Replit ne peut pas réattribuer manuellement un sous-domaine libéré. Consultez [Géographie du projet](/fr/features/publishing/project-geography).
+  </Accordion>
+</AccordionGroup>
+
+## Vous avez encore besoin d'aide ?
+
+Si votre erreur n'est pas couverte ici, [contactez le support Replit](https://replit.com/support).

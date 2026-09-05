@@ -1,0 +1,69 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Banco de dados
+
+> Respostas às perguntas comuns sobre banco de dados—corrigir endpoints desativados, restaurar tabelas, migrar para produção e erros de conexão.
+
+Estas respostas abrangem o banco de dados de produção. Para referência completa, veja [Bancos de dados de produção](/pt/features/data-and-storage/development-and-production) e [Banco de dados SQL](/pt/features/data-and-storage/sql-database).
+
+<AccordionGroup>
+  <Accordion title="Meus endpoints de banco de dados estão desativados—como corrijo o erro &#x22;endpoint has been disabled&#x22;?">
+    Este erro significa que seu endpoint de computação do banco de dados foi pausado. Para retomar:
+
+    1. Abra o painel **Banco de dados** e selecione **Desenvolvimento** no menu suspenso.
+    2. Se um botão **Retomar banco de dados** aparecer, selecione-o.
+    3. Mude o menu suspenso para **Produção** e selecione **Retomar banco de dados** novamente se aparecer.
+
+    Se o botão não aparecer, um secret `DATABASE_URL` conflitante pode estar ocultando-o. Abra o painel **Secrets**, compare qualquer entrada `DATABASE_URL` com a string de conexão no painel **Banco de dados** e atualize ou remova o secret conflitante para que correspondam.
+
+    As causas comuns são uma fatura não paga (pague-a para evitar recorrência) ou uma pausa transitória durante a publicação (as etapas de retomada acima resolvem). Veja [Bancos de dados de produção](/pt/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="A página de status mostra uma interrupção do banco de dados de produção—preciso abrir um chamado?">
+    Não. Se a interrupção já estiver listada em [status.replit.com](https://status.replit.com), a equipe está trabalhando nela e um chamado não acelerará a correção. Abra o incidente ativo e assine as atualizações para ser notificado conforme ele avança.
+
+    Se o problema do seu banco de dados *não* estiver listado na página de status, [entre em contato com o Suporte do Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Como restauro uma tabela de banco de dados excluída ou descartada?">
+    O Replit suporta restauração pontual para bancos de dados de produção. A janela de restauração depende do seu plano—7 dias no [Core](/pt/billing/plans/replit-core) e 28 dias no [Pro](/pt/billing/plans/replit-pro).
+
+    Para restaurar, abra o painel **Banco de dados**, vá para o banco de dados, abra suas configurações de restauração, selecione o timestamp desejado e confirme. Se estiver fora da janela de restauração, [entre em contato com o Suporte do Replit](https://replit.com/support). Veja [Bancos de dados de produção](/pt/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="Meu banco de dados está congelado e não vejo um botão Retomar">
+    Uma URL de banco de dados conflitante geralmente oculta o botão **Retomar**. Abra o painel **Secrets**, encontre qualquer entrada `DATABASE_URL` e compare-a com a string de conexão no painel **Banco de dados**. Se forem diferentes, o secret está substituindo a URL correta—remova-o, atualize e verifique o painel **Banco de dados** novamente.
+
+    Se o botão ainda não aparecer após remover o secret conflitante, [entre em contato com o Suporte do Replit](https://replit.com/support) com a URL do seu projeto.
+  </Accordion>
+
+  <Accordion title="Meu aplicativo está lançando erros de &#x22;connection pool exhausted&#x22;—o que isso significa?">
+    Seu aplicativo está abrindo mais conexões de banco de dados de uma vez do que o pool permite. Causas comuns:
+
+    * Conexões que não são fechadas após cada requisição
+    * Um pico de tráfego
+    * Consultas lentas mantendo conexões abertas
+
+    A maioria dos frameworks espera um único pool de conexões compartilhado em vez de uma nova conexão por requisição.
+
+    Para a correção mais rápida, abra um novo chat do Agent, descreva o erro e peça ao Agent para verificar como seu aplicativo gerencia as conexões do banco de dados.
+  </Accordion>
+
+  <Accordion title="Como migro do banco de dados de desenvolvimento para produção?">
+    O Replit mantém os bancos de dados de desenvolvimento e produção separados para que alterações de teste não afetem dados ao vivo. Para executar migrações contra a produção, adicione seu comando de migração à etapa de build ou pré-implantação da sua implantação para que seja executado em cada deploy. Por exemplo, use `drizzle-kit migrate` para Drizzle. Você também pode executar a migração manualmente a partir de um Shell no seu ambiente de produção.
+
+    Veja [Criar um banco de dados de produção ao publicar](/pt/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="Meu banco de dados mostra &#x22;endpoint disabled&#x22; mesmo com o faturamento em dia">
+    Às vezes isso acontece independentemente do faturamento. Tente retomar manualmente: abra o painel **Banco de dados**, selecione **Desenvolvimento** e selecione **Retomar banco de dados** se aparecer, depois repita para **Produção**.
+
+    Se o botão não aparecer ou o problema continuar recorrendo, [entre em contato com o Suporte do Replit](https://replit.com/support) com a URL do seu projeto—isso pode exigir uma retomada manual. Veja [Bancos de dados de produção](/pt/features/data-and-storage/development-and-production).
+  </Accordion>
+</AccordionGroup>
+
+## Ainda precisa de ajuda?
+
+Se sua dúvida sobre banco de dados não foi respondida aqui, [entre em contato com o Suporte do Replit](https://replit.com/support).

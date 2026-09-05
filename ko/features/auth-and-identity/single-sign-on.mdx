@@ -1,0 +1,77 @@
+---
+title: "앱에 SSO 추가하기 (Clerk)"
+description: "Okta 또는 Microsoft Entra ID와 같은 회사의 아이덴티티 제공자로 앱 사용자가 Clerk 대시보드를 통해 로그인하도록 하고, 다중 요소 인증과 세션 제어도 함께 설정하세요."
+---
+
+<Note>
+  **Replit 조직**에 대한 SSO를 필수로 설정(replit.com 로그인)하려고 하시나요? 이는 별도로 구성합니다 — [싱글 사인온(SAML SSO)](/ko/teams/identity-and-access-management/saml)을 참고하세요. 이 페이지는 Replit에서 **빌드한 앱**의 로그인 흐름에 SSO를 추가하는 방법을 다룹니다.
+</Note>
+
+사용자가 Okta 또는 Microsoft Entra ID 같은 회사의 아이덴티티 제공자로 앱에 로그인할 수 있도록 하세요. 앱이 [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)를 사용한다면, Clerk 대시보드를 통해 SSO 및 기타 고급 인증 기능을 구성합니다. 필요한 내용을 Agent에게 요청하면 Agent가 설정을 완료할 대시보드로 안내합니다.
+
+<Frame>
+  <img src="/assets/mirror/sso-cover-28a76bfa16fb.jpeg" alt="자물쇠 아이콘과 노트북으로 작업하는 빌더가 있는 SSO로 Replit 앱 빌드하기 배너." width="1920" height="1080" data-path="images/workspace/auth/sso-cover.jpeg" />
+</Frame>
+
+Clerk 대시보드는 기본 로그인 경험을 훨씬 뛰어넘는 기능을 제공합니다. Clerk에서 설정한 구성은 Replit 앱의 인증에 자동으로 적용됩니다.
+
+## 구성할 수 있는 항목
+
+* **엔터프라이즈 SSO 연결**: OIDC 또는 SAML을 사용하여 Okta 또는 Microsoft Entra ID로 싱글 사인온을 구성합니다. 고객이 회사의 아이덴티티 제공자로 로그인할 수 있게 합니다. SSO는 수동 이메일 허용 목록을 회사의 기존 아이덴티티 제공자로 대체하여 민감한 데이터를 다루는 내부 도구도 보호합니다.
+* **다중 요소 인증(MFA)**: 앱의 로그인 흐름에 MFA를 추가합니다.
+* **세션 제어**: 세션 길이와 인증 빈도를 조정합니다.
+* **기타 Clerk 설정**: 추가 Clerk 구성은 Replit 앱에 자동으로 적용됩니다. API 키나 환경 설정은 변경하지 마세요 — Replit이 이를 관리합니다. [개발 및 프로덕션 환경](/ko/features/auth-and-identity/clerk-auth#development-and-production-environments)을 참고하세요.
+
+## Clerk 대시보드 열기
+
+필요한 인증 변경 사항을 Agent에게 요청하세요. Agent는 처리할 수 있는 부분을 설정하고, 사용자의 입력이 필요한 구성은 앱의 Clerk 대시보드로 안내합니다.
+
+<Frame>
+  <img src="/assets/mirror/build-with-sso-agent-workflow-46422788bd18.webp" alt="Agent가 Clerk 기반 앱을 안내하여 Clerk 대시보드에서 엔터프라이즈 SSO를 구성하는 모습." width="1602" height="1080" data-path="images/workspace/auth/build-with-sso-agent-workflow.webp" />
+</Frame>
+
+Workspace에서도 대시보드를 열 수 있습니다.
+
+1. Tools 패널에서 **Users & Auth**를 선택합니다.
+2. **Configure** 탭을 선택합니다.
+3. **Advanced**를 선택합니다.
+4. **Clerk dashboard** 아래에서 **Open Clerk dashboard**를 선택합니다.
+
+<Frame>
+  <img src="/assets/mirror/open-clerk-dashboard-tools-pane-a314ffea741d.webp" alt="Configure 탭이 열려 있고 Advanced 섹션과 Open Clerk dashboard 버튼이 표시된 Users & Auth 도구." width="2158" height="1372" data-path="images/workspace/auth/open-clerk-dashboard-tools-pane.webp" />
+</Frame>
+
+## 엔터프라이즈 SSO 연결 설정하기
+
+1. Clerk 대시보드에서 **Configure**를 선택합니다.
+2. **User & authentication** 아래에서 **SSO connections**를 선택합니다.
+3. **Enterprise**를 선택합니다.
+4. **Add connection**을 선택합니다.
+
+<Frame>
+  <img src="/assets/mirror/build-with-sso-enterprise-connections-b0a6a27885b5.webp" alt="Enterprise SSO connections 페이지와 Add connection 작업이 표시된 Clerk 대시보드." width="1826" height="1080" data-path="images/workspace/auth/build-with-sso-enterprise-connections.webp" />
+</Frame>
+
+전체 연결 구성 방법은 [Clerk 문서](https://clerk.com/docs)를 참고하세요.
+
+### 연결 확인하기
+
+구성을 완료한 후 아이덴티티 제공자의 테스트 계정으로 로그인하세요. 해당 계정이 앱의 예상되는 부분에 접근할 수 있는지 확인합니다.
+
+로그인에 실패하면 Agent에게 도움을 요청하세요. 요청에 아이덴티티 제공자, 프로토콜, 오류 메시지를 포함하세요.
+
+<Note>
+  이 페이지는 앱 자체 로그인 흐름을 위한 엔터프라이즈 SSO를 다룹니다. Workspace에서 **SSO providers**로 표시되는 Google, GitHub, Apple, X를 통한 소셜 로그인은 [로그인 제공자](/ko/features/auth-and-identity/sign-in-providers)를 참고하세요. 이 페이지는 Replit Auth 마이그레이션이나 Replit 계정을 위한 SAML 로그인은 다루지 않습니다.
+</Note>
+
+## 가격 및 이용 가능 여부
+
+Clerk 대시보드 접근은 [Replit Pro](/ko/billing/plans/replit-pro) 플랜에서 이용할 수 있습니다. 엔터프라이즈 플랜은 곧 제공될 예정입니다.
+
+<Info>
+  엔터프라이즈 SSO 연결은 2026년 10월 1일까지 무료입니다. 이후에는 SSO 가격이 Clerk의 가격 정책과 일치하며 Replit 청구서에 반영됩니다.
+</Info>
+
+## 관련 문서
+
+* [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)는 Replit 앱에서 Clerk 기반 인증이 작동하는 방식을 설명합니다.

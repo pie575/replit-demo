@@ -1,0 +1,235 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# External Access Tokens
+
+> Let CI pipelines, webhooks, and other automated services reach your private Replit app without signing in.
+
+External access tokens are bearer tokens you mint for a specific Replit App.
+They let automated services — CI pipelines, webhooks, status-check pingers, Slack
+bots, internal scripts — reach the app even when its URL is locked down by
+[a Private Dev URL ](/features/publishing/private-deployments)
+or by a [Private Deployment](/features/publishing/private-deployments).
+
+Treat each token like a password: anyone who has it can reach your app until
+the token expires or you revoke it.
+
+<Note>
+  External access tokens are available when you select private access for a
+  deployment. No workspace opt-in is required. In an Enterprise workspace,
+  only workspace admins can manage tokens.
+</Note>
+
+## When to use a token
+
+Reach for an external access token when something *outside* your browser needs
+to call your private Replit App. Common cases:
+
+* A GitHub Actions workflow that runs a smoke test against your dev URL on
+  every commit.
+* An uptime monitor (Better Stack, Pingdom, UptimeRobot) hitting a health
+  endpoint on your published app.
+* A webhook receiver — Stripe, Slack, GitHub — POSTing to a Private Deployment.
+* A `curl` or `fetch` call from a teammate's machine while debugging.
+
+External access tokens are designed for **API traffic**, not for opening UI
+pages in a browser. Single-page apps (Vite, Next.js, etc.) load JavaScript
+bundles in follow-up requests that won't carry your token, so those requests
+fail. For interactive browsing, sign in normally instead.
+
+## Token environments
+
+Each token is bound to one environment:
+
+| Environment   | Where it works                                                     | Use for                                             |
+| :------------ | :----------------------------------------------------------------- | :-------------------------------------------------- |
+| `Development` | The app's workspace dev URL (`*.replit.dev`)                       | Hitting a running Repl during development           |
+| `Production`  | The app's published deployment (`*.replit.app` and custom domains) | Hitting a Private Deployment from external services |
+
+A `Production` token survives a republish, including publishing a new version.
+Replit revokes it when you:
+
+* Unpublish the deployment.
+* Delete the deployment.
+* Change the app's access from private to public.
+
+A token also stops working when it expires or you revoke it.
+
+## Create an external access token
+
+<Steps>
+  <Step>
+    Open the app you want to expose, then open the **Publishing** tool.
+  </Step>
+
+  <Step>
+    Select **Adjust settings** to expand the redeploy options.
+  </Step>
+
+  <Step>
+    In the **Security** section, find **External access tokens**.
+  </Step>
+
+  <Step>
+    Select **Create access token** and fill in:
+
+    * **Label** (optional): a short name so you can recognize the token later,
+      such as `CI` or `Stripe webhook`. Maximum 120 characters.
+    * **Environment**: choose `Development` or `Production` based on where the
+      calling service needs to reach the app.
+    * **Expires after**: pick a lifetime — `1 hour`, `24 hours`, `7 days`,
+      `30 days`, `3 months`, `1 year`, or `5 years`. Pick the shortest window
+      that fits the job. There is no "never expires" option.
+  </Step>
+
+  <Step>
+    Select **Create**.
+  </Step>
+</Steps>
+
+Replit shows the token **once**. Copy it now — once you close the dialog there
+is no way to see the token again. If you lose it, revoke that token and mint a
+new one.
+
+The reveal screen offers two copy actions:
+
+* **Copy query parameter** — copies `?project-protection-bypass=<token>` for
+  appending to a URL. Handy for quick `curl` checks.
+* **Copy token only** — copies the raw token, suitable for sending in an
+  `Authorization: Bearer` header.
+
+<Info>
+  Creating your first token automatically turns on external access for the app, if
+  it wasn't on already. Without shielding the token has nothing to bypass.
+</Info>
+
+## Use a token
+
+Present the token in one of two ways:
+
+### Authorization header (recommended)
+
+```bash theme={null}
+curl -H "Authorization: Bearer <token>" https://your-app.replit.app/health
+```
+
+This is the right choice for almost everything — webhooks, CI scripts,
+backend-to-backend calls. The token never appears in logs that capture URLs
+and never lands in your browser history.
+
+### Query parameter
+
+```bash theme={null}
+curl "https://your-app.replit.app/health?project-protection-bypass=<token>"
+```
+
+Use the query-parameter form only when you can't set headers — for example, a
+service that only takes a URL. URLs with tokens often end up in proxy logs,
+shell history, and screenshots, so prefer the header form whenever you can.
+
+## Manage existing tokens
+
+The **External access tokens** section lists every token you've created for
+the app — newest first — along with its label, environment, creation date,
+expiry, and revocation status. The last few characters of the token are shown
+on each row to help you tell tokens apart, since the full value is only ever
+displayed at creation time.
+
+You only see tokens *you* created. Other collaborators' tokens are private to
+them, even if you own the app.
+
+## Revoke a token
+
+Revoke a token whenever it's no longer needed, or as soon as you suspect it
+may have leaked. To revoke:
+
+<Steps>
+  <Step>
+    Open the **External access tokens** section in the app's publishing settings.
+  </Step>
+
+  <Step>
+    Find the token in the list and select the trash icon.
+  </Step>
+
+  <Step>
+    Confirm the revocation.
+  </Step>
+</Steps>
+
+Revocation is **immediate and irreversible**. Any traffic still using the
+token starts getting rejected within seconds. If you need access again, mint a
+new token.
+
+You can only revoke tokens you created yourself. Removing a collaborator from
+the workspace automatically revokes the tokens they minted for that app.
+
+## Keep your tokens safe
+
+External access tokens are credentials. Handle them with the same care you'd
+give an API key or password.
+
+### Do
+
+* **Store tokens in a secret manager** — GitHub Actions secrets, your CI
+  vendor's vault, your cloud provider's secret store, or a password manager.
+  Never commit them to a repository.
+* **Use short lifetimes** when you can. A 7-day token for a one-off
+  integration is safer than a 5-year token left lying around.
+* **Label every token** so future-you knows what it's for and whether it's
+  still in use. Unlabeled tokens are the first ones to leak and the last ones
+  to get revoked.
+* **Mint a separate token per consumer.** One token per CI job, one per
+  webhook source, one per uptime check. When something gets compromised — or
+  a vendor is no longer needed — you revoke just that one.
+* **Prefer the `Authorization` header** over query parameters so the token
+  doesn't leak through URL logs, browser history, or referer headers.
+* **Revoke immediately** if a token might have been exposed — a leaked log,
+  a public repository commit, a screen-share, a former employee's laptop.
+  Revocation takes effect right away; mint a replacement afterwards.
+
+### Don't
+
+* **Don't share a token across teammates or services.** If two systems share
+  one token, you can't revoke one without breaking the other.
+* **Don't paste tokens into chat, email, screenshots, or issue trackers.**
+  These channels get archived, indexed, and shared in ways you can't predict.
+* **Don't embed tokens in client-side code** — browser apps, mobile apps,
+  desktop binaries. Anything shipped to a user's device should be considered
+  public.
+* **Don't rely on tokens for browser sessions.** Tokens work for API calls,
+  not for loading SPAs in a browser tab. Use a normal Replit sign-in for that.
+* **Don't pick a 5-year expiry by default.** Match the lifetime to how long
+  the consumer actually needs access.
+
+## Troubleshooting
+
+<Accordion title="My production token suddenly stopped working">
+  Production tokens stay valid across normal republishes. Check whether the
+  token expired or you revoked it. Also check whether you unpublished or
+  deleted the deployment, or changed the app from private to public. If the app
+  no longer has a private deployment, publish it privately. Then mint a new
+  token. You cannot reinstate an expired or revoked token.
+</Accordion>
+
+<Accordion title="My token works for `curl` but my browser still shows the sign-in page">
+  External access tokens are intended for API traffic, not for browser
+  sessions. When a single-page app loads in a browser, the initial HTML
+  request can carry the token via query parameter, but follow-up requests for
+  JavaScript bundles, CSS, and API calls won't include it and will be
+  rejected. To browse the app interactively, sign in to Replit normally.
+</Accordion>
+
+<Accordion title="I lost the token — can I see it again?">
+  No. Replit only shows the token once, at creation time. The list view shows
+  metadata (label, environment, expiry, last few characters) but never the
+  full token value. If you lost it, revoke that token and create a new one.
+</Accordion>
+
+## Next steps
+
+* [Private Deployments](/features/publishing/private-deployments):
+  the underlying access-control feature these tokens bypass.
+* [Replit App Access Management](/teams/identity-and-access-management/repl-access-management):
+  manage which Replit users can sign in to your private apps.

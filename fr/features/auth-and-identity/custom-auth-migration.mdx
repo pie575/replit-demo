@@ -1,0 +1,47 @@
+---
+title: "Planifier une migration d'authentification personnalisée"
+description: "Planifiez une migration sûre d'un système d'authentification personnalisé vers Clerk Auth tout en préservant les données utilisateurs et les règles d'accès de votre application."
+---
+
+Utilisez cette page lorsque votre application dispose de son propre système d'authentification, magasin d'utilisateurs ou logique de session. Passer à [Clerk Auth](/fr/features/auth-and-identity/clerk-auth) est une migration de données et d'identité, pas seulement un changement de code. Sans plan, les utilisateurs récurrents peuvent sembler avoir perdu l'accès à leurs données existantes.
+
+<Note>
+  **Vous utilisez Replit Auth ?** Le flux de migration automatisé est réservé aux applications Replit Auth éligibles. Suivez plutôt [Migrer de Replit Auth vers Clerk](/fr/features/auth-and-identity/migrate-auth-to-clerk).
+
+  Replit ne migre pas automatiquement un système d'authentification personnalisé. Cette page fournit des conseils de planification et de validation, et non une procédure d'importation automatisée.
+</Note>
+
+## Planifier la continuité de l'identité
+
+* Identifiez la valeur stable qui relie une personne aux données de votre application aujourd'hui. Il peut s'agir d'un ID utilisateur, d'une adresse e-mail, d'un nom d'utilisateur ou d'un enregistrement de compte séparé.
+* Recensez chaque table et service qui dépend de cette valeur, y compris la propriété, les autorisations, les abonnements, les préférences et les journaux d'audit.
+* Décidez comment le nouveau système d'identité résoudra chaque enregistrement local existant avant de modifier le comportement de connexion.
+* Définissez comment les tout nouveaux utilisateurs seront assignés et liés aux enregistrements locaux après la bascule.
+
+<Warning>
+  Ne présumez pas que l'ID utilisateur d'un fournisseur, une adresse e-mail ou un nouveau compte créé lors de la première connexion correspondra à vos enregistrements existants. Vérifiez la correspondance avec des comptes représentatifs avant la bascule.
+</Warning>
+
+## Identifiants de compte et sessions
+
+* Recensez séparément vos hachages de mots de passe, identités OAuth, facteurs MFA, états de vérification et sessions actives. Ils peuvent avoir des exigences de portabilité et de sécurité différentes.
+* Validez toute migration de mot de passe par rapport à la documentation actuelle de votre fournisseur choisi avant de traiter de vrais comptes. Si un identifiant ne peut pas être migré en toute sécurité, prévoyez un flux de réinitialisation de mot de passe ou de liaison de compte.
+* Ne présumez pas que les identités OAuth ou les sessions actives se transfèrent automatiquement. Planifiez comment les utilisateurs existants se reconnecteront et comment vous éviterez les comptes en double.
+* Conservez les données d'autorisation et spécifiques à l'application dans votre modèle de données local, sauf si vous avez explicitement prévu un remplacement. L'authentification et l'autorisation nécessitent souvent un travail de migration distinct.
+
+## Tester avant la bascule
+
+* Testez dans un environnement hors production avec des comptes et des données représentatifs et non sensibles.
+* Connectez-vous avec un compte existant, puis ouvrez des pages qui lisent des données spécifiques à l'utilisateur, comme un tableau de bord, un profil ou des éléments enregistrés.
+* Vérifiez les règles d'autorisation, la récupération de compte, la déconnexion et le flux de création d'un nouveau compte.
+* Surveillez les enregistrements en double et les échecs d'accès pendant la bascule. Conservez un plan de retour en arrière jusqu'à ce que votre validation soit terminée.
+
+## Obtenir de l'aide
+
+* Si vous devez migrer un système d'authentification personnalisé vers Clerk Auth géré par Replit, [contactez le support Replit](https://replit.com/support) avant de modifier les données de compte en production.
+* Si vous gérez l'authentification avec un autre fournisseur, utilisez la documentation de migration actuelle de ce fournisseur et validez votre correspondance d'identité avant la bascule.
+
+## Ressources supplémentaires
+
+* [Vue d'ensemble de Clerk Auth](/fr/features/auth-and-identity/clerk-auth) — Comment Clerk Auth fonctionne sur Replit
+* [Migrer de Replit Auth vers Clerk](/fr/features/auth-and-identity/migrate-auth-to-clerk) — Utilisez le flux de migration pour les applications éligibles à Replit Auth

@@ -1,0 +1,110 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Deployment and publishing
+
+> Answers to common publishing questions—debugging failed publishes, reading logs, fixing runtime errors, redeploying, and changing regions.
+
+These answers cover publishing and deployments. For step-by-step troubleshooting, see [Troubleshooting deployments](/build/troubleshooting), and for deployment types and monitoring, see [Autoscale deployments](/features/publishing/deployment-types#autoscale) and [Monitoring a deployment](/features/publishing/monitoring-a-deployment).
+
+<AccordionGroup>
+  <Accordion title="My publish fails at &#x22;Creating Autoscale service&#x22;—how do I debug it?">
+    Most Autoscale publish failures are fixable once you read the deployment logs:
+
+    1. Open **Publishing** and find the failed deployment.
+    2. Select the three-dot menu next to it to open the logs.
+    3. Copy the log output, open a new Agent chat, paste it, and ask what's wrong and how to fix it.
+
+    If you see a `No run command configured` error even though you set one, open your deployment settings, disconnect the run command, re-add it, then save and republish. See [Troubleshooting deployments](/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="My app shows an Internal Server Error after publishing successfully—what's wrong?">
+    If publishing succeeded but the live app returns a 500 error, the issue is in your app code rather than Replit's infrastructure:
+
+    1. Open **Publishing**, view the logs, and copy the full error text.
+    2. Open a new Agent chat, paste the logs, and ask what's causing the error.
+    3. Apply the fix and republish.
+
+    If Agent can't find the problem, open **Publishing → History**, find the last working version, and redeploy it. See [Troubleshooting deployments](/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="My deployment is stuck during build or migration—what should I do?">
+    1. Open the command palette with `Cmd+K` (Mac) or `Ctrl+K` (Windows), search for **Restart compute**, and select it.
+    2. Open **Publishing** and select **Publish** to trigger a new deployment.
+    3. If it fails again, open the failed deployment's logs from the three-dot menu, copy the build log, and paste it into a new Agent chat for diagnosis.
+
+    If the deployment stays stuck, [contact Replit Support](https://replit.com/support) with your full build logs. See [Troubleshooting deployments](/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="My app is live but slow or returning timeouts—what should I check?">
+    1. Check your deployment logs for recurring timeout or out-of-memory messages.
+    2. Check your deployment resources for CPU or memory limits—see [Monitoring a deployment](/features/publishing/monitoring-a-deployment).
+    3. Open a new Agent chat, paste recent logs, and ask Agent to find bottlenecks.
+
+    Common causes include database queries without indexes, blocking synchronous operations, and memory leaks. With [Autoscale deployments](/features/publishing/deployment-types#autoscale), the first request after scaling to zero can take a few seconds—that's a normal cold start.
+  </Accordion>
+
+  <Accordion title="My deployment history shows failed builds—how do I find what's wrong?">
+    Open **Publishing → History**, select the failed deployment, and view the
+    build logs. Find the first line marked `ERROR` or `FAILED`—that's usually the
+    root cause, and the lines after it are knock-on effects. Copy that section
+    into a new Agent chat for diagnosis. Most build failures come from missing
+    dependencies, an incorrect run command, or a failed database migration. See
+    [Monitoring a deployment](/features/publishing/monitoring-a-deployment).
+  </Accordion>
+
+  <Accordion title="My app works in the editor preview but not when published—why?">
+    This is almost always a configuration difference between environments. Check that:
+
+    * Every key from your development [Secrets](/core-concepts/project-editor/app-setup/secrets) pane is also set in your deployment secrets—they're separate environments.
+    * Your `DATABASE_URL` points to the production database, not development.
+    * There are no hard-coded `localhost` or `127.0.0.1` references; use relative paths or environment-based URLs instead.
+
+    Then check your deployment logs for production-specific errors. See [Troubleshooting deployments](/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="My Autoscale deployment keeps restarting—what do SIGTERM or Exit code 1 mean?">
+    [Autoscale deployments](/features/publishing/deployment-types#autoscale) restart regularly by design. A `SIGTERM` in your logs means the process was gracefully stopped—this is normal. `Exit code 1` means the process crashed on its own; check the lines just before it for the actual error.
+
+    If restarts are frequent enough to affect users, look for unhandled promise rejections, out-of-memory errors, or missing environment variables that cause startup to fail.
+  </Accordion>
+
+  <Accordion title="I updated my environment variables but my published app isn't picking them up—why?">
+    Replit keeps development and production secrets in separate stores, and changing one doesn't update the other. The [development Secrets](/core-concepts/project-editor/app-setup/secrets) pane is only available in the editor; your published app reads from your deployment secrets.
+
+    To update a variable in your live app, set it in your deployment secrets, then open **Publishing** and select **Publish** to push it live again. The new values take effect when the new deployment starts. See [Troubleshooting deployments](/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="How do I trigger a redeploy without changing my code?">
+    Open **Publishing** and select **Publish**. Replit builds and publishes your current code even if nothing changed—useful after updating a secret, after a database unpause, or to pick up a dependency update.
+
+    If your app is unresponsive and a full redeploy feels heavy, open the command palette with `Cmd+K` (Mac) or `Ctrl+K` (Windows), search for **Restart compute**, and select it.
+  </Accordion>
+
+  <Accordion title="Can I change my app's deployment region after it's been published?">
+    No. You cannot change publishing geography in place after you publish an app. To move the app, remix it and publish the remix in the new region. See [Project geography](/features/publishing/project-geography).
+
+    You also cannot change the database region in place. The remixed app may receive a different `.replit.app` subdomain, so connect a [custom domain](/features/publishing/custom-domains) first if you need a stable URL, and re-add any deployment secrets.
+  </Accordion>
+
+  <Accordion title="Why does a PCI or security scan flag the GAESA cookie on my published app?">
+    Google's serving infrastructure adds the `GAESA` (Google App Engine session affinity) cookie to published Replit apps to route requests to the right instance. Its value is an opaque routing identifier and carries no sensitive or application data.
+
+    Some security scanners flag `GAESA` because it doesn't set the `Secure` or `HttpOnly` attributes. Your app doesn't create this cookie, and you can't change or disable it for a published app.
+
+    If a PCI compliance or security scan reports this cookie, dispute the finding with the scan vendor as a false positive. Include the cookie name and explain that Google's infrastructure sets it for request routing. Your published app can't read, change, or disable it, and the cookie carries no sensitive data.
+
+    Compliance for the app you build is your responsibility—see the [shared responsibility model](/features/security/shared-responsibility-model). If your scan vendor needs more detail, [contact Replit Support](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="How do I take my app offline or unpublish it?">
+    Open **Publishing** and select the option to shut down your deployment, then confirm. Your app goes offline and stops incurring deployment charges. Your project files, code, and database aren't deleted—only the live deployment stops. Custom domain connections tied to this deployment are removed, so re-add them if you republish.
+
+    If cost is your concern, note that [Autoscale deployments](/features/publishing/deployment-types#autoscale) scale to zero when there's no traffic, so you may not need to shut down at all.
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If your deployment question isn't answered here, [contact Replit Support](https://replit.com/support).

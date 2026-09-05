@@ -1,0 +1,124 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Single sign-on (SAML SSO)
+
+> Configure o single sign-on SAML para a sua Organização Replit Enterprise diretamente nas configurações do workspace, incluindo a configuração do IdP e declarações de domínio de e-mail.
+
+## Introdução
+
+<Note>
+  Você está procurando adicionar SSO ao fluxo de login de **um app que você cria** no Replit? Veja [Adicione SSO ao seu app (Clerk)](/pt/features/auth-and-identity/single-sign-on). Esta página aborda como habilitar o SSO para a sua **organização do Replit** — como a sua equipe faz login no replit.com.
+</Note>
+
+<Note>
+  Apenas organizações com um plano Enterprise podem usar SAML SSO. Você pode [comprar o plano Enterprise diretamente na página de preços](https://replit.com/pricing) ou [entrar em contato conosco](https://replit.com/teams#inlineForm) para um passo a passo guiado.
+</Note>
+
+O [SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) SSO permite que você use seu Provedor de Identidade (IdP) para autenticar usuários que fazem login no replit.com. Os usuários da sua Organização são redirecionados para o seu IdP para autenticação, e o IdP retorna uma resposta ao Replit que verifica a identidade do usuário e os conecta.
+
+Os administradores Enterprise podem configurar o SAML SSO diretamente em **Configurações Enterprise → Autenticação** sem entrar em contato com o Replit. O assistente gera os valores do Provedor de Serviços (SP), aceita suas credenciais do IdP e provisiona o SSO automaticamente. O mesmo fluxo de autoatendimento é usado no cadastro quando você compra o plano Enterprise online, então você será guiado pela configuração do SSO como parte do onboarding.
+
+## Configurar SAML SSO
+
+<img src="https://mintcdn.com/replit/Q9XsduFBPCiKwlxc/images/teams/identity-and-access-management/saml-enterprise-settings.png?fit=max&auto=format&n=Q9XsduFBPCiKwlxc&q=85&s=ae33addb0a54e6b668111e0425a3be49" alt="Configuração SAML SSO nas configurações Enterprise" width="1024" height="613" data-path="images/teams/identity-and-access-management/saml-enterprise-settings.png" />
+
+O assistente de configuração leva você por cinco etapas. Você precisará de acesso de administrador tanto na sua Organização Replit quanto no seu Provedor de Identidade.
+
+<Steps>
+  <Step title="Abrir configurações de Autenticação">
+    Abra o seletor de workspace, escolha seu workspace Enterprise e abra **Configurações**. Selecione **Avançado**, expanda a seção **Autenticação** e clique em **Habilitar SSO** no cartão **SAML single sign-on**.
+
+    O indicador de status muda para **Em andamento** e o assistente revela os valores necessários para o seu IdP.
+  </Step>
+
+  <Step title="Escolha seu Provedor de Identidade">
+    Selecione seu IdP em **Configurar seu provedor de identidade**:
+
+    * **Microsoft Entra ID**
+    * **Google Workspace**
+    * **Okta**
+    * **Outro provedor**
+
+    Cada opção personaliza os rótulos dos campos e fornece um link direto para o console de administração do seu IdP para que você possa criar o aplicativo SAML em uma nova aba.
+  </Step>
+
+  <Step title="Criar o aplicativo SAML no seu IdP">
+    No console de administração do seu IdP, crie um novo aplicativo SAML usando os valores mostrados pelo Replit:
+
+    | Campo                              | Valor                                                                                                                      |
+    | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+    | URI do público / ID da entidade SP | Copie o valor mostrado no assistente (exclusivo para sua Organização, no formato `https://replit.com/<tenant-id>/saml/sp`) |
+    | URL SSO (URL ACS)                  | `https://replit.com/__/auth/handler`                                                                                       |
+    | Formato do ID de nome              | Endereço de e-mail                                                                                                         |
+    | Nome de usuário do aplicativo      | E-mail                                                                                                                     |
+  </Step>
+
+  <Step title="Inserir os valores do seu IdP">
+    Depois que o aplicativo SAML for criado no seu IdP, copie os seguintes valores de volta para a seção **Inserir os valores do seu provedor** no Replit:
+
+    * **URL SSO do IdP** — a URL para a qual o Replit redireciona os usuários durante a autenticação.
+    * **ID da entidade do IdP** — identifica seu IdP para o Replit.
+    * **Certificado X.509** — o certificado de assinatura do IdP em PEM ou base64. Os marcadores `BEGIN/END` são opcionais.
+    * **Domínios de e-mail** — lista separada por vírgulas dos domínios com os quais seus usuários fazem login (por exemplo, `acme.com, acme.co.uk`). Inclua todos os aliases e subdomínios que seu IdP possa reportar.
+
+    Clique em **Enviar credenciais**. O Replit valida de forma síncrona a URL, analisa o certificado (rejeitando certificados expirados ou ainda não válidos) e verifica os domínios de e-mail declarados. Cada domínio deve corresponder ao e-mail de pelo menos um administrador de faturamento na sua Organização, e domínios públicos (como `gmail.com`) não podem ser declarados.
+  </Step>
+
+  <Step title="Aguardar o provisionamento">
+    O indicador de status muda para **Provisionando…** enquanto o Replit cria o tenant SAML subjacente. Isso geralmente leva cerca de um minuto. Quando concluído, o indicador de status torna-se **Ativo** e sua Organização pode fazer login com SSO.
+
+    Se o provisionamento falhar, o indicador de status torna-se **Configuração falhou** e o Replit limpa automaticamente qualquer estado parcial. Clique em **Tentar novamente** para reiniciar o assistente.
+  </Step>
+</Steps>
+
+## Escolha seus domínios de e-mail
+
+Você pode declarar vários domínios de e-mail e subdomínios para sua Organização. Qualquer usuário que tentar se cadastrar com um domínio de e-mail que corresponda ao seu domínio declarado será obrigado a usar o SAML SSO. Seus domínios declarados devem corresponder ao que o seu IdP reporta para os seus usuários. Se você usar aliases de domínio de e-mail, inclua-os também para evitar que usuários se cadastrem sem usar o SSO.
+
+Por exemplo, se sua empresa usa domínios de e-mail correspondentes a `acmeco.com`, `foo.acmeco.com` e `acmebiz.com`, declare todos os três ao enviar as credenciais.
+
+O Replit valida cada domínio declarado com base nos endereços de e-mail dos seus administradores. Para adicionar ou remover domínios após a ativação, edite o campo **Domínios de e-mail** no cartão **Autenticação**. Para declarar um domínio que não corresponde ao e-mail de um administrador existente, entre em contato com [support@replit.com](mailto:support@replit.com).
+
+## Usando SAML SSO
+
+<Note>
+  O cadastro com SAML não convida automaticamente os usuários para a sua Organização. Para gerenciamento automatizado de usuários e operações em massa, consulte [SCIM](/pt/teams/identity-and-access-management/scim).
+</Note>
+
+Depois que o SAML SSO estiver **Ativo**, seus usuários poderão fazer login em [replit.com](https://replit.com) usando o botão **Continuar com SSO**.
+
+## Perguntas Frequentes
+
+### O que acontece com usuários que já têm contas no replit.com antes do SAML SSO ser configurado?
+
+Depois que o SAML SSO for habilitado para a sua Organização, todos os usuários com domínios de e-mail SSO declarados serão obrigados a usar SSO para fazer login. Os usuários existentes não poderão mais usar seus métodos de autenticação anteriores (e-mail ou login social) se o e-mail deles corresponder ao domínio SSO. Eles não são adicionados automaticamente à sua Organização.
+
+### Os usuários são automaticamente desprovisionados no Replit quando meu IdP remove o acesso?
+
+Não, o SAML SSO cuida apenas da autenticação. Para provisionamento e desprovisionamento automatizado de usuários, você pode usar a integração [SCIM](/pt/teams/identity-and-access-management/scim), disponível para clientes Enterprise. O SCIM permite sincronizar o diretório do seu IdP para gerenciar automaticamente funções e provisionamento de usuários.
+
+### Os assentos da Organização são automaticamente consumidos quando os usuários recebem acesso no nosso IdP?
+
+Não, os assentos são consumidos apenas quando um usuário aceita o convite para a sua Organização.
+
+### O que acontece se a configuração do SAML falhar?
+
+O assistente reporta a falha com um indicador **Configuração falhou**, e o Replit reverte automaticamente qualquer provisionamento parcial. Clique em **Tentar novamente** para reiniciar o assistente, verifique novamente os valores do seu IdP e reenvie as credenciais. Se o erro persistir, entre em contato com o seu gerente de conta.
+
+### Como desabilito o SAML SSO?
+
+A desativação por autoatendimento ainda não é suportada. Entre em contato com o seu gerente de conta para desativar o SSO para a sua Organização. Você ainda pode editar domínios de e-mail declarados por conta própria no cartão **Autenticação** após a ativação.
+
+## Recursos Relacionados
+
+<CardGroup cols={2}>
+  <Card title="SCIM" icon="key" href="/pt/teams/identity-and-access-management/scim">
+    Saiba mais sobre como automatizar o gerenciamento de usuários com a integração SCIM
+  </Card>
+
+  <Card title="Grupos e Permissões" icon="shield" href="/pt/teams/identity-and-access-management/groups-and-permissions">
+    Entenda como gerenciar funções e acesso de usuários
+  </Card>
+</CardGroup>

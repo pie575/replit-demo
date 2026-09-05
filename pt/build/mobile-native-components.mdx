@@ -1,0 +1,134 @@
+---
+title: "Use componentes nativos do iOS"
+description: "Use alertas, folhas de ações, SF Symbols e outros componentes nativos do iOS no PixelGames."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const nativeAlertPrompt = `Quando um jogador tenta sair no meio de uma partida, mostre um alerta nativo perguntando "Sair do jogo? Seu progresso será perdido." com as opções Cancelar e Sair.`;
+export const nativeActionSheetPrompt = "Quando um jogador toca para alterar a foto de perfil, mostre a folha de ações nativa com as opções Câmera e Biblioteca de fotos, não um modal personalizado.";
+export const nativeSwitchesPrompt = "Adicione uma tela de Configurações com switches nativos para efeitos sonoros e feedback tátil.";
+export const sfSymbolsPrompt = "Use SF Symbols para os ícones de configurações e placar no iOS.";
+export const nativeShareSheetPrompt = "Deixe os jogadores compartilharem seu recorde usando a folha de compartilhamento nativa.";
+
+## Por que isso importa
+
+Todo iPhone já tem alertas, folhas de compartilhamento, switches e menus integrados, e os
+jogadores os usam em todos os outros apps que possuem. Quando seu app usa esses mesmos
+componentes nativos, os jogadores já sabem como eles funcionam antes mesmo de tocar em um,
+isso é o que faz parecer um app de iPhone real.
+
+Abaixo estão exemplos de prompts para componentes nativos que você pode adicionar ao seu app:
+alertas, folhas de ações, switches e mais.
+
+## Alertas nativos
+
+<AiPrompt>
+  {nativeAlertPrompt}
+</AiPrompt>
+
+Isso renderiza um alerta `UIAlertController` real, o mesmo estilo dos popups que o próprio iOS
+usa. Use um alerta quando houver uma decisão clara a confirmar.
+
+<Frame caption="O alerta nativo de Sair do jogo no PixelGames.">
+  <img src="/assets/mirror/native-alert-6e4b3fe19086.png" alt="Alerta nativo do iOS perguntando Sair do jogo? com as opções Cancelar e Sair" data-path="images/pixelgames/mobile/native-alert.png" width="1516" height="258" data-path="images/pixelgames/mobile/native-alert.png" />
+</Frame>
+
+## Folhas de ações nativas
+
+<AiPrompt>
+  {nativeActionSheetPrompt}
+</AiPrompt>
+
+Uma folha de ações é a irmã de um alerta, use-a quando houver algumas opções distintas para
+escolher, em vez de uma única decisão sim/não. O Android tem seu próprio equivalente nativo, o
+Agent escolhe o certo para cada plataforma automaticamente.
+
+<Frame caption="A folha de ações nativa para alterar a foto de perfil do PixelGames.">
+  <img src="/assets/mirror/native-action-sheet-8bd2e8bfb6ef.png" alt="Folha de ações nativa do iOS com as opções Tirar uma foto, Escolher da biblioteca e Escolher um avatar em pixel" data-path="images/pixelgames/mobile/native-action-sheet.png" width="1516" height="418" data-path="images/pixelgames/mobile/native-action-sheet.png" />
+</Frame>
+
+## Switches nativos
+
+<AiPrompt>
+  {nativeSwitchesPrompt}
+</AiPrompt>
+
+O mesmo switch on/off usado em todo o app Configurações do iOS, instantaneamente reconhecível,
+para que os jogadores não precisem descobrir um design de alternância personalizado.
+
+<Frame caption="Switches nativos para efeitos sonoros e feedback tátil nas Configurações do PixelGames.">
+  <img src="/assets/mirror/native-switch-1537c64d8ed7.png" alt="Switches nativos do iOS alternando efeitos sonoros e feedback tátil ligado e desligado" data-path="images/pixelgames/mobile/native-switch.png" width="1516" height="288" data-path="images/pixelgames/mobile/native-switch.png" />
+</Frame>
+
+## SF Symbols
+
+<AiPrompt>
+  {sfSymbolsPrompt}
+</AiPrompt>
+
+O SF Symbols é o conjunto de ícones integrado da Apple. Os símbolos combinam automaticamente
+com o tamanho, peso e modo escuro do texto ao redor, algo que um conjunto de ícones
+personalizado precisa ser construído manualmente para fazer.
+
+<Frame caption="SF Symbols usados para os ícones de efeitos sonoros e vibração nas Configurações.">
+  <img src="/assets/mirror/native-sf-46d879d1c2c1.png" alt="Ícones SF Symbols ao lado das configurações de Efeitos sonoros e Vibração" data-path="images/pixelgames/mobile/native-sf.png" width="1516" height="310" data-path="images/pixelgames/mobile/native-sf.png" />
+</Frame>
+
+<Note>
+  O SF Symbols é exclusivo do iOS. Peça ao Agent para escolher um conjunto de ícones equivalente
+  para o Android, os ícones não serão idênticos entre as plataformas, e isso é esperado.
+</Note>
+
+## Folha de compartilhamento nativa
+
+<AiPrompt>
+  {nativeShareSheetPrompt}
+</AiPrompt>
+
+Abre a mesma folha de compartilhamento do sistema usada pelo Fotos ou Safari, então ela lista
+quaisquer apps que o jogador já tenha instalado.
+
+<Frame caption="Compartilhando um recorde do PixelGames pela folha de compartilhamento nativa.">
+  <img src="/assets/mirror/native-share-c28a7af1c6d7.png" alt="Folha de compartilhamento nativa do iOS compartilhando um recorde do PixelGames" data-path="images/pixelgames/mobile/native-share.png" width="1516" height="630" data-path="images/pixelgames/mobile/native-share.png" />
+</Frame>
+
+## Solução de problemas
+
+* **O alerta ou a folha de ações mostra um modal personalizado em vez do nativo:** confirme
+  que o Agent usou a API nativa em vez de uma imitação renderizada em JS, eles podem parecer
+  semelhantes mas se comportam de forma diferente.
+* **Ícones parecem errados no Android:** esperado especificamente para o SF Symbols, ele é
+  exclusivo do iOS. Pergunte ao Agent qual conjunto de ícones alternativo ele usou.
+* **A folha de compartilhamento não inclui um app que você esperava:** isso é controlado pelo
+  sistema operacional e pelos apps instalados no dispositivo de teste, não é algo que o
+  PixelGames possa adicionar diretamente.
+
+## O que vem a seguir
+
+<CardGroup cols={2}>
+  <Card title="Acessar contatos" icon="address-book" href="/pt/build/mobile-contacts">
+    Combine a folha de compartilhamento com links de convite.
+  </Card>
+
+  <Card title="Pré-visualize e teste no seu celular" icon="mobile" href="/build/mobile-preview-testing">
+    Confirme que os componentes nativos são renderizados corretamente no dispositivo.
+  </Card>
+</CardGroup>
+
+## Relacionado
+
+* [Adicione feedback tátil](/pt/build/mobile-haptics)

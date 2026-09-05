@@ -1,0 +1,145 @@
+---
+title: "ブランドの言及を監視する"
+description: "ブランドに関する重要な会話を見つけて、チームがすでに使っている場所に送ります。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+X上でのブランドの言及を監視し、重要な会話を検出し、センチメントと文脈を要約し、関連する言及をSlackに送信し、Notionにアーカイブします。Agentはノイズを無視し、返信が必要なものだけにフラグを立てるので、サポートや広報の問題になる前に急増を察知できます。
+
+## こんな人におすすめ
+
+* サポートや広報の問題になる前に、センチメントの急増を把握したいブランド・コミュニティマネージャー。
+* すべての言及ではなく、返信が必要な言及だけを知りたいソーシャル・サポート担当者。
+
+## コネクタ
+
+<Connectors
+  items={[
+{
+  id: "x",
+  name: "X",
+  why: "公開されている言及や会話の情報源",
+  auth: "api-key",
+},
+{
+  id: "slack",
+  name: "Slack",
+  why: "返信が必要な言及があればチームに通知",
+},
+{ id: "notion", name: "Notion", why: "後で見直せるよう要約をアーカイブ" },
+]}
+/>
+
+## 始める前に
+
+気になるブランド名やアカウント、アラート用のSlackチャンネル、アーカイブ用のNotionデータベースを用意してください。
+
+Agentは**Xのベアラートークン**を尋ねてきます。[console.x.com](https://console.x.com)でアカウントを作成し、ベアラートークンを生成してください。
+
+Xの開発者アカウントにクレジットを追加してください。クレジットがないと、Xでの言及検索は失敗します。
+
+## Agentへのプロンプト
+
+<AiPrompt>
+  毎朝8時に実行されるルーティンを作成してください。X上での\[ブランド]の言及を
+  監視してください。重要な会話を検出し、センチメントと文脈を要約し、関連する
+  言及をSlackに送信し、Notionにアーカイブしてください。ノイズは無視してくだ
+  さい。返信が必要なものにはフラグを立ててください。
+</AiPrompt>
+
+## 期待できること
+
+Agentは言及を監視し、どれが重要かをスコアリングし、Slackに短い要約を投稿し、Notionにスレッドを保存します。最初のバッチを確認し、「重要」の基準を調整してください。言及が全く入ってこない場合は、ベアラートークンが設定されているか、X開発者アカウントにクレジットがあるかを確認してください。最初の朝の実行後、Slackのアラートを開いてXにリンクをたどり、Notionの行に同じリンクがあることを確認してください。
+
+## 自分向けにカスタマイズする
+
+<AiPrompt>
+  ネガティブなセンチメントか、いいねが\[n]件を超える言及だけをSlackに
+  アラートしてください。それ以外はすべてNotionにアーカイブしてください。
+</AiPrompt>
+
+<AiPrompt>
+  上位5件の言及と全体のセンチメントを含む日次ダイジェストをSlackに追加して
+  ください。
+</AiPrompt>
+
+## トラブルシューティング
+
+* **言及が全く入ってこない:** Xのベアラートークンが設定されているか、X開発者アカウントにクレジットがあるかを確認してください。クレジットがないと、有効なトークンがあっても言及検索は失敗します。
+* **Slackは静かなのにNotionだけが増えていく:** Agentがすべてをノイズとして扱っている可能性があります。「重要」の基準を厳しくするか、返信が不要な場合でも日次ダイジェストを投稿するよう依頼してください。
+* **アーカイブが乱雑になる:** すでに使っている列(日付、リンク、センチメント、返信要否)があるNotionデータベースをAgentに指定してください。毎回新しいページを作るのではなく、それらのフィールドにマッピングするよう依頼してください。
+
+## 関連項目
+
+<CardGroup cols={2}>
+  <Card title="顧客フィードバックを分析する" href="/ja/use-cases/analyze-customer-feedback">
+    サポートチケット向けに同じSlackとNotionの構成を使います。
+  </Card>
+
+  <Card title="競合を監視する" href="/ja/use-cases/monitor-competitors">
+    競合サイト向けに同じSlackアラートとNotionアーカイブを使います。
+  </Card>
+</CardGroup>

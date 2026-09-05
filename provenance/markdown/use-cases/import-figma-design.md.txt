@@ -1,0 +1,142 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Go from Figma to a live App
+
+> Turn Figma frames into a publishable Replit app that matches layout, type, and color.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+You already have screens in Figma. Agent builds them as a live Replit app you can edit,
+preview, and publish: layout, type, colors, and spacing. The result is a working product,
+not a screenshot. Point Agent at specific frames if the file has more than one flow.
+
+## Best for
+
+* Product designers who need a coded Replit app from frames they already have.
+* Founders who have a Figma file and need it live without rebuilding from a blank page.
+
+## Connectors
+
+<Connectors
+  items={[
+{
+  id: "figma",
+  name: "Figma",
+  why: "Frames, components, type, and colors to implement",
+},
+]}
+/>
+
+## Before you start
+
+Have a Figma file with named frames (home, product, checkout, and so on). Connect Figma.
+Share the file with Agent, or paste the file link and the frame links you care about. Say
+whether this is a marketing site, an app, or a single landing page.
+
+## Prompt the agent
+
+<AiPrompt>
+  From this Figma file \[link], build a live Replit app from these frames: \[frame
+  names or links]. Match layout, typography, colors, spacing, and breakpoints
+  (desktop and mobile).
+</AiPrompt>
+
+## What to expect
+
+Agent reads the selected frames and builds matching pages you can publish from Replit. Spot-check spacing,
+type, and colors against Figma. Review interactive bits (nav, forms, hover) yourself. They
+often need a second pass. Preview on desktop and at a phone width. Click nav and forms,
+then compare a screenshot to Figma before you publish.
+
+## Make it work for you
+
+<AiPrompt>
+  Implement only the mobile frames first. Match the Figma auto-layout and
+  spacing. Desktop comes after I approve mobile.
+</AiPrompt>
+
+<AiPrompt>
+  Reuse one component for buttons, inputs, and cards. Pull colors and type from
+  Figma variables if they exist.
+</AiPrompt>
+
+## Troubleshooting
+
+* **Agent can't read the file:** connect Figma, share the file, and paste the frame links, not only the file URL. Name the frames (home, product, checkout) if the file has more than one flow.
+* **Hover, nav, or forms feel unfinished:** layout and color often land first. Ask for a second pass on interactive bits, and spot-check spacing against Figma.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Design a landing page" href="/use-cases/design-landing-page">
+    For product designers who need frames first, from a Notion brief.
+  </Card>
+
+  <Card title="Build an online store" href="/use-cases/build-online-store">
+    For founders and product designers who need a Shopify storefront next.
+  </Card>
+</CardGroup>

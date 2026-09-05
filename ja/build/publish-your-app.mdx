@@ -1,0 +1,230 @@
+---
+title: "アプリを公開する"
+description: "リリース設定を選び、アプリを公開し、公開後のバージョンを確認し、ローンチ後にモニタリングしましょう。"
+---
+
+export const PublishingPlanAvailability = () => <Note>
+    Publishing is available on every plan. Starter includes {FreeDeployments}
+    published app, which expires after 30 days and can be republished. Core and
+    Pro include additional publishing options. See [Deployment
+    pricing](/billing/deployment-pricing) and [Starter
+    plan](/billing/plans/starter-plan) for current limits.
+  </Note>;
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+**Preview** でアプリを構築してテストしたら、次は他の人に使ってもらいたくなるはずです。PreviewのURLは一時的なもので、開発用です — 一般に配布するためのリンクではありません。開いてみると、安全に共有するための公開についてバナーが案内します。
+
+<Frame>
+  <img src="/assets/mirror/00-development-preview-banner-938d35d8ae00.jpg" alt="GatherのURLは一時的なものであり、安全な共有のためにアプリを公開する必要があることを説明するバナーが表示された開発プレビュー" width="1280" height="720" data-path="images/publish-gather/00-development-preview-banner.jpg" />
+</Frame>
+
+公開すると**本番デプロイメント**が作成されます — 専用のURLで動作する、安定した共有可能なバージョンのアプリです。開発プレビューは構築とテストを行う場所で、本番デプロイメントは訪問者が使うバージョンです。両者は分かれているため、再度公開するまでライブ版を変更することなく作業を続けられます。
+
+公開はPreviewを公開状態にするだけではありません。Replitがアプリをパッケージ化し、必要なリソースをプロビジョニングし、リリースをチェックし、ドメインを公開されたデプロイメントにルーティングします。
+
+<YouTubeEmbed videoId="ski8_MUYO4M" title="Replitでアプリを公開する" />
+
+## 公開する前に
+
+バナーをたどったり **Publish** を開いたりする前に、Previewを使ってメインのユーザージャーニーをテストし、対応する画面サイズでレイアウトを確認し、Agentから報告されたエラーを修正してください。公開すると現在のバージョンが他の人に利用可能になるため、シークレットや非公開のテストデータをアプリに含めないようにしましょう。
+
+## アプリを公開する
+
+<Steps>
+  <Step title="Publishダイアログを開く">
+    開発プレビューのバナーで **Publish your app** を選択すると、公開フローに戻ります。プロジェクトを自分で開き、BuildまたはDesignで作業中にプロジェクトエディタの右上にある **Publish** を選択することもできます。
+
+    <Tip>
+      プロンプトボックスでAgentに次のように依頼することもできます: `Publish this app.` Agentがリリースを準備するか、必要な確認へ案内します。
+    </Tip>
+  </Step>
+
+  <Step title="ドメインとアクセス設定を選ぶ">
+    **ドメイン**は訪問者がデプロイメントにアクセスするために使うアドレスです。生成された `.replit.app` ドメインを確認し、必要であれば利用可能な名前に変更してください。次に、誰がアプリを開けるかを決める**アクセスレベル**を選びます:
+
+    * **Public**：リンクを持つすべての人がアプリを利用できます。
+    * **Password protected**：訪問者は共有パスワードを入力する必要があります。
+    * **Workspace only**：アクセスをワークスペースのメンバーに限定します。
+    * **Invite only**：選択した個人またはグループにアクセスを限定します。
+
+    各オプションの詳細については、[アプリのアクセス](/ja/features/publishing/private-deployments)をご覧ください。
+
+    訪問者が公開済みアプリからフィードバックを送信できるように、フィードバックウィジェットを有効にすることもできます。
+
+    <Frame>
+      <img src="/assets/mirror/01-publish-settings-733fb21c48f5.jpg" alt="生成されたドメイン、公開アクセス設定、フィードバックウィジェット、セキュリティレビュー、Publishボタンが表示されたGatherのPublishダイアログ" width="1280" height="720" data-path="images/publish-gather/01-publish-settings.jpg" />
+    </Frame>
+
+    <PublishingPlanAvailability />
+  </Step>
+
+  <Step title="セキュリティを確認して公開する">
+    **Review security** を選択して、ライブになる前にリリースを確認します。ドメイン、アクセス、セキュリティ設定の準備ができたら、**Publish** を選択します。
+
+    Replitがデプロイメントをプロビジョニングし、セキュリティチェックを実行し、アプリをビルド・バンドルし、リリースをプロモートします。プロビジョニングはクラウドリソースを準備し、ビルドとバンドルはプロジェクトを本番環境向けのパッケージに変換し、プロモートはそのパッケージをライブバージョンにします。ステージが完了するまでプロジェクトを開いたままにしてください。
+
+    <Frame>
+      <img src="/assets/mirror/02-publishing-progress-1eda9fe3099f.jpg" alt="リリース開始後、公開が進行中であることを示すGatherプロジェクト" width="1280" height="720" data-path="images/publish-gather/02-publishing-progress.jpg" />
+    </Frame>
+  </Step>
+
+  <Step title="公開されたアプリを開いて確認する">
+    公開が完了すると、Replitはデプロイメントのステータスと公開URLを表示します。URLを開き、開発プレビューだけでなくライブアプリをテストして、そのページと最も重要な操作が期待どおりに動作することを確認してください。
+
+    <Frame>
+      <img src="/assets/mirror/03-published-project-673907839521.jpg" alt="公開後、成功した本番ステータスとライブURLを示すGatherプロジェクト" width="1280" height="720" data-path="images/publish-gather/03-published-project.jpg" />
+    </Frame>
+
+    <Frame>
+      <img src="/assets/mirror/04-live-site-c16b8b42d58a.jpg" alt="公開URLで開いている、公開済みのGatherワークショップ発見アプリ" width="1280" height="720" data-path="images/publish-gather/04-live-site.jpg" />
+    </Frame>
+  </Step>
+</Steps>
+
+## 公開済みプロジェクトを理解する
+
+公開後、プロジェクトには関連する2つの部分があります: 引き続き構築する編集可能なプロジェクトと、現在訪問者にサービスを提供している本番デプロイメントです。**Tools** を開いて、その本番環境を確認・管理しましょう。
+
+**Publishing** パネルはデプロイメントの概要です。最新のリリースが成功したかどうか、誰がアクセスできるか、どこで実行されているか、どのようにホストされているか、どのリソースを使用できるか、どのドメインが紐づいているかを表示します。
+
+**デプロイメントタイプ**は、Replitがアプリをどのように実行するかを表します。**Autoscale**はトラフィックの変化に応じてマシンを追加起動します。**Reserved VM**はマシンを常時利用可能な状態に保ちます。**Static**は実行中のバックエンドを必要としないファイルを配信し、**Scheduled**はプログラムをタイムテーブルに沿って実行します。比較するには[デプロイメントタイプ](/ja/features/publishing/deployment-types)をご覧ください。
+
+**マシンの性能**は各インスタンスで利用できるCPUとメモリです。最大マシン数はAutoscaleがどこまで拡張できるかを制限します。[マシンの設定](/ja/features/publishing/machine-configuration)をご覧ください。リソースを増やすとキャパシティが向上しますが、利用コストも増加します。
+
+**デプロイメントの地域**はアプリが実行されるリージョンを制御します。ほとんどの訪問者に近いリージョンを選ぶと、レイテンシを削減できます。[プロジェクトの地域](/ja/features/publishing/project-geography)をご覧ください。
+
+アプリとプランによっては、**Adjust settings** または **Manage** から、本番用のシークレットや関連する公開オプションと合わせてこれらのコントロールにアクセスできます。
+
+これらはオプションの本番向けコントロールです。一般的なアプリを共有するために変更する必要はなく、一部の変更は可用性や利用コストに影響する場合があります。
+
+<Frame>
+  <img src="/assets/mirror/07-resource-settings-0ecee90f1279.jpg" alt="マシンの性能、CPUとRAM、最大マシン数、推定コンピュート使用量を示すGatherのAutoscaleマシン設定" width="1280" height="720" data-path="images/publish-gather/07-resource-settings.jpg" />
+</Frame>
+
+### リリースをモニタリングする
+
+**Monitoring**は本番環境に関する問いに答えます: *アプリは健全に動作し、きちんと応答しているか？* **Tools** パネルの **Replit Cloud** の下にある **Monitoring** を開きます。リクエスト、HTTPステータス、応答時間、CPU使用率、メモリ使用率が表示されます。ステータスコードは失敗したリクエストを示し、応答時間は遅い応答を示します。CPUとメモリのグラフはリソースの限界を特定するのに役立ちます。新しいリリースはライブアプリがトラフィックを受け取るまでデータがほとんど表示されないことがあります。詳しくは[公開済みアプリのモニタリング](/ja/features/publishing/monitoring-a-deployment)をご覧ください。
+
+<Frame>
+  <img src="/assets/mirror/05-monitoring-2da17ab4d843.jpg" alt="アプリケーションのリクエストメトリクスとインフラのCPU・メモリグラフを示すGatherのMonitoringパネル" width="1280" height="720" data-path="images/publish-gather/05-monitoring.jpg" />
+</Frame>
+
+### トラフィックと成長を確認する
+
+**Growth**は別の問いに答えます: *人々はアプリを見つけて利用しているか？* **Tools** パネルの **Replit Cloud** の下にある **Growth** を開きます。基本的な指標には、訪問者数、上位ページ、リファラー、国、ブラウザ、デバイスが含まれます。これらは、オーディエンスがどこから来て何に関心を持っているかを示します。[SEOスコア](/ja/features/publishing/seo-rating)は、公開済みページが検索エンジン向けにどれだけ最適化されているかを測定します。有料プランのビルダーは[SEO Agent](/ja/features/publishing/seo-agent)を使って改善点をスキャンできます。分析データは公開済みアプリがトラフィックを受け取った後に表示されます。
+
+<Frame>
+  <img src="/assets/mirror/06-growth-analytics-5355db7c4d65.jpg" alt="公開済みアプリのSEOステータスと基本的な訪問者分析を示すGatherのGrowthパネル" width="1280" height="720" data-path="images/publish-gather/06-growth-analytics.jpg" />
+</Frame>
+
+## 公開済みアプリを更新する
+
+プロジェクトエディタでの変更は、ライブリリースを自動的に置き換えることはありません。この分離により、訪問者に影響を与えることなく変更を準備・テストできます。**Preview** で変更をテストし、準備ができたら **Republish** を選択してください。再公開すると同じURLで新しい本番リリースが作成されるため、訪問者に新しいリンクを送る必要はありません。
+
+再公開後、再度公開URLを開いて変更した動作を確認してください。リリースが失敗した場合は、再試行する前に公開ステータスとログを使って失敗したステージを特定してください。
+
+## 次のステップ
+
+<section className="chat-mkt chat-workflow-grid has-visuals catalog-three-up">
+  <a className="chat-example has-visual" href="/ja/build/add-custom-domain">
+    <div className="chat-use-case-visual palette-blush">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="globe" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="globe" size={19} />
+    </span>
+
+    <div className="chat-card-title">カスタムドメインを追加する</div>
+    <p>`.replit.app` の代わりに独自ドメインを使用しましょう。</p>
+    <div className="chat-card-link">続ける →</div>
+  </a>
+
+  <a className="chat-example has-visual" href="/ja/learn/projects-and-artifacts/replit-deployments">
+    <div className="chat-use-case-visual palette-stone">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="server" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="server" size={19} />
+    </span>
+
+    <div className="chat-card-title">デプロイメントの種類</div>
+    <p>Autoscale、Reserved VM、Static、Scheduledデプロイメントを比較しましょう。</p>
+    <div className="chat-card-link">デプロイメントを比較する →</div>
+  </a>
+
+  <a className="chat-example has-visual" href="/ja/build/troubleshooting">
+    <div className="chat-use-case-visual palette-ink">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="triangle-exclamation" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="triangle-exclamation" size={19} />
+    </span>
+
+    <div className="chat-card-title">公開のトラブルシューティング</div>
+    <p>よくある公開の問題とその解決方法を確認しましょう。</p>
+    <div className="chat-card-link">トラブルシューティングする →</div>
+  </a>
+</section>

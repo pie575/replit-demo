@@ -1,0 +1,144 @@
+---
+title: "Frames"
+description: "Les types de frame, la barre d'actions par frame, et les actions Build et Focus sur Canvas."
+sidebarTitle: "Frames"
+icon: "square-dashed"
+---
+
+Chaque tuile sur le Canvas est une **frame**. Les frames sont ce que vous sélectionnez, faites glisser et sur quoi vous agissez. Cette page couvre les types de frame, la barre d'actions par frame qui apparaît à la sélection, et les capacités que vous déclenchez depuis celle-ci : Build et Focus.
+
+<Frame>
+  <img src="/assets/mirror/canvas-overview-d32e8d2ab073.png" alt="Canvas avec trois frames disposées sur le tableau : un Website (Scroll Hero), un APEX X1 Design System, et une maquette Design de la supercar APEX X1, avec la barre d'outils flottante (Chat, Draw, Edit, Generate) en bas" width="2000" height="1255" data-path="images/replitai/canvas-overview.png" />
+</Frame>
+
+## Types de frame
+
+Les deux types principaux sont les **Artifacts** (surfaces vivantes, adossées à une application) et les **Designs** (maquettes). L'en-tête en haut à gauche de la frame indique de quel type il s'agit.
+
+| Type            | Étiquette d'en-tête           | Adossé à                         | Interagit comme une application vivante ? | Convertible en véritable application ?                        |
+| --------------- | ----------------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
+| Artifact        | **Website**, **Slides**, etc. | Un artifact en cours d'exécution | Oui                                       | Déjà une application.                                         |
+| Mobile artifact | **Mobile app**                | Un artifact en cours d'exécution | Oui (dans le simulateur)                  | Déjà une application.                                         |
+| Design          | **Design**                    | Maquette statique / interactive  | Frame interactive uniquement              | Oui — via le menu **Build…** par frame. Voir [Build](#build). |
+| Image           | **Image**                     | PNG / JPG généré                 | Non                                       | Non — à utiliser comme référence.                             |
+| Video           | **Video**                     | Vidéo générée                    | Non                                       | Non.                                                          |
+| Vector graphic  | **Graphic**                   | SVG généré                       | Non                                       | Non — à intégrer dans une véritable application.              |
+
+<Note>
+  Le fait qu'une frame Design se comporte comme une image statique ou comme un prototype interactif dépend de la capacité **Interactive frames**. Lorsqu'elle est activée, les frames Design répondent aux clics et aux saisies de formulaire comme une véritable page ; sinon, elles s'affichent comme un instantané que vous pouvez itérer mais pas parcourir en cliquant.
+</Note>
+
+## Aperçu sur différents appareils
+
+Voyez à quoi ressemble un design sur différentes tailles d'écran. Demandez à Agent de vous montrer une version mobile, tablette ou ordinateur, par exemple « Montre-moi la version mobile de cette page », et il génère une frame à cette taille :
+
+* **Mobile** : 390 × 844
+* **Tablet** : 768 × 1024
+* **Desktop** : 1280 × 720
+
+## Barre d'actions par frame
+
+La sélection d'une frame fait apparaître une barre d'actions. Les actions dépendent du type de la frame.
+
+### Frames Artifact et Design
+
+Pour les frames Artifact (Website, Slides, etc.) et Design, la barre d'actions s'étend sur toute la largeur en haut de la frame.
+
+<Frame caption="La barre d'actions d'une frame Design : Build…, Focus, et plus d'options.">
+  <img src="/assets/mirror/canvas-frame-action-bar-86f90fdd1375.png" alt="Canvas avec une frame Design APEX X1 sélectionnée, montrant la barre d'actions par frame en haut avec l'étiquette de type et les actions Build, Focus et plus d'options, la frame attachée sous forme de puce dans la zone de prompt du chat" width="2000" height="1290" data-path="images/replitai/canvas-frame-action-bar.png" />
+</Frame>
+
+Le groupe d'actions se réduit en icônes sur les largeurs étroites et révèle les libellés au fur et à mesure que la frame s'élargit. L'ensemble complet, dans l'ordre de gauche à droite :
+
+| Action   | Ce que ça fait                                                                                                                                                                                                    |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export   | Télécharge la frame en PNG. Voir [Exporter une frame en PNG](/fr/design/canvas#export-a-frame-as-png).                                                                                                            |
+| Build…   | Ouvre un menu listant chaque Artifact du projet — choisissez-en un pour y appliquer le design, ou choisissez **Build this design** pour créer un nouvel Artifact. Frames Design uniquement. Voir [Build](#build). |
+| Focus    | Passe en mode focus, en développant la frame comme vue principale.                                                                                                                                                |
+| More (…) | Actions supplémentaires sur la frame. Copier, dupliquer, réorganiser et exporter se trouvent aussi dans le [menu du clic droit](/fr/design/canvas#right-click-menu) du tableau.                                   |
+
+Les frames d'application (Website, Slides, Mobile app) affichent Focus et plus d'options ; les frames Design ajoutent Build… avant celles-ci. Pour créer de nouvelles directions à partir d'une frame sélectionnée, suivez ses [suggestions](/fr/design/explore-suggestions).
+
+Sélectionner une frame l'attache aussi au prochain message de chat Agent sous forme d'instantané — voir [Ce qui se trouve sur le canvas](/fr/design/canvas#what-lives-on-the-canvas).
+
+<Note>
+  La barre d'actions respecte le **mode lecture seule**. Lorsque Canvas est verrouillé dans un contexte de tâche en arrière-plan, les actions d'itération se masquent et seul Focus reste disponible.
+</Note>
+
+### Frames média
+
+Les frames Image, Video et Vector graphic affichent une petite barre d'actions flottante au-dessus de la frame. Les trois types partagent :
+
+* **Replace media** : téléversez un nouveau fichier pour le substituer dans la frame, en conservant sa position et sa taille sur Canvas.
+* **Download** : enregistrez le fichier média sur votre ordinateur.
+* **Alt text** : ajoutez un texte alternatif pour l'accessibilité et afin qu'Agent dispose de plus de contexte lorsque la frame est référencée.
+
+<Frame caption="La barre d'actions d'une frame vidéo : Replace media, Download et Alt text.">
+  <img src="/assets/mirror/canvas-frame-video-actions-905585560e90.png" alt="Une frame vidéo sélectionnée d'une supercar bleue sur Canvas avec sa barre d'actions flottante au-dessus, montrant Replace media, Download (avec une infobulle indiquant « Download original ») et les contrôles Alt text." width="2000" height="1252" data-path="images/replitai/canvas-frame-video-actions.png" />
+</Frame>
+
+Les frames Image ajoutent deux contrôles supplémentaires :
+
+* **Crop** : rognez l'image directement sur Canvas.
+* **Generate video** : générez un clip vidéo à partir de l'image.
+
+<Frame caption="La barre d'actions d'une frame image ajoute Crop et Generate video.">
+  <img src="/assets/mirror/canvas-frame-image-actions-aae1378db7e3.png" alt="Une frame image sélectionnée d'une supercar jaune sur Canvas avec sa barre d'actions flottante au-dessus, montrant les contrôles Replace media, Crop, Download, Alt text et Generate video." width="1600" height="1002" data-path="images/replitai/canvas-frame-image-actions.png" />
+</Frame>
+
+## Explorer de nouvelles directions
+
+Sélectionner une frame fait apparaître des [suggestions](/fr/design/explore-suggestions) à côté d'elle : des directions en un clic ancrées dans ce que vous regardez, comme une mise en page différente, une nouvelle ambiance, ou une page que votre design sous-entend. Chacune se génère sous forme de nouvelle frame à côté de la source, de sorte que l'originale reste intacte et que vous puissiez comparer.
+
+<Frame>
+  <img src="/assets/mirror/ambient-iq-0989ea31bce7.png" alt="Une frame Website sélectionnée montrant une image principale d'une supercar APEX X1, avec un panneau Suggested next steps à côté proposant des puces de suggestion telles que Explore different approaches, Try different layouts, Explore different vibes et Surprise me" width="2000" height="1254" data-path="images/design/replit-design/ambient-iq.png" />
+</Frame>
+
+## Build
+
+Le menu **Build…** sur une frame Design sélectionnée fait passer le design au rang d'application vivante et fonctionnelle. Le même menu couvre aussi l'application du design à un Artifact déjà existant.
+
+<Frame>
+  <img src="/assets/mirror/canvas-build-menu-f06b8b8b455f.png" alt="Le menu Build ouvert sur une frame Design sélectionnée (APEX X1 Exact Replica) avec l'en-tête « Build or apply your designs », montrant « Build this design », qui crée un nouvel artifact, et « Apply to an existing creation » listant l'APEX X1 Design System du projet et son site Scroll Hero" width="2000" height="1153" data-path="images/replitai/canvas-build-menu.png" />
+</Frame>
+
+### Build this design
+
+Choisir **Build this design** dans le menu démarre un nouvel Artifact à partir de la frame Design sélectionnée. Le nouvel Artifact atterrit dans la liste des artifacts du projet et devient une application vivante et fonctionnelle. Build nécessite Core ou Pro.
+
+### Apply to an existing Artifact
+
+Le menu Build… liste chaque Artifact du projet. En choisir un applique les changements du Design sélectionné à cet Artifact — Agent réécrit le code de l'Artifact pour correspondre au design, en laissant la frame Design sur le Canvas pour référence.
+
+## Mode focus
+
+Le mode focus vous permet de travailler avec une frame sélectionnée en taille réelle tout en restant dans Design.
+
+<Steps>
+  <Step title="Choisir Focus sur une frame">
+    Sélectionnez une frame, puis choisissez **Focus** dans sa barre d'actions.
+
+    <Frame caption="L'action Focus dans la barre d'actions d'une frame sélectionnée.">
+      <img src="/assets/mirror/focus-before-0c9ced9218d9.png" alt="Une frame Design sélectionnée sur Canvas avec l'action Focus mise en évidence dans la barre d'actions de la frame." width="2000" height="1254" data-path="images/design/replit-design/focus-before.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Travailler en taille réelle">
+    La frame remplit la vue, ce qui vous permet de travailler dessus de près sans le reste du tableau.
+
+    <Frame caption="Mode focus">
+      <img src="/assets/mirror/focus-mode-24da418577ae.png" alt="Mode focus montrant une frame Design remplissant la vue et un bouton Exit focus en haut du tableau." width="2000" height="1254" data-path="images/design/replit-design/focus-mode.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Revenir au canvas">
+    Sélectionnez **Exit focus** en haut du tableau pour revenir au canvas.
+  </Step>
+</Steps>
+
+## Pages liées
+
+* [Canvas](/fr/design/canvas) — vue d'ensemble et anatomie.
+* [Toolbar](/fr/design/toolbar) — la barre d'outils flottante ; Generate crée de nouvelles frames.
+* [Elements](/fr/design/elements) — les éléments individuels à l'intérieur d'une frame.
+* [Visual Editor](/fr/design/visual-editor) — modifications au niveau des éléments à l'intérieur d'une frame en focus.

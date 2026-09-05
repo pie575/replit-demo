@@ -1,0 +1,56 @@
+---
+title: "커스텀 도메인 및 DNS"
+description: "일반적인 커스텀 도메인 질문에 대한 답변—도메인 연결, SSL 및 인증 문제 해결, Clerk 인증 설정."
+---
+
+이 답변은 커스텀 도메인 연결 및 문제 해결을 다룹니다. 전체 참조는 [커스텀 도메인 추가](/ko/build/add-custom-domain) 및 [커스텀 도메인](/ko/features/publishing/custom-domains)을 참조하세요.
+
+<AccordionGroup>
+  <Accordion title="Replit 앱에 커스텀 도메인을 어떻게 연결하나요?">
+    Replit을 통해 도메인을 구매한 경우 DNS 레코드가 자동으로 관리됩니다—**Publishing → Domains**를 열고 제품 내 설정을 따르세요. [도메인 구매](/ko/build/domain-purchasing)를 참조하세요.
+
+    외부 등록 기관의 도메인을 연결하려면:
+
+    1. 프로젝트를 열고 **Publishing → Domains**로 이동합니다.
+    2. **Connect your own domain**을 선택하고 도메인을 입력한 다음 계속합니다.
+    3. Replit이 A 레코드와 TXT 레코드를 표시합니다—둘 다 복사하세요.
+    4. DNS 제공업체에서 두 레코드를 추가합니다.
+    5. Replit으로 돌아가 인증을 시작합니다.
+
+    몇 가지 중요한 참고 사항:
+
+    * SSL을 위해 A 레코드와 TXT 레코드가 모두 필요합니다. 루트(apex) CNAME은 지원되지 않습니다—루트 도메인에는 A 레코드를 사용하세요.
+    * 와일드카드 인증서(`*.example.com`)는 지원되지 않습니다. 각 서브도메인을 개별적으로 연결하세요.
+    * Cloudflare에서는 A 레코드를 **DNS only**(회색 클라우드)로 설정하여 프록시 모드가 SSL 설정을 차단하지 않도록 하세요.
+    * DNS 변경 사항은 전파되는 데 최대 48시간이 소요될 수 있습니다.
+
+    전체 참조는 [커스텀 도메인](/ko/features/publishing/custom-domains)을 참조하세요.
+  </Accordion>
+
+  <Accordion title="도메인이 인증되지 않거나 SSL이 프로비저닝되지 않습니다—어떻게 문제를 해결하나요?">
+    다음 확인 사항을 순서대로 진행하세요—대부분의 문제는 그 중 하나에서 발생합니다:
+
+    1. **DNS 전파를 기다리세요.** 변경 사항은 최대 48시간이 소요될 수 있습니다. DNS 조회 도구로 레코드가 전 세계에서 표시되는지 확인하세요.
+    2. **AAAA 레코드를 제거하세요.** A 레코드와 동일한 호스트명의 IPv6(AAAA) 레코드가 SSL을 차단할 수 있습니다.
+    3. **이전 또는 충돌하는 A 레코드를 제거하세요.** 루트 도메인에서 Replit을 가리키는 A 레코드를 하나만 유지하세요.
+    4. **Cloudflare를 DNS only로 설정하세요.** 주황색 클라우드(프록시 모드)가 SSL 프로비저닝을 방해합니다.
+    5. **Publishing → Domains → Manage**에서 도메인을 연결 해제 후 다시 연결하여 새 인증서를 강제로 발급받고 몇 분 기다린 후 새로고침하세요.
+    6. **CAA 레코드를 확인하세요.** CAA 레코드가 있는 경우 Replit이 Let's Encrypt를 통해 인증서를 발급하므로 최소 하나의 레코드가 Let's Encrypt를 발급자로 허용해야 합니다.
+
+    이 확인 사항은 외부 등록 도메인에 적용됩니다. Replit을 통해 도메인을 구매한 경우 [Replit 지원팀에 문의](https://replit.com/support)하세요. [커스텀 도메인](/ko/features/publishing/custom-domains)을 참조하세요.
+  </Accordion>
+
+  <Accordion title="커스텀 도메인에서 Clerk 인증을 어떻게 설정하나요?">
+    커스텀 도메인에서 [Clerk 인증](/ko/features/auth-and-identity/clerk-auth)을 사용할 때 일반적으로 몇 가지 문제가 발생합니다:
+
+    * **"Clerk CNAME records required" 경고.** 이것은 Clerk 통합 요구 사항이며 도메인 인증이나 SSL을 차단하지 않습니다. **Publishing → Domains**를 열고 **Manage**를 선택한 다음 인증 DNS 설정 섹션을 찾아 각 CNAME 레코드를 DNS 제공업체에 정확히 추가하세요. 섹션이 표시되지 않으면 도메인을 연결 해제 후 다시 연결하세요.
+    * **이전 Clerk 사용 후 도메인이 인증 중에 멈춤.** 도메인이 다른 Clerk 애플리케이션에 연결되어 있었다면 [Clerk 대시보드](https://dashboard.clerk.com)에서 제거한 다음 Replit에서 도메인을 연결 해제 후 다시 연결하세요.
+    * **자체 Clerk 인스턴스로 마이그레이션.** Replit 관리 Clerk에서 자체 인스턴스로 전환하려면 수동 단계가 필요합니다—[Replit 지원팀에 문의](https://replit.com/support)하세요. [자체 Clerk 앱을 사용할 수 있나요?](/ko/features/auth-and-identity/clerk-auth#can-i-bring-my-own-clerk-app-instead-of-using-the-replit-managed-one)를 참조하세요.
+
+    여전히 막혀 있다면 도메인 이름, 프로젝트 이름, 이미 시도한 내용을 포함하여 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+  </Accordion>
+</AccordionGroup>
+
+## 도움이 더 필요하신가요?
+
+여기서 도메인 질문의 답변을 찾을 수 없다면 [Replit 지원팀에 문의](https://replit.com/support)하세요.

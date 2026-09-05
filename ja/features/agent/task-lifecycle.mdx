@@ -1,0 +1,491 @@
+---
+title: "タスクライフサイクル"
+description: "タスクの状態、キューに入った作業、変更の適用、アーカイブ、Agent タスクのキャンセルを理解しましょう。"
+---
+
+export const TaskCard = ({title = "Product Manager next steps discussion", description = "", status = "draft", timestamp = "Created 3 minutes ago", width = "364px", showMenu = false}) => {
+  if (typeof document !== "undefined" && !document.getElementById("task-card-styles")) {
+    const style = document.createElement("style");
+    style.id = "task-card-styles";
+    style.textContent = `
+      .task-card {
+        --tc-bg: var(--replit-docs-bg-task, #EDECE8);
+        --tc-border: var(--replit-docs-border, #DEDAD5);
+        --tc-text: var(--replit-docs-text, #1D1D1D);
+        --tc-text-dim: var(--replit-docs-text-muted, #5C5C5C);
+        --tc-text-dimmest: var(--replit-docs-text-subtle, #858585);
+        --tc-dot-active: #4A7BF7;
+        --tc-dot-draft: #A6A6A6;
+        --tc-dot-ready: #F59E0B;
+        --tc-dot-done: #22C55E;
+      }
+      .dark .task-card,
+      html.dark .task-card,
+      [data-theme="dark"] .task-card {
+        --tc-bg: var(--replit-docs-bg-task, #252527);
+        --tc-border: var(--replit-docs-border, #39393D);
+        --tc-text: var(--replit-docs-text, #F5F5F5);
+        --tc-text-dim: var(--replit-docs-text-muted, #B8B8BE);
+        --tc-text-dimmest: var(--replit-docs-text-subtle, #8E8F97);
+        --tc-dot-active: #6B9EFF;
+        --tc-dot-draft: #6B7280;
+        --tc-dot-ready: #FBBF24;
+        --tc-dot-done: #4ADE80;
+      }
+      @keyframes task-card-fade-in {
+        from { transform: translateY(6px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes tc-tl {
+        0%{opacity:1;fill:var(--tc-light)} 5%{opacity:1;fill:var(--tc-dark)} 10%{opacity:1;fill:var(--tc-dark)} 15%{opacity:1;fill:var(--tc-light)}
+        20%{opacity:0} 25%{opacity:1;fill:var(--tc-dark)} 30%{opacity:1;fill:var(--tc-light)} 35%{opacity:0}
+        40%{opacity:1;fill:var(--tc-dark)} 45%{opacity:1;fill:var(--tc-light)} 50%{opacity:0} 55%{opacity:1;fill:var(--tc-dark)}
+        60%{opacity:0} 65%{opacity:1;fill:var(--tc-light)} 70%{opacity:1;fill:var(--tc-light)} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:1;fill:var(--tc-light)} 85%{opacity:0} 90%{opacity:1;fill:var(--tc-light)} 95%{opacity:1;fill:var(--tc-light)}
+      }
+      @keyframes tc-tr {
+        0%{opacity:1;fill:var(--tc-dark)} 5%{opacity:0} 10%{opacity:0} 15%{opacity:0}
+        20%{opacity:1;fill:var(--tc-light)} 25%{opacity:1;fill:var(--tc-light)} 30%{opacity:1;fill:var(--tc-light)} 35%{opacity:1;fill:var(--tc-light)}
+        40%{opacity:0} 45%{opacity:1;fill:var(--tc-dark)} 50%{opacity:1;fill:var(--tc-dark)} 55%{opacity:0}
+        60%{opacity:1;fill:var(--tc-dark)} 65%{opacity:0} 70%{opacity:0} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:0} 85%{opacity:1;fill:var(--tc-dark)} 90%{opacity:0} 95%{opacity:0}
+      }
+      @keyframes tc-bl {
+        0%{opacity:1;fill:var(--tc-light)} 5%{opacity:0} 10%{opacity:0} 15%{opacity:0}
+        20%{opacity:1;fill:var(--tc-light)} 25%{opacity:1;fill:var(--tc-light)} 30%{opacity:1;fill:var(--tc-light)} 35%{opacity:1;fill:var(--tc-light)}
+        40%{opacity:0} 45%{opacity:1;fill:var(--tc-light)} 50%{opacity:1;fill:var(--tc-light)} 55%{opacity:0}
+        60%{opacity:1;fill:var(--tc-light)} 65%{opacity:0} 70%{opacity:0} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:0} 85%{opacity:1;fill:var(--tc-light)} 90%{opacity:0} 95%{opacity:0}
+      }
+      @keyframes tc-br {
+        0%{opacity:1;fill:var(--tc-light)} 5%{opacity:1;fill:var(--tc-dark)} 10%{opacity:1;fill:var(--tc-light)} 15%{opacity:1;fill:var(--tc-light)}
+        20%{opacity:0} 25%{opacity:1;fill:var(--tc-light)} 30%{opacity:1;fill:var(--tc-dark)} 35%{opacity:0}
+        40%{opacity:1;fill:var(--tc-light)} 45%{opacity:1;fill:var(--tc-light)} 50%{opacity:0} 55%{opacity:1;fill:var(--tc-light)}
+        60%{opacity:0} 65%{opacity:1;fill:var(--tc-dark)} 70%{opacity:1;fill:var(--tc-light)} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:1;fill:var(--tc-light)} 85%{opacity:0} 90%{opacity:1;fill:var(--tc-light)} 95%{opacity:1;fill:var(--tc-dark)}
+      }
+      @keyframes tc-drop {
+        0%{opacity:0} 5%{opacity:1;fill:var(--tc-dark)} 10%{opacity:1;fill:var(--tc-dark)} 15%{opacity:1;fill:var(--tc-dark)}
+        20%{opacity:0} 25%{opacity:0} 30%{opacity:0} 35%{opacity:0}
+        40%{opacity:1;fill:var(--tc-dark)} 45%{opacity:0} 50%{opacity:0} 55%{opacity:1;fill:var(--tc-dark)}
+        60%{opacity:0} 65%{opacity:1;fill:var(--tc-dark)} 70%{opacity:1;fill:var(--tc-dark)} 75%{opacity:0}
+        80%{opacity:1;fill:var(--tc-dark)} 85%{opacity:0} 90%{opacity:1;fill:var(--tc-dark)} 95%{opacity:1;fill:var(--tc-dark)}
+      }
+      @keyframes tc-dropalt {
+        0%{opacity:0} 5%{opacity:0} 10%{opacity:0} 15%{opacity:0}
+        20%{opacity:1;fill:var(--tc-dark)} 25%{opacity:0} 30%{opacity:0} 35%{opacity:1;fill:var(--tc-dark)}
+        40%{opacity:0} 45%{opacity:0} 50%{opacity:1;fill:var(--tc-dark)} 55%{opacity:0}
+        60%{opacity:1;fill:var(--tc-dark)} 65%{opacity:0} 70%{opacity:0} 75%{opacity:0}
+        80%{opacity:0} 85%{opacity:1;fill:var(--tc-dark)} 90%{opacity:0} 95%{opacity:0}
+      }
+      .task-card .tc-el-tl { animation: tc-tl 4s step-end infinite; }
+      .task-card .tc-el-tr { animation: tc-tr 4s step-end infinite; }
+      .task-card .tc-el-bl { animation: tc-bl 4s step-end infinite; }
+      .task-card .tc-el-br { animation: tc-br 4s step-end infinite; }
+      .task-card .tc-el-drop { animation: tc-drop 4s step-end infinite; }
+      .task-card .tc-el-dropalt { animation: tc-dropalt 4s step-end infinite; }
+      @media (hover: hover) {
+        .task-card:hover {
+          border-color: var(--tc-text-dimmest) !important;
+        }
+        .task-card .tc-menu-btn:hover {
+          background: var(--tc-border);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const colorPairs = {
+    active: {
+      dark: "#57ABFF",
+      light: "#A8D4FF"
+    },
+    "active-queued": {
+      dark: "#6BB5FF",
+      light: "#6BB5FF"
+    },
+    draft: {
+      dark: "#A6A6A6",
+      light: "#D4D4D4"
+    },
+    "draft-static": {
+      dark: "#A6A6A6",
+      light: "#D4D4D4"
+    },
+    "draft-done": {
+      dark: "#A6A6A6",
+      light: "#D4D4D4"
+    },
+    ready: {
+      dark: "#009118",
+      light: "#6CD97E"
+    },
+    "ready-drop": {
+      dark: "#009118",
+      light: "#6CD97E"
+    },
+    applying: {
+      dark: "#7C3AED",
+      light: "#C4B5FD"
+    },
+    done: {
+      dark: "#22C55E",
+      light: "#86EFAC"
+    }
+  };
+  const statusLabels = {
+    active: "Active",
+    "active-queued": "Queued",
+    draft: "Draft",
+    "draft-static": "Draft",
+    "draft-done": "Done",
+    ready: "Ready",
+    "ready-drop": "Ready",
+    applying: "Applying",
+    done: "Done"
+  };
+  const colors = colorPairs[status] || colorPairs.draft;
+  const applyingIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;--tc-dark:#009118;--tc-light:#6CD97E"><circle class="tc-el-tl" cx="5.332" cy="5.338" r="5.332" fill="#009118"/><circle class="tc-el-tr" cx="18.663" cy="5.338" r="5.332" fill="#009118"/><circle class="tc-el-bl" cx="5.332" cy="18.668" r="5.332" fill="#009118"/><circle class="tc-el-br" cx="18.663" cy="18.668" r="5.332" fill="#009118"/><path class="tc-el-drop" fill="#009118" d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z"/><g class="tc-el-dropalt" transform="rotate(90, 12, 12)"><path fill="#009118" d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z"/></g></svg>';
+  const doneIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;fill:var(--tc-text-dimmest)"><path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/><path fill-rule="evenodd" d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1Zm0 2a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" clip-rule="evenodd"/></svg>';
+  const handleApplyChanges = e => {
+    const tooltip = e.currentTarget.parentElement;
+    tooltip.style.display = "none";
+    const menuBtn = tooltip.previousElementSibling;
+    if (menuBtn) menuBtn.style.background = "none";
+    const card = e.currentTarget.closest(".task-card");
+    if (!card) return;
+    const headerRow = card.firstElementChild;
+    const oldIcon = headerRow.firstElementChild;
+    const menuWrapper = headerRow.lastElementChild;
+    const meta = card.lastElementChild;
+    const temp = document.createElement("div");
+    temp.innerHTML = applyingIconHtml;
+    headerRow.replaceChild(temp.firstElementChild, oldIcon);
+    meta.textContent = "Applying \u2022 just now";
+    menuWrapper.style.visibility = "hidden";
+    setTimeout(() => {
+      const currentIcon = headerRow.firstElementChild;
+      const doneTemp = document.createElement("div");
+      doneTemp.innerHTML = doneIconHtml;
+      headerRow.replaceChild(doneTemp.firstElementChild, currentIcon);
+      meta.textContent = "Done \u2022 just now";
+      const board = card.closest(".kb-board");
+      if (!board) return;
+      const doneCol = board.querySelector('[data-kb-column="done"]');
+      if (!doneCol) return;
+      const cardList = doneCol.querySelector("[data-kb-cards]");
+      const readyCol = board.querySelector('[data-kb-column="ready"]');
+      card.style.transition = "opacity 300ms, transform 300ms";
+      card.style.opacity = "0";
+      card.style.transform = "translateY(-10px)";
+      setTimeout(() => {
+        card.parentElement.removeChild(card);
+        if (readyCol) {
+          const rc = readyCol.querySelector("[data-kb-count]");
+          rc.textContent = parseInt(rc.textContent) - 1;
+        }
+        const dc = doneCol.querySelector("[data-kb-count]");
+        dc.textContent = parseInt(dc.textContent) + 1;
+        card.style.opacity = "0";
+        card.style.transform = "translateY(6px)";
+        cardList.insertBefore(card, cardList.firstChild);
+        requestAnimationFrame(() => {
+          card.style.transition = "opacity 300ms, transform 300ms";
+          card.style.opacity = "1";
+          card.style.transform = "translateY(0)";
+        });
+      }, 300);
+    }, 3000);
+  };
+  return <div className="task-card" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: width,
+    background: "var(--tc-bg)",
+    border: "1px solid var(--tc-border)",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    margin: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+    cursor: "pointer",
+    opacity: 0,
+    animation: "task-card-fade-in 300ms ease-out forwards",
+    transition: "border-color 120ms ease-out"
+  }}>
+      {}
+      <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px"
+  }}>
+        {status === "done" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--tc-text-dimmest)" style={{
+    flexShrink: 0
+  }}>
+            <path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
+            <path fillRule="evenodd" d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1Zm0 2a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" clipRule="evenodd" />
+          </svg> : status === "draft-static" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle cx="18.663" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle cx="5.332" cy="18.668" r="5.332" fill={colors.dark} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.dark} />
+          </svg> : status === "draft-done" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="5.332" cy="18.668" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.light} />
+          </svg> : status === "active-queued" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="5.332" cy="18.668" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.light} />
+          </svg> : status === "ready-drop" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.light} />
+            <path fill={colors.dark} d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+          </svg> : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0,
+    "--tc-dark": colors.dark,
+    "--tc-light": colors.light
+  }}>
+            <circle className="tc-el-tl" cx="5.332" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle className="tc-el-tr" cx="18.663" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle className="tc-el-bl" cx="5.332" cy="18.668" r="5.332" fill={colors.dark} />
+            <circle className="tc-el-br" cx="18.663" cy="18.668" r="5.332" fill={colors.dark} />
+            <path className="tc-el-drop" fill={colors.dark} d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+            <g className="tc-el-dropalt" transform="rotate(90, 12, 12)">
+              <path fill={colors.dark} d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+            </g>
+          </svg>}
+        <span style={{
+    flex: 1,
+    fontSize: "14px",
+    lineHeight: "1.4",
+    color: "var(--tc-text)",
+    minWidth: 0
+  }}>
+          {title}
+        </span>
+        <div style={{
+    position: "relative",
+    flexShrink: 0
+  }}>
+          <button className="tc-menu-btn" type="button" aria-label="Thread actions" onClick={showMenu ? e => {
+    const btn = e.currentTarget;
+    const popup = btn.nextElementSibling;
+    const card = btn.closest(".task-card");
+    const isHidden = popup.style.display === "none";
+    popup.style.display = isHidden ? "flex" : "none";
+    btn.style.background = isHidden ? "var(--tc-border)" : "none";
+    if (card) card.style.zIndex = isHidden ? "9999" : "";
+  } : undefined} style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "24px",
+    border: "none",
+    background: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    color: "var(--tc-text-dimmest)",
+    padding: 0,
+    flexShrink: 0,
+    transition: "background 120ms ease-out"
+  }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path fillRule="evenodd" d="M10.25 5a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {showMenu && <div style={{
+    display: "none",
+    position: "absolute",
+    top: 0,
+    left: "28px",
+    background: "var(--tc-bg)",
+    border: "1px solid var(--tc-border)",
+    borderRadius: "8px",
+    padding: "4px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06)",
+    zIndex: 9999,
+    minWidth: "160px",
+    flexDirection: "column",
+    gap: "0"
+  }}>
+              <div onClick={handleApplyChanges} style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "6px 8px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    color: "var(--tc-text)",
+    fontSize: "14px"
+  }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{
+    flexShrink: 0
+  }}>
+                  <path fillRule="evenodd" d="M6 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM2.25 6a3.75 3.75 0 1 1 4.527 3.67 8.25 8.25 0 0 0 7.554 7.553A3.751 3.751 0 0 1 21.75 18a3.75 3.75 0 0 1-7.43.726 9.75 9.75 0 0 1-7.57-4.53V21a.75.75 0 0 1-1.5 0V9.675A3.751 3.751 0 0 1 2.25 6ZM18 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clipRule="evenodd" />
+                </svg>
+                <span>Apply changes</span>
+              </div>
+              <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "6px 8px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    color: "var(--tc-text)",
+    fontSize: "14px"
+  }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{
+    flexShrink: 0
+  }}>
+                  <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                </svg>
+                <span>Cancel</span>
+              </div>
+            </div>}
+        </div>
+      </div>
+      {}
+      {description && <div style={{
+    fontSize: "12px",
+    color: "var(--tc-text-dim)",
+    lineHeight: "1.5",
+    overflow: "hidden",
+    display: "-webkit-box",
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: "vertical",
+    paddingLeft: "0"
+  }}>
+          {description}
+        </div>}
+      {}
+      <div style={{
+    fontSize: "12px",
+    color: "var(--tc-text-dimmest)",
+    paddingLeft: "0"
+  }}>
+        {statusLabels[status] || status} • {timestamp}
+      </div>
+    </div>;
+};
+
+すべての Agent タスクはライフサイクルを経由します：計画済み、実行中、レビュー待ち、完了。このライフサイクルにより、メインバージョンに何を含めるかを決定するまで、作業が分離された状態を保ちます。
+
+<Frame>
+  <img src="/assets/mirror/task-board-progress-f4d3b5e7e93e.png" alt="下書き、アクティブ、レディ、完了の列に整理されたタスクを表示するタスクボード" width="3456" height="1984" data-path="images/replitai/task-board-progress.png" />
+</Frame>
+
+## 下書き
+
+**下書き**は、Agent が計画したがまだ構築を開始していないタスクです。下書きには提案された作業（タスクのタイトル、説明、計画）のみが含まれるため、安全にレビューできます。
+
+下書きを使って、Agent が目標を正しく理解しているかどうかを確認してください。タスクを開始したり、計画の修正を Agent に依頼したり、後のために下書きをアーカイブしたりできます。
+
+## アクティブ
+
+**アクティブ**タスクはバックグラウンドで実行中です。Agent はプロジェクトの独立したコピーで作業するため、タスクの実行中もメインバージョンは変更されません。
+
+アクティブタスクが実行している間もメインスレッドを使い続けることができます。タスクにフィードバックが必要な場合は、そのスレッドを開いて会話を続けてください。
+
+## キュー済み
+
+**キュー済み**タスクは承認済みですが、開始待ちの状態です。タスクが別のタスクに依存している場合や、プランのアクティブなバックグラウンドタスク制限に達している場合にキューに入ることがあります。
+
+キュー済みタスクは、前提条件が完了してアクティブなタスクスロットが開いたときに自動的に開始されます。
+
+## レディ
+
+**レディ**タスクは完了しましたが、変更がまだメインバージョンに適用されていません。変更を適用する前に、タスクの作業ログ、テスト結果、プレビューをレビューしてください。
+
+作業が正しければメインに適用してください。期待通りでなければ却下して新しいタスクを開始してください。
+
+## 適用中
+
+**適用中**タスクは、変更をメインバージョンに移動する途中です。複数のタスクから変更を適用する際の競合は Agent が自動的に処理します。
+
+最終結果を判断する前に適用が完了するまで待ってください。その後何か問題があれば、メインスレッドで Agent に修正を依頼してください。
+
+## 完了
+
+**完了**タスクは終了しており、アクションは不要です。完了には、メインバージョンに適用済み、開始前にアーカイブ済み、構築に移行してからキャンセル済みの場合が含まれます。
+
+**完了**列を、完了済み、アーカイブ済み、キャンセル済みのタスク作業の履歴として使用してください。
+
+## 状態の例
+
+すべてのタスクはアイデアからアプリの一部になるまで一連の段階を経ます。各段階には独自のアイコンがあり、一目で何が起きているかわかります。
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px', margin: '20px 0' }}>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="家族と友人へのギフトフローを追加" description="親が他の子どものためにストーリーを作成してギフトとして送れるようにします。" status="draft-static" timestamp="2m" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>下書き</strong>: Agent がこのタスクを提案しました。レビュー用の計画が準備されています。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="ストーリーの続き：続編" description="「冒険を続ける」ボタンを追加すると、前回の終わりから続く続編が生成されます。" status="active" timestamp="12m" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>アクティブ</strong>: Agent が今このタスクを構築中です。プロジェクトの独自のコピーで実行されるため、メインバージョンは安全に保たれます。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="家族と友人へのギフトフローを追加" description="親が他の子どものためにストーリーを作成してギフトとして送れるようにします。" status="active-queued" timestamp="1m" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>キュー済み</strong>: このタスクは承認済みですが、構築を開始するためのスロットが開くのを待っています。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="ダークテーマ付きの就寝モード" description="温かみのあるダークテーマとアンビエントサウンド付きの専用就寝モード。" status="ready-drop" timestamp="35m" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>レディ</strong>: このタスクは完了しました。変更をレビューして、準備ができたらメインバージョンに適用できます。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="OG プレビュー付きの共有リンク" description="公開共有リンクの追加は単一最大の成長レバーです。" status="applying" timestamp="31m" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>適用中</strong>: このタスクの変更が今メインバージョンに適用されています。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="単語ハイライト付きの音読" description="テキスト読み上げ機能により、子どもはハイライトされた単語を追いながら独立してストーリーを楽しめます。" status="done" timestamp="4h" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>完了</strong>: このタスクは終了し、変更はメインバージョンの一部です。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="新規読者向けのオンボーディングツアー" description="初回起動時に親にコア読書フローを紹介する短いガイド付きウォークスルー。" status="draft-static" timestamp="1h" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>アーカイブ済み</strong>: 構築が開始する前に保留にした計画セッションです。アーカイブ済みの計画セッションは後で<strong>完了</strong>列から復元できます。</span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <TaskCard title="実験的なステッカーパックジェネレーター" description="ストーリーのキャラクターやシーンからカスタムイラストステッカーを生成します。" status="done" timestamp="2h" width="100%" />
+
+    <span style={{ fontSize: '13px', color: 'var(--kb-text-dimmer, #666)', padding: '0 4px' }}><strong>キャンセル済み</strong>: 構築に移行してから停止したタスクです。キャンセルされたタスクは復元できません。気が変わった場合は新しいタスクを開始してください。</span>
+  </div>
+</div>
+
+## タスクのアーカイブとキャンセル
+
+タスクはライフサイクルの任意の時点で停止できますが、表示されるオプションはボード上のタスクの位置によって異なります。**アーカイブ**と**キャンセル**はどちらもタスクを**完了**列に移動しますが、動作が異なります：
+
+| アクション     | 利用可能なタイミング                                          | 何が起こるか                                           | 元に戻せるか？                                             |
+| --------- | --------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
+| **アーカイブ** | タスクがまだ計画セッション中の場合：構築を開始していない**下書き**                 | 実行せずに計画セッションが保留にされます。計画は保持されます。                  | はい。**完了**列のアーカイブ済みカードを開いて**下書き**に復元できます。            |
+| **キャンセル** | タスクが計画から構築に移行した後：**アクティブ**、**キュー済み**、または**レディ**のタスク | Agent がタスクを停止し、進行中の作業を破棄します。メインバージョンに変更は適用されません。 | いいえ。キャンセルされたタスクは復元できません。作業を再開したい場合は新しいタスクを開始してください。 |
+
+後で再検討したい計画セッションには**アーカイブ**を使用してください。キュー済み、実行中、または構築完了のタスクの永久停止ボタンとして**キャンセル**を使用してください。
+
+アーカイブ済みの計画セッションとキャンセル済みのタスクは、完了済みのタスクとともにタスクボードの右端にある**完了**列で確認できます。

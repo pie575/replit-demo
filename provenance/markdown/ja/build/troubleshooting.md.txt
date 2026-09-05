@@ -1,0 +1,238 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 公開のトラブルシューティング
+
+> Replitアプリがプレビューでは動作するのに公開に失敗したり、公開URLで異なる動作をする場合の一般的な問題を診断します。
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+公開によってプロジェクトはパブリックアプリに変わります。公開に失敗した場合、または公開URLがプレビューと異なる動作をする場合は、順を追って問題を解決してください。
+
+このページはBuildの復旧ガイドとデプロイのトラブルシューティングリファレンスを兼ねています。最もシンプルな問いから始めましょう：アプリはプレビューで動作しますか？
+
+## 達成できること
+
+このページを読み終えると、問題がアプリ自体、公開設定、本番環境のSecrets、デプロイタイプ、ポート設定、ネットワーク/DNSアクセスのいずれにあるかを特定できるようになります。
+
+## プレビューから始める
+
+公開前に、プロジェクトエディターでアプリが正しく動作することを確認してください。
+
+プロジェクトエディター上部の**Run**を選択し、プレビューを開きます。プレビューに`replit.dev` URLでアプリが表示されない場合は、公開前にアプリを修正してください。
+
+まずAgentにプレビューの診断を依頼しましょう：
+
+<AiPrompt>
+  This app does not work in Preview.<br />
+  Check the run command, dependency installation, app errors, ports, and missing Secrets.<br />
+  Fix the smallest issue first and tell me how to verify Preview works before publishing.
+</AiPrompt>
+
+プレビューが機能しない場合、公開しても解決しません。
+
+## プレビューは動作するが公開に失敗する場合
+
+プレビューは動作するが公開に失敗する場合は、公開固有の設定を確認してください。
+
+### ログを確認する
+
+**Publishing**ペインの**Logs**タブを開きます。スタックトレース、パッケージの不足、コマンドの失敗、環境変数の欠如、起動エラーを探してください。
+
+関連するエラーをAgentにペーストしてください：
+
+<AiPrompt>
+  Publishing failed with this log output: \[paste error].<br />
+  Explain the likely cause.<br />
+  Tell me whether this is a command, dependency, Secret, port, build, or app error.<br />
+  Recommend the smallest fix and how I should verify it.
+</AiPrompt>
+
+### 実行コマンドとビルドコマンドを確認する
+
+よくあるミスには、タイプミス、誤ったフラグ、エントリファイルの間違い、ローカルでしか動作しないコマンドなどがあります。
+
+**Publishing**ペインでコマンドを確認してください。アプリにビルドコマンドと起動コマンドの両方が必要な場合は、両方が正しいことを確認してください。
+
+### 本番環境のSecretsを確認する
+
+プロジェクトエディターで設定したSecretsは、公開済みアプリに自動的に引き継がれません。**Publishing**ペインで本番環境のSecretsと環境変数をすべて追加してください。
+
+Secretsの欠如は、未定義の値に関するエラー、APIコールの失敗、データベース接続の失敗、ログインエラー、決済の失敗などを引き起こす可能性があります。
+
+[Secrets](/ja/core-concepts/project-editor/app-setup/secrets)を参照してください。
+
+### 長時間実行プロセスの動作を確認する
+
+公開済みアプリは、プログラムが継続して実行されることを前提としています。プログラムが一度実行されて終了する場合、プラットフォームは自動的に再起動します。
+
+アプリケーションがウェブサーバーなどの長時間実行プロセスを起動することを確認してください。
+
+### ホストとポートの設定を確認する
+
+ウェブサーバーを実行している場合、Deploymentsはサーバーが使用するポートを自動的に検出できますが、サーバーは`0.0.0.0`でリッスンする必要があります。`localhost`または`127.0.0.1`のみでリッスンしている場合、公開済みアプリでは動作しません。
+
+[`.replit`設定でポートを指定している場合](/ja/features/project-setup/configuration)、自動ポート検出は無効になります。プロモーションステップを通過するには、`externalPort`を`80`に設定したポートを指定する必要があります。サーバーが指定した`localPort`でリッスンしていることを確認してください。
+
+Agentに詳しく確認してもらいましょう：
+
+<AiPrompt>
+  Check whether this app is configured correctly for publishing.<br />
+  Verify that the server starts a long-running process, listens on 0.0.0.0, uses the expected port, and matches any .replit port configuration.<br />
+  Do not change app behavior beyond the publishing fix.
+</AiPrompt>
+
+### ヘルスチェックのタイミングを確認する
+
+公開済みアプリをライブとしてマークする前に、ReplitはアプリにHTTPリクエストを送信します。ホームページの応答に5秒以上かかる場合、ヘルスチェックがタイムアウトし、最終ステップで公開が失敗することがあります。
+
+起動が遅い場合は、Agentに起動時の処理を減らすよう依頼するか、重い処理をユーザーアクションの後ろに移動させるか、適切な箇所でデータをキャッシュするよう依頼してください。
+
+## 公開は成功したが公開URLが機能しない場合
+
+プレビューが動作し公開も成功したのに、公開URLが機能しない場合は、プレビューと本番環境の動作を比較してください。
+
+確認事項：
+
+* 本番環境のSecretsと環境変数。
+* データベース接続設定。
+* ログインコールバックまたはリダイレクトURL。
+* 決済ウェブフックまたはリダイレクト設定。
+* APIの許可リストまたはCORS設定。
+* データベースやストレージサービスではなくローカルに書き込まれたファイル。
+* モバイルレイアウトとブラウザの違い。
+
+Agentに環境の比較を依頼しましょう：
+
+<AiPrompt>
+  The app works in Preview but not at the published URL.<br />
+  Help me compare Preview and production behavior.<br />
+  Check Secrets, database settings, API calls, login redirects, payment redirects, build output, and logs.<br />
+  Give me the safest next check.
+</AiPrompt>
+
+## 静的デプロイの問題
+
+静的デプロイはHTML、CSS、JavaScriptなどの静的ファイルを配信します。
+
+アプリにサーバーサイドの処理、APIルート、認証コールバック、サーバーからのデータベース呼び出し、または長時間実行されるバックエンドロジックが含まれている場合、静的デプロイには適していない可能性があります。代わりに**Publishing**ペインでデプロイタイプをAutoscaleに変更してください。
+
+静的デプロイの問題は、publicディレクトリの指定が誤っているか、サーバーが必要なアプリに対してStaticを選択したことが原因であることが多いです。
+
+## ファイルとサイズの制限
+
+Reserved VMおよびAutoscale DeploymentsはReplit Appsを最大8 GBまでサポートします。静的デプロイは最大1 GBまでサポートします。
+
+アプリサイズを削減するには、不要なファイルを削除し、生成された出力のコミットを避けるか、大きなアセットには外部ストレージを使用してください。
+
+<Warning>
+  公開済みアプリのファイルシステムは永続的ではなく、公開するたびにリセットされます。データの永続化には、[SQL Database](/ja/features/data-and-storage/sql-database)などのデータベースを使用してください。
+</Warning>
+
+アップロードされたファイルや生成されたデータが公開後に消える場合は、アプリのファイルシステムではなくデータベースまたはストレージサービスに保存してください。
+
+## `replit.app`および`replit.dev` URLへのアクセス問題
+
+`replit.app`または`replit.dev`ドメインでアプリにアクセスできない場合、ウェブフィルターやネットワーク制限が原因である可能性があります。
+
+Google DNS（`8.8.8.8`）またはCloudflare DNS（`1.1.1.1`）などのパブリックDNSリゾルバーを試してください。
+
+### DNS設定を変更する
+
+<Tabs>
+  <Tab title="Windows">
+    1. **コントロールパネル**を開きます。
+    2. **ネットワークと共有センター**に移動します。
+    3. 左側の**アダプターの設定の変更**を選択します。
+    4. アクティブなネットワーク接続を右クリックし、**プロパティ**を選択します。
+    5. **インターネット プロトコル バージョン 4 (TCP/IPv4)** を選択し、**プロパティ**をクリックします。
+    6. **次のDNSサーバーのアドレスを使う**を選択します。
+    7. Google DNSの場合は`8.8.8.8`、Cloudflare DNSの場合は`1.1.1.1`などのパブリックDNSサーバーIPアドレスを入力します。
+    8. **OK**を選択して変更を保存します。
+
+    詳細な手順については、[Microsoft DNS設定ガイド](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace)を参照してください。
+  </Tab>
+
+  <Tab title="macOS">
+    1. **システム環境設定**を開きます。
+    2. **ネットワーク**を選択します。
+    3. 左側でアクティブなネットワーク接続を選択します。
+    4. 右下の**詳細**を選択します。
+    5. **DNS**タブに移動します。
+    6. \*\*+\*\*ボタンを選択してDNSサーバーを追加します。
+    7. Google DNSの場合は`8.8.8.8`、Cloudflare DNSの場合は`1.1.1.1`などのパブリックDNSサーバーIPアドレスを入力します。
+    8. **OK**を選択し、**適用**をクリックします。
+
+    詳細な手順については、[Apple DNS設定ガイド](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac)を参照してください。
+  </Tab>
+
+  <Tab title="Linux">
+    1. パブリックDNSサーバーを追加するために`/etc/resolv.conf`ファイルを編集します。正確な方法はディストリビューションによって異なります。
+    2. 以下の行を追加します：
+
+    ```bash theme={null}
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+
+    異なるディストリビューションでのDNS設定の詳細については、[Debian Wiki ネットワーク設定ガイド](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers)を参照してください。
+  </Tab>
+</Tabs>
+
+### DNSキャッシュをクリアする
+
+DNS設定を変更した後、新しい設定を適用するためにDNSキャッシュをクリアしてください：
+
+* **Windows**: コマンドプロンプトで`ipconfig /flushdns`を実行します。
+* **macOS and Linux**: ターミナルで`sudo systemctl restart NetworkManager`を実行します。正確なコマンドはディストリビューションによって異なる場合があります。
+
+<Note>
+  地域のパフォーマンスと安定性を向上させるため、Replit Appsの`replit.dev`
+  URLはクラスターの移行中に変更される場合があります。移行が完了すると、
+  URLは明示的に場所の変更をリクエストしない限り、約1年間安定して維持されます。
+</Note>
+
+## Streamlitアプリケーションを公開する
+
+StreamlitアプリケーションはReplit Deploymentsで動作します。最も簡単に始める方法は[Streamlitテンプレート](https://replit.com/@replit/Streamlit?v=1)を使用することです。
+
+または、公開用の実行コマンドを以下のように設定してください：
+
+```bash theme={null}
+streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
+```
+
+アプリケーションが異なるエントリファイルを使用している場合は、`main.py`をそのファイル名に置き換えてください。
+
+## 完了の確認
+
+* プレビューが動作している。
+* 公開が完了している。
+* 公開URLが読み込まれる。
+* 公開URLでメインのアプリフローが動作する。
+* 本番環境のSecretsと設定が構成されている。
+* ログに隠れた起動エラーが表示されていない。
+
+## 関連情報
+
+* [Replit Deployments](/ja/learn/projects-and-artifacts/replit-deployments)
+* [カスタムドメインを追加する](/ja/build/add-custom-domain)
+* [カスタムドメイン](/ja/features/publishing/custom-domains)
+* [Secrets](/ja/core-concepts/project-editor/app-setup/secrets)
+* [SQL Database](/ja/features/data-and-storage/sql-database)
+
+これらのステップを試した後もさらにサポートが必要な場合は、[Replitコミュニティハブ](https://replit.com/community)でより多くのリソースをご覧ください。

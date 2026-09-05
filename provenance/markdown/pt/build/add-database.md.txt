@@ -1,0 +1,106 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Adicionar um banco de dados
+
+> Faça os carros, a disponibilidade e as reservas da Velocity persistirem após atualização, reinicialização e publicação.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ao final, cada carro, slot de disponibilidade e reserva da Velocity ainda estarão lá amanhã.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-database/persisted-bookings.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=6ccc5fa405db4922759cb7f8fc0d3bbe" alt="Velocity após atualização mostrando a lista Minhas reservas do cliente logado com duas reservas salvas e a página da frota com os carros na mesma ordem, ambas inalteradas em relação a antes da atualização" width="1280" height="720" data-path="images/velocity/add-database/persisted-bookings.png" />
+</Frame>
+
+Você adicionou login à Velocity em [Adicionar login](/pt/build/add-login). Mas os carros da frota e as reservas que os clientes fazem ainda desaparecem quando a página é atualizada — eles vivem apenas no navegador. Adicione um banco de dados para que tudo persista.
+
+## Peça ao Agent para salvar os dados
+
+Para a Velocity, use o Neon — o banco de dados Postgres gerenciado do Replit. O Neon lida com reservas simultâneas de forma limpa, escala com tráfego real de clientes e o Agent o provisiona automaticamente com ambientes de Desenvolvimento e Produção separados. Não há cadastro no painel do Neon e nenhuma chave para colar.
+
+<AiPrompt>
+  Salve os dados da Velocity em um banco de dados para que os carros, a disponibilidade e as reservas não desapareçam ao atualizar.<br />
+  Use Neon (Postgres).<br />
+  Salve: cada carro (marca, modelo, ano, diária, foto, localização), o calendário de disponibilidade de cada carro e cada reserva (data de retirada, data de devolução, carro, cliente).<br />
+  Vincule cada reserva ao cliente logado para que cada pessoa veja apenas as suas.<br />
+  Evite que o mesmo carro seja reservado em datas sobrepostas.<br />
+  Me diga o que testar após a alteração.
+</AiPrompt>
+
+O Agent provisionará um banco de dados Neon, moverá a frota e as reservas de dados em memória para ele e adicionará a verificação de sobreposição para que a mesma Lamborghini não possa ser reservada duas vezes.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-database/agent-db-connected.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=11a1d228d22617852eb346b3585ddad5" alt="Chat do Agent após a migração para o Neon mostrando o checklist de verificação — prevenção de sobreposição, bloqueio sem login, reservas por usuário, rejeição de datas inválidas, rejeição de carro inválido — e um indicador de Checkpoint feito agora, ao lado do Preview da Velocity renderizando com a frota persistida" width="1280" height="720" data-path="images/velocity/add-database/agent-db-connected.png" />
+</Frame>
+
+## Teste que tudo persiste
+
+1. Entre na Velocity no Preview e reserve um carro para o próximo sábado.
+2. Atualize a página. A reserva ainda deve estar em "Minhas reservas".
+3. Reinicie o app pelo chat do Agent. A frota e a reserva ainda devem estar lá.
+4. Tente reservar o mesmo carro no mesmo sábado com uma segunda conta. A Velocity deve dizer que o carro não está disponível e oferecer uma data ou carro diferente.
+5. Saia e entre novamente. Sua reserva ainda deve estar lá.
+
+Se uma reserva desaparecer em alguma etapa, cole o sintoma exato no Agent:
+
+<AiPrompt>
+  Reservei um carro na Velocity, mas a reserva desaparece após atualizar.<br />
+  Verifique se a reserva está sendo salva no banco de dados ou apenas armazenada na página.<br />
+  Corrija o menor problema e me diga como verificar.
+</AiPrompt>
+
+Você também pode pedir ao Agent uma visão administrativa simples para ver o que está no banco de dados:
+
+<AiPrompt>
+  Me mostre uma página administrativa simples na Velocity que lista cada carro e cada reserva no banco de dados, agrupados por carro.<br />
+  Mostre apenas para mim como proprietário do projeto.
+</AiPrompt>
+
+## Publicar e confirmar na URL pública
+
+A configuração do Neon pelo Agent dá à Velocity ambientes de Desenvolvimento e Produção separados desde o início. Publique a Velocity novamente pelo chat do Agent ou pelo tile de Publicação, depois abra a URL pública em uma nova aba. O Replit conecta as credenciais do Neon de Produção à implantação publicada automaticamente — faça uma reserva na URL pública, atualize e confirme que ainda está lá.
+
+A Velocity agora lembra cada carro, cada data disponível e cada reserva. A próxima atualização não perderá nenhuma reserva.
+
+## Melhorias a seguir
+
+<CardGroup cols={2}>
+  <Card title="Adicionar pagamentos" icon="credit-card" href="/pt/build/add-payments">
+    Cobre um depósito reembolsável quando um cliente reservar um carro.
+  </Card>
+
+  <Card title="Adicionar integrações" icon="plug" href="/pt/build/add-integrations">
+    Envie cada reserva para o calendário do cliente.
+  </Card>
+
+  <Card title="Criar um dashboard a partir de dados" icon="chart-simple" href="/pt/build/dashboard">
+    Transforme as reservas salvas em gráficos de utilização.
+  </Card>
+</CardGroup>
+
+## Precisa de mais ajuda?
+
+* **Reservas são salvas no Preview mas não na URL pública:** peça ao Agent para confirmar que as credenciais do Neon de Produção estão conectadas à implantação publicada.
+* **Os dados são difíceis de inspecionar:** peça ao Agent para adicionar uma visão administrativa simples que lista tudo no banco de dados.
+* **Você quer pré-popular a frota:** peça ao Agent para adicionar um script único que carrega seus carros reais no banco de dados.
+* **Você quer um banco de dados sem configuração para um protótipo rápido:** use o [Replit Database](/pt/features/data-and-storage/sql-database) em vez disso — está integrado em cada Repl sem provisionamento separado.
+
+## Relacionado
+
+* [Bancos de dados de produção](/pt/features/data-and-storage/development-and-production)
+* [Replit Database](/pt/features/data-and-storage/sql-database)

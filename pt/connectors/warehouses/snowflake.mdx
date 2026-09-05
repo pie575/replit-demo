@@ -1,0 +1,248 @@
+---
+title: "Conectores Snowflake"
+description: "Configure um conector Snowflake para criar aplicativos orientados a dados com o Replit Agent."
+sidebarTitle: "Snowflake"
+---
+
+<Info>
+  O conector Snowflake está disponível exclusivamente no plano **Enterprise**.
+</Info>
+
+Os Conectores de Warehouse permitem que o Replit Agent consulte os data warehouses da sua organização. Com o conector Snowflake, os desenvolvedores podem criar dashboards, ferramentas de relatórios e aplicativos de dados usando linguagem natural — sem necessidade de conhecimento em SQL.
+
+A configuração é um processo único que requer um administrador do Snowflake e um administrador do workspace Replit. Uma vez configurado, qualquer membro da organização pode fazer login e começar a criar com os dados do Snowflake.
+
+Este guia orienta você pela configuração completa. Três funções estão envolvidas:
+
+1. **Administrador de conta do Snowflake** — Cria a integração OAuth no Snowflake
+2. **Administrador do workspace Replit** — Configura o conector no Replit
+3. **Desenvolvedor** — Faz login e começa a criar
+
+## Criar a integração OAuth no Snowflake
+
+O Administrador de conta do Snowflake cria uma Integração de Segurança OAuth que permite ao Replit autenticar com o Snowflake.
+
+### Pré-requisitos
+
+* Função `ACCOUNTADMIN` no Snowflake
+* Acesso para executar SQL nas planilhas do Snowflake
+
+### Executar o script de configuração
+
+<Steps>
+  <Step title="Fazer login no Snowflake">
+    Abra sua conta do Snowflake e certifique-se de estar usando a função `ACCOUNTADMIN`. Você pode verificar isso no menu suspenso de funções no canto superior direito.
+  </Step>
+
+  <Step title="Abrir uma planilha SQL">
+    Clique em **Planilhas** na barra lateral esquerda e crie uma nova planilha.
+  </Step>
+
+  <Step title="Executar o script de integração OAuth">
+    Copie e cole o seguinte script SQL e execute-o:
+
+    ```sql Criar integração OAuth theme={null}
+    -- Remover integração existente, se necessário
+    DROP INTEGRATION IF EXISTS REPLIT_OAUTH;
+
+    -- Criar integração OAuth para o Replit
+    CREATE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    <Warning>
+      O URI de redirecionamento deve ser exatamente `https://replit.com/connectors/oauth/callback`. Qualquer outro valor causa um erro 404 durante a autenticação.
+    </Warning>
+
+    <Note>
+      Definir `BLOCKED_ROLES_LIST = ()` garante que nenhuma função seja bloqueada de usar a integração. Sem isso, você pode receber erros de "solicitação de consentimento inválida" ou "função bloqueada" ao conectar.
+    </Note>
+  </Step>
+
+  <Step title="Recuperar suas credenciais OAuth">
+    Execute esta consulta para obter o Client ID e o Client Secret:
+
+    ```sql Obter credenciais OAuth theme={null}
+    -- Ver detalhes da integração
+    DESCRIBE INTEGRATION REPLIT_OAUTH;
+
+    -- Obter Client ID e Secret
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+
+    Copie o **Client ID** e o **Client Secret** do resultado. Você precisará desses valores na próxima etapa.
+  </Step>
+</Steps>
+
+## Configurar o conector no Replit
+
+O Administrador do workspace Replit adiciona as credenciais do Snowflake ao Replit. Uma vez configurado, qualquer pessoa na organização pode fazer login.
+
+<Note>
+  Esta etapa requer um plano Enterprise com acesso de administrador.
+</Note>
+
+<Steps>
+  <Step title="Abrir Integrações">
+    Acesse as configurações da sua organização e selecione a aba **Integrações**.
+  </Step>
+
+  <Step title="Adicionar o conector Snowflake">
+    Clique em **Adicionar novo conector** e selecione **Snowflake**.
+  </Step>
+
+  <Step title="Inserir credenciais">
+    Forneça o **Client ID** e o **Client Secret** da etapa anterior.
+  </Step>
+
+  <Step title="Definir o escopo">
+    Defina o escopo do conector como `refresh_token`.
+
+    <Warning>
+      Use apenas o escopo `refresh_token`. Outros escopos como `session:role-any` ou `session:role:PUBLIC` podem causar um erro de "escopo inválido".
+    </Warning>
+  </Step>
+
+  <Step title="Salvar">
+    Clique em **Salvar** para ativar o conector.
+  </Step>
+</Steps>
+
+## Fazer login no Snowflake
+
+Qualquer membro da organização com acesso ao conector pode fazer login. Faça login pela página de **Integrações** primeiro para verificar a conexão antes de usá-la com o Agent.
+
+<Steps>
+  <Step title="Encontrar o conector Snowflake">
+    Acesse **Integrações** no Replit. Em **Conectores**, encontre **Snowflake**.
+  </Step>
+
+  <Step title="Clicar em Entrar">
+    Clique em **Entrar** no conector Snowflake.
+  </Step>
+
+  <Step title="Inserir seu ID de conta Snowflake">
+    O prompt OAuth solicita seu ID de conta do Snowflake.
+
+    Para encontrar seu ID de conta, observe a URL do seu Snowflake:
+
+    ```
+    https://app.snowflake.com/minhaorg/minhaconta
+    ```
+
+    Pegue as duas partes após `app.snowflake.com/` e junte-as com um hífen:
+
+    ```
+    minhaorg-minhaconta
+    ```
+
+    <Note>
+      A URL usa `/` entre as duas partes, mas o ID de conta usa `-` em vez disso.
+    </Note>
+  </Step>
+
+  <Step title="Autenticar">
+    O Snowflake redireciona você para a página de login. Insira suas credenciais do Snowflake para concluir o fluxo OAuth.
+  </Step>
+</Steps>
+
+## Começar a criar com seus dados do Snowflake
+
+Após a conexão, você pode usar o conector Snowflake com o Agent de duas formas:
+
+* **Comando de barra** — Digite `/snowflake` no prompt para usar o conector
+* **Linguagem natural** — Peça ao Agent para usar seus dados do Snowflake diretamente
+
+Aqui está um exemplo de prompt:
+
+```
+Crie um dashboard usando meus dados do Snowflake. Mostre a receita total
+por região em um gráfico de barras, uma linha de tendência por trimestre e uma tabela
+dos 10 principais clientes. Tema escuro, limpo e moderno.
+```
+
+O Agent escreve e executa consultas SQL nos seus dados do Snowflake e cria um aplicativo funcional.
+
+## Solução de problemas
+
+<AccordionGroup>
+  <Accordion title="Erro de solicitação de consentimento inválida ou função bloqueada">
+    Sua integração Snowflake pode ter funções bloqueadas por padrão.
+
+    Verifique se a integração foi criada com `BLOCKED_ROLES_LIST = ()`. Se você já a criou sem essa configuração, execute:
+
+    ```sql Corrigir funções bloqueadas theme={null}
+    CREATE OR REPLACE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    Se o erro persistir, verifique se sua função padrão não está bloqueada:
+
+    ```sql Definir função padrão theme={null}
+    ALTER USER "SEU_NOME_DE_USUARIO" SET DEFAULT_ROLE = 'PUBLIC';
+    ```
+  </Accordion>
+
+  <Accordion title="Erro 404 na autenticação">
+    Verifique se o URI de redirecionamento na sua integração Snowflake é exatamente:
+
+    ```
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    Qualquer divergência causa um erro 404 durante o fluxo OAuth.
+  </Accordion>
+
+  <Accordion title="Erro de escopo inválido">
+    Certifique-se de que o escopo do conector no Replit está definido apenas como `refresh_token`. Remova quaisquer outros escopos como `session:role-any` ou `session:role:PUBLIC`.
+  </Accordion>
+
+  <Accordion title="Erro de falha na conexão">
+    Verifique se o Client ID e o Client Secret no Replit correspondem ao que o Snowflake gerou. Verifique novamente executando:
+
+    ```sql Verificar credenciais theme={null}
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Documentação relacionada
+
+* [Visão geral dos conectores de warehouse](/pt/connectors/warehouses/overview) — Visão geral de todos os conectores de warehouse suportados
+* [Conectar Databricks](/pt/connectors/warehouses/databricks) — Configuração passo a passo do Databricks
+* [Gerenciando seus conectores](/pt/replitai/managing-connectors) — Gerenciamento e configuração de conectores
+* [Snowflake — Configurar OAuth para clientes personalizados](https://docs.snowflake.com/en/user-guide/oauth-custom) — Documentação OAuth do Snowflake

@@ -1,0 +1,280 @@
+---
+title: "보안 체크리스트"
+description: "vibe 코딩 애플리케이션이 최선의 보안 관행을 따르도록 이 포괄적인 보안 체크리스트를 따르세요."
+sidebarTitle: "보안 체크리스트"
+icon: "clipboard-check"
+---
+
+이 가이드는 vibe 코딩 애플리케이션이 최선의 보안 관행을 따르도록 포괄적인 보안 체크리스트를 제공합니다.
+
+Replit은 [기본적으로](/ko/features/security/overview) 많은 보안 기능을 제공하지만, 특정 애플리케이션 요구 사항에 맞는 추가 보안 조치를 이해하고 구현하는 것이 중요합니다.
+
+<iframe src="https://www.youtube.com/embed/0D9FMFyNBWo" title="Vibe code security checklist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen />
+
+## 사전 요구 사항
+
+* Replit 계정
+* 선호하는 프로그래밍 언어에 대한 기본 이해
+* Project Editor에 대한 친숙함
+* Replit에서 빌드 중인 애플리케이션
+
+## 프론트엔드 보안
+
+<AccordionGroup>
+  <Accordion title="모든 곳에 HTTPS 사용" icon="lock">
+    Replit은 모든 애플리케이션에 기본적으로 HTTPS를 사용합니다. 걱정하지 않아도 됩니다!
+  </Accordion>
+
+  <Accordion title="입력 유효성 검사 및 새니타이징" icon="shield-check">
+    크로스 사이트 스크립팅(XSS) 공격을 방지하려면 항상 사용자 입력을 유효성 검사하고 새니타이징하세요:
+
+    ```javascript theme={null}
+    // 잘못된 예: 사용자 입력을 직접 사용
+    element.innerHTML = userInput;
+
+    // 올바른 예: 사용 전에 입력 새니타이징
+    import { sanitize } from 'some-sanitizer-library';
+    element.innerHTML = sanitize(userInput);
+    ```
+
+    Agent에게 물어보세요:
+
+    ```
+    XSS 공격으로부터 보호하기 위해 입력을 유효성 검사하고 새니타이징하는 데 도움을 주세요
+    ```
+  </Accordion>
+
+  <Accordion title="민감한 데이터를 브라우저에서 제외하기" icon="eye-slash">
+    API 키 같은 민감한 정보를 저장하려면 Replit 시크릿을 사용해야 합니다.
+
+    다음 위치에 시크릿을 전달하거나 저장하지 마세요:
+
+    * 로컬 스토리지
+    * 세션 스토리지
+    * 클라이언트 측 JavaScript
+    * 적절한 보안 속성 없는 쿠키
+
+    Agent에게 물어보세요:
+
+    ```
+    민감한 데이터를 브라우저에서 제외하는 데 도움을 주세요. 제대로 하고 있나요?
+    ```
+  </Accordion>
+
+  <Accordion title="CSRF 보호" icon="shield">
+    양식에 크로스 사이트 요청 위조(CSRF) 보호를 구현하세요:
+
+    ```javascript theme={null}
+    // CSRF 토큰 구현 예시
+    const csrfToken = generateToken();
+    session.csrfToken = csrfToken;
+    ```
+
+    Agent에게 물어보세요:
+
+    ```
+    양식에 CSRF 토큰을 구현하는 데 도움을 주세요
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 백엔드 보안
+
+<AccordionGroup>
+  <Accordion title="인증 기본 사항" icon="key">
+    인증을 구현할 때:
+
+    * 가능하면 Replit Auth 사용하기
+    * 커스텀 인증을 빌드한다면 검증된 라이브러리 사용하기
+    * 평문 비밀번호 저장하지 않기
+
+    Agent에게 물어보세요:
+
+    ```
+    Replit Auth로 내 애플리케이션의 인증을 구현하는 데 도움을 주세요
+    ```
+  </Accordion>
+
+  <Accordion title="권한 부여 확인" icon="user-lock">
+    작업을 수행하기 전에 항상 권한을 확인하세요:
+
+    ```javascript theme={null}
+    // 권한 부여 확인 예시
+    if (!user.canAccess(resource)) {
+      return res.status(403).send('Access denied');
+    }
+    ```
+
+    Agent에게 물어보세요:
+
+    ```
+    내 애플리케이션의 권한 부여 확인을 구현하는 데 도움을 주세요
+    ```
+  </Accordion>
+
+  <Accordion title="API 엔드포인트 보호" icon="shield">
+    API 엔드포인트를 안전하게 하세요:
+
+    * 민감한 엔드포인트에 인증 추가하기
+    * 적절한 CORS 설정 구현하기
+    * 속도 제한 고려하기
+
+    Agent에게 물어보세요:
+
+    ```
+    내 앱에서 엔드포인트를 올바르게 인증하는 방법은 무엇인가요?
+    ```
+  </Accordion>
+
+  <Accordion title="SQL 인젝션 방지" icon="database">
+    Agent는 기본적으로 ORM을 사용해 SQL 인젝션을 방지합니다. 커스텀 데이터베이스 쿼리를 작성한다면:
+
+    ```javascript theme={null}
+    // 잘못된 예: 쿼리에서 문자열 연결
+    db.query(`SELECT * FROM users WHERE username = '${username}'`);
+
+    // 올바른 예: ORM을 사용한 매개변수화된 쿼리
+    db.query('SELECT * FROM users WHERE username = ?', [username]);
+    ```
+  </Accordion>
+
+  <Accordion title="보안 헤더" icon="code">
+    애플리케이션에 중요한 보안 헤더를 추가하세요:
+
+    ```html theme={null}
+    <!-- index.html 또는 백엔드를 통해 -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+    ```
+
+    [securityheaders.com](https://securityheaders.com)에서 사이트를 스캔해 권장 사항을 받을 수 있습니다.
+
+    Agent에게 물어보세요:
+
+    ```
+    내 애플리케이션에 보안 헤더를 추가해 주실 수 있나요?
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 지속적인 보안 관행
+
+<AccordionGroup>
+  <Accordion title="의존성 업데이트 유지" icon="arrow-rotate-right">
+    취약점이 있을 수 있는 오래된 패키지를 정기적으로 확인하세요:
+
+    ```bash theme={null}
+    npm audit
+    ```
+  </Accordion>
+
+  <Accordion title="적절한 오류 처리" icon="exclamation">
+    오류 메시지에 민감한 정보를 노출하지 마세요:
+
+    ```javascript theme={null}
+    // 잘못된 예: 민감한 세부 정보 노출
+    catch (err) {
+      res.status(500).send(`Database error: ${err.message}`);
+    }
+
+    // 올바른 예: 일반 오류 메시지
+    catch (err) {
+      console.error(err); // 내부적으로 로깅
+      res.status(500).send('An error occurred');
+    }
+    ```
+
+    Agent에게 물어보세요:
+
+    ```
+    내 애플리케이션의 적절한 오류 처리를 구현하는 데 도움을 주세요
+    ```
+  </Accordion>
+
+  <Accordion title="안전한 쿠키" icon="cookie">
+    쿠키를 사용할 때:
+
+    * JavaScript 접근을 방지하려면 HttpOnly 플래그 설정하기
+    * HTTPS를 요구하려면 Secure 속성 사용하기
+    * CSRF를 방지하려면 SameSite 속성 구현하기
+
+    Agent에게 물어보세요:
+
+    ```
+    내 애플리케이션의 쿠키를 안전하게 하는 데 도움을 주세요
+    ```
+  </Accordion>
+
+  <Accordion title="파일 업로드 보안" icon="upload">
+    애플리케이션이 파일 업로드를 허용하는 경우:
+
+    * 파일 유형 및 크기 제한하기
+    * 가능하면 맬웨어 스캔하기
+    * Replit의 오브젝트 스토리지에 파일 저장하기
+    * 사용자가 제공한 이름 대신 새 파일 이름 생성하기
+
+    Agent에게 물어보세요:
+
+    ```
+    내 애플리케이션의 파일 업로드를 안전하게 하는 데 도움을 주세요
+    ```
+  </Accordion>
+
+  <Accordion title="속도 제한" icon="clock">
+    특히 인증 관련 API 엔드포인트에 속도 제한을 구현하세요:
+
+    ```javascript theme={null}
+    // 속도 제한 미들웨어 예시
+    const rateLimit = require('express-rate-limit');
+
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15분
+      max: 100 // 각 IP를 windowMs당 100개 요청으로 제한
+    });
+
+    app.use('/api/', limiter);
+    ```
+
+    Agent에게 물어보세요:
+
+    ```
+    내 애플리케이션의 속도 제한을 구현하는 데 도움을 주세요
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 체크리스트
+
+보안 관행을 유지하는 데 도움이 되는 위 내용을 체크리스트로 정리했습니다.
+
+## 프론트엔드 보안
+
+|   | 보안 조치               | 설명                           |
+| - | ------------------- | ---------------------------- |
+| ☐ | 모든 곳에 HTTPS 사용      | 기본적인 도청 및 중간자 공격 방지          |
+| ☐ | 입력 유효성 검사 및 새니타이징   | 모든 사용자 입력을 유효성 검사해 XSS 공격 방지 |
+| ☐ | 브라우저에 민감한 데이터 저장 금지 | 로컬 스토리지나 클라이언트 측 코드에 시크릿 없음  |
+| ☐ | CSRF 보호             | 양식 및 상태 변경 요청에 CSRF 방지 토큰 구현 |
+| ☐ | 프론트엔드에 API 키 노출 금지  | API 자격증명은 항상 서버 측에 유지        |
+
+## 백엔드 보안
+
+|   | 보안 조치        | 설명                                               |
+| - | ------------ | ------------------------------------------------ |
+| ☐ | 인증 기본 사항     | 검증된 라이브러리, 적절한 비밀번호 저장(해싱+솔팅) 사용                 |
+| ☐ | 권한 부여 확인     | 작업 수행 전 항상 권한 확인                                 |
+| ☐ | API 엔드포인트 보호 | 모든 API 엔드포인트에 적절한 인증 구현                          |
+| ☐ | SQL 인젝션 방지   | 매개변수화된 쿼리 또는 ORM 사용, 사용자 입력이 있는 원시 SQL 금지        |
+| ☐ | 기본 보안 헤더     | X-Frame-Options, X-Content-Type-Options, HSTS 구현 |
+| ☐ | DDoS 보호      | 기본 DDoS 완화 기능이 있는 CDN 또는 클라우드 서비스 사용             |
+
+## 실용적인 보안 습관
+
+|   | 보안 조치       | 설명                               |
+| - | ----------- | -------------------------------- |
+| ☐ | 의존성 업데이트 유지 | 대부분의 취약점은 오래된 라이브러리에서 발생         |
+| ☐ | 적절한 오류 처리   | 오류 메시지에 민감한 세부 정보 노출 금지          |
+| ☐ | 안전한 쿠키      | HttpOnly, Secure, SameSite 속성 설정 |
+| ☐ | 파일 업로드 보안   | 파일 유형, 크기 유효성 검사 및 악성 콘텐츠 스캔     |
+| ☐ | 속도 제한       | 모든 API 엔드포인트, 특히 인증 관련 엔드포인트에 구현 |

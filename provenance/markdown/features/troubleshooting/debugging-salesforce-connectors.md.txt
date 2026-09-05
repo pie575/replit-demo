@@ -1,0 +1,98 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Fixing Salesforce Connection Expired Errors
+
+> Fix 'Connection Expired' errors when using the Salesforce connector in Replit by updating your refresh token policy.
+
+## Overview
+
+If your Salesforce connector stops working and you see a **"Connection Expired"** error, it usually means your Salesforce organization's refresh token policy is configured to expire tokens after a set period. When this happens, Replit can no longer authenticate with Salesforce on your behalf, and the connection must be re-authorized.
+
+This guide walks you through updating your Salesforce Connected App settings so the refresh token remains valid until it is explicitly revoked.
+
+<Warning>
+  These steps require **Salesforce administrator access**. If you do not have admin privileges, contact your Salesforce admin and share this guide with them.
+</Warning>
+
+## Troubleshooting steps
+
+### Step 1: Open your Salesforce Connected App settings
+
+<Steps>
+  <Step title="Log in to Salesforce">
+    Log in to your Salesforce organization as an administrator.
+  </Step>
+
+  <Step title="Navigate to Connected Apps">
+    Go to **Setup > Apps > Connected Apps > Manage Connected Apps**.
+  </Step>
+
+  <Step title="Find the Replit app">
+    Locate the **Replit** Connected App in the list and select it.
+  </Step>
+
+  <Step title="Edit policies">
+    Select **Edit Policies** to open the policy configuration page.
+  </Step>
+</Steps>
+
+### Step 2: Update the refresh token policy
+
+The default Salesforce refresh token policy may expire tokens after a set number of days or after a period of inactivity. To prevent connection expiration, change the policy to keep tokens valid indefinitely.
+
+<Steps>
+  <Step title="Find the Refresh Token Policy setting">
+    On the Connected App Edit page, locate the **Refresh Token Policy** section under **OAuth Policies**.
+  </Step>
+
+  <Step title="Select 'Refresh token is valid until revoked'">
+    Change the policy to **Refresh token is valid until revoked**. This ensures the token does not expire automatically.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/kG5pMeNajrUnlGOX/images/replitai/debugging-salesforce-connectors/refresh-token-policy.png?fit=max&auto=format&n=kG5pMeNajrUnlGOX&q=85&s=0856869ae9de3146aa0a5ff61c8a6ddd" alt="Salesforce Connected App Edit page showing the Refresh Token Policy set to 'Refresh token is valid until revoked'" width="886" height="449" data-path="images/replitai/debugging-salesforce-connectors/refresh-token-policy.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Save your changes">
+    Select **Save** to apply the updated policy.
+  </Step>
+</Steps>
+
+<Tip>
+  Policy changes may take a few minutes to take effect. After saving, wait a few minutes before reconnecting Salesforce in Replit.
+</Tip>
+
+### Step 3: Reconnect Salesforce in Replit
+
+After updating the refresh token policy, reconnect the Salesforce connector in Replit.
+
+<Steps>
+  <Step title="Open the Project Editor">
+    Navigate to your app in the Project Editor.
+  </Step>
+
+  <Step title="Go to Connectors">
+    Open the **Connectors** panel in the sidebar.
+  </Step>
+
+  <Step title="Reconnect Salesforce">
+    Select **Reconnect** on the expired Salesforce connection. Complete the OAuth authorization flow when prompted.
+  </Step>
+</Steps>
+
+## Still seeing errors?
+
+If you have updated the refresh token policy and the connection still expires:
+
+* **Check other token policy options**: Make sure none of the alternative expiration options (such as "Expire refresh token if not used for" or "Expire refresh token after") are selected.
+* **Verify IP Relaxation settings**: If your Salesforce org enforces IP restrictions, the **IP Relaxation** setting on the Connected App may block requests from Replit's servers. Consider setting it to **Relax IP restrictions** if appropriate for your security requirements.
+* **Review login history**: In Salesforce, check **Setup > Login History** for any failed authentication attempts related to Replit.
+* **Contact Replit support**: If the issue is not on the Salesforce side, reach out to [Replit support](https://replit.com/support) for help.
+
+## Related documentation
+
+* [Connectors overview](/features/integrations/overview) -- Learn about all integration types, including Salesforce connectors
+* [Managing your connectors](/replitai/managing-connectors) -- Admin setup for Workspace and organization connectors
+* [Salesforce Help: Manage Connected Apps](https://help.salesforce.com/s/articleView?id=sf.connected_app_manage.htm) -- Salesforce's official guide to managing Connected App policies

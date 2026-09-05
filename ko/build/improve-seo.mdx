@@ -1,0 +1,145 @@
+---
+title: "앱 SEO 개선"
+description: "Replit의 SEO 점수와 Agent를 사용해 배포된 앱이 검색 엔진에서 더 높은 순위를 차지하도록 합니다."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+이 작업이 끝나면 배포된 앱이 검색 엔진에서 더 높은 순위를 차지하게 되며, Publishing 도구의 SEO 점수에 반영됩니다.
+
+성공적인 배포 후 Replit은 SEO 감사를 실행하고 SEO 점수를 표시합니다. 점수가 개선 여지가 있으면, 클릭 한 번으로 특정 문제를 Agent에 전달합니다. 대부분의 빌더에게 워크플로우는 단순합니다. **배포 → 점수 확인 → Agent에게 최적화 요청**.
+
+점수 계산 방법(Lighthouse 감사, 각 점수의 의미, 지원되는 배포 유형)에 대한 자세한 내용은 [SEO 점수](/ko/features/publishing/seo-rating)를 참조하세요.
+
+## SEO Agent로 최적화
+
+[SEO Agent](/ko/features/publishing/seo-agent)는 배포된 앱에 대한 기술적 SEO 감사를 실행하고 각 발견 사항을 원클릭 수정으로 전환합니다. Project Editor의 **Growth** 패널에 위치하며 유료 플랜 빌더에게 제공됩니다. 다음 단계에 따라 앱을 스캔하고 수정 사항을 적용하세요.
+
+<Steps>
+  <Step title="앱을 배포하여 Growth 잠금 해제">
+    SEO Agent는 배포된 앱에서 작동합니다. 배포하기 전까지는 **Growth** 패널이 잠겨 있으며 **Go to Publishing**을 클릭하라는 안내가 표시됩니다. Agent 채팅 또는 **Publishing** 도구에서 배포한 다음 Growth 패널로 돌아오세요.
+
+    <Frame caption="배포 전에는 Go to Publishing 프롬프트와 함께 Growth 패널이 잠겨 있습니다">
+      <img src="/assets/mirror/01-growth-locked-b05c24711f10.png" alt="'앱을 배포하여 Growth 도구 잠금 해제'라는 제목과 Go to Publishing 버튼이 있는 잠긴 상태의 Growth 패널" width="1657" height="947" data-path="images/deployments/seo-agent/01-growth-locked.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Agent로 스캔 실행">
+    **Growth** 패널을 열고 **SEO 점수** 카드를 찾으세요. **Run scan with Agent**를 선택하여 프로젝트에 대한 기술적 SEO 감사를 시작합니다. 스캔은 보통 몇 분 정도 걸립니다.
+
+    <Frame caption="SEO 점수 카드에서 Run scan with Agent를 선택하여 감사를 시작하세요">
+      <img src="/assets/mirror/02-run-scan-94a2b8918fe9.png" alt="Run scan with Agent 버튼을 빨간 사각형으로 강조한 SEO 점수 카드의 확대 화면" width="1656" height="946" data-path="images/deployments/seo-agent/02-run-scan.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Agent로 수정 또는 Agent로 모두 수정">
+    스캔이 완료되면 **Severity**(낮음, 중간, 높음) 및 **Status**(미해결) 열이 있는 표에 **AI Readiness**, **Crawlability & Discovery**, **Landing Page Rendering & Metadata**, **Performance Proxies** 등의 카테고리별로 분류된 문제들이 표시됩니다. 각 문제를 펼쳐 SEO Agent가 발견한 내용을 확인하세요.
+
+    원하는 세분성으로 수정을 적용할 수 있습니다.
+
+    * 단일 문제에서 **Fix with Agent**를 선택하면 해당 항목만 Agent에 전달됩니다.
+    * 카테고리에서 **Fix with Agent**를 선택하면 해당 그룹의 모든 문제를 수정합니다.
+    * **Fix all with Agent**를 선택하면 모든 문제를 한 번에 Agent에 전달합니다. 채팅의 **Fix all issues** 버튼도 동일한 기능을 합니다.
+
+    <Frame caption="스캔 후 Fix all with Agent로 개별, 카테고리별, 또는 한 번에 모든 문제를 수정하세요">
+      <img src="/assets/mirror/03-fix-with-agent-c5b9e642818e.png" alt="카테고리별로 분류되고 severity 및 status 열이 있는 스캔 결과 표 — Fix all with Agent 버튼과 카테고리별 Fix with Agent 버튼을 빨간 사각형으로 강조" width="1657" height="947" data-path="images/deployments/seo-agent/03-fix-with-agent.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Agent가 수정 작업 진행">
+    Agent는 각 문제에 대한 수정 작업을 생성하고 백그라운드에서 작업을 진행하므로 계속 빌드할 수 있습니다. 행이 **Fix in progress**로 업데이트되며, **Go to task** 링크를 통해 작업을 열어 진행 상황을 확인할 수 있습니다.
+
+    <Frame caption="Agent가 수정 작업을 생성하면 문제 행에 Fix in progress 상태와 Go to task 링크가 표시됩니다">
+      <img src="/assets/mirror/04-fixes-in-progress-e05dd10c05b3.png" alt="Agent가 작업 중인 동안 Fix in progress 상태와 Go to task 링크가 표시된 스캔 결과 표" width="1657" height="947" data-path="images/deployments/seo-agent/04-fixes-in-progress.png" />
+    </Frame>
+  </Step>
+
+  <Step title="메인 버전에 변경 사항 적용">
+    수정이 완료되면 작업이 **Ready for review** 상태로 표시됩니다. 변경 사항을 검토한 다음 초록색 **Apply changes to main version** 버튼을 선택하여 앱에 수정 사항을 병합하세요. 새 빌드를 기준으로 SEO 점수를 새로 고침하려면 재배포하세요.
+
+    <Frame caption="각 수정 사항을 검토하고 Apply changes to main version을 선택하여 병합하세요">
+      <img src="/assets/mirror/05-apply-changes-7d167b6bb93a.png" alt="초록색 Apply changes to main version 버튼을 빨간 사각형으로 강조한 Ready for review 작업 푸터의 확대 화면" width="1656" height="946" data-path="images/deployments/seo-agent/05-apply-changes.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Tip>
+  스캔 UI를 완전히 건너뛸 수도 있습니다. Agent를 열고 \*\*"optimize my
+  SEO"\*\*라고 말하면 Agent가 최신 결과를 가져와 작업을 시작합니다.
+</Tip>
+
+Agent가 적용할 일반적인 수정 사항:
+
+* 각 페이지에 고유하고 설명적인 제목이 있도록 누락되거나 일반적인 `<title>` 태그를 추가하거나 재작성합니다.
+* 모든 페이지에 메타 설명을 추가합니다.
+* 이미지에 설명적인 `alt` 텍스트를 추가합니다.
+* `<html>` 요소에 `lang` 속성을 설정합니다.
+* 링크에 식별 가능한 텍스트가 있는지 확인합니다 ("여기 클릭" 또는 빈 앵커 없음).
+* `robots.txt`와 `sitemap.xml`을 추가합니다.
+* 모바일 렌더링을 위한 viewport 메타 태그를 추가합니다.
+* 접근성 검사를 통과하지 못하는 텍스트의 색상 대비를 개선합니다.
+* 소셜 플랫폼에서 앱 링크가 잘 미리보기될 수 있도록 Open Graph 및 Twitter 카드 메타 태그를 추가합니다.
+
+## SEO 최적화 앱을 위한 모범 사례
+
+Agent에게 처리를 요청하든 직접 작성하든, 다음이 가장 중요한 항목들입니다.
+
+* **모든 페이지에 고유한 제목과 메타 설명을 부여합니다.** 제목은 60자 이내, 설명은 150\~160자를 목표로 합니다.
+* **시맨틱 HTML을 사용합니다.** `<main>`, `<header>`, `<nav>`, `<footer>`로 레이아웃을 감쌉니다. 페이지당 `<h1>`을 한 번만 사용하고 헤딩 레벨을 순서대로 사용합니다.
+* **모든 이미지에 alt 텍스트를 추가합니다.** 이미지가 무엇인지가 아닌 무엇을 보여주는지 설명합니다.
+* **`sitemap.xml`과 `robots.txt`를 생성합니다.** 검색 엔진이 크롤링할 내용을 알 수 있도록 Agent에게 두 가지 모두 만들도록 요청합니다.
+* **Open Graph 및 Twitter 카드 태그를 추가합니다.** 소셜 미디어에서 공유할 때 앱의 모습을 제어합니다.
+* **커스텀 도메인을 사용합니다.** 브랜드 도메인은 방문자와 검색 엔진 모두에게 신뢰를 구축합니다. [커스텀 도메인 추가](/ko/build/add-custom-domain)를 참조하세요.
+* **올바른 배포 유형을 선택합니다.** 콘텐츠가 많은 사이트의 경우 [Static 배포](/ko/features/publishing/deployment-types#static)가 검색 엔진이 즉시 파싱하는 미리 렌더링된 HTML을 제공합니다.
+* **구조화된 데이터를 추가합니다.** JSON-LD 마크업은 검색 엔진이 제품, 기사, FAQ, 이벤트에 대한 풍부한 결과를 표시하는 데 도움이 됩니다.
+* **앱을 빠르게 유지합니다.** 이미지를 최적화하고, 렌더링을 막는 스크립트를 피하고, Replit의 호스팅을 활용해 응답 시간을 낮게 유지합니다.
+
+한 번에 대부분을 적용하는 간단한 방법:
+
+<AiPrompt>
+  내 사이트의 SEO 모범 사례를 감사하고 수정 사항을 적용하세요. 사이트맵, robots.txt, Open Graph 태그, 적절한 곳에 구조화된 데이터를 추가하고, 모든 페이지에 고유한 제목과 메타 설명이 있는지 확인하세요.
+</AiPrompt>
+
+## 다음 개선 사항
+
+<CardGroup cols={2}>
+  <Card title="SEO Agent" icon="robot" href="/ko/features/publishing/seo-agent">
+    기술적 SEO 감사를 실행하고 크롤 가능성, 메타데이터, 구조화된 데이터에 대한 원클릭 수정을 적용하세요.
+  </Card>
+
+  <Card title="SEO 점수" icon="magnifying-glass-chart" href="/ko/features/publishing/seo-rating">
+    점수 계산 방법, 각 점수의 의미, 지원하는 배포 유형을 정확히 확인합니다.
+  </Card>
+
+  <Card title="커스텀 도메인 추가" icon="globe" href="/ko/build/add-custom-domain">
+    앱을 자체 도메인으로 이전합니다 — 브랜드 URL은 방문자와 검색 엔진 모두에게 신뢰를 구축합니다.
+  </Card>
+
+  <Card title="Static 배포" icon="file-code" href="/ko/features/publishing/deployment-types#static">
+    콘텐츠가 많고 SEO가 중요한 사이트에 가장 적합한 배포 유형입니다.
+  </Card>
+
+  <Card title="배포 지역" icon="globe-pointer" href="/ko/features/publishing/project-geography">
+    대상 독자를 위한 응답 시간을 낮게 유지하기 위해 앱이 실행되는 위치를 선택합니다.
+  </Card>
+</CardGroup>
+
+## 추가 도움이 필요하신가요?
+
+* **재배포 후 점수가 업데이트되지 않음:** 1\~2분 기다리세요 — 감사는 배포가 완료된 후 비동기적으로 실행되며, 결과가 도착하면 배지가 새로 고침됩니다.
+* **Agent 변경 후에도 점수가 동일함:** Agent가 처리한 특정 Lighthouse 항목을 물어보고, 배지 툴팁에서 여전히 표시된 항목을 확인하세요.
+* **일부 페이지의 점수가 다른 페이지보다 낮음:** 배지는 크롤링된 모든 URL 중 가장 낮은 점수를 표시합니다. Lighthouse가 표시한 특정 페이지에 집중하도록 Agent에게 요청하세요.
+* **배포된 앱에서 점수가 표시되지 않음:** SEO 점수는 공개 웹 대면 배포 유형(Autoscale, Reserved VM, Static)에서만 실행됩니다. 예약 배포와 비공개 배포는 점수를 생성하지 않습니다.

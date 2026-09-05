@@ -1,0 +1,120 @@
+---
+title: "Recuperação de desastres do Git"
+description: "Aprenda como recuperar seu histórico Git e código usando o sistema de backup automático do Replit."
+---
+
+O Replit faz backup automático do seu repositório Git para ajudá-lo a se recuperar de problemas como pastas `.git` corrompidas ou histórico de commits perdido. Esse sistema de backup roda em segundo plano, então seu trabalho está protegido sem nenhum esforço extra.
+
+## Como funciona
+
+Cada Replit App mantém um backup seguro do seu repositório Git. Quando o Replit Agent faz alterações no código ou você publica seu app, elas são automaticamente sincronizadas com esse backup. Se o seu repositório Git local ficar corrompido ou inutilizável, você pode restaurar seu histórico completo de commits a partir do backup.
+
+<Info>
+  O remote de backup é nomeado `gitsafe-backup` e é gerenciado automaticamente pelo Replit. Você não precisa configurar nada — ele já está funcionando em segundo plano.
+</Info>
+
+## Visualizar seu histórico de backup
+
+A maneira mais fácil de visualizar seu histórico de commits é através do [painel do Git](/pt/features/workspace-tools/git-interface). Abra-o na seção Tools no Project Editor — ele mostra seu histórico completo de commits, incluindo todos os checkpoints do Agent. Isso funciona para a maioria dos casos e não requer nenhum comando.
+
+Se precisar inspecionar o remote gitsafe-backup diretamente, você pode usar o Shell:
+
+```bash theme={null}
+git fetch gitsafe-backup main
+git log gitsafe-backup/main
+```
+
+Isso mostra seu histórico completo de commits, incluindo todos os checkpoints do Agent e commits manuais. Você pode usar isso para verificar se seu trabalho está com backup ou para encontrar um commit específico para restaurar.
+
+## Recuperação de problemas do Git
+
+Se você encontrar erros do Git ou seu repositório ficar corrompido, comece com o [painel do Git](/pt/features/workspace-tools/git-interface). Ele pode resolver a maioria dos problemas comuns — como redefinir para um commit anterior ou fazer pull de um remote — sem precisar de comandos no Shell.
+
+Para casos em que o painel do Git não consegue ajudar (como uma pasta `.git` totalmente corrompida), use os passos baseados no Shell abaixo.
+
+### Verificar se o backup está disponível
+
+Primeiro, verifique se o remote de backup existe:
+
+```bash theme={null}
+git remote -v
+```
+
+Procure por `gitsafe-backup` na saída. Se estiver presente, você pode prosseguir com a recuperação.
+
+### Restaurar seu repositório
+
+<Warning>
+  Este processo substitui sua pasta `.git` atual pela versão com backup. Seus arquivos de trabalho permanecem inalterados, mas seu histórico Git local será substituído pelo backup.
+</Warning>
+
+<Steps>
+  <Step title="Salvar sua configuração atual do Git">
+    Faça backup do seu arquivo de configuração do Git caso você tenha configurações personalizadas:
+
+    ```bash theme={null}
+    cp .git/config .git_config_backup
+    ```
+  </Step>
+
+  <Step title="Clonar o repositório de backup">
+    Crie um clone temporário a partir do backup:
+
+    ```bash theme={null}
+    git clone --bare git://gitsafe:5418/backup.git /tmp/gitsafe-restore
+    ```
+  </Step>
+
+  <Step title="Substituir sua pasta Git">
+    Mova sua pasta `.git` corrompida para o lado e substitua-a pelo backup:
+
+    ```bash theme={null}
+    mv .git .git_corrupted_backup
+    mv /tmp/gitsafe-restore/ .git
+    ```
+  </Step>
+
+  <Step title="Restaurar sua configuração">
+    Copie de volta sua configuração do Git:
+
+    ```bash theme={null}
+    mv .git_config_backup .git/config
+    ```
+  </Step>
+</Steps>
+
+Após concluir essas etapas, execute `git status` para verificar se seu repositório está funcionando corretamente.
+
+## Solução de problemas comuns
+
+### "fatal: repository not found" ou remote de backup ausente
+
+O sistema de backup pode não estar habilitado para projetos mais antigos. Entre em contato com o suporte se precisar de ajuda para recuperar um projeto antigo.
+
+### A recuperação não incluiu commits recentes
+
+Os backups são sincronizados após cada commit do Agent. Se você fez alterações mas não as commitou, essas alterações não estarão no backup. Verifique seu diretório de trabalho em busca de arquivos não commitados.
+
+### Operações do Git estão lentas ou travadas
+
+Se as operações do Git ficarem sem resposta, pode haver um arquivo de lock obsoleto. Você pode removê-lo com segurança:
+
+```bash theme={null}
+rm -f .git/index.lock
+```
+
+## Prevenção de perda de dados
+
+Embora o sistema de backup proteja automaticamente seu histórico do Git, você pode tomar medidas adicionais para proteger seu trabalho:
+
+* **Faça commits com frequência**: Faça commits pequenos e frequentes para que seu progresso seja continuamente salvo em backup
+* **Use checkpoints**: Ao trabalhar com o [Replit Agent](/pt/features/agent/overview), os checkpoints criam commits automaticamente em marcos chave
+* **Conecte ao GitHub**: Para projetos críticos, [conecte seu app ao GitHub](/pt/build/import-from-providers) para uma camada adicional de backup
+
+## Próximos passos
+
+Para saber mais sobre controle de versão no Replit:
+
+* [Visão geral do controle de versão](/pt/learn/projects-and-artifacts/version-control): Aprenda sobre todas as opções de controle de versão
+* [Usando o painel do Git](/pt/features/workspace-tools/git-interface): Gerencie o Git visualmente sem linha de comando
+* [Checkpoints e Rollbacks](/pt/features/version-control/checkpoints-and-rollbacks): Entenda como os checkpoints do Agent funcionam

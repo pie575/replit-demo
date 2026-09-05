@@ -1,0 +1,135 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Portas
+
+> Saiba como configurar e gerenciar portas de rede no seu Replit App.
+
+Como o Replit executa seus projetos em um ambiente de nuvem, as portas funcionam de forma diferente no Replit do que no seu computador local. (Se você precisar de uma explicação mais básica sobre o que são portas TCP, [comece aqui](https://www.reddit.com/r/explainlikeimfive/comments/1t9s5a/eli5_what_are_ports_ex_tcp_port/).)
+
+Em um computador, você tem apenas uma camada de gerenciamento de portas: seus programas definem uma porta que escutam, e quando o tráfego atinge essa porta no seu computador a partir da internet, ele é roteado para o processo apropriado.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/computer.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=6e8edcd0ec3e450bdef6c32289d36dcc" alt="computador" width="1323" height="786" data-path="images/ports/computer.png" />
+</Frame>
+
+A parte `0.0.0.0` é o endereço, ou host. Se um processo está escutando em `0.0.0.0`, isso significa que ele deve escutar em cada interface de rede — o que significa que se outro computador (na internet) enviar uma solicitação para o endereço IP do seu computador, ele verá. Portanto, escutar em 0.0.0.0 significa que esses processos estão acessíveis à internet pública (se o seu computador estiver conectado).
+
+A maioria dos frameworks de programação *não* escuta em `0.0.0.0` quando você está desenvolvendo, porque você não necessariamente quer que seu trabalho seja exposto ao público enquanto você está trabalhando, por privacidade e segurança. Em vez disso, eles escutarão em um endereço diferente — `127.0.0.1`, também conhecido como `localhost`. Isso significa que apenas aquele computador pode fazer solicitações para essa porta.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/computer-localhost.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=96a818c90fd879a814a647e18b506f7c" alt="Portas localhost são visíveis apenas no computador que as hospeda." width="1467" height="786" data-path="images/ports/computer-localhost.png" />
+</Frame>
+
+No Replit, para que um processo em execução seja acessível na visualização web ou por meio de uma solicitação externa, ele precisa ter uma **porta externa** definida. Isso ocorre porque a "porta interna" que os processos normalmente usam é visível apenas dentro do ambiente de nuvem isolado que o Replit fornece. Essa porta interna deve ser conectada a uma porta externamente acessível para enviar o tráfego correto para seus programas. Mesmo que o processo escute em uma porta normalmente disponível ao público como 0.0.0.0, ela ainda precisa estar vinculada a uma porta externa.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/replit.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=9162e125c12faa1b6f896cc394957a85" alt="Portas externas encaminham o tráfego para portas internas que os programas escutam." width="1641" height="870" data-path="images/ports/replit.png" />
+</Frame>
+
+O Replit faz isso vinculando portas externas a portas internas específicas — por exemplo, no diagrama acima, a porta externa `:80` está vinculada à porta interna `:3000`. Isso significa que qualquer tráfego que o Replit App receber na porta 80 irá para a porta interna 3000.
+
+Esta configuração é capturada na seção \[\[ports]] do arquivo de configuração .replit.
+
+Por padrão, o Replit vincula a primeira porta que você abre à porta externa padrão 80, o que permite que esse processo esteja disponível no domínio sem um endereço de porta (por exemplo, customdomain.com/ em vez de customdomain.com:3000/). Portas internas adicionais que são abertas são vinculadas a outras portas externas disponíveis (veja a lista completa abaixo).
+
+## Visualização
+
+Na ferramenta Preview, você pode alterar qual porta externa a visualização web está renderizando clicando no domínio e selecionando uma porta diferente. Você também pode abrir a ferramenta de rede pelo ícone de "engrenagem" para mais detalhes.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/webview_dropdown.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=35f188e6a98287c45e1c5a4b811e9794" alt="Clicar no domínio na visualização web permite que você escolha qual porta visualizar." width="862" height="534" data-path="images/ports/webview_dropdown.png" />
+</Frame>
+
+## Porta padrão
+
+A porta :80 é a "porta padrão" para tráfego HTTP, então o tráfego HTTP enviado ao domínio raiz será automaticamente roteado para a porta 80. Por esse motivo, o caminho da porta não é mostrado na URL para a porta 80. Portas diferentes de `:80` aparecerão no caminho do domínio (por exemplo, customdomain.com:4200/). (O Replit fornece TLS por padrão, então tecnicamente será pela porta 443, que é a porta padrão para HTTPS. Para todos os efeitos, você pode tratá-las como intercambiáveis.)
+
+## Ferramenta de rede
+
+Para mais detalhes sobre configuração de porta e rede, você pode abrir a ferramenta de rede. Ela mostra o status das portas abertas no seu Replit App, a qual porta externa estão vinculadas e permite adicionar ou remover configurações.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/networking_tool.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=61b24a896e5dc920ed70f3603228d33f" alt="A ferramenta de rede mostra sua configuração de portas." width="1412" height="558" data-path="images/ports/networking_tool.png" />
+</Frame>
+
+## Publicação
+
+Deployments Autoscale e Reserved VM suportam apenas uma única porta externa sendo exposta, e a porta interna correspondente não pode usar `localhost`. Se você expuser mais portas, ou expuser uma única porta no localhost, o aplicativo publicado falhará. Uma maneira fácil de garantir que seus deployments Autoscale funcionem conforme esperado é remover todas as entradas `externalPort` das portas na sua configuração *exceto* a porta do serviço com o qual você deseja interagir da internet.
+
+## Depuração
+
+Um motivo comum pelo qual algo pode não estar funcionando como esperado é que, embora a configuração da porta pareça correta, o programa está na verdade procurando uma porta diferente. Por exemplo, se a sua configuração for:
+
+```
+[[ports]]
+internalPort = 3000
+externalPort = 80
+```
+
+Então o tráfego da internet para a porta 80 irá para a porta interna 3000. No entanto, se o seu programa não estiver escutando na porta 3000, mas em outra (como 8080), parecerá que nenhum tráfego está chegando. Isso pode acontecer se você mudar a porta no código sem mudar a porta correspondente na configuração, ou copiar e colar a configuração de um projeto para outro.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/AZ1L8RlIroSxuJDa/images/ports/replit-wrong_port.png?fit=max&auto=format&n=AZ1L8RlIroSxuJDa&q=85&s=42510d0331118fcf4a5cba7c812d09ee" alt="Os programas podem mudar as portas que escutam." width="1641" height="870" data-path="images/ports/replit-wrong_port.png" />
+</Frame>
+
+Cada framework tem portas padrão diferentes que escuta — por exemplo, Flask é 5000, React é 3000 e Laravel é 8000. Certifique-se de que a porta correta esteja configurada!
+
+## Preferências
+
+O Replit vincula automaticamente as portas abertas no seu Replit App a portas externas disponíveis quando são abertas e registra essa vinculação no arquivo de configuração .replit.
+
+No entanto, isso não acontece por padrão para portas internas que abrem no localhost, porque serviços que geralmente são executados no localhost normalmente assumem que serão acessíveis apenas no mesmo computador que o processo em execução (portas localhost são visíveis apenas para o mesmo computador que executa o processo). Isso significa que esses serviços muitas vezes não são tão seguros quanto serviços criados presumindo que estarão disponíveis para a internet pública.
+
+Você sempre pode substituir isso definindo a opção de configuração `exposeLocalhost` como `true` para a porta que deseja expor.
+
+Se você quiser *sempre* expor portas localhost por padrão, pode definir a configuração de "encaminhamento automático de portas" na ferramenta Configurações do Usuário como "Todas as portas".
+
+Se você quiser *nunca* criar configuração para portas que são abertas e controlar manualmente a configuração de portas de todos os seus Replit Apps, pode definir isso como "nunca".
+
+## Portas suportadas
+
+O Replit App definirá a porta 80 como a porta externa padrão quando a primeira porta for aberta. Um Replit App pode expor 3000, 3001, 3002, 3003, 4200, 5000, 5173, 6000, 6800, 8000, 8008, 8080, 8081, como portas externas adicionais.
+
+As portas 22 e 8283 não podem ser encaminhadas, pois são usadas internamente.
+
+## Configuração `[[ports]]` do .replit
+
+Tipo: `{localPort, externalPort, exposeLocalhost}`
+
+A configuração `[[ports]]` permite que você configure qual porta HTTP expor para a saída web. Por padrão, qualquer porta HTTP exposta com host 0.0.0.0 será exposta como saída web do seu Replit App.
+
+Portas adicionais podem ser servidas sem substituir a porta padrão adicionando uma nova entrada \[\[ports]] ao arquivo .replit. É necessário especificar entradas de localPort e externalPort. Você pode adicionar várias portas extras adicionando múltiplas entradas \[\[ports]] ao arquivo .replit conforme definido abaixo.
+
+### localPort
+
+Determina qual porta o Replit vinculará a uma porta externa.
+
+### externalPort
+
+Determina qual porta deve ser exposta como porta acessível publicamente para essa porta local.
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+Se você quiser *nunca* expor uma porta específica, pode manter a configuração `localPort`, mas simplesmente não adicionar um `externalPort`:
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+```
+
+### exposeLocalhost
+
+Determina se uma porta interna usando `localhost` pode ser vinculada a uma porta externa. Pode ser `true`, `false` ou null.
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+exposeLocalhost = true
+```

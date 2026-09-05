@@ -1,0 +1,315 @@
+---
+title: "Clerk Auth"
+description: "Clerk Authがカスタマイズ可能なブランディング、独立したユーザーアカウント、SSOプロバイダーを備えた専用認証システムをReplit appに提供する方法を説明します。"
+---
+
+Clerk Authは、[Clerk](https://clerk.com)を基盤とした専用認証システムをアプリに提供します。Replitのログインシステムを使用してReplitアカウントを作成する[Replit Auth](/ja/features/auth-and-identity/authentication)とは異なり、Clerk Authはアプリ専用の**別のClerkテナント**をプロビジョニングします。アプリのユーザーはReplitアカウントではなく、アプリ内で直接アカウントを作成します。ブランディング、ログイン方法、サインイン体験を完全にコントロールできます。
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/auth-vid-e89aaccd245e.mp4" />
+</Frame>
+
+<Note>
+  **Clerk Auth vs. Replit Auth** — **Clerk Auth**（このページ）では、アプリが完全にカスタマイズ可能なブランディングとReplitから独立したユーザーアカウントを持つ独自の認証テナントを取得します。\*\*[Replit Auth](/ja/features/auth-and-identity/authentication)\*\*では、ユーザーはReplitアカウントでサインインし、Replitブランドのログインページが表示されます。ログイン体験に独自のブランドを使いたい場合や、Replitから独立したユーザーアカウントが必要な場合はClerk Authを選択してください。
+</Note>
+
+## Clerk Auth vs. Replit Auth 比較
+
+|               | Clerk Auth                        | Replit Auth                       |
+| ------------- | --------------------------------- | --------------------------------- |
+| **ユーザーアカウント** | ユーザーはアプリ内でアカウントを作成（Replitアカウント不要） | ユーザーはReplitアカウントでサインイン            |
+| **ブランディング**   | 完全カスタマイズ可能 — アプリ名、アイコン、カラー        | Replitブランドのログインページ                |
+| **SSO認証情報**   | プロバイダーごとに独自のOAuth認証情報を使用          | ReplitのShared OAuthアプリを使用         |
+| **環境**        | 開発環境と本番環境が分離                      | シングル環境                            |
+| **紹介プログラム**   | Replit紹介との統合なし                    | サインアップがReplit Referralsにカウント      |
+| **最適な用途**     | カスタムブランドアプリ、プロフェッショナル/商業製品        | クイックセットアップ、Replitブランディングが許容できるアプリ |
+
+## はじめに
+
+Clerk AuthをアプリにAgentプロンプトに含めて追加します：
+
+```
+Help me create an app that [your app idea] and should feature Clerk Auth.
+```
+
+Agentがすべてを処理します。Clerkテナントの作成、認証情報の保存、ルートの設定、ミドルウェアの追加などです。Clerkアカウントや手動セットアップは必要ありません。
+
+## Clerk AuthがReplitで動作する仕組み
+
+AgentがアプリにClerk Authをセットアップすると、以下が行われます：
+
+1. **専用のClerkテナントを作成** — アプリは開発環境と本番環境が分離された独自のClerkアプリケーションを取得します
+2. **認証情報のプロビジョニング** — APIキーとシークレットが環境変数として保存されます
+3. **プロキシの設定** — 認証が発行済みドメインでシームレスに動作します
+4. **サインインとサインアップルートのセットアップ** — 事前構築済みのClerk Reactコンポーネントがアプリに追加されます
+5. **サーバーサイドミドルウェアの追加** — APIルートがClerkのExpressミドルウェアで保護されます
+
+<Note>
+  Clerkアカウントを作成したりインフラを管理したりする必要はありません。すべてがReplitによって自動的に管理されます。
+</Note>
+
+## 機能
+
+### サポートされている機能
+
+Clerk Authはアプリに以下を提供します：
+
+* **独立したユーザーアカウント** — アプリのユーザーはReplitユーザーではなく、アプリのClerkテナント内にのみ存在します
+* **完全ブランドのサインインページ** — アプリ名、ロゴ、カラー、フォント、コピーをアプリのコードで設定します
+* **カスタムブランドSSO** — プロバイダーごとに独自のOAuthクライアントを提供することで、プロバイダーのOAuth同意画面にデフォルトではなくアプリの名前とブランディングが表示されます
+* **メールとパスワード認証** — メール認証を含む組み込みのサインアップとサインイン
+* **ソーシャルサインイン（SSO）** — Google、GitHub、Apple、X（Twitter）でのサインインを許可
+* **ユーザー管理** — Authペインからユーザーの表示、検索、モデレート
+* **セッション管理** — 自動管理される安全なセッショントークン
+* **開発環境と本番環境** — 公開前に開発で認証をテスト
+
+<Note>
+  Clerk Authの設定のほとんどは、Project EditorのAuthツールから管理できます。Clerkアカウントは不要で、Clerkダッシュボードに触れる必要もありません。
+</Note>
+
+### サポートされていない機能
+
+今日のClerk Authでは、以下の機能は利用できません（自分でセットアップする外部Clerkアプリと比較して）。詳細な内訳については[このFAQ](#how-does-clerk-auth-compare-to-external-clerk)を参照してください。
+
+* **電話番号でのサインイン** — SMSベースのサインインと認証
+* **MFAサポート** — エンドユーザー向けの多要素認証
+* **SSOプロバイダーの完全対応** — 現在はGoogle、GitHub、Apple、Xのみサポート
+* **組織テナント** — Clerkの組織とチームメンバーシップ機能
+
+## 開発環境と本番環境
+
+Clerk Authを使用するすべてのアプリは、2つの完全に分離されたClerk環境を取得します。ビルド中の開発/プレビューアプリを動作させる**開発**環境と、発行済みアプリを動作させる**本番**環境です。これらの環境は設計上分離されており、APIキーとユーザーストアが別々になっています。
+
+### 別々のAPIキー
+
+各環境にはそれぞれの公開可能キーとシークレットAPIキーがあります。アプリに公開されるキーは、アプリが開発中か本番中かに応じて自動的に切り替わります：
+
+* ワークスペースでは、`CLERK_PUBLISHABLE_KEY`と`CLERK_SECRET_KEY`のSecretsには、開発環境を指す**テストキー**（`pk_test...`と`sk_test...`）が含まれています。
+
+<Frame>
+  <img src="/assets/mirror/clerk-check-dev-keys-5a23f6b7dd0c.png" alt="sk_test_とpk_test_プレフィックスのCLERK_SECRET_KEYとCLERK_PUBLISHABLE_KEYを表示するワークスペースのSecretsツール" width="1946" height="402" data-path="images/workspace/auth/clerk-check-dev-keys.png" />
+</Frame>
+
+* アプリを発行すると、発行済みデプロイメントは本番環境を指す**ライブキー**（`pk_live...`と`sk_live...`）で動作します。プレフィックスを確認するには、**Publishing → Overview → Adjust settings**を開いて`CLERK_PUBLISHABLE_KEY`と`CLERK_SECRET_KEY`を確認します。
+
+<Frame>
+  <img src="/assets/mirror/clerk-check-prod-keys-acccd7f68da1.png" alt="sk_live_とpk_live_プレフィックスのCLERK_SECRET_KEYとCLERK_PUBLISHABLE_KEYを表示するPublishing OverviewのProduction appシークレット" width="1924" height="1664" data-path="images/workspace/auth/clerk-check-prod-keys.png" />
+</Frame>
+
+<Note>
+  環境を切り替えるために何かする必要はありません。Replitが開発と本番の両方のキーを自動的に管理します。開発、テスト、発行するだけです。
+</Note>
+
+<Warning>
+  テストキーをライブキーに置き換えたり、Secretsペインで編集したり、Clerkダッシュボードで手動設定したりしないでください。そうすると自動的な開発/本番の切り替えが壊れ、Replit管理のClerk Authではサポートされなくなります。
+</Warning>
+
+### 別々のユーザーストア
+
+各環境にはそれぞれのユーザーストアがあります。開発環境でサインアップしたアカウントは本番環境には**存在せず**、その逆も同様です：
+
+* 開発/プレビューアプリでテスト中にサインアップしたユーザーは、開発ストアのみに作成されます。
+* 発行済みアプリでサインアップしたユーザーは、本番ストアのみに作成されます。
+* セッション、ユーザーメタデータ、Clerkの`userId`に関連付けたデータは同様に、アカウントが作成された環境にスコープされます。
+
+これは期待される動作です。各環境のユーザーを確認するには、ワークスペースで**Authペイン**を開き、**Users**タブの環境トグルを使って開発と本番を切り替えてください。
+
+<Note>
+  開発は実験とビルドの場所です。本番はライブアプリの実際のユーザーを提供します。この2つは意図的に分離されており、開発で作成されたアカウントとデータは本番には表示されません。
+</Note>
+
+## ユーザーの管理
+
+Project EditorのAuthペインは、認証済みユーザーの完全なビューを提供します。Clerk Authはアプリ専用のユーザーストアを作成するため、ここにリストされているユーザーはアプリのアカウントであり、Replitアカウントではありません。
+
+<Frame>
+  <img src="/assets/mirror/clerk-users-4940ed365605.png" alt="Authペインで認証済みユーザーを表示するClerk AuthのUsersタブ" width="2136" height="794" data-path="images/workspace/auth/clerk-users.png" />
+</Frame>
+
+**Users**タブから以下のことができます：
+
+* メール、名前、最終ログイン、アカウント作成日などの詳細で**すべてのユーザーを表示**
+* 特定のユーザーを見つけるための**検索とフィルタリング**
+* アプリへのアクセスを制御するための**ユーザーのBanとUnBan**
+* 異なる基準による**ユーザーの並べ替え**
+* **環境の切り替え** — 開発と本番を切り替えて各環境のユーザーを管理
+
+## サインインページのカスタマイズ
+
+サインインとサインアップページのビジュアルブランディング（アプリ名、ロゴ、カラー、フォント、コピー）はAuthペインではなく、アプリのコードで設定されます。変更するにはAgentに依頼してください：
+
+```
+Update my sign-in page to use [your app name] as the title, [describe your logo], and match my site's colors.
+```
+
+内部的には、これは`<ClerkProvider>`に渡される`appearance`と`localization`プロパティ、およびアプリの`public/`ディレクトリのロゴファイルによって管理されています。Agentはこれらをアプリのテーマと同期させます。
+
+<Note>
+  **GoogleのOAuth同意画面、AppleのOAuth同意画面、GitHub、XのOAuth同意画面**（ユーザーが「Googleでサインイン」などをクリックした後に表示される画面）に表示されるアプリ名は別のものです。これはプロバイダーに登録されたOAuthアプリから来ており、サインインページのコードを編集しても**変更されません**。変更するには、そのプロバイダーの[カスタムOAuth認証情報の設定](#configuring-oauth-credentials-for-an-sso-provider)が必要です。
+</Note>
+
+## ログインプロバイダーの設定
+
+Clerk AuthはGoogle、GitHub、Apple、XをSSOプロバイダーとしてサポートしています。AuthペインのConfigureタブから、サインインページに表示するプロバイダーを制御できます。また本番環境では、各プロバイダーがReplit管理のOAuth認証情報を使用するか、ブランドサインイン用の独自の認証情報を使用するかを設定できます。
+
+<Frame>
+  <img src="/assets/mirror/clerk-configure-60169c473d64.png" alt="SSOプロバイダーが表示されたサイドバー、Productionが選択され、有効化トグルとEditアクションを表示するプロバイダーリストを含むConfigureタブ" width="923" height="378" data-path="images/workspace/auth/clerk-configure.png" />
+</Frame>
+
+**Configure**タブを開きます。**SSO providers**のサイドバーで**Development**または**Production**を選択します。**Development**はワークスペースの開発/プレビューアプリを動作させ、**Production**は発行済みアプリを動作させます。各環境のリストがメインパネルに表示されます。そこから以下のことができます：
+
+* **プロバイダーの有効化/無効化** — トグルを使用してサインインページにプロバイダーが表示されるかどうかを制御します。無効なプロバイダーはユーザーから非表示になります。
+* **カスタムOAuth認証情報の設定（本番のみ）** — 下記の[SSOプロバイダーのOAuth認証情報の設定](#configuring-oauth-credentials-for-an-sso-provider)を参照してください。
+
+### SSOプロバイダーのOAuth認証情報の設定
+
+デフォルトでは、プロバイダーは**Replit管理の認証情報**を使用します。サインインはすぐに機能しますが、OAuthの同意画面にはReplitのブランディングが表示されます。**Custom credentials**に切り替えると、プロバイダーのデベロッパーコンソールから独自のOAuthクライアントを使用でき、同意画面にデフォルトではなくアプリの名前とブランディングが表示されます。
+
+1. Project EditorでAuthペインを開きます。Configureタブに移動し、サイドバーの**SSO providers**で**Production**を選択します。
+
+<Frame>
+  <img src="/assets/mirror/clerk-configure-60169c473d64.png" width="923" height="378" data-path="images/workspace/auth/clerk-configure.png" />
+</Frame>
+
+2. 設定するプロバイダーの横にある**Edit**アイコンを選択します。デフォルトでは**Replit-managed credentials**が選択されています。
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-default-credentials-525090775408.png" alt="Replit管理の認証情報とカスタム認証情報オプションを表示するプロバイダー編集パネル" width="1468" height="960" data-path="images/workspace/auth/clerk-sso-default-credentials.png" />
+</Frame>
+
+3. **Custom credentials**を選択します。パネルが展開され、認証情報フィールドと、プロバイダー側で登録する必要がある値を含む**Provider setup**チェックリストが表示されます。
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-custom-credentials-f24112a5cf07.png" alt="OAuthクライアントIDとシークレットフィールド、リダイレクトコールバックURLとJavaScriptオリジンを含むProvider setupチェックリストを表示するCustom credentialsパネル" width="1468" height="2246" data-path="images/workspace/auth/clerk-sso-custom-credentials.png" />
+</Frame>
+
+4. 設定を完了するための手順に従います。手順にはコンソールへの直接リンクと関連するヘルパードキュメントが含まれています。また、[Additional resources](#additional-resources)でプロバイダー向けのヘルパードキュメントも確認できます。
+5. 必要な認証情報の値をすべて入力します。
+6. プロバイダーのデベロッパーコンソールで、**Provider setup**チェックリストに記載されているすべてのエントリをプロバイダーのデベロッパーポータルに登録します。コピーアイコンを使用して各値を正確にコピーし、完了したらアイテムにチェックを入れるか、すべて完了したら**Mark all as done**を選択します。
+7. **Save changes**を選択します。
+
+### ドメイン変更後のセットアップの再確認
+
+新しい外部ドメインのリンクや[Replitを通じたドメイン購入](/ja/build/domain-purchasing)などのドメイン関連の操作により、アプリのリダイレクトコールバックURLとJavaScriptオリジンが変更される場合があります。その場合、カスタム認証情報で設定されたプロバイダーは、デベロッパーコンソールで新しい値を登録する必要があります。
+
+ドメイン変更後、**Configure**タブに戻ります。セットアップのリマインダーがタブ、サイドバー、**SSO providers**リストのプロバイダーの横に警告アイコンとして表示されます。プロバイダーの横に警告アイコンと**setup steps remaining**が表示されている場合、その**Provider setup**チェックリストに完了すべき新しい項目があることを意味します。
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-setup-reminders-a5b092846006.png" alt="セットアップ警告を表示するConfigureタブとサイドバー、ドメイン変更後のプロバイダーの横に警告アイコンとsetup steps remainingが表示されたSSO providersリスト" width="923" height="378" data-path="images/workspace/auth/clerk-sso-setup-reminders.png" />
+</Frame>
+
+プロバイダーの編集パネルを開き、**Provider setup**の更新された値をコピーしてプロバイダーのデベロッパーコンソールに登録し、**Mark all as done**を選択します。
+
+## メール認証のドメインセットアップ
+
+アプリが**メールとパスワードによるサインアップ**を提供している場合、Clerkは各新規ユーザーの受信箱に認証コードを送信します。メール配信のためにドメインを設定することで、コードがスパムフィルターによって遅延またはブロックされることなく、アプリのURLから届くようになります。
+
+### このセットアップが必要な場合
+
+このDNSレコードの設定が必要なのは、アプリが**別のプロバイダーで管理されている外部ドメイン**をリンクしている場合のみです（例：Cloudflare、GoDaddy、Namecheap、または類似サービスで登録したドメイン）。
+
+以下の場合はセットアップ不要です：
+
+* `.replit.app`サブドメインから提供される場合
+* [Replitを通じて購入した](/ja/build/domain-purchasing)ドメインの場合
+
+どちらの場合もReplitがDNSレコードを管理します。
+
+### メール送信のためのDNSレコードの追加
+
+外部ドメインからのメール認証の送信をアプリに許可するには、ドメインプロバイダーにDNSレコードのセットを追加します。
+
+1. Project Editorで**Publishing**を開きます。
+2. **Domains**を選択します。
+3. リンクされた外部ドメインを見つけて**Manage**を選択します。
+4. **Authentication DNS setup required**の下で、Replitが表示するCNAMEレコードをコピーします。これらはClerkがドメインからの認証メールを送信するために必要なレコードです。
+5. DNSプロバイダー（Cloudflare、GoDaddy、Namecheapなど）にサインインし、表示されたとおりに各レコードを追加します。
+
+<Frame>
+  <img src="/assets/mirror/clerk-domain-8797ea9f41fc.png" alt="Clerkメール配信のためのCNAMEレコードを含むAuthentication DNS setup requiredセクションを表示するDomain Manageパネル" width="1156" height="1524" data-path="images/workspace/auth/clerk-domain.png" />
+</Frame>
+
+DNSの変更が反映されるまで最大48時間かかる場合があります。レコードが有効になると、メールとパスワードによるサインアップが自動的にドメインから認証コードを送信します。Authペインでの追加操作は必要ありません。
+
+### トラブルシューティング
+
+* **認証メールが届かない** — Manageパネルに表示されたとおりに各レコードが追加されていることを確認してください。DNSプロバイダーが要求する末尾のドットを含むようにしてください。受信者のスパムフォルダを確認してください。
+* **レコードがまだ検出されない** — DNS反映の時間を待ち（最大48時間）、Manageパネルで欠落しているとフラグが立てられているレコードを再確認してください。
+
+## セキュリティベストプラクティス
+
+* **常にサーバーサイドで検証する** — UIだけでなく、APIルートで認証を確認してください
+* **環境変数を使用する** — コードにキーやシークレットをハードコードしないでください
+* **プロキシミドルウェアを最初に置く** — ExpressアプリでClerkプロキシはボディパーサーの前にマウントする必要があります
+* **ホームページをサインインにリダイレクトしない** — 未認証の訪問者がランディングページにアクセスできるようにしてください
+
+## FAQ
+
+### Clerk Authを使用するためにClerkアカウントが必要ですか？
+
+不要です。Clerk Authの背後にあるClerkテナントは、AgentがアプリをセットアップするときにReplitによって自動的に作成・管理されます。Clerkにサインアップしたり、Clerkインフラを自分で管理したりする必要はありません。
+
+### Replit管理のClerkインスタンスのClerkダッシュボードにアクセスできますか？
+
+できません。Replit管理のClerkインスタンスはClerkダッシュボードを通じて公開されていません。代わりにProject EditorのAuthツールから管理してください。プロバイダーの設定、ユーザーの表示、開発環境と本番環境の切り替えはそこで行います。
+
+### Clerkの公開可能キーが`pk_test`で始まっています。ライブキーに切り替えるにはどうすればよいですか？
+
+切り替える必要はありません。ワークスペースのSecretsペインに表示される`pk_test...`と`sk_test...`キーは、ビルド中に使用するアプリの**開発**Clerk環境に属しています。アプリを発行すると、デプロイメントは本番環境のために`pk_live...`と`sk_live...`キーで自動的に動作します。確認するには、ワークスペースで**Publishing → Overview → Adjust settings**を開き、発行済みアプリの`CLERK_PUBLISHABLE_KEY`の値を確認してください。`pk_live`で始まっているはずです。これらのキーを手動で編集しないでください。詳細は[開発環境と本番環境](#development-and-production-environments)を参照してください。
+
+### 開発中に作成したアカウントで発行済みアプリにサインインできないのはなぜですか？
+
+Clerk Authの**開発**と**本番**環境は別々のユーザーストアを持っています。開発/プレビューアプリで作成したアカウントは開発環境にのみ存在し、発行時に本番にコピーされません。発行済みアプリで再度サインアップする必要があります。Clerkの`userId`に関連付けたデータも同様です。ワークスペースで**Authペイン**を開き、**Users**タブの環境トグルを使って各環境のユーザーを確認してください。詳細は[別々のユーザーストア](#separate-user-stores)を参照してください。
+
+### Clerk Authは無料で使用できますか？
+
+現在、Clerk Authは無料です。Replit上の他の使用量ベースのサービスと同様に、後で使用量ベースの料金が導入される可能性があります。将来の料金は既存のReplit請求を通じて適用されます。別途Clerkの請求書や支払い方法は必要ありません。
+
+### Clerk AuthはマンスリーアクティブユーザーのMAU制限がありますか？
+
+ありません。外部Clerkプランとは異なり（ティアによってMAUが上限）、Clerk AuthはMAUの制限を課しません。
+
+### Clerk AuthはExternal Clerkとどう違いますか？
+
+Clerk Authの背後にあるReplit管理のClerkテナントは、Clerkアカウントで作成したClerkアプリ（**External Clerk**）と比べていくつかの違いがあります。以下の表は現在の両者の違いを示しています。これはClerk Authの現在の状態を反映しており、サポートされる機能セットは継続的に拡大していきます。
+
+|                   | Clerk Auth                          | External Clerk  |
+| ----------------- | ----------------------------------- | --------------- |
+| **セットアップ**        | Replitによって自動プロビジョニング                | 自分でセットアップ       |
+| **Clerkテナントの所有権** | Replit管理、アプリが所有                     | Clerkアカウントが所有   |
+| **料金体系**          | 現在無料（将来的に従量課金予定）                    | サブスクリプション＋従量課金  |
+| **請求**            | Replit請求（現在無料）                      | Clerkアカウントでの請求  |
+| **MAU制限**         | 無制限                                 | ティアによる制限        |
+| **プロキシとドメイン設定**   | replit.appと購入済みドメインは自動、リンクドドメインは手動  | 手動              |
+| **SSOプロバイダー**     | 特定のプロバイダーのみ対応：Google、Apple、GitHub、X | より多くのプロバイダーに対応  |
+| **ユーザー管理画面**      | Project EditorのAuthツール              | Clerkアプリダッシュボード |
+| **SMS**           | 非対応                                 | 対応              |
+| **MFA**           | 非対応                                 | 対応              |
+| **組織テナント**        | 非対応                                 | 対応              |
+
+### 手動で対応が必要なClerk Authの設定は何ですか？
+
+Clerk Authのほとんどのセットアップは自動化されていますが、一部の設定はAuthツール以外での操作が必要です：
+
+* **SSOプロバイダーのカスタムOAuth認証情報** — プロバイダーの同意画面にReplitのデフォルトではなくアプリの名前とブランディングを表示したい場合は、プロバイダーのデベロッパーコンソールでOAuthアプリを登録し、認証情報をAuthペインに貼り付けます。[SSOプロバイダーのOAuth認証情報の設定](#configuring-oauth-credentials-for-an-sso-provider)を参照してください。
+* **外部ドメインのメール認証用DNSレコード** — アプリが別のプロバイダーで管理されている外部ドメインをリンクしている場合、認証メールがドメインから配信されるようにDNSレコードを追加する必要があります。[メール認証のドメインセットアップ](#domain-setup-for-email-verification)を参照してください。
+
+### Replit管理のClerkアプリの代わりに独自のClerkアプリを使用できますか？
+
+可能です。アプリにすでにReplit管理のClerkアプリがプロビジョニングされている場合は、独自の外部Clerkアプリを接続する前にまず削除してください：
+
+1. Project EditorのAuthペインを開きます。
+2. Configureタブに移動します。
+3. ページの下部までスクロールして**Delete Clerk app**をクリックします。
+
+Clerkアプリを削除すると、Replit管理のClerkテナントが削除され、それに付随するドメインが解放されます。その後、独自のClerkアプリを接続してそれらのドメインを再使用できます。アプリにまだReplit管理のClerkアプリがない場合はこの手順をスキップして、外部Clerkアプリを直接統合できます。
+
+## 追加リソース
+
+* [Replit AuthからClerkに移行する](/ja/features/auth-and-identity/migrate-auth-to-clerk) — Agentを使用して既存のReplit AuthアプリをClerk Authに移行する
+* [カスタム認証移行を計画する](/ja/features/auth-and-identity/custom-auth-migration) — アカウントの継続性を損なわずにカスタム認証システムをClerk Authに移行するためのベストプラクティス
+* [Google SSOの設定](/ja/features/auth-and-identity/sign-in-providers#google) — カスタムGoogle OAuth認証情報のセットアップ
+* [GitHub SSOの設定](/ja/features/auth-and-identity/sign-in-providers#github) — カスタムGitHub OAuth認証情報のセットアップ
+* [Apple SSOの設定](/ja/features/auth-and-identity/sign-in-providers#apple) — カスタムApple Sign In認証情報のセットアップ
+* [X（Twitter）SSOの設定](/ja/features/auth-and-identity/sign-in-providers#x-twitter) — カスタムX OAuth認証情報のセットアップ
+* [Clerkドキュメント](https://clerk.com/docs) — 外部Clerkアプリを統合するビルダー向けのリファレンス

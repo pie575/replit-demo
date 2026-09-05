@@ -1,0 +1,175 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Bases de données de développement et de production
+
+> Comprenez les deux bases de données de votre application : la base de données de développement avec laquelle vous construisez et la base de données de production qui alimente votre application publiée.
+
+Chaque application Replit fonctionne avec deux bases de données. La **base de données de développement** est l'endroit où vous et Agent expérimentez pendant la construction. La **base de données de production** stocke les données en direct qui alimentent votre application publiée, gardant vos données réelles en sécurité pendant que vous continuez à construire.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/tlGd6oyGOaUUeRxr/images/databases/production-databases.jpg?fit=max&auto=format&n=tlGd6oyGOaUUeRxr&q=85&s=b60de03dc3f59d971894d1795033cc6b" alt="Interface de gestion de la base de données de production" width="1080" height="471" data-path="images/databases/production-databases.jpg" />
+</Frame>
+
+## Comparaison
+
+| Aspect            | Base de données de développement                                 | Base de données de production                                              |
+| ----------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Objectif**      | Expérimentation et développement de fonctionnalités              | Servir les utilisateurs réels et stocker les données métier                |
+| **Données**       | Données de test, enregistrements fictifs, petits jeux de données | Données réelles des utilisateurs, informations critiques pour l'entreprise |
+| **Création**      | Automatique avec chaque application Replit                       | Lorsque vous publiez votre application                                     |
+| **Agent**         | Agent peut créer et modifier des tables                          | Agent ne peut pas y toucher                                                |
+| **Modifications** | Changements de schéma fréquents, itération rapide                | Changements soigneux et planifiés appliqués lors de la publication         |
+| **Facturation**   | Incluse gratuitement avec chaque application Replit              | Basée sur l'utilisation                                                    |
+
+<Note>
+  Agent ne peut pas modifier la base de données de production. Cette restriction existe pour garder votre base de données de production en sécurité.
+
+  Agent peut apporter des modifications à votre base de données de développement. Au moment de la publication, tous les changements que vous avez effectués avec Agent sur la structure de votre base de données de développement (ajout et suppression de colonnes ou de tables) sont appliqués à votre base de données de production.
+
+  Vous pouvez modifier manuellement vos données de production à tout moment : ouvrez l'outil **Database**, sélectionnez la base de données de production, ouvrez **My Data**, puis activez **Edit**.
+</Note>
+
+## Créer une base de données de production lors de la publication
+
+Votre application publiée obtient sa propre base de données de production, distincte de la base de données de développement que vous utilisez pendant la construction.
+
+* **Infrastructure actuelle (Helium)** : Replit crée la base de données de production pour vous en cas de besoin lors de la publication. Il n'y a rien à configurer.
+* **Bases de données de développement Neon legacy** : Vous créez la base de données de production depuis les paramètres de publication. Ouvrez **Production database settings** pendant la publication, activez **Create production database**, et activez éventuellement **Set up your production database with your current development data** pour copier vos données de développement.
+
+<Frame caption="Paramètres de la base de données de production dans Publishing">
+  <img src="https://mintcdn.com/replit/LrPHebhkEtjoxAa5/images/databases/shared-database-migration/production-database-settings.png?fit=max&auto=format&n=LrPHebhkEtjoxAa5&q=85&s=a5ca44635f062423aaa9c8d8b73753e3" alt="Paramètres de publication montrant les options de création de base de données de production" width="1406" height="1207" data-path="images/databases/shared-database-migration/production-database-settings.png" />
+</Frame>
+
+<Warning>
+  Ne copiez des données de développement vers la production que si ces données peuvent être utilisées sans risque dans votre application en direct. Les données de développement peuvent inclure des comptes de test, des enregistrements d'exemple ou du contenu incomplet.
+</Warning>
+
+Après la publication, votre application publiée utilise la base de données de production tandis que l'éditeur de projet continue d'utiliser la base de données de développement, afin que les futurs changements de développement ne modifient pas directement les données en direct.
+
+## Regroupement de connexions
+
+Par défaut, les bases de données de production n'ont pas le regroupement de connexions (connection pooling) activé. Votre application se connecte directement à la base de données à l'aide de la chaîne de connexion `DATABASE_URL`, donc la plupart des frameworks doivent gérer leur propre pool de connexions côté client.
+
+<Note>
+  Chaque projet Neon inclut une chaîne de connexion directe et une chaîne de connexion groupée (pooled). Une chaîne de connexion directe ressemble à `postgresql://neondb_owner:<password>@<host>.<region>.neon.tech/<db>?sslmode=require`.
+
+  Pour utiliser la connexion groupée, ajoutez `-pooler` à l'hôte : `postgresql://neondb_owner:<password>@<host>-pooler.<region>.neon.tech/<db>?sslmode=require`.
+</Note>
+
+Si une chaîne de connexion de production a été exposée, [régénérez les identifiants de votre base de données de production](/fr/features/data-and-storage/connection-details#régénérer-les-identifiants-de-la-base-de-données-de-production).
+
+## Apporter des modifications sûres à votre base de données de production
+
+Lorsque vous publiez des mises à jour incluant des changements de base de données, certains changements nécessitent une planification minutieuse pour éviter les interruptions de service ou la perte de données.
+
+<Info>
+  Vous pourriez constater une brève interruption de votre application publiée pendant la publication. Les changements de base de données nécessitent parfois d'arrêter temporairement votre application pour éviter les conflits et protéger vos données pendant l'application des changements.
+</Info>
+
+Les types de changements suivants nécessitent généralement de la prudence :
+
+* **Supprimer des colonnes de base de données** que le code de votre application référence encore
+* **Changer les types de données des colonnes** de façons que le code existant ne peut pas gérer
+* **Ajouter des champs obligatoires** sans valeurs par défaut à des tables existantes
+* **Renommer des tables ou des colonnes** qui cassent des requêtes existantes
+* **Modifier des contraintes** qui pourraient rejeter la logique applicative existante
+
+### Tester les changements avec un aperçu de déploiement
+
+Un aperçu de déploiement est une copie temporaire et isolée de votre environnement de production où vous pouvez tester les changements de base de données et les mises à jour d'application avant qu'ils n'affectent les utilisateurs réels. Utilisez-le pour :
+
+* Vérifier que votre application fonctionne toujours avec les changements de base de données appliqués, sur l'ensemble de vos principaux parcours utilisateurs
+* Confirmer que les données existantes ont été correctement migrées et que les nouveaux champs contiennent les valeurs attendues
+* Surveiller les régressions de performance dans les temps de réponse des requêtes
+
+## Facturation et utilisation des ressources
+
+Les bases de données de production sont facturées en fonction de l'utilisation via Neon, un fournisseur de bases de données serverless. La base de données entre dans un état inactif après cinq minutes d'inactivité, ce qui met en pause la facturation du temps de calcul, et se réactive instantanément dès qu'elle reçoit une requête.
+
+La vue d'accueil de l'outil Database affiche votre **Billing Period** et vos **Hours of Compute Used**. Pour le stockage par base de données, ouvrez l'onglet **Settings** de la base de données. Pour voir l'utilisation sur l'ensemble de vos applications Replit, ouvrez **Settings** → **Account** → **Account usage** et développez les lignes **PostgreSQL Storage** et **PostgreSQL Compute**.
+
+Pour savoir comment Replit facture l'utilisation des bases de données, consultez [Facturation des déploiements et des bases de données](/fr/billing/about-usage-based-billing#databases).
+
+## Supprimer une base de données de production
+
+<Warning>
+  L'action de suppression est irréversible après une période de rétention de 7 jours. Assurez-vous de sauvegarder toute donnée importante avant de continuer. Les bases de données ont une période de suppression réversible de 7 jours pendant laquelle elles peuvent être restaurées ; contactez le support si vous avez besoin d'aide. Après 7 jours, la base de données est définitivement supprimée et irrécupérable.
+</Warning>
+
+<Accordion title="Comment supprimer une base de données">
+  Depuis l'outil **Database** :
+
+  1. Sélectionnez la base de données, puis ouvrez l'onglet **Settings**
+  2. Sélectionnez **Remove database** et confirmez en sélectionnant **Yes, Remove database**
+</Accordion>
+
+## Base de données de développement legacy
+
+Avant le 4 décembre 2025, la base de données de développement était hébergée sur <a href="https://neon.com/" target="_blank">Neon</a>. Toutes les nouvelles bases de données de développement sont hébergées sur l'infrastructure propre de Replit (Helium). Vous pouvez vérifier laquelle votre application utilise dans l'onglet **Settings** : un `DATABASE_URL` contenant `neon.tech` signifie l'infrastructure Neon legacy ; `helium` signifie l'infrastructure actuelle.
+
+| **Fonctionnalité**                 | **Replit (actuel)**                                                                                                                                                       | **Neon (legacy)**                                                                                                                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hébergement**                    | Hébergé sur l'infrastructure propre de Replit                                                                                                                             | Hébergé sur Neon (fournisseur tiers)                                                                                                                                               |
+| **Facturation**                    | Inclus gratuitement avec chaque application Replit                                                                                                                        | Facturation basée sur l'utilisation. Voir [Facturation des publications et des bases de données](/fr/billing/about-usage-based-billing#databases) pour plus de détails.            |
+| **Capacité de restauration**       | Restaurez votre base de données à n'importe quel point de contrôle grâce à la [fonctionnalité de rollback](/fr/features/data-and-storage/data-recovery)                   | Restauration à un point dans le temps (PITR) : récupérez à n'importe quel point dans la fenêtre de rétention des sauvegardes.                                                      |
+| **Sécurité de connexion**          | Accessible uniquement depuis votre application ; jamais exposé publiquement.                                                                                              | Utilisait une chaîne de connexion complète. Si elle était divulguée, n'importe qui pouvait accéder à votre base de données et la modifier.                                         |
+| **Comportement du remix**          | Le [remix](/fr/features/projects-and-artifacts/remix-an-app) crée une nouvelle base de données de développement avec des données copiées pour l'isolation et la sécurité. | Le remix réutilisait la même base de données pour toutes les copies, donc les modifications dans les remixes pouvaient affecter l'application d'origine.                           |
+| **Création de la base de données** | Créée automatiquement pour chaque application Replit.                                                                                                                     | Nécessitait une configuration explicite.                                                                                                                                           |
+| **Flux de publication**            | La publication crée une base de données de production distincte pour isoler les environnements.                                                                           | Le développement et la production partageaient la même base de données, donc des changements de développement non intentionnels pouvaient affecter les applications en production. |
+
+## Mise à niveau de l'infrastructure de base de données
+
+Replit met à niveau les bases de données de développement de Neon vers **Helium**, l'infrastructure PostgreSQL gérée propre à Replit. La mise à niveau est automatique, s'exécute une fois par application lorsque vous l'ouvrez dans l'éditeur de projet, et préserve toutes vos données.
+
+Ce qui change :
+
+* **Latence plus faible et plus de stockage** : Votre base de données fonctionne sur l'infrastructure Replit à côté de votre application, et votre limite de stockage passe de 10 Go à 20 Go.
+* **Même moteur de base de données** : Helium utilise PostgreSQL 16, la même version que Neon. Vos requêtes, schémas et données fonctionnent de la même façon.
+* **Mise à jour automatique de la connexion** : `DATABASE_URL` est mis à jour pour pointer vers Helium. Votre ancienne chaîne de connexion Neon est enregistrée sous `NEON_DATABASE_URL` dans vos Secrets pour référence.
+* **Suppression des variables PG individuelles** : `PGHOST`, `PGPORT`, `PGUSER` et `PGPASSWORD` sont supprimées. Utilisez `DATABASE_URL` à la place.
+
+Pendant la mise à niveau, vous verrez un écran de progression **« Upgrading your database »**. Cela peut prendre de quelques minutes à quelques heures pour les grandes bases de données ; vous pouvez fermer l'onglet et revenir plus tard. Si la mise à niveau rencontre un problème, elle est automatiquement ignorée et retentée la prochaine fois que vous ouvrez votre application. Une fois terminée, une boîte de dialogue de confirmation apparaît.
+
+Pour la plupart des créateurs, aucune action n'est nécessaire par la suite. Vérifiez les points suivants s'ils s'appliquent à vous :
+
+* **Chaînes de connexion Neon codées en dur** : Mettez à jour le code qui référence une chaîne de connexion `neon.tech` pour utiliser la variable d'environnement `DATABASE_URL` à la place.
+* **Rôles PostgreSQL personnalisés** : Les rôles et permissions migrent automatiquement, mais les mots de passe des rôles ne peuvent pas être copiés. Réinitialisez les mots de passe des rôles personnalisés sur la nouvelle base de données.
+
+### Erreurs de connexion SSL après la mise à niveau
+
+Si vous voyez des erreurs telles que `The server does not support SSL connections`, votre code de connexion force une négociation SSL. Neon exigeait SSL ; Helium fonctionne localement à côté de votre application et ne l'utilise pas. Rendez le paramètre SSL conditionnel à l'environnement :
+
+<CodeGroup>
+  ```js JavaScript theme={null}
+  // Avant (casse après la mise à niveau)
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  // Après (fonctionne en développement comme en production)
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl:
+      process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : false,
+  });
+  ```
+</CodeGroup>
+
+<Tip>
+  Si vous utilisez un ORM comme Drizzle, Prisma ou Sequelize, consultez sa documentation pour savoir comment configurer les paramètres SSL de façon conditionnelle. Le même principe s'applique : désactivez SSL pour la base de données de développement et activez-le pour la production.
+</Tip>
+
+### Applications forkées ayant partagé une base de données
+
+Sous l'ancien système Neon, forker une application copiait le `DATABASE_URL` de l'application d'origine, si bien que les deux applications et leurs versions publiées se connectaient à la même base de données. Les bases de données legacy partagées ont été fermées le **8 juin 2026**. Si votre application publiée a cessé de fonctionner ou a perdu l'accès à ses données, consultez [Corriger une application publiée utilisant une base de données partagée](/fr/features/data-and-storage/shared-database-migration) ou [contactez le support](https://replit.com/support).
+
+## Prochaines étapes
+
+* [Récupération de données](/fr/features/data-and-storage/data-recovery) : Restaurez les données de développement ou de production.
+* [Détails de connexion](/fr/features/data-and-storage/connection-details) : Trouvez la chaîne de connexion de votre base de données.
+* [Travailler avec vos données](/fr/features/data-and-storage/work-with-your-data) : Parcourez, modifiez et interrogez vos données.

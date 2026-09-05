@@ -1,0 +1,204 @@
+---
+title: "共有データベースを使用する発行済みアプリの修正"
+description: "別のアプリ用に作成されたデータベースをまだ使用している発行済みアプリを更新するための手順。"
+---
+
+一部の古い発行済みアプリは、元々別のアプリ用に作成された開発データベースに接続されたままの場合があります。
+
+これはReplitでフォークまたはリミックスされた古いアプリで発生する可能性があります。レガシーNeonのセットアップでは、フォークが元のアプリのデータベース接続を引き続き使用できました。Replitが開発データベースと本番データベースを完全に分離する移行の一環として、古い共有開発データベースが削除され、発行済みアプリは独自の本番データベースに移行する必要があります。
+
+発行済みアプリにデータベース接続エラーが表示されている場合、またはSecretsパネルの`DATABASE_URL`がまだ`neon.tech`を指している場合は、このガイドを使用してください。
+
+<Warning>
+  古い共有データベースは**2026年6月8日**にシャットダウンされます。ダウンタイムや永続的なデータ損失を避けるために、それまでに発行済みアプリを更新してください。
+</Warning>
+
+## 開始前に
+
+発行済みアプリには独自の**本番データベース**が必要です。**データベース**パネルに表示される開発データベースは、発行済みアプリから直接使用すべきではありません。
+
+<Frame>
+  <img src="/assets/mirror/dev-database-5c024a6c134e.png" alt="開発データベースを表示するデータベースパネル" width="955" height="767" data-path="images/databases/shared-database-migration/dev-database.png" />
+</Frame>
+
+これを修正するには、まず自分の状況を確認します：
+
+* **ケース1：** 必要なデータが既にアプリの**データベース**パネルに表示されている。
+* **ケース2：** 発行済みアプリがまだ古い共有開発データベースを使用しているため、**データベース**パネルに必要なデータが表示されていない。
+
+## 発行済みアプリが共有データベースを使用しているかどうかの確認方法
+
+以下のいずれかに該当する場合、発行済みアプリが影響を受けています：
+
+* データベースのアップグレード後に発行済みアプリにデータベース接続エラーが表示される
+* アプリが**2026年1月9日以前**にデータベースを持つ別のアプリからリミックスされた
+
+## 発行済みアプリがソースアプリの共有データベースを使用しているかどうかの確認方法
+
+### ステップ1：ソースアプリのデータベースパネルを開く
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-showing-secrets-763dd4c4845f.png" alt="DATABASE_URLを表示するシークレットパネル" width="792" height="418" data-path="images/databases/shared-database-migration/secret-pane-showing-secrets.png" />
+</Frame>
+
+`NEON_DATABASE_URL`の値を取得するか、`NEON_DATABASE_URL`が存在しない場合は`DATABASE_URL`を使用します。
+
+<Info>
+  すべての影響を受けるアプリに`NEON_DATABASE_URL`があるわけではありません。それが見つからない場合は、まだ`neon.tech`を指している場合は発行済みアプリのSecretsから現在の`DATABASE_URL`を使用してください。
+</Info>
+
+### ステップ2：発行済みアプリのPublishパネルを開く
+
+<Frame>
+  <img src="/assets/mirror/production-app-secrets-e4da45c53e36.png" alt="DATABASE_URLを表示する発行済みアプリのシークレット" width="1385" height="1225" data-path="images/databases/shared-database-migration/production-app-secrets.png" />
+</Frame>
+
+発行済みアプリのデータベースURLを確認するには：
+
+1. ReplitでアプリをAIで開く
+2. **発行**パネルを開く
+3. **設定を調整**を開く
+4. **シークレット**を開く
+5. `DATABASE_URL`を探す
+
+### ステップ3：ステップ1のソースアプリとステップ2のリミックスアプリのデータベースURLを比較する
+
+同じ場合、発行済みアプリはソースアプリの共有Neon開発データベースを使用しています。
+
+## ソースアプリから発行済みアプリにデータをコピーする方法
+
+発行済みアプリがソースアプリの共有開発データベースを使用していることを確認した後、次のステップは必要なデータを発行済みアプリに転送することです。考慮すべき2つのシナリオがあります：
+
+* ケース1：発行済みアプリの**データベース**パネルに必要なデータが既に含まれている。
+* ケース2：発行済みアプリの**データベース**パネルに必要なデータが含まれていない。
+
+### ケース1：データベースパネルに必要なデータが既に表示されている場合
+
+アプリの**データベース**パネルに必要なデータが既に表示されている場合、これが最も簡単な方法です。
+
+#### ステップ1：データが存在することを確認する
+
+<Frame>
+  <img src="/assets/mirror/my-data-12834f2ebfd6.png" alt="データ行を表示するデータベースパネル" width="865" height="454" data-path="images/databases/shared-database-migration/my-data.png" />
+</Frame>
+
+発行済みアプリの**データベース**パネルを開き、必要なテーブルとデータがあることを確認します。
+
+データベースパネルに必要なデータが表示されない場合は、ここで一時停止してください。[ケース2](#case-2-the-database-panel-does-not-show-the-data-you-need)の手順に従って、データを適切にマイグレーションしてください。
+
+#### ステップ2：本番データベースで発行または再発行する
+
+1. プロジェクトエディターでアプリを開く
+2. **発行**または**再発行**を選択する
+3. **本番データベースを作成**をオンにする
+4. **現在の開発データで本番データベースをセットアップ**をオンにする
+5. 発行フローを完了する
+
+発行すると、発行済みアプリの新しいバージョンが作成され、`DATABASE_URL`が自動的に新しい本番データベースに設定されます。このフロー中にそのシークレットを手動で更新する必要はありません。
+
+<Frame>
+  <img src="/assets/mirror/production-database-settings-8855bf453da9.png" alt="本番データベース作成オプションを表示する発行設定" width="1406" height="1207" data-path="images/databases/shared-database-migration/production-database-settings.png" />
+</Frame>
+
+<Warning>
+  本番にコピーすると、既存の本番データが上書きされます。詳細については[本番データベース](/ja/features/data-and-storage/development-and-production)を参照してください。
+</Warning>
+
+#### ステップ3：発行済みアプリを確認する
+
+発行済みアプリを開いて、データにアクセスできてアプリが正しく動作することを確認します。
+
+### ケース2：データベースパネルに必要なデータが表示されていない場合
+
+発行済みアプリの**データベース**パネルに必要なデータが表示されていない場合は、以下の手順に従ってデータをエクスポートします。
+
+発行済みアプリがまだ別のアプリのデータベースに接続されている場合、データベースパネルに「外部データベースが検出されました」という警告が表示されます。
+
+<Frame>
+  <img src="/assets/mirror/external-database-detected-489d99632e74.png" alt="外部データベースが検出されたことを表示するデータベースパネル" width="1403" height="1208" data-path="images/databases/shared-database-migration/external-database-detected.png" />
+</Frame>
+
+<Warning>
+  ユーザーがまだアプリを使用して新しいデータを保存している場合は、データをエクスポートする前に短いメンテナンスウィンドウを計画してください。
+</Warning>
+
+#### ステップ1：古いデータベースからデータをエクスポートする
+
+<Frame>
+  <img src="/assets/mirror/pg-dump-example-54c6c790ccb1.png" alt="pg_dumpの例" width="1252" height="450" data-path="images/databases/shared-database-migration/pg-dump-example.png" />
+</Frame>
+
+プロジェクトエディターで**シェル**を開き、以下を実行します：
+
+```bash theme={null}
+pg_dump -Fc "database_url" --no-owner --no-privileges -f backup.dump
+```
+
+`database_url`は[ステップ1：ソースアプリのデータベースパネルを開く](#step-1-open-the-database-panel-in-the-source-app)で取得したデータベースURLです。
+
+### ステップ2：アプリのSecretsから古い`DATABASE_URL`を削除する
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-eb253120f8a6.png" alt="シークレットパネルの例" width="1410" height="1184" data-path="images/databases/shared-database-migration/secret-pane.png" />
+</Frame>
+
+1. プロジェクトエディターで**シークレット**ツールを開く
+2. 古い`DATABASE_URL`を見つける
+3. 削除する
+4. ページを更新するか**データベース**パネルを再度開く
+
+この後、アプリは古い共有データベースを参照するのをやめ、現在の開発データベースを再度使用するようになります。
+
+### ステップ3：現在の開発データベースにデータをインポートする
+
+<Frame>
+  <img src="/assets/mirror/pg-restore-example-409ae4d7bf09.png" alt="pg_restoreの例" width="802" height="426" data-path="images/databases/shared-database-migration/pg-restore-example.png" />
+</Frame>
+
+古い`DATABASE_URL`シークレットが削除されると、アプリの現在の開発データベースがプロジェクトエディターで`$DATABASE_URL`として再び利用可能になります。
+
+プロジェクトエディターの**シェル**に戻り、以下を実行します：
+
+```bash theme={null}
+pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+```
+
+これにより、エクスポートしたデータがアプリの現在の開発データベースに読み込まれます。
+
+### ステップ5：ケース1に従って本番データベースで発行または再発行する
+
+**データベース**パネルに正しいデータが表示されたら、[ケース1](#case-1-the-database-panel-already-shows-the-data-you-need)に従って**本番データベースを作成**してそのデータを本番にコピーして発行または再発行します。
+
+### ステップ6：発行済みアプリを確認する
+
+<Frame>
+  <img src="/assets/mirror/successful-export-bfb997304cc1.png" alt="成功したエクスポート" width="965" height="554" data-path="images/databases/shared-database-migration/successful-export.png" />
+</Frame>
+
+発行済みアプリを開いて、データにアクセスできてアプリが正しく動作することを確認します。
+
+## トラブルシューティング
+
+### テーブルが既に存在するためインポートが失敗する
+
+上記の`pg_restore --clean --if-exists`コマンドは、ダンプから一致するオブジェクトを復元前にドロップして再作成します。
+
+### ロールまたはポリシーエラーでインポートが失敗する
+
+データベースがカスタムのPostgreSQLロールまたはロールベースのポリシーを使用している場合、それらのロールが新しいデータベースにまだ存在しないため、インポートが失敗する可能性があります。
+
+Replitの自動Heliumマイグレーションは復元前にロールスタブを再作成しようとしますが、上記の手動プロセスは行いません。`pg_restore`中にロール関連のエラーが発生した場合は、[サポートに問い合わせてください](https://replit.com/support)。
+
+### アプリを既に修正した場合
+
+発行済みアプリに既に独自の本番データベースがあり、正しく動作している場合は、他に何もする必要はありません。
+
+## さらにサポートが必要な場合
+
+どのケースが自分のアプリに適用されるかわからない場合、またはマイグレーション中に問題が発生した場合は、[サポートに問い合わせてください](https://replit.com/support)。
+
+## 関連ドキュメント
+
+* [データベースのアップグレード](/ja/features/data-and-storage/development-and-production#database-infrastructure-upgrade)
+* [本番データベース](/ja/features/data-and-storage/development-and-production)
+* [データベース](/ja/features/data-and-storage/sql-database)

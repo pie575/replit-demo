@@ -1,0 +1,146 @@
+---
+title: "GoogleコネクタでのThis app is blockedエラーの解決"
+description: "ReplitでGoogle Drive、Docs、Sheets、Calendar、GmailのコネクタInterfaceを試みるときに発生する「This app is blocked」エラーを修正する。"
+---
+
+## 概要
+
+[Connectors](/ja/features/integrations/overview#connectors) を通じてGoogle Workspaceサービス（Drive、Docs、Sheets、Calendar、またはGmail）に接続しようとすると **「This app is blocked」** というエラーメッセージが表示される場合、それは通常、組織のGoogle WorkspaceにおけるGoogle OAuthの設定の誤りが原因です。
+
+このガイドでは、問題を解決してReplit AppにGoogleサービスを接続できるようにする手順を説明します。
+
+<Frame>
+  <img src="/assets/mirror/app-is-blocked-837b32f44f72.png" alt="OAuthアクセスをブロックする「This app is blocked」メッセージが表示されているGoogleエラーダイアログ" width="1279" height="502" data-path="images/replitai/debugging-google-connectors/app-is-blocked.png" />
+</Frame>
+
+<Warning>
+  これらの手順は**Google Workspace**アカウント（組織管理アカウント）にのみ適用されます。`@gmail.com` アドレスに紐付けられた個人のGoogleアカウントを使用していて、Replitコネクタがブロックされている場合は、OAuthポリシーを自分で変更することはできません — Google Workspaceの管理者に連絡するか、別のアカウントを使用してください。
+</Warning>
+
+## トラブルシューティング手順
+
+### ステップ1: シークレットモードを試す
+
+ブラウザの拡張機能やキャッシュされたデータがOAuthフローを妨げることがあります。シークレットモードを使用するとこれらの問題を回避できます。
+
+<Steps>
+  <Step title="シークレットモードを開く">
+    ブラウザで新しい**シークレット**（Chrome）または**プライベート**（Firefox/Safari）ウィンドウを開きます。
+  </Step>
+
+  <Step title="Replitにサインイン">
+    [replit.com](https://replit.com) でReplitアカウントにログインします。
+  </Step>
+
+  <Step title="接続を再試行する">
+    Project EditorでアプリをOpen し、サイドバーで **Connectors** に移動して、Googleサービスへの接続を再試行します。
+  </Step>
+</Steps>
+
+エラーが解消しない場合は、ステップ2に進んでください。
+
+### ステップ2: Google WorkspaceのOAuth設定を確認する
+
+<Note>
+  このステップでは、組織の**Google管理コンソール**へのアクセスが必要です。管理者アクセス権がない場合は、ITチームに連絡してください。
+</Note>
+
+<Steps>
+  <Step title="Google管理コンソールを開く">
+    組織の[Google管理コンソール](https://admin.google.com)にログインします。
+  </Step>
+
+  <Step title="ユーザーの存在を確認する">
+    **Users** セクションに移動して、Replit接続を試みているアカウントが一覧に含まれていることを確認します。
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-users-c21d8fd43f71.png" alt="ユーザーアカウントが表示されているGoogle管理コンソールのUsersセクション" width="1104" height="596" data-path="images/replitai/debugging-google-connectors/google-workspace-users.png" />
+    </Frame>
+  </Step>
+
+  <Step title="APIコントロールに移動する">
+    **Security > Access and data control > API controls** に移動します。
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-api-controls-b811709315cf.png" alt="Security > API Controlsのナビゲーションパスが表示されているGoogle管理コンソール" data-og-width="1140" width="1140" data-og-height="631" height="631" data-path="images/replitai/debugging-google-connectors/google-workspace-api-controls.png" data-optimize="true" data-opv="3" srcset="/assets/mirror/google-workspace-api-controls-a27d4577aee8.png 280w, /assets/mirror/google-workspace-api-controls-d681943c082d.png 560w, /assets/mirror/google-workspace-api-controls-8f1b1659e60a.png 840w, /assets/mirror/google-workspace-api-controls-795bc698b885.png 1100w, /assets/mirror/google-workspace-api-controls-c122b9eb493f.png 1650w, /assets/mirror/google-workspace-api-controls-2415c93b4f41.png 2500w" />
+    </Frame>
+  </Step>
+
+  <Step title="サードパーティアプリのアクセスを開く">
+    **Manage third-party app access** を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/third-party-app-access-eb5c94107497.png" alt="Manage third-party app accessボタンがハイライトされているGoogle管理コンソールのAPIコントロールページ" width="1686" height="468" data-path="images/replitai/debugging-google-connectors/third-party-app-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="OAuthアクセスを確認する">
+    Google WorkspaceのユーザーにOAuthアクセスが有効になっていることを確認します。制限されている場合は、ReplitがOAuthフローを完了できるように必要なアクセスを付与してください。
+  </Step>
+</Steps>
+
+接続がまだ失敗する場合は、ステップ3に進んでください。
+
+### ステップ3: ReplitをOAuth信頼済みクライアントとして追加する
+
+組織がデフォルトでサードパーティアプリのアクセスを制限している場合、明示的にReplitを信頼する必要があります。
+
+<Steps>
+  <Step title="Google管理コンソールを開く">
+    組織の[Google管理コンソール](https://admin.google.com)にログインします。
+  </Step>
+
+  <Step title="APIコントロールに移動する">
+    **Security > Access and data control > API controls** に移動します。
+  </Step>
+
+  <Step title="サードパーティアプリのアクセスを開く">
+    **App access control** の下で **Manage third-party app access** を選択します。
+  </Step>
+
+  <Step title="新しいアプリを追加する">
+    **Add app** ボタンを選択し、ドロップダウンから **OAuth App Name or Client ID** を選択します。
+  </Step>
+
+  <Step title="Replitを検索する">
+    ReplicのClient IDを入力します：
+
+    ```
+    1012035106355-2dhot2e6o0malvog2ofss7akj2nsp8nq.apps.googleusercontent.com
+    ```
+
+    **Search** を選択します。検索結果にReplitアプリが表示されたら選択します。
+  </Step>
+
+  <Step title="アクセスレベルを設定する">
+    アクセスレベルを **Trusted** に設定します。
+  </Step>
+
+  <Step title="保存する">
+    **Save** を選択します。
+  </Step>
+</Steps>
+
+<Tip>
+  Google Workspaceポリシーへの変更が反映されるまで数分かかることがあります。保存後、5〜10分待ってからReplitでGoogleサービスへの接続を再試行してください。
+</Tip>
+
+## まだブロックされている場合
+
+3つのステップをすべて完了してもエラーが続く場合：
+
+* **組織単位（OU）を再確認する**: Google WorkspaceポリシーはOUごとにスコープされることがあります。OAuthと信頼済みアプリの設定が、接続しようとしているユーザーが含まれるOUに適用されていることを確認してください。
+* **Google Workspaceアラートを確認する**: 管理コンソールで **Reporting > Audit and investigation > OAuth log events** を確認して、Replitに関連する拒否されたリクエストがないか確認します。
+* **Replitサポートに連絡する**: 問題がGoogle Workspace側にない場合は、[Replitサポート](https://replit.com/support) にお問い合わせください。
+
+## 関連ドキュメント
+
+* [Connectorsの概要](/ja/features/integrations/overview) -- Google Workspaceコネクタを含むすべての連携タイプについて学ぶ
+* [コネクタの管理](/ja/replitai/managing-connectors) -- WorkspaceおよびOrganizationコネクタの管理者設定
+* [Google Workspace管理者ヘルプ: サードパーティアプリのアクセスを管理する](https://support.google.com/a/answer/7281227) -- OAuthアプリアクセスの管理に関するGoogleの公式ガイド
+
+***
+
+<Note>
+  このエラーの解決に関する[オリジナルガイド](https://help.element451.com/en/articles/9999308-resolving-this-app-is-blocked-error-for-google-drive-connectors)を提供してくれた[Element451](https://element451.com)チームに特別な感謝を申し上げます。この記事はそのガイドを基に作成しました。
+</Note>

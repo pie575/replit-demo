@@ -1,0 +1,232 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Lancer une page d'accueil
+
+> Créez et publiez une page d'accueil avec une offre claire, un appel à l'action et un formulaire fonctionnel qui capture les réponses.
+
+export const RACHEL_JONES_PROMPT = `Build me a one-page website for an online fitness coach named Rachel Jones. It should feel premium, like a magazine ad — dark, moody, and luxurious, with black and warm gold as the only colors. Big bold headlines, lots of empty space, and elegant serif accents. No bright colors, no rounded "tech startup" vibes.
+
+Here's what should be on the page, top to bottom:
+
+A header bar with a small gold "RJ" logo on the left, the words "RACHEL JONES — FITNESS COACH" next to it, a few menu links across the middle (About, Coaching, Programs, Success Stories, Resources), and a gold "Book a Free Consultation" button on the right.
+
+A huge hero section with a dramatic close-up photo of a strong, fit woman lit with warm gold light against a black background. On the left side over the dark area, put a giant three-line headline:
+"STRONGER BODY. CONFIDENT MIND. UNSTOPPABLE YOU." — with the last line in gold.
+Underneath: "Personalized coaching. Proven strategies. Real results that last." Then two buttons: a gold "Work With Rachel" and an outlined "Watch Rachel's Story" with a play icon. Below that, show 4 little circular client photos and 5 gold stars with the line "Trusted by 500+ women worldwide."
+On the right side, layered on the photo, write "Rachel Jones" in a fancy gold script font, with "CERTIFIED FITNESS COACH" underneath, and a list of credentials with little gold icons: NASM Certified, Precision Nutrition Level 1, Women's Fitness Specialist, 10+ Years Experience.
+
+A "Featured In" strip — a thin row showing fake magazine logos written in different fancy fonts: Women's Health, Oxygen, Forbes, mindbodygreen, Fit Pregnancy, Shape.
+
+A "Holistic Approach" section — centered headline "A Holistic Approach. Real Results." in an elegant serif. Below it, four columns side by side, each with a small gold icon, a title, and a one-line description: Custom Training, Nutrition Guidance, Mindset Coaching, Accountability.
+
+A "Success Stories" section — on the left, the headline "Stronger on the Outside. Stronger on the Inside." with a "See More Success Stories" button. On the right, three before/after transformation photos of women, each with a big gold result number underneath ("−24 LBS in 16 weeks", "+18 LBS of muscle", "−20% body fat in 14 weeks"), a short italic quote, and the client's first name.
+
+A final call-to-action panel — a wide dark card split into three parts. Left: a friendly portrait of Rachel. Middle: headline "You Don't Need More Motivation. You Need the Right Plan." with a gold "Book Your Free Consultation" button. Right: three small benefits with icons — "1:1 Strategy Call", "Personalized Plan", "Start Your Transformation".
+
+For the photos, generate them — I want a fit woman with warm gold dramatic lighting on a black background, very cinematic. The before/after photos should be full-body in the same dark studio style.
+
+Make it look like a real, professional coaching brand — not a template. Don't add forms, signups, or extra pages — just this one beautiful landing page.`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Copied!";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Copy the prompt
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Build on Replit ↗
+      </button>
+    </div>;
+};
+
+Une page d'accueil donne à une idée, une campagne, une liste d'attente, un événement ou une offre un endroit ciblé où vivre.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/yG4SOQfWGbnjXJ3G/images/build-examples/rachel-jones-coach.png?fit=max&auto=format&n=yG4SOQfWGbnjXJ3G&q=85&s=b43fe0b074a4473b478a04ede1bb53ff" alt="La page d'accueil de Rachel Jones Fitness Coach publiée à une URL publique — un héros éditorial sombre avec le titre 'Un corps plus fort. Un esprit confiant. Un vous inarrêtable.', un appel à l'action 'Travailler avec Rachel', des certifications et une bande de mentions presse" width="2880" height="1800" data-path="images/build-examples/rachel-jones-coach.png" />
+</Frame>
+
+<PromptActions prompt={RACHEL_JONES_PROMPT} campaign="docs-landing-page" />
+
+## Ce que vous allez apprendre
+
+Vous apprendrez à :
+
+* Transformer une audience, une offre et un appel à l'action en une page.
+* Demander à Agent du texte de page, une mise en page et un comportement de formulaire.
+* Vérifier si la page est claire avant de la partager.
+* Tester un formulaire depuis l'URL publiée.
+* Améliorer la page en fonction de la qualité des réponses.
+
+## Affiner et explorer des alternatives dans Canvas
+
+Une fois qu'Agent a terminé la première construction, ouvrez Canvas pour donner des retours visuels et demander à Agent d'explorer des directions alternatives sans réécrire le prompt.
+
+<Steps>
+  <Step title="Construire la page d'accueil">
+    Copiez le prompt et collez-le dans la boîte de prompt sur [replit.com](https://replit.com), ou cliquez sur **Construire sur Replit** pour ouvrir Replit avec le prompt prérempli.
+
+    <PromptActions prompt={RACHEL_JONES_PROMPT} campaign="docs-landing-page" />
+  </Step>
+
+  <Step title="Prévisualiser l'application qu'Agent a créée">
+    Quand Agent a terminé, le volet droit bascule vers **Preview** pour que vous puissiez interagir avec la page d'accueil en temps réel. Faites défiler le héros, cliquez sur les appels à l'action et vérifiez que le texte et les images correspondent à ce que vous avez demandé avant de commencer à affiner.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-preview.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=867fe0f59c2d879e608a822f91466157" alt="La page d'accueil de la coach fitness Rachel Jones rendue dans le volet Preview de Replit à côté du chat Agent — un héros éditorial sombre avec le titre 'Un corps plus fort. Un esprit confiant. Un vous inarrêtable.' sur un portrait éclairé à l'or, les boutons Travailler avec Rachel et Regarder l'histoire de Rachel, des certifications à droite et une bande étoilée 'Approuvée par 500+ femmes dans le monde'" width="3452" height="1988" data-path="images/fitstart/launch-landing-page/landing-preview.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ouvrir Canvas">
+    Sélectionnez le bouton **Canvas** sous les onglets Preview et Outils pour faire basculer le volet droit de Preview à Canvas.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-canvas-button.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=0df9348f1e5a76b3e35238b634802053" alt="L'espace de travail Replit avec le bouton Canvas mis en évidence sous les onglets Preview et Outils" width="720" height="450" data-path="images/fitstart/launch-landing-page/landing-canvas-button.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Annoter en dehors de la prévisualisation">
+    Utilisez les outils **Texte** et **Dessin** du Canvas pour ajouter des notes et des flèches dans l'espace vide autour de la maquette, puis pointez-les vers l'élément spécifique que vous souhaitez qu'Agent modifie. Les annotations placées sur le canvas — en dehors de la prévisualisation — restent attachées à vos retours pour qu'Agent puisse les lire avec le design.
+
+    Gardez chaque annotation centrée sur un seul changement. Les notes courtes et précises ("Réduire la largeur de ce bouton") fonctionnent mieux que les retours ouverts.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-canvas-annotate-text.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=fc50cf754d3531471e90a5df69cb57a7" alt="Une annotation Canvas qui indique 'Réduire la largeur de ce bouton' placée dans la marge vide du canvas à droite de la page d'accueil Rachel Jones, avec une flèche pointant vers le bouton doré 'Réserver une consultation gratuite' dans l'en-tête de la page" width="3452" height="1988" data-path="images/fitstart/launch-landing-page/landing-canvas-annotate-text.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Sélectionner les annotations et la prévisualisation, puis envoyer à Agent">
+    Sélectionnez vos annotations avec la prévisualisation par un lasso, saisissez un court prompt dans **Discuter des éléments sélectionnés** et envoyez. Agent lit les annotations et le design comme un seul contexte, de sorte qu'il sait à quel élément chaque note fait référence.
+
+    Gardez le message de chat général — quelque chose comme "Appliquer les modifications des annotations." Laissez les annotations porter les détails.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-canvas-send.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=9e470adbcfd65080434ac5dc3aeba9e5" alt="La page d'accueil Rachel Jones sélectionnée avec deux annotations sur le Canvas — 'Réduire la largeur de ce bouton' pointant vers le bouton Réserver une consultation gratuite et 'Ajouter une animation en glissement pour l'image de Rachel' pointant vers la photo héros — avec un prompt de chat saisi dans le champ Discuter des éléments sélectionnés" width="1726" height="1988" data-path="images/fitstart/launch-landing-page/landing-canvas-send.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Explorer différentes directions">
+    Cliquez sur le design dans Canvas et choisissez une suggestion à côté, comme **Explorer différentes approches**, pour demander à Agent des directions visuelles alternatives.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-canvas-reimagine.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=6b92b25a43c699b3e90084e96bc5ba70" alt="Trois directions alternatives pour la page d'accueil générées sous forme de cadres Design sur le canvas à côté de l'original" width="1726" height="994" data-path="images/fitstart/launch-landing-page/landing-canvas-reimagine.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Examiner les alternatives et itérer">
+    Attendez qu'Agent ait terminé de générer. **Explorer différentes approches** met à jour le même artefact avec de nouvelles variantes — passez de l'une à l'autre depuis le menu déroulant d'artefact au-dessus de la maquette. **Explorer différentes ambiances** génère des maquettes visuelles séparées qui apparaissent sur le canvas à côté de l'original.
+
+    Une fois les variantes arrivées, choisissez une direction et continuez à itérer. Ajoutez une autre annotation sur le cadre choisi, sélectionnez-le avec le design par un lasso et envoyez une nouvelle demande — par exemple, "Appliquer les modifications demandées dans les annotations." Agent utilise le contexte de la variante plus vos nouvelles annotations comme un seul prompt.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-canvas-zoomed.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=d83303c26926b024376ff2fb6ef1c63c" alt="La page d'accueil Rachel Jones sur Canvas après qu'Agent a généré trois variantes d'ambiance (Editorial Warmth, Quiet Clinical, Vibrant Pop) — le cadre original est sélectionné avec deux nouvelles annotations ('Réduire la largeur de ce bouton' et 'Ajouter une animation en glissement pour l'image de Rachel') et le chat indique 'Appliquer les modifications demandées dans les annotations'" width="3452" height="1988" data-path="images/fitstart/launch-landing-page/landing-canvas-zoomed.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Publier votre travail">
+    Quand la page fonctionne dans Preview, cliquez sur **Publier** (ou **Republier** lors des déploiements suivants) en haut à droite de l'espace de travail pour pousser la dernière version vers votre URL publique. Ouvrez l'URL publiée dans un nouvel onglet et soumettez une réponse de test pour confirmer que la page en ligne la capture avant de la partager.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/aRjqxvnoTuPani4_/images/fitstart/launch-landing-page/landing-publish.png?fit=max&auto=format&n=aRjqxvnoTuPani4_&q=85&s=dfc35f1e97bce76955e420196468dc84" alt="Le coin supérieur droit de l'espace de travail Replit zoomé 2x — le bouton gris Republier dans l'en-tête est mis en évidence avec un contour orange, et sa fenêtre contextuelle est ouverte en dessous affichant 'Raouf a publié il y a environ 18 heures', Visibilité : Publique, et les boutons d'action Vérifier la sécurité et Republier" width="2142" height="1072" data-path="images/fitstart/launch-landing-page/landing-publish.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Étapes suivantes
+
+<CardGroup cols={2}>
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/build/add-integrations">
+    Envoyez des e-mails de suivi ou synchronisez les réponses avec un CRM.
+  </Card>
+
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/build/add-custom-domain">
+    Donnez à la page une URL de campagne de marque avant de la partager.
+  </Card>
+
+  <Card title="Ajouter une base de données" icon="database" href="/fr/build/add-database">
+    Stockez des réponses plus structurées que vous pouvez trier et exporter.
+  </Card>
+
+  <Card title="Tester un changement à la fois" icon="flask">
+    Créez une deuxième variante et comparez les messages en tête-à-tête — changez un élément par tour pour savoir ce qui a fait la différence.
+  </Card>
+</CardGroup>
+
+## En relation
+
+* [Ajouter des intégrations](/fr/build/add-integrations)
+* [Ajouter un domaine personnalisé](/fr/build/add-custom-domain)

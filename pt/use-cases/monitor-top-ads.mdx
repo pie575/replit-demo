@@ -1,0 +1,163 @@
+---
+title: "Monitorar os melhores anúncios"
+description: "Centralize o desempenho dos anúncios e veja quais criativos realmente valem a pena."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Puxe os anúncios da semana passada do TikTok Ads, Snapchat Ads, Meta Ads e Google Ads.
+Centralize o desempenho e identifique os melhores anúncios por investimento, taxa de
+cliques, custo por aquisição e retorno sobre o investimento em anúncios. Classifique
+vencedores e perdedores para saber quais criativos escalar ou pausar entre plataformas.
+
+## Ideal para
+
+* Profissionais de performance que precisam de uma revisão criativa semanal entre Meta, Google, TikTok e Snapchat.
+* Líderes de crescimento que precisam saber quais anúncios escalar e quais pausar.
+
+## Conectores
+
+<Connectors
+  items={[
+{
+  id: "tiktok-ads",
+  name: "TikTok Ads",
+  why: "Desempenho de criativos em formato curto",
+},
+{
+  id: "snapchat",
+  name: "Snapchat Ads",
+  why: "Desempenho de anúncios Snap e de stories",
+},
+{
+  id: "google-ads",
+  name: "Google Ads",
+  why: "Desempenho de busca e display",
+  auth: "api-key",
+},
+{
+  id: "facebook",
+  name: "Meta Ads",
+  why: "Investimento, taxa de cliques, custo por aquisição, retorno sobre o investimento em anúncios",
+  auth: "api-key",
+},
+]}
+/>
+
+## Antes de começar
+
+Conecte o TikTok Ads e o Snapchat Ads no Replit. Para o Google Ads e o Meta Ads, tenha sua
+chave de API à mão. O Agent vai pedi-la quando precisar buscar dados. Escolha um período e
+diga quais métricas importam mais (retorno sobre o investimento em anúncios vs. custo por
+aquisição).
+
+## Dê o prompt ao agente
+
+<AiPrompt>
+  Crie uma rotina que rode toda segunda-feira às 9h. Puxe os anúncios da semana
+  passada do TikTok Ads, Snapchat Ads, Meta Ads e Google Ads. Centralize o
+  desempenho e identifique os melhores anúncios por investimento, taxa de
+  cliques, custo por aquisição e retorno sobre o investimento em anúncios.
+  Classifique vencedores e perdedores, e me diga quais criativos devo escalar
+  ou pausar.
+</AiPrompt>
+
+## O que esperar
+
+O Agent monta uma tabela classificada de criativos entre plataformas. Faça uma checagem
+pontual dos totais em cada gerenciador de anúncios antes de mudar orçamentos. Os períodos e
+fusos horários costumam divergir, então combine a janela em cada gerenciador de anúncios
+primeiro. Escolha o melhor e o pior anúncio, abra-os no gerenciador de anúncios e confirme
+que o investimento bate antes de mover orçamento.
+
+## Adapte ao seu caso
+
+<AiPrompt>
+  Agrupe por tema criativo, não apenas por nome da campanha. Mostre quais
+  temas vencem em qual plataforma.
+</AiPrompt>
+
+<AiPrompt>
+  Publique um resumo de segunda-feira no Slack: os 3 melhores anúncios, os 3
+  piores e movimentos de orçamento sugeridos.
+</AiPrompt>
+
+## Solução de problemas
+
+* **O Google Ads ou o Meta Ads falham ao puxar dados:** esses dois não são conectores nativos. O Agent vai pedir sua chave de API. Tenha-a à mão e confirme que ela consegue ler as contas de anúncios que você acompanha.
+* **Os totais não batem com o gerenciador de anúncios:** os períodos e fusos horários costumam divergir. Peça ao Agent para usar a mesma janela de cada plataforma (geralmente semana passada, segunda a domingo) e faça uma checagem pontual do investimento antes de mudar orçamentos.
+* **Uma plataforma está ausente da tabela:** conecte o TikTok Ads e o Snapchat Ads no Replit primeiro. Se uma conexão nativa expirar, reconecte e rode a rotina novamente.
+
+## Relacionados
+
+<CardGroup cols={2}>
+  <Card title="Criar ícones e banners para redes sociais" href="/pt/use-cases/create-social-kit">
+    Para profissionais de marketing que também precisam de imagens de perfil e capa por rede.
+  </Card>
+
+  <Card title="Analisar feedback de clientes" href="/pt/use-cases/analyze-customer-feedback">
+    Veja se os anúncios batem com o que os clientes realmente dizem.
+  </Card>
+</CardGroup>

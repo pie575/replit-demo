@@ -1,0 +1,189 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Setting up a Design System
+
+> Configure Agent with your organization's design system - component library, brand assets, design tokens, and visual standards - so every app, site, and artifact follows your design language.
+
+A design system gives Agent the knowledge it needs to build on-brand UI across everything your organization creates on Replit - web apps, mobile apps, slides, and other artifacts. By setting up your component library, design tokens, brand assets, and usage rules within the standard Replit pnpm monorepo, Agent applies your visual language from the first prompt.
+
+<Note>
+  Design systems are available exclusively on the **Enterprise** plan. Only org admins can configure and manage design systems.
+</Note>
+
+## Why set up a design system
+
+Without a design system, every builder needs to manually explain your component library, color tokens, and layout conventions to Agent. Setting up a design system solves this by:
+
+* **Encoding your visual standards**: Agent uses your exact components, colors, and spacing - not generic defaults
+* **Ensuring consistency**: Every app follows the same design language
+* **Reducing onboarding time**: New builders produce on-brand results immediately
+* **Capturing tribal knowledge**: Design decisions and component usage patterns that live in your team's heads get documented for Agent
+
+## What you will need
+
+* Frontend code component library as a tarfile or set of tarfiles
+* Font assets and icons used in your design system
+* Any AI documentation of your design system (MCP, Agent Skills)
+
+## What you can configure
+
+Setting up a design system involves three parts:
+
+1. **Custom instructions**. Your `custom_instruction/instructions.md` file gives Agent the high-level rules that apply to every project: which component library to use, which design tokens to reference, and which patterns to follow. Agent always has this file in context.
+
+2. **Skills**. Skills in `.agents/skills/` provide detailed reference material that Agent loads on demand. Use them for component API documentation, theming guides, layout pattern libraries, and other deep reference content that would be too large for the main instructions file.
+
+3. **Design and brand assets**. Place your logos, icons, fonts, and other brand assets in a dedicated folder (for example, `src/assets/brand/`). Configure a Vite path alias so Agent and builders can reference them with clean imports like `@brand/logo.svg` instead of fragile relative paths. This keeps asset references consistent across the entire project.
+
+## Step-by-step guide
+
+This guide walks you through setting up a design system end to end using your existing component library packaged as tarfiles:
+
+1. **Create a new Replit app** and upload your tarfiles.
+2. **Tell Replit Agent to install the packages and display all of the components.** Agent will configure the project and render your component library.
+3. **Review the output.** Make sure all components look correct and match your expectations. Once everything is verified, proceed to [Creating the design system skill](#creating-the-design-system-skill).
+
+### Creating the design system skill
+
+With your components ready, the final step is to create a design system skill so Agent can reference your components, tokens, and usage patterns in every project.
+
+Copy the entire prompt below and paste it into Agent. Replace `<your-design-system-name>` with the name of your design system:
+
+````
+Create a `<your-design-system-name>` design system skill from the components and packages in this project.
+
+Use the file structure shown below with a `SKILL.md` at the root, a `references/` directory for guides and component docs, and a `packages/` directory containing all dependencies needed to function.
+
+Go through every component in the project and document each one in its own file under `references/components/`, including its props, variants, and example usage.
+
+Format `SKILL.md` as an index that links out to the guide and component reference files, with a "General Guidance" section and a "Components" section, following the example shown below.
+
+File structure:
+
+.agents/skills/your-design-system/
+├── SKILL.md
+├── references/
+│   ├── guides/
+│   │   ├── setup.md
+│   │   ├── guardrails.md
+│   │   ├── layout-and-spacing.md
+│   │   └── ...
+│   └── components/
+│       ├── component-index.md
+│       ├── button.md
+│       ├── checkbox.md
+│       └── ...
+└── packages/
+    └── (Tar files or code components)
+
+The `SKILL.md` file acts as an index that links out to separate markdown files for guides and component references. Each linked file covers one topic in detail. Here is an example of what the generated `SKILL.md` looks like:
+
+```markdown
+---
+name: your-design-system
+description: Use when building or modifying any UI. Provides component API references, layout guidance, and visual style rules for your design system.
+---
+
+# Your Design System
+
+## General Guidance
+
+- [Setup](references/guides/setup.md) — Installation, project configuration, and provider setup
+- [Guardrails](references/guides/guardrails.md) — Hard rules that must never be broken (banned patterns, required tokens, accessibility minimums)
+- [Layout & Spacing](references/guides/layout-and-spacing.md) — Grid system, spacing scale, responsive breakpoints, and page templates
+- ...
+
+## Components
+
+- [Component Index](references/components/component-index.md) — Full list of available components with status and category
+
+Individual component references (props, variants, examples):
+
+- [Button](references/components/button.md)
+- [Checkbox](references/components/checkbox.md)
+- ...
+```
+
+Guide files cover one topic each — setup and installation steps, best practices and rules, reference tables for token values, and short code examples showing correct usage.
+
+Component files document a single component each, including the component name, a brief description, a props table, usage examples, and any guidelines or constraints. The more complete these files are, the better Agent's output will be.
+````
+
+### Connect your skill to Agent
+
+Once the skill is created, make sure your `custom_instruction/instructions.md` points Agent to it:
+
+```markdown theme={null}
+# Design System
+
+Read and follow the design system skill at `.agents/skills/your-design-system/`.
+Always apply the design system when building or modifying UI.
+```
+
+Finally, pre-populate `replit.md` with design-system-specific context so Agent understands your visual standards from the start. Include a project overview, your preferred component library, key design preferences (spacing scale, accessibility requirements), and the architecture stack.
+
+### Validate your setup
+
+Before rolling out your design system, verify these essentials:
+
+* `custom_instruction/instructions.md` points Agent to your design system skill
+* `.agents/skills/` includes the skill with component references, guides, and packages
+* `replit.md` is pre-populated with project overview, preferences, and architecture
+* Design tokens file is included (`tokens.css` or equivalent)
+* Design system package is pre-installed in `package.json`
+* Create a new test app and verify Agent uses the design system correctly
+
+### Pin the design system to your organization
+
+Once your design system is ready, pin it so every org member can use it:
+
+1. Navigate to the design system app in your organization
+2. Open the app's action menu (three-dot menu)
+3. Select **Pin to Agent input box**
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-pin-to-agent.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=6633df41d207aa5e9215ce0f4f1e1683" alt="App action menu showing the Pin to Agent input box option" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  Only org admins (members of the `system_admins` role) can pin and unpin design systems.
+</Note>
+
+Set member access to **Read-only** so that members can see and use the pinned design system without being able to edit it.
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-members-read-only.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=76e9519d8881090d5dce7f7634acb701" alt="Invite dialog showing member access set to Read-only" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+The design system now appears as a selectable pill below the Agent input box for every member of your organization. To remove it, open the same menu and select **Unpin from Agent input box**.
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-input-box.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=627369c01a5a109f15ca0c61968a8505" alt="Design system appearing as a selectable pill in the Agent input box" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+## Maintain your design system over time
+
+Design systems evolve. Keep yours current:
+
+* **Update token files** when your design system ships new colors, spacing, or typography values
+* **Update skills** when components get new props, variants, or usage patterns
+* **Update instructions** when design principles or standards change
+* **Bump package versions** when new releases of your design system ship
+* **Test regularly** by creating a new app and verifying that Agent produces correct output
+
+## Design Systems vs. Custom Templates
+
+Design systems and [custom templates](/teams/custom-templates) serve different purposes:
+
+|                      | Design Systems                                                            | Custom Templates                                                      |
+| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **Purpose**          | Change the frontend stack to your team's and utilize your code components | Replace the default stack entirely (e.g., Rust, Go, C++)              |
+| **Stack**            | Works within the standard Replit pnpm monorepo                            | Defines a completely custom project structure                         |
+| **What it provides** | Component library rules, design tokens, brand assets, visual skills       | Full boilerplate: runtime, build config, dependencies, project layout |
+| **Applies to**       | Web apps, mobile apps, slides, artifacts - anything Agent builds          | Only apps created from that specific template                         |
+
+Use a design system when you want Agent to follow your visual standards across the normal Replit experience. Use a custom template when you need a fundamentally different stack.
+
+## Related resources
+
+* [Custom Templates](/teams/custom-templates) - Set up entirely custom stacks for your organization
+* [Agent Skills](/features/agent/skills) - How skills work and how to create them
+* [Use a skill](/build/use-agent-skills) - Hands-on guide to using skills
+* [replit.md](/features/project-setup/replit-dot-md) - Customize Agent behavior with project context
+* [Enterprise overview](/category/teams) - Learn about Enterprise features

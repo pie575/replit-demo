@@ -1,0 +1,138 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# サブスクリプションを追跡する
+
+> メールの中から定期支払いを見つけ、月々のコストを計算します。
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Gmailをスキャンしてサブスクリプションや領収書のメールを見つけ、定期支払いを特定し、Google Sheetsで月々のコストを計算します。Agentは事業者名、金額、支払いサイクルを抽出し、更新前に忘れられたトライアルらしきものにフラグを立てます。
+
+## こんな人におすすめ
+
+* ツールやサービスへの実際の月間支出を把握したい創業者やオペレーション担当者。
+* 更新前に忘れられたトライアルを見つけたい経理・総務担当者。
+
+## コネクタ
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "領収書と更新メール" },
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "サブスクリプションと月間コストの一覧",
+},
+]}
+/>
+
+## 始める前に
+
+GmailとGoogle Sheet(またはAgentに新規作成を依頼)を接続してください。どの受信箱やラベルを検索するかをAgentに伝えてください。
+
+## Agentへのプロンプト
+
+<AiPrompt>
+  毎週月曜9時に実行されるルーティンを作成してください。Gmailをスキャンし
+  てサブスクリプションや領収書のメールを見つけてください。定期支払いを特
+  定し、事業者名、金額、支払いサイクルを抽出し、月間コストを計算する
+  Google Sheetを作成してください。忘れられたトライアルらしきものにフラグ
+  を立ててください。
+</AiPrompt>
+
+## 期待できること
+
+Agentは事業者名、金額、請求サイクル、月間合計の表を作成します。いくつかの行を元のメールと照らし合わせて確認してください。最初の実行では、件名に「サブスクリプション」と書かれていない事業者を見逃すことがあります。そうしたラベルを追加して再実行してください。知っている事業者を3つ選び、Gmailの領収書を開いて、月間合計を信頼する前に金額と支払いサイクルを確認してください。
+
+## 自分向けにカスタマイズする
+
+<AiPrompt>
+  サブスクリプションをカテゴリ別(開発ツール、デザイン、AI、個人利用)に
+  グループ化し、月額\[金額]を超えるものをハイライトしてください。
+</AiPrompt>
+
+<AiPrompt>
+  \[金額]を超える年間更新の3日前にSlackでリマインダーを送ってください。
+</AiPrompt>
+
+## トラブルシューティング
+
+* **知っているサブスクリプションがシートにない:** どのGmailラベルや検索条件を使うかをAgentに伝え、件名に「サブスクリプション」と書かれていない事業者も含めてください。いくつかの行を元のメールと照らし合わせて確認してください。
+* **金額や支払いサイクルが間違っているように見える:** 領収書には税金、クレジット、異なる通貨が表示されていることがよくあります。メールに記載された明細金額と請求期間をそのまま使い、推測した行にはフラグを立てるようAgentに依頼してください。
+* **同じ事業者が2回表示される:** 事業者名でマージし、最新の領収書を残してから月間合計を再計算するようAgentに依頼してください。
+
+## 関連項目
+
+<CardGroup cols={2}>
+  <Card title="不在中の出来事をキャッチアップする" href="/ja/use-cases/catch-up-while-away">
+    休暇後の創業者やオペレーション担当者向けに同じGmailコネクタを使います。
+  </Card>
+
+  <Card title="リアルタイムAPIダッシュボードを構築する" href="/ja/use-cases/live-api-dashboard">
+    週次の表の代わりにリアルタイムダッシュボードを使います。
+  </Card>
+</CardGroup>

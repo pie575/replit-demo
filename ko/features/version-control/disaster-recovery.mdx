@@ -1,0 +1,120 @@
+---
+title: "Git 재해 복구"
+description: "Replit의 자동 백업 시스템을 사용하여 Git 기록과 코드를 복구하는 방법을 알아보세요."
+---
+
+Replit은 손상된 `.git` 폴더나 손실된 커밋 기록과 같은 문제에서 복구할 수 있도록 Git 저장소를 자동으로 백업합니다. 이 백업 시스템은 백그라운드에서 실행되므로 별도의 노력 없이 작업이 보호됩니다.
+
+## 작동 방식
+
+모든 Replit 앱은 Git 저장소의 안전한 백업을 유지합니다. Replit Agent가 코드를 변경하거나 앱을 게시하면 해당 변경 사항이 자동으로 이 백업에 동기화됩니다. 로컬 Git 저장소가 손상되거나 사용할 수 없게 된 경우 백업에서 전체 커밋 기록을 복원할 수 있습니다.
+
+<Info>
+  백업 원격 저장소의 이름은 `gitsafe-backup`이며 Replit이 자동으로 관리합니다. 별도로 구성할 필요 없이 이미 백그라운드에서 작동하고 있습니다.
+</Info>
+
+## 백업 기록 보기
+
+커밋 기록을 보는 가장 쉬운 방법은 [Git 창](/ko/features/workspace-tools/git-interface)을 통하는 것입니다. Project Editor의 Tools 섹션에서 열면 모든 Agent 체크포인트를 포함한 전체 커밋 기록이 표시됩니다. 대부분의 경우 명령어가 필요 없이 이 방법으로 처리할 수 있습니다.
+
+gitsafe-backup 원격 저장소를 직접 확인해야 하는 경우 Shell을 사용할 수 있습니다:
+
+```bash theme={null}
+git fetch gitsafe-backup main
+git log gitsafe-backup/main
+```
+
+이렇게 하면 모든 Agent 체크포인트와 수동 커밋을 포함한 전체 커밋 기록이 표시됩니다. 이를 사용하여 작업이 백업되었는지 확인하거나 복원할 특정 커밋을 찾을 수 있습니다.
+
+## Git 문제에서 복구하기
+
+Git 오류가 발생하거나 저장소가 손상된 경우 [Git 창](/ko/features/workspace-tools/git-interface)부터 시작하세요. Shell 명령이 필요 없이 이전 커밋으로 재설정하거나 원격에서 가져오기와 같은 대부분의 일반적인 문제를 해결할 수 있습니다.
+
+Git 창으로 해결할 수 없는 경우(예: 완전히 손상된 `.git` 폴더)에는 아래의 Shell 기반 단계를 사용하세요.
+
+### 백업 사용 가능 여부 확인
+
+먼저 백업 원격 저장소가 존재하는지 확인하세요:
+
+```bash theme={null}
+git remote -v
+```
+
+출력에서 `gitsafe-backup`을 찾으세요. 이것이 있으면 복구를 진행할 수 있습니다.
+
+### 저장소 복원
+
+<Warning>
+  이 과정은 현재 `.git` 폴더를 백업된 버전으로 교체합니다. 작업 파일은 변경되지 않지만 로컬 Git 기록은 백업으로 교체됩니다.
+</Warning>
+
+<Steps>
+  <Step title="현재 Git 구성 저장">
+    사용자 설정이 있을 경우를 대비해 Git 구성 파일을 백업하세요:
+
+    ```bash theme={null}
+    cp .git/config .git_config_backup
+    ```
+  </Step>
+
+  <Step title="백업 저장소 클론">
+    백업에서 임시 클론을 생성하세요:
+
+    ```bash theme={null}
+    git clone --bare git://gitsafe:5418/backup.git /tmp/gitsafe-restore
+    ```
+  </Step>
+
+  <Step title="Git 폴더 교체">
+    손상된 `.git` 폴더를 옆으로 옮기고 백업으로 교체하세요:
+
+    ```bash theme={null}
+    mv .git .git_corrupted_backup
+    mv /tmp/gitsafe-restore/ .git
+    ```
+  </Step>
+
+  <Step title="구성 복원">
+    Git 구성을 다시 복사하세요:
+
+    ```bash theme={null}
+    mv .git_config_backup .git/config
+    ```
+  </Step>
+</Steps>
+
+이 단계를 완료한 후 `git status`를 실행하여 저장소가 올바르게 작동하는지 확인하세요.
+
+## 일반적인 문제 해결하기
+
+### "fatal: repository not found" 또는 백업 원격이 누락됨
+
+이전 프로젝트에서는 백업 시스템이 활성화되지 않았을 수 있습니다. 이전 프로젝트를 복구하는 데 도움이 필요하면 지원팀에 문의하세요.
+
+### 복구에 최근 커밋이 포함되지 않음
+
+백업은 각 Agent 커밋 후 동기화됩니다. 변경했지만 커밋하지 않았다면 해당 변경 사항은 백업에 포함되지 않습니다. 커밋되지 않은 파일이 있는지 작업 디렉터리를 확인하세요.
+
+### Git 작업이 느리거나 멈춤
+
+Git 작업이 응답하지 않게 되면 오래된 잠금 파일이 있을 수 있습니다. 안전하게 제거할 수 있습니다:
+
+```bash theme={null}
+rm -f .git/index.lock
+```
+
+## 데이터 손실 방지하기
+
+백업 시스템이 Git 기록을 자동으로 보호하지만 작업을 보호하기 위해 추가 조치를 취할 수 있습니다:
+
+* **자주 커밋하기**: 작고 빈번한 커밋을 만들어 진행 상황이 계속 백업되도록 하세요
+* **체크포인트 사용하기**: [Replit Agent](/ko/features/agent/overview)로 작업할 때 체크포인트가 주요 단계마다 자동으로 커밋을 생성합니다
+* **GitHub에 연결하기**: 중요한 프로젝트의 경우 [앱을 GitHub에 연결](/ko/build/import-from-providers)하여 추가적인 백업 계층을 확보하세요
+
+## 다음 단계
+
+Replit의 버전 관리에 대해 더 알아보려면:
+
+* [버전 관리 개요](/ko/learn/projects-and-artifacts/version-control): 모든 버전 관리 옵션에 대해 알아보세요
+* [Git 창 사용하기](/ko/features/workspace-tools/git-interface): 명령줄 없이 시각적으로 Git을 관리하세요
+* [체크포인트 및 롤백](/ko/features/version-control/checkpoints-and-rollbacks): Agent 체크포인트가 작동하는 방식을 이해하세요

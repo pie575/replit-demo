@@ -1,0 +1,142 @@
+---
+title: "Figmaからライブアプリへ"
+description: "Figmaのフレームを、レイアウト・タイポグラフィ・カラーが一致する公開可能なReplitアプリに変換します。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+すでにFigmaに画面があるとします。Agentはそれを、編集・プレビュー・公開できるライブの
+Replitアプリとして構築します。レイアウト、タイポグラフィ、カラー、余白まで反映されます。
+できあがるのはスクリーンショットではなく、実際に動作する製品です。ファイルに複数の
+フローが含まれる場合は、対象となる具体的なフレームをAgentに指定してください。
+
+## 最適な用途
+
+* すでに持っているフレームから、コード化されたReplitアプリが必要なプロダクトデザイナー。
+* Figmaファイルを持っていて、白紙から作り直さずにライブ化したい創業者。
+
+## コネクタ
+
+<Connectors
+  items={[
+{
+  id: "figma",
+  name: "Figma",
+  why: "実装対象のフレーム、コンポーネント、タイポグラフィ、カラー",
+},
+]}
+/>
+
+## 始める前に
+
+名前が付けられたフレーム(ホーム、商品、チェックアウトなど)を含むFigmaファイルを
+用意してください。Figmaを接続します。ファイルをAgentと共有するか、ファイルのリンクと
+対象となるフレームのリンクを貼り付けてください。マーケティングサイトなのか、アプリ
+なのか、単一のランディングページなのかを伝えてください。
+
+## エージェントへの指示
+
+<AiPrompt>
+  このFigmaファイル\[リンク]から、これらのフレーム:\[フレーム名またはリンク]をもとに
+  ライブのReplitアプリを構築して。レイアウト、タイポグラフィ、カラー、余白、
+  ブレークポイント(デスクトップとモバイル)を一致させて。
+</AiPrompt>
+
+## 期待できること
+
+Agentは選択されたフレームを読み込み、Replitから公開できる対応ページを構築します。
+余白、タイポグラフィ、カラーをFigmaと照合して抜き取りチェックしてください。ナビゲーション、
+フォーム、ホバーなどのインタラクティブな部分は自分で確認してください。多くの場合、追加の
+調整が必要です。デスクトップとスマートフォン幅でプレビューしてください。ナビゲーションと
+フォームをクリックし、公開前にスクリーンショットをFigmaと比較してください。
+
+## 自分に合わせてカスタマイズする
+
+<AiPrompt>
+  まずモバイルのフレームだけを実装して。Figmaのオートレイアウトと余白を一致させて。
+  デスクトップは私がモバイルを承認した後にして。
+</AiPrompt>
+
+<AiPrompt>
+  ボタン、入力欄、カードには1つのコンポーネントを再利用して。Figmaの変数がある場合は
+  そこからカラーとタイポグラフィを取得して。
+</AiPrompt>
+
+## トラブルシューティング
+
+* **Agentがファイルを読み込めない:** Figmaを接続し、ファイルを共有した上で、ファイルのURLだけでなくフレームのリンクを貼り付けてください。ファイルに複数のフローがある場合は、フレームに名前を付けて(ホーム、商品、チェックアウトなど)伝えてください。
+* **ホバー、ナビゲーション、フォームが未完成に感じる:** レイアウトとカラーが先に完成することが多いです。インタラクティブな部分については追加の調整を依頼し、余白をFigmaと照合して抜き取りチェックしてください。
+
+## 関連情報
+
+<CardGroup cols={2}>
+  <Card title="ランディングページをデザインする" href="/ja/use-cases/design-landing-page">
+    Notionのブリーフから、まずフレームが必要なプロダクトデザイナー向けです。
+  </Card>
+
+  <Card title="オンラインストアを構築する" href="/ja/use-cases/build-online-store">
+    次にShopifyストアフロントが必要な創業者やプロダクトデザイナー向けです。
+  </Card>
+</CardGroup>

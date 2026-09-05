@@ -1,0 +1,982 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Créer une application mobile
+
+> Créez une application en priorité sur téléphone avec Agent, testez-la dans un simulateur et sur votre téléphone, et partagez-la pour obtenir des retours.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const AgentInput = ({defaultPrompt = "", highlightPlan = false, highlightStart = false, showTypewriter = true}) => {
+  const AGENT_INPUT_TYPEWRITER_SCRIPT_ID = "replit-docs-typewriter-core";
+  const AGENT_INPUT_TYPEWRITER_SRC = "https://unpkg.com/typewriter-effect@2.18.2/dist/core.js";
+  const AGENT_INPUT_TYPEWRITER_PROMPTS = ["Build a project tracker for my team", "Design a landing page for my coffee shop", "Add Stripe payments to my app"];
+  const AGENT_INPUT_TYPING_SPEED = 40;
+  const AGENT_INPUT_DELETE_SPEED = 20;
+  const AGENT_INPUT_PAUSE_AFTER = 2000;
+  const AGENT_INPUT_START_DELAY = 500;
+  const getAgentInputTypewriterLoader = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriterLoader) {
+      window.__replitDocsAgentInputTypewriterLoader = {};
+    }
+    return window.__replitDocsAgentInputTypewriterLoader;
+  };
+  const ensureAgentInputTypewriterCore = () => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return Promise.resolve(null);
+    }
+    if (window.Typewriter) {
+      return Promise.resolve(window.Typewriter);
+    }
+    const loader = getAgentInputTypewriterLoader();
+    if (loader.promise) {
+      return loader.promise;
+    }
+    loader.promise = new Promise((resolve, reject) => {
+      const handleLoad = () => {
+        if (window.Typewriter) {
+          resolve(window.Typewriter);
+          return;
+        }
+        loader.promise = null;
+        reject(new Error("Typewriter core loaded without a global Typewriter export."));
+      };
+      const handleError = () => {
+        loader.promise = null;
+        reject(new Error("Failed to load typewriter core."));
+      };
+      const existingScript = document.getElementById(AGENT_INPUT_TYPEWRITER_SCRIPT_ID);
+      if (existingScript) {
+        existingScript.addEventListener("load", handleLoad, {
+          once: true
+        });
+        existingScript.addEventListener("error", handleError, {
+          once: true
+        });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = AGENT_INPUT_TYPEWRITER_SCRIPT_ID;
+      script.src = AGENT_INPUT_TYPEWRITER_SRC;
+      script.async = true;
+      script.addEventListener("load", handleLoad, {
+        once: true
+      });
+      script.addEventListener("error", handleError, {
+        once: true
+      });
+      document.head.appendChild(script);
+    });
+    return loader.promise;
+  };
+  const getAgentInputTypewriterRegistry = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    if (!window.__replitDocsAgentInputTypewriters) {
+      window.__replitDocsAgentInputTypewriters = new WeakMap();
+    }
+    return window.__replitDocsAgentInputTypewriters;
+  };
+  const findAgentInputContainer = node => node?.closest?.("[data-agent-input-container]") || null;
+  const getAgentInputElements = container => ({
+    textarea: container?.querySelector?.('[data-agent-input-role="textarea"]') || null,
+    startButton: container?.querySelector?.('[data-agent-input-role="start-button"]') || null,
+    pillsContainer: container?.querySelector?.('[data-agent-input-role="pills"]') || null
+  });
+  const getAgentInputPromptValue = container => {
+    const {textarea} = getAgentInputElements(container);
+    return textarea?.value?.trim() || "";
+  };
+  const updateAgentInputButtonState = container => {
+    const {startButton} = getAgentInputElements(container);
+    if (!startButton) {
+      return;
+    }
+    const hasText = getAgentInputPromptValue(container).length > 0;
+    startButton.style.opacity = hasText ? "1" : "0.4";
+    startButton.style.cursor = hasText ? "pointer" : "not-allowed";
+  };
+  const stopAgentInputTypewriter = (textarea, {placeholder, clearDemo = false} = {}) => {
+    if (typeof window === "undefined" || !textarea) {
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const record = registry?.get(textarea);
+    if (!record) {
+      if (placeholder) {
+        textarea.setAttribute("placeholder", placeholder);
+      }
+      return;
+    }
+    record.stopped = true;
+    if (record.startTimer) {
+      window.clearTimeout(record.startTimer);
+    }
+    if (record.writeFrame) {
+      window.cancelAnimationFrame(record.writeFrame);
+    }
+    if (record.typewriter?.stop) {
+      record.typewriter.stop();
+    }
+    textarea.removeEventListener("focus", record.handleFocus);
+    textarea.removeEventListener("pointerdown", record.handlePointerDown);
+    textarea.removeEventListener("input", record.handleInput);
+    if (clearDemo && textarea.value === record.pendingValue) {
+      textarea.value = "";
+    }
+    textarea.setAttribute("placeholder", placeholder || "");
+    updateAgentInputButtonState(record.container);
+    registry.delete(textarea);
+  };
+  const startAgentInputTypewriter = (container, {defaultPrompt, placeholder, showTypewriter}) => {
+    if (typeof window === "undefined" || typeof document === "undefined" || !container) {
+      return;
+    }
+    const {textarea} = getAgentInputElements(container);
+    if (!textarea) {
+      return;
+    }
+    if (!showTypewriter || defaultPrompt) {
+      stopAgentInputTypewriter(textarea, {
+        placeholder
+      });
+      textarea.setAttribute("placeholder", placeholder);
+      updateAgentInputButtonState(container);
+      return;
+    }
+    const registry = getAgentInputTypewriterRegistry();
+    const existingRecord = registry.get(textarea);
+    if (existingRecord && !existingRecord.stopped) {
+      updateAgentInputButtonState(container);
+      return;
+    }
+    textarea.setAttribute("placeholder", "");
+    if (textarea.value) {
+      textarea.value = "";
+    }
+    updateAgentInputButtonState(container);
+    const record = {
+      container,
+      element: textarea,
+      pendingValue: "",
+      renderedValue: "",
+      stopped: false,
+      startTimer: null,
+      writeFrame: null,
+      typewriter: null,
+      handleFocus: null,
+      handlePointerDown: null,
+      handleInput: null
+    };
+    const queueValue = nextValue => {
+      record.pendingValue = nextValue;
+      if (record.writeFrame) {
+        return;
+      }
+      record.writeFrame = window.requestAnimationFrame(() => {
+        record.writeFrame = null;
+        if (record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        if (textarea.value !== record.pendingValue) {
+          textarea.value = record.pendingValue;
+        }
+        updateAgentInputButtonState(container);
+      });
+    };
+    const stopDemo = () => {
+      stopAgentInputTypewriter(textarea, {
+        placeholder,
+        clearDemo: true
+      });
+    };
+    record.handleFocus = stopDemo;
+    record.handlePointerDown = stopDemo;
+    record.handleInput = stopDemo;
+    registry.set(textarea, record);
+    textarea.addEventListener("focus", record.handleFocus, {
+      once: true
+    });
+    textarea.addEventListener("pointerdown", record.handlePointerDown, {
+      once: true
+    });
+    textarea.addEventListener("input", record.handleInput, {
+      once: true
+    });
+    record.startTimer = window.setTimeout(() => {
+      ensureAgentInputTypewriterCore().then(Typewriter => {
+        if (!Typewriter || record.stopped || registry.get(textarea) !== record || !textarea.isConnected) {
+          return;
+        }
+        const typewriter = new Typewriter(null, {
+          loop: true,
+          delay: AGENT_INPUT_TYPING_SPEED,
+          deleteSpeed: AGENT_INPUT_DELETE_SPEED,
+          cursor: "",
+          skipAddStyles: true,
+          wrapperClassName: "",
+          cursorClassName: "",
+          onCreateTextNode: character => {
+            record.renderedValue += character;
+            queueValue(record.renderedValue);
+            return null;
+          },
+          onRemoveNode: () => {
+            record.renderedValue = record.renderedValue.slice(0, -1);
+            queueValue(record.renderedValue);
+          }
+        });
+        AGENT_INPUT_TYPEWRITER_PROMPTS.forEach(prompt => {
+          typewriter.typeString(prompt).pauseFor(AGENT_INPUT_PAUSE_AFTER).deleteAll(AGENT_INPUT_DELETE_SPEED).pauseFor(400);
+        });
+        record.typewriter = typewriter;
+        typewriter.start();
+      }).catch(() => {
+        stopAgentInputTypewriter(textarea, {
+          placeholder
+        });
+      });
+    }, AGENT_INPUT_START_DELAY);
+  };
+  if (typeof document !== "undefined" && !window.LZString) {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+    document.head.appendChild(script);
+  }
+  const placeholder = "Describe your idea, Replit will bring it to life...";
+  const outputTypes = [{
+    name: "Web",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clip-rule="evenodd" /><path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Animation",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Design",
+    iconSvg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" /><path fill-rule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clip-rule="evenodd" /></svg>',
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M20.53 5.47a.75.75 0 0 1 0 1.06l-11 11a.75.75 0 0 1-1.06 0l-5-5a.75.75 0 1 1 1.06-1.06L9 15.94 19.47 5.47a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>';
+  if (typeof document !== "undefined" && !document.getElementById("agent-input-styles")) {
+    const style = document.createElement("style");
+    style.id = "agent-input-styles";
+    style.textContent = `
+      /* Theme variables - light mode */
+      [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #F6F6F4);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-border-default: var(--replit-docs-border, #DEDAD5);
+        --ai-border-strong: var(--replit-docs-border-strong, #CAC4BE);
+        --ai-text-secondary: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #858585);
+        --ai-text-primary: var(--replit-docs-text, #1D1D1D);
+        --ai-button-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-button-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-icon-default: var(--replit-docs-text-subtle, #858585);
+        --ai-icon-hover: var(--replit-docs-text-muted, #5C5C5C);
+        --ai-shadow: 0 2px 6px #00000005;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ai-option-border: var(--replit-docs-border, #DEDAD5);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --ai-pill-bg: #CDDCF1;
+        --ai-pill-text: var(--replit-docs-text-muted, #5C5C5C);
+      }
+
+      /* Theme variables - dark mode */
+      .dark [data-agent-input-container],
+      html.dark [data-agent-input-container],
+      [data-theme="dark"] [data-agent-input-container] {
+        --ai-surface-bg: var(--replit-docs-bg, #1E1E1F);
+        --ai-surface-higher: var(--replit-docs-bg-elevated, #222223);
+        --ai-border-default: var(--replit-docs-border, #39393D);
+        --ai-border-strong: var(--replit-docs-border-strong, #4A4A50);
+        --ai-text-secondary: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-text-tertiary: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-text-primary: var(--replit-docs-text, #F5F5F5);
+        --ai-button-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-button-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --ai-icon-default: var(--replit-docs-text-subtle, #8E8F97);
+        --ai-icon-hover: var(--replit-docs-text-muted, #B8B8BE);
+        --ai-shadow: 0 2px 6px #00000020;
+        --ai-option-bg: var(--replit-docs-bg-elevated, #222223);
+        --ai-option-border: var(--replit-docs-border, #39393D);
+        --ai-option-hover-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-option-selected-bg: var(--replit-docs-bg-muted, #222223);
+        --ai-pill-bg: #2A3A4D;
+        --ai-pill-text: #D0D8E4;
+      }
+
+      .agent-input-container {
+        box-sizing: border-box;
+      }
+
+      /* Entry animation */
+      @keyframes agent-input-fade-in-up {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      /* Hover state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:hover) [data-agent-input-role="inner"] {
+        border-color: #85C7FF !important;
+      }
+
+      /* Focus state for input box */
+      [data-agent-input-container]:has([data-agent-input-role="inner"]:focus-within) [data-agent-input-role="inner"] {
+        border-color: #0079F2 !important;
+      }
+
+      /* Icon button hover */
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-icon-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-icon-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-option-btn:not([data-selected="true"]):hover {
+          background: var(--ai-option-hover-bg);
+        }
+        [data-agent-input-container] .ai-plan-btn:hover {
+          background: var(--ai-button-bg-hover);
+        }
+        [data-agent-input-container] .ai-nav-btn:hover svg {
+          color: var(--ai-icon-hover);
+        }
+        [data-agent-input-container] .ai-pill-close:hover {
+          opacity: 0.7;
+        }
+      }
+      @keyframes plan-border-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      [data-agent-input-container] .ai-plan-wrap {
+        position: relative;
+        border-radius: 32px;
+        padding: 2px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-plan-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-plan-wrap .ai-plan-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        color: var(--ai-text-primary);
+        font-weight: 400;
+        border: none;
+        border-radius: 32px;
+        z-index: 1;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off::before {
+        animation: none;
+        background: transparent;
+      }
+      [data-agent-input-container] .ai-plan-wrap.ai-plan-off .ai-plan-btn-highlight {
+        background: var(--ai-button-bg);
+        color: var(--ai-text-secondary);
+      }
+      /* Plan checkbox styles */
+      [data-agent-input-container] .ai-plan-checkbox-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: var(--border-radius-6, 6px);
+        background: var(--ai-button-bg);
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        color: var(--ai-text-secondary);
+        transition: background 120ms ease-out;
+        user-select: none;
+      }
+      @media (hover: hover) {
+        [data-agent-input-container] .ai-plan-checkbox-label:hover {
+          background: var(--ai-button-bg-hover);
+        }
+      }
+      [data-agent-input-container] .ai-plan-checkbox-input {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        accent-color: #0079F2;
+        cursor: pointer;
+      }
+      [data-agent-input-container] .ai-start-wrap {
+        position: relative;
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      [data-agent-input-container] .ai-start-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #3b82f6
+        );
+        animation: plan-border-spin 1s linear infinite;
+      }
+      [data-agent-input-container] .ai-start-wrap .ai-start-btn-highlight {
+        position: relative;
+        background: var(--ai-surface-higher);
+        border: none;
+        border-radius: 6px;
+        z-index: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const getLink = (container, promptOverride) => {
+    if (typeof document === "undefined" || !window.LZString) return "";
+    const prompt = promptOverride || getAgentInputPromptValue(container);
+    if (!prompt) return "";
+    const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+    const utm = "utm_source=replit-docs&utm_medium=docs&utm_campaign=docs-intro-agent-input&utm_content=homepage-prompt-box";
+    return `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+  };
+  const handleStartClick = e => {
+    e.preventDefault();
+    const container = findAgentInputContainer(e.currentTarget);
+    const link = getLink(container);
+    if (link) window.open(link, "_blank");
+  };
+  const toggleOutputType = name => {
+    const btn = document.querySelector(`[data-option-name="${name}"]`);
+    const pillsContainer = document.getElementById("agent-input-pills");
+    if (!btn || !pillsContainer) return;
+    const isSelected = btn.dataset.selected === "true";
+    if (isSelected) {
+      btn.dataset.selected = "false";
+      btn.style.background = "var(--ai-option-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      const type = outputTypes.find(t => t.name === name);
+      if (iconEl && type) iconEl.innerHTML = type.iconSvg;
+      const pill = document.getElementById(`pill-${name}`);
+      if (pill) pill.remove();
+    } else {
+      document.querySelectorAll('[data-option-name][data-selected="true"]').forEach(prevBtn => {
+        const prevName = prevBtn.dataset.optionName;
+        prevBtn.dataset.selected = "false";
+        prevBtn.style.background = "var(--ai-option-bg)";
+        const prevIconEl = prevBtn.querySelector(".option-icon");
+        const prevType = outputTypes.find(t => t.name === prevName);
+        if (prevIconEl && prevType) prevIconEl.innerHTML = prevType.iconSvg;
+        const prevPill = document.getElementById(`pill-${prevName}`);
+        if (prevPill) prevPill.remove();
+      });
+      btn.dataset.selected = "true";
+      btn.style.background = "var(--ai-option-selected-bg)";
+      const iconEl = btn.querySelector(".option-icon");
+      if (iconEl) iconEl.innerHTML = checkSvg;
+      const type = outputTypes.find(t => t.name === name);
+      if (type) {
+        const pill = document.createElement("span");
+        pill.id = `pill-${name}`;
+        pill.style.cssText = "display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 8px 0 8px;border-radius:32px;background:var(--ai-pill-bg);color:var(--ai-pill-text);font-size:14px;white-space:nowrap;cursor:default;";
+        pill.innerHTML = `<span style="display:flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">${type.iconSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}</svg></span><span>${name}</span><span class="ai-pill-close" style="display:flex;align-items:center;cursor:pointer;margin-left:2px" data-pill-remove="${name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7A1 1 0 0 0 5.7 7.12L10.59 12 5.7 16.88a1 1 0 1 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41Z"/></svg></span>`;
+        pill.querySelector(`[data-pill-remove="${name}"]`).addEventListener("click", () => toggleOutputType(name));
+        pillsContainer.appendChild(pill);
+      }
+    }
+  };
+  const PlusIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.25a.75.75 0 0 1 .75.75v6.25H19a.75.75 0 0 1 0 1.5h-6.25V19a.75.75 0 0 1-1.5 0v-6.25H5a.75.75 0 0 1 0-1.5h6.25V5a.75.75 0 0 1 .75-.75Z" />
+    </svg>;
+  const MicIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 9.25a.75.75 0 0 1 .75.75v2a7.75 7.75 0 0 1-7 7.713V22a.75.75 0 0 1-1.5 0v-2.287a7.75 7.75 0 0 1-6.99-7.328L4.25 12v-2a.75.75 0 0 1 1.5 0v2l.008.31A6.25 6.25 0 0 0 12 18.25l.31-.008a6.249 6.249 0 0 0 5.932-5.932l.008-.31v-2a.75.75 0 0 1 .75-.75Z" />
+      <path fillRule="evenodd" d="M12 1.25A3.75 3.75 0 0 1 15.75 5v7a3.75 3.75 0 1 1-7.5 0V5A3.75 3.75 0 0 1 12 1.25Zm0 1.5A2.25 2.25 0 0 0 9.75 5v7a2.25 2.25 0 0 0 4.5 0V5A2.25 2.25 0 0 0 12 2.75Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowUpIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 1 1-1.06 1.06l-5.72-5.72V19a.75.75 0 0 1-1.5 0V6.81l-5.72 5.72a.75.75 0 0 1-1.06-1.06l7-7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowLeftIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M4.47 11.47a.75.75 0 0 0 0 1.06l7 7a.75.75 0 1 0 1.06-1.06l-5.72-5.72H19a.75.75 0 0 0 0-1.5H6.81l5.72-5.72a.75.75 0 0 0-1.06-1.06l-7 7Z" clipRule="evenodd" />
+    </svg>;
+  const ArrowRightIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M19.53 11.47a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 1.06-1.06l7 7Z" clipRule="evenodd" />
+    </svg>;
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "28px",
+    height: "28px",
+    border: "none",
+    borderRadius: "6px",
+    background: "transparent",
+    cursor: "pointer",
+    color: "var(--ai-icon-default)",
+    padding: 0,
+    transition: "background 120ms ease-out"
+  };
+  const optionIconStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ai-option-border)",
+    borderRadius: "12px",
+    background: "var(--ai-option-bg)",
+    cursor: "pointer",
+    color: "var(--ai-text-secondary)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  const initAgentInput = container => {
+    if (!container) {
+      return;
+    }
+    updateAgentInputButtonState(container);
+    startAgentInputTypewriter(container, {
+      defaultPrompt,
+      placeholder,
+      showTypewriter
+    });
+    const ta = container.querySelector('[data-agent-input-role="textarea"]');
+    if (ta && ta.value) {
+      requestAnimationFrame(() => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+    }
+  };
+  return <div ref={initAgentInput} data-agent-input-container className="agent-input-container" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "734px",
+    alignSelf: "center",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "agent-input-fade-in-up 300ms ease-out forwards"
+  }}>
+      <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px"
+  }}>
+        {}
+        <div data-agent-input-role="inner" style={{
+    position: "relative",
+    borderRadius: "6px",
+    border: "1px solid var(--ai-border-strong)",
+    background: "var(--ai-surface-bg)",
+    transition: "border-color 120ms ease-out",
+    boxShadow: "var(--ai-shadow)"
+  }}>
+          {}
+          <div style={{
+    padding: "12px 12px 48px 12px"
+  }}>
+            <textarea data-agent-input-role="textarea" placeholder={placeholder} defaultValue={defaultPrompt} rows={1} onInput={e => {
+    const ta = e.currentTarget;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+    updateAgentInputButtonState(findAgentInputContainer(ta));
+  }} style={{
+    display: "block",
+    width: "100%",
+    minHeight: "21px",
+    maxHeight: "calc(14px * 1.5 * 10)",
+    padding: 0,
+    margin: 0,
+    border: "none",
+    outline: "none",
+    resize: "none",
+    fontSize: "14px",
+    lineHeight: "1.5",
+    color: "var(--ai-text-primary)",
+    background: "transparent",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    overflowY: "auto"
+  }} />
+          </div>
+          {}
+          <div style={{
+    position: "absolute",
+    left: "8px",
+    right: "8px",
+    bottom: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  }}>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    overflow: "hidden",
+    minWidth: 0
+  }}>
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Add attachment" type="button">
+                {PlusIcon}
+              </button>
+              <div id="agent-input-pills" data-agent-input-role="pills" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    overflow: "hidden"
+  }}></div>
+            </div>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flexShrink: 0
+  }}>
+              {highlightPlan ? <div className="ai-plan-wrap" onClick={e => {
+    const wrap = e.currentTarget;
+    wrap.classList.toggle("ai-plan-off");
+  }}>
+                  <label className="ai-plan-btn-highlight" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    height: "32px",
+    padding: "0 8px",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontFamily: "inherit",
+    transition: "background 120ms ease-out"
+  }}>
+                    <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" defaultChecked />
+                    <span>Plan</span>
+                  </label>
+                </div> : <label className="ai-plan-checkbox-label">
+                  <input className="ai-plan-checkbox-input" type="checkbox" aria-label="Plan mode" name="Plan mode" />
+                  <span>Plan</span>
+                </label>}
+              <button className="ai-icon-btn" style={iconBtnStyle} aria-label="Start voice input" type="button">
+                {MicIcon}
+              </button>
+              {highlightStart ? <div className="ai-start-wrap">
+                  <button data-agent-input-role="start-button" className="ai-icon-btn ai-start-btn-highlight" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    borderRadius: "6px",
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                    {ArrowUpIcon}
+                  </button>
+                </div> : <button data-agent-input-role="start-button" className="ai-icon-btn" onClick={handleStartClick} type="button" aria-label="Start" style={{
+    ...iconBtnStyle,
+    background: "#0079F2",
+    color: "#fff",
+    opacity: defaultPrompt ? "1" : "0.4",
+    cursor: defaultPrompt ? "pointer" : "not-allowed"
+  }}>
+                  {ArrowUpIcon}
+                </button>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+⏰ *Durée estimée : 15 minutes*
+
+Une application mobile doit se sentir naturelle sur un téléphone : rapide à ouvrir, facile à appuyer et confortable à utiliser d'une seule main.
+
+Vous allez créer **Pace Mobile**, un suivi de course en priorité sur téléphone inspiré de l'exemple de suivi de course de [Qu'est-ce que Replit ?](/fr/welcome). L'objectif est de tester un flux mobile ciblé avant de s'engager dans le chemin complet de l'App Store.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/yG4SOQfWGbnjXJ3G/images/build-examples/mobile-app.png?fit=max&auto=format&n=yG4SOQfWGbnjXJ3G&q=85&s=cb9cc92f85f2998f62df8457f89a8acb" alt="Un exemple d'application mobile soignée avec des écrans de suivi fitness conçus pour les téléphones" width="1440" height="850" data-path="images/build-examples/mobile-app.png" />
+</Frame>
+
+## Ce que vous allez accomplir
+
+À la fin de ce guide, vous aurez :
+
+* Un projet d'application mobile créé avec Agent.
+* Une première version délimitée autour d'un flux adapté aux téléphones.
+* L'application fonctionnant dans un simulateur ou émulateur.
+* L'application fonctionnant sur votre téléphone avec Expo Go.
+* Une version partageable que vous pouvez envoyer à quelqu'un pour obtenir des retours.
+
+## Ce que vous allez apprendre
+
+Vous apprendrez à :
+
+* Démarrer une application mobile depuis un prompt.
+* Délimiter la première version autour des contraintes du téléphone.
+* Tester l'application dans un simulateur ou émulateur.
+* Tester l'application sur un vrai appareil avec Expo Go.
+* Décider quand continuer à itérer avant le travail sur App Store ou TestFlight.
+
+## À qui s'adresse ce guide
+
+Utilisez ce guide quand votre idée doit être utilisée sur un téléphone.
+
+C'est utile pour les applications de suivi, les flux de réservation, les outils de terrain, les applications d'événements, les outils d'apprentissage, les applications d'habitudes et tout ce que les gens devraient utiliser loin d'un bureau.
+
+<Note>
+  La publication sur TestFlight et l'App Store est distincte de ce guide. Quand vous êtes prêt pour ce chemin, consultez [Créer et lancer une application mobile](/fr/build/mobile-app).
+</Note>
+
+## Avant de commencer
+
+Vous avez besoin de :
+
+* Un [compte Replit](https://replit.com).
+* Un téléphone avec [Expo Go](https://expo.dev/go) installé.
+* Un flux mobile que vous pouvez tester en quelques minutes.
+
+Pour les détails exacts sur les simulateurs, émulateurs et l'aperçu sur appareil, consultez [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps).
+
+## Définir le flux mobile
+
+Avant de construire, décidez ce que quelqu'un devrait faire sur son téléphone.
+
+Pour Pace Mobile :
+
+* **Audience** : les coureurs qui veulent enregistrer une course rapidement.
+* **Flux principal** : choisir le type de course → entrer la distance et la durée → enregistrer la course → voir le résumé du jour.
+* **Contrainte mobile** : l'action principale doit être facile à atteindre avec un pouce.
+* **Première version** : pas de comptes, pas de fil social, pas d'analyses avancées.
+
+Cela maintient le premier segment mobile suffisamment petit pour être testé.
+
+## Construire la première version
+
+Ouvrez Replit et démarrez une nouvelle application. Décrivez ce que vous souhaitez construire, puis sélectionnez **Application mobile** comme type d'application.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TlSUj3SmUsRG399T/images/native-mobile-apps/prompt.png?fit=max&auto=format&n=TlSUj3SmUsRG399T&q=85&s=21bba53b72382bf6fb0dc37a168de9e8" alt="L'écran d'accueil Replit avec Application mobile sélectionné comme type d'application" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
+</Frame>
+
+Utilisez ce prompt :
+
+<AiPrompt>
+  Crée Pace Mobile, un suivi de course conçu en priorité pour le téléphone.<br />
+  Un coureur doit pouvoir choisir un type de course, entrer la distance et la durée, enregistrer la course et voir le résumé du jour.<br />
+  Conçois-la pour une utilisation à une main, avec de grandes zones tactiles, une navigation simple et un rendu soigné digne d'une application de fitness.<br />
+  Garde la première version suffisamment simple pour la tester aujourd'hui dans un simulateur et sur un vrai téléphone.
+</AiPrompt>
+
+Si vous souhaitez que Agent réfléchisse avant de construire, utilisez le [mode Plan](/fr/features/agent/plan-mode). Demandez à Agent de vérifier les écrans, la navigation, les zones tactiles et les contraintes spécifiques aux téléphones avant de commencer à construire.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/63zH0ZBPWnbQaqFI/images/fitstart/work-with-agent/agent-plan-mode-prompt.png?fit=max&auto=format&n=63zH0ZBPWnbQaqFI&q=85&s=4eb27dd607f04e5559b2acb80d4489bf" alt="Le compositeur de prompt Replit avec le mode Plan sélectionné avant qu'Agent délimite la construction d'une application mobile" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
+</Frame>
+
+## Tester dans un simulateur ou émulateur
+
+Quand Agent a terminé la première construction, ouvrez [Preview](/fr/features/editor/preview). Dans le sélecteur d'appareils, choisissez **Simulateur iOS** ou **Émulateur Android**.
+
+Naviguez dans l'application comme quelqu'un l'utilisant sur un téléphone.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TlSUj3SmUsRG399T/images/native-mobile-apps/workspace.png?fit=max&auto=format&n=TlSUj3SmUsRG399T&q=85&s=6508e73ef3c21dcee8221e884164a23c" alt="L'éditeur de projet Replit affichant un aperçu d'application mobile et l'option de prévisualisation sur un appareil mobile" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
+</Frame>
+
+Vérifiez que vous pouvez :
+
+* Démarrer l'application sans erreurs.
+* Choisir un type de course.
+* Entrer la distance et la durée.
+* Enregistrer la course.
+* Voir le résumé du jour se mettre à jour.
+* Naviguer sans blocage.
+* Lire le texte sans zoomer.
+
+## Tester sur votre téléphone
+
+Les tests dans le simulateur sont utiles, mais un téléphone vous dit si l'application se sent bien.
+
+Ouvrez le panneau d'aperçu sur appareil mobile et scannez le code QR avec votre téléphone. Cela ouvre l'application dans Expo Go.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TlSUj3SmUsRG399T/images/native-mobile-apps/mobile-screen.png?fit=max&auto=format&n=TlSUj3SmUsRG399T&q=85&s=d512e8c7bf0a86ecacd92fbef1f52749" alt="Une application mobile fonctionnant dans l'aperçu de l'éditeur de projet Replit avec le panneau Preview sur appareil et le code QR pour Expo Go" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
+</Frame>
+
+Sur votre téléphone, vérifiez :
+
+* Pouvez-vous terminer le flux principal d'une seule main ?
+* Les boutons et les champs de saisie sont-ils suffisamment grands pour appuyer dessus ?
+* L'action principale est-elle facile à atteindre ?
+* Le clavier couvre-t-il des champs importants ?
+* L'application a-t-elle encore du sens sur un petit écran ?
+
+Si quelque chose semble maladroit, demandez à Agent de corriger cette partie spécifique plutôt que de reconcevoir toute l'application.
+
+<AiPrompt>
+  Améliore Pace Mobile pour une utilisation à une main sur téléphone.<br />
+  Rends le bouton Enregistrer la course plus facile à atteindre, augmente les zones tactiles là où c'est nécessaire, et garde le formulaire de course simple.<br />
+  N'ajoute pas de nouvelles fonctionnalités.<br />
+  Après la modification, vérifie qu'enregistrer une course met toujours à jour le résumé du jour.
+</AiPrompt>
+
+## Partager pour obtenir des retours
+
+Quand le flux sur téléphone fonctionne, publiez l'application pour créer une version Expo Go partageable pour les premiers retours.
+
+Partagez avec une tâche ciblée :
+
+> Ouvrez Pace Mobile sur votre téléphone, enregistrez une course et dites-moi tout ce qui vous a semblé maladroit à appuyer, lire ou comprendre.
+
+Les retours ciblés sont plus faciles à utiliser que les opinions générales. Si les retours pointent vers un problème clair, demandez à Agent le correctif le plus petit possible et testez à nouveau l'application sur votre téléphone.
+
+## Publier sur l'App Store
+
+Après avoir testé Pace Mobile dans le simulateur et sur votre téléphone avec Expo Go, vous pouvez promouvoir la même application vers TestFlight et l'App Store. Ce flux nécessite une adhésion au **Programme développeur Apple** avec l'authentification à deux facteurs. Pour des informations sur l'inscription, les comptes individuels vs. organisations, les tests TestFlight vs. l'examen de l'App Store et les tests externes, consultez [Créer et lancer une application mobile](/fr/build/mobile-app).
+
+<Steps>
+  <Step title="Ouvrir l'onglet Publication et démarrer la publication sur l'App Store">
+    Après que votre aperçu Expo Go est en ligne, ouvrez l'onglet **Publication**. Sous **Production**, vous verrez une carte **Prêt à publier Pace sur l'App Store ?**. Sélectionnez **Commencer la publication sur l'App Store**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/JR8_IioflYr99heO/images/native-mobile-apps/app-store-02-start-publishing.png?fit=max&auto=format&n=JR8_IioflYr99heO&q=85&s=d7eee58ac91b1a3f2e4b7812014233f8" alt="L'onglet Publication dans l'éditeur de projet affichant le statut de production et une carte 'Prêt à publier Pace sur l'App Store ?' avec un bouton Commencer la publication sur l'App Store" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-02-start-publishing.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Choisir votre projet Expo">
+    Replit ouvre **Launch** — un flux Expo intégré dans Replit. Entrez ou confirmez le nom et le slug de votre projet Expo, puis sélectionnez **Continuer**. Si vous avez déjà un projet Expo, sélectionnez plutôt **Utiliser l'existant**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/JR8_IioflYr99heO/images/native-mobile-apps/app-store-03-choose-expo-project.png?fit=max&auto=format&n=JR8_IioflYr99heO&q=85&s=127389ad2e5a29d6ddf21c2f2abff296" alt="La boîte de dialogue Launch avec l'étape Choisir un projet Expo active — champs pour le nom du projet et le slug préremplis avec Pace, un bouton Continuer et une option Utiliser l'existant" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-03-choose-expo-project.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Se connecter avec Apple">
+    Connectez le compte développeur Apple qui sera propriétaire de la liste App Store. Le compte doit être inscrit au Programme développeur Apple, et Apple impose l'authentification à deux facteurs — soyez prêt à approuver un code de vérification sur un appareil de confiance.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/JR8_IioflYr99heO/images/native-mobile-apps/app-store-04-sign-in-apple.png?fit=max&auto=format&n=JR8_IioflYr99heO&q=85&s=009447e8d28e609f92b3b1c66ba97c8d" alt="La boîte de dialogue Launch à l'étape Se connecter avec Apple — champs pour l'e-mail ou le numéro de téléphone du développeur Apple et le mot de passe, avec une note indiquant que le mot de passe ne quitte jamais l'appareil et que le compte doit être inscrit au Programme développeur Apple" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-04-sign-in-apple.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Choisir ou créer votre application Apple">
+    Entrez le **Nom de l'application** et l'**identifiant de bundle** (par exemple `app.replit.pace`) qui apparaîtront sur l'App Store. L'identifiant de bundle ne peut pas être modifié après le premier build, donc choisissez-le soigneusement.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/JR8_IioflYr99heO/images/native-mobile-apps/app-store-05-choose-apple-app.png?fit=max&auto=format&n=JR8_IioflYr99heO&q=85&s=bf79a5d6df89758adf6ae0db15c99e48" alt="La boîte de dialogue Launch à l'étape Choisir une application Apple — nom de l'application défini sur Pace, identifiant de bundle app.replit.pace, avec une note indiquant que l'identifiant de bundle ne peut pas être modifié ultérieurement, et un bouton Création de l'application…" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-05-choose-apple-app.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Lancer vers l'App Store">
+    Replit configure les certificats Apple en votre nom. Quand l'étape **Prêt pour le lancement** s'allume, sélectionnez **Lancer vers l'App Store**. Replit construit votre application native dans le cloud et soumet le build à App Store Connect pour l'examen bêta TestFlight.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/JR8_IioflYr99heO/images/native-mobile-apps/app-store-06-ready-for-launch.png?fit=max&auto=format&n=JR8_IioflYr99heO&q=85&s=f1bdffe5ef656a501808eebceb9f2b83" alt="La boîte de dialogue Launch à l'étape Prêt pour le lancement avec Choisir une application Apple et Configurer les certificats Apple marqués comme terminés, et un bouton Lancer vers l'App Store avec des paramètres de lancement optionnels" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-06-ready-for-launch.png" />
+    </Frame>
+
+    Quand Launch est terminé, vous verrez une confirmation que l'application cible l'App Store, puis la boîte de dialogue se ferme et vous ramène à l'éditeur de projet.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/JR8_IioflYr99heO/images/native-mobile-apps/app-store-targeting.png?fit=max&auto=format&n=JR8_IioflYr99heO&q=85&s=3b74e9eb9da3ebac5d400f029ef3d61d" alt="La boîte de dialogue Launch avec Ciblage de l'App Store marqué comme terminé et un message Redirection vers Replit — l'état de confirmation après que Lancer vers l'App Store est sélectionné" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-targeting.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Note>
+  Le premier build d'une version nécessite généralement un examen bêta TestFlight avant que les testeurs puissent l'installer. Après approbation, les builds supplémentaires parviennent généralement aux testeurs plus rapidement. Pour partager avec des testeurs externes ou soumettre pour la sortie App Store, terminez la liste dans **App Store Connect** — consultez [Créer et lancer une application mobile](/fr/build/mobile-app) pour la liste de contrôle complète d'App Store Connect.
+</Note>
+
+## Vous avez terminé quand
+
+* L'application s'ouvre dans le simulateur iOS ou l'émulateur Android.
+* L'application s'ouvre sur votre téléphone avec Expo Go.
+* Vous pouvez terminer le flux mobile principal.
+* Le texte, les boutons et la navigation se sentent confortables sur un téléphone.
+* Vous avez publié ou partagé une version mobile testable.
+* Au moins une personne peut l'essayer et donner des retours.
+* (Optionnel) Vous avez soumis l'application à TestFlight via le flux App Store.
+
+## Améliorer ensuite
+
+<CardGroup cols={2}>
+  <Card title="Ajouter une connexion" icon="user-lock" href="/fr/build/add-login">
+    Permettez à chaque personne de voir sa propre progression.
+  </Card>
+
+  <Card title="Ajouter une base de données" icon="database" href="/fr/build/add-database">
+    Sauvegardez l'historique des courses au-delà de la première session de test.
+  </Card>
+
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/build/add-integrations">
+    Connectez l'application aux notifications, aux données de santé ou aux services externes.
+  </Card>
+
+  <Card title="Créer et lancer une application mobile" icon="mobile-screen" href="/fr/build/mobile-app">
+    Faites progresser une application mobile fonctionnelle vers TestFlight et l'App Store.
+  </Card>
+</CardGroup>
+
+## Besoin d'aide supplémentaire ?
+
+* **Agent construit une application web à la place :** recommencez et sélectionnez **Application mobile** comme type d'application avant de construire.
+* **L'aperçu Expo Go semble périmé :** secouez votre téléphone, ouvrez le menu développeur et sélectionnez **Rafraîchir**.
+* **Les zones tactiles semblent trop petites :** demandez à Agent d'augmenter les cibles tactiles et de garder les actions principales à portée du pouce.
+* **La navigation semble encombrée :** demandez à Agent de réduire l'application au minimum d'écrans nécessaires pour le flux principal.
+* **Le simulateur fonctionne mais le téléphone ne fonctionne pas :** testez le comportement spécifique au matériel sur un vrai appareil et consultez [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps).
+* **La publication échoue :** consultez [Dépannage des applications mobiles](/fr/features/troubleshooting/mobile-app).
+
+## Essayez maintenant
+
+<AgentInput highlightStart defaultPrompt="Build Pace Mobile, a phone-first running tracker. A runner should be able to choose a run type, enter distance and time, save the run, and see today's summary. Design it for one-handed use with large tap targets, simple navigation, and a polished fitness-app feel. Keep the first version small enough to test today in a simulator and on a real phone." showTypewriter={false} />
+
+## En relation
+
+* [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps)
+* [Créer et lancer une application mobile](/fr/build/mobile-app)
+* [Vibe coding 101](/fr/learn/foundations/vibe-coding-101)
+* [Dépannage des applications mobiles](/fr/features/troubleshooting/mobile-app)

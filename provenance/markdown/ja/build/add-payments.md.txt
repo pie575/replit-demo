@@ -1,0 +1,109 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 決済を追加する
+
+> 顧客がVelocityの車を予約する際に返金可能なデポジットを受け取り、受け取り時に残額を請求します。
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+完了すると、Velocityの顧客が車の予約時に返金可能なデポジットを支払い、受け取り時に残額を支払えるようになります。
+
+Velocityにサインイン機能とデータベースを追加しました。次は本格的な予約ビジネスに発展させましょう：予約時に返金可能な**デポジット**で車を仮押さえし、**受け取り時に残額を請求**します。ReplitはStripeを通じて決済を処理するため、Stripeのコードを自分で書く必要はありません。
+
+## デポジットと残額の金額を決める
+
+Agentにビルドを依頼する前に、計算方法を決めましょう：
+
+* **予約時のデポジット：** 定額にするか、合計金額の割合にするか？定額の\$500はわかりやすく、20%は車に応じてスケールします。
+* **受け取り時の残額：** レンタル費用の残りで、顧客が鍵を受け取る際に請求されます。
+* **返金期間：** キャンセルしてもデポジットが返金されるのはいつまでか？48時間前が一般的なデフォルトです。
+
+このガイドでは、Velocityは予約時に定額\$500の返金可能なデポジットを受け取り、受け取り時に残額を請求し、48時間以上前にキャンセルした場合は全額返金します。実際のビジネスに合わせて調整してください。
+
+## AgentにStripeチェックアウトの追加を指示する
+
+<AiPrompt>
+  Add deposit-and-balance payments to Velocity using Stripe in test mode.<br />
+  At booking, take a \$500 refundable deposit and save the customer's payment method on file.<br />
+  At pickup, charge the remaining balance to the saved payment method.<br />
+  If the customer cancels more than 48 hours before pickup, refund the deposit in full. Inside 48 hours, keep it.<br />
+  Save the deposit status and the saved-card reference in the database so a customer can see both on their booking.<br />
+  Tell me exactly which secret keys I need to paste from Stripe and where to paste them.<br />
+  Give me a test checklist for the deposit success, deposit cancel, balance charge, and cancellation refund cases.
+</AiPrompt>
+
+AgentはバックグラウンドでStripeをセットアップし、デポジットと残額のフローを追加し、Stripeから取得すべきシークレットキーを教えてくれます。Agentに求められたら、アプリの設定にキーを貼り付けてください — テストキーはそこに保存し、コードには絶対に書かないでください。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-payments/stripe-secrets.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=80f25ad62982cb96274ab45692f7baff" alt="Replit SecretsペインにAgentがビルダーへ貼り付けるよう伝えたStripe APIキー（STRIPE_SECRET_KEY、STRIPE_PUBLISHABLE_KEY、STRIPE_WEBHOOK_SECRET）が表示されている" width="1280" height="720" data-path="images/velocity/add-payments/stripe-secrets.png" />
+</Frame>
+
+## テストモードで全フローをテストする
+
+Stripeには特別なテストカードがあり、実際のお金を使わずにリアルな決済を実行できます：`4242 4242 4242 4242`、将来の有効期限であれば何でもよく、3桁のCVCも任意の数字で構いません。
+
+1. PreviewでVelocityにサインインし、次の土曜〜日曜で車を予約する。
+2. チェックアウト時に「本日のデポジット：$500」と「受け取り時の残額：$1,900」（またはご自身の計算結果の金額）が表示されるはずです。
+3. `4242`のテストカードでデポジットを支払う。デポジット支払い済みと残額用に保存された支払い方法が表示される確認ページに戻るはずです。
+4. 「My bookings」から予約を開き、管理者または受け取りアクションを使って残額を請求する。残額が支払い済みとして表示されることを確認する。
+5. 2件目の予約をして、48時間以上前にキャンセルする。デポジットがテストカードに返金されるはずです（Stripeのテストモードダッシュボードで確認できます）。
+6. 3件目の予約をして、48時間以内にキャンセルする。デポジットは保持され、顧客にわかりやすく説明されるはずです。
+7. Stripeの決済失敗テストカード（`4000 0000 0000 0002`）でチェックアウトを試みる。予約は確定されず、顧客にわかりやすい失敗メッセージが表示されるはずです。
+
+デポジットは成功したが予約が確定されない場合は、Agentに伝えてください：
+
+<AiPrompt>
+  The Stripe test deposit for Velocity succeeded but the reservation isn't showing as confirmed.<br />
+  Connect the deposit-success event to the reservation status in the database.<br />
+  Show me how to verify it with another test booking.
+</AiPrompt>
+
+## 準備ができたらライブ決済に切り替える
+
+テストモードはあなたのためのものです。ライブモードは実際にお金を支払う本物の顧客のためのものです。Velocityの準備ができたら：
+
+1. Stripeでテストモードからライブモードに切り替え、**ライブ**シークレットキーをコピーする。
+2. アプリの設定で、テストキーをライブキーに置き換える。
+3. AgentチャットからVelocityを再度公開する。
+4. 公開URLを開き、自分の実際のカードで低価格のテスト車を予約して、デポジットと残額のフローが両方エンドツーエンドで機能することを確認する。
+
+公開URLを広く共有する前に、実際のカードでそのテストを一度実行してください。これでVelocityは実際のお金で本物の予約を受け付けられるようになりました。
+
+## 次の改善
+
+<CardGroup cols={2}>
+  <Card title="インテグレーションを追加する" icon="plug" href="/ja/build/add-integrations">
+    各予約を顧客のカレンダーに送信します。
+  </Card>
+
+  <Card title="カスタムドメインを追加する" icon="globe" href="/ja/build/add-custom-domain">
+    顧客に請求する前にVelocityをブランドURLに移行します。
+  </Card>
+</CardGroup>
+
+## さらにサポートが必要な場合
+
+* **デポジットは成功したが予約が確定されない：** StripeのSuccessイベントをデータベースの予約ステータスに接続するようAgentに伝えてください。
+* **テストモードは機能するがライブモードが機能しない：** アプリの設定でテストキーをライブキーに置き換えたか確認してください。
+* **デポジット＋残額ではなく一括前払いにしたい：** 予約時に全額一括で支払うようVelocityを変更するようAgentに伝えてください。
+* **月額サブスクリプション料金（フリートへの月額アクセス）が必要：** ReplitはRevenueCatもサポートしています — Stripeの代わりにRevenueCatを使うようAgentに伝えてください。
+
+## 関連情報
+
+* [Stripe決済](/ja/features/monetization/stripe-payments)
+* [RevenueCatサブスクリプション](/ja/features/monetization/revenuecat-subscriptions)

@@ -1,0 +1,69 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Database
+
+> Answers to common database questions—fixing disabled endpoints, restoring tables, migrating to production, and connection errors.
+
+These answers cover the production database. For full reference, see [Production databases](/features/data-and-storage/development-and-production) and [SQL database](/features/data-and-storage/sql-database).
+
+<AccordionGroup>
+  <Accordion title="My database endpoints are disabled—how do I fix the &#x22;endpoint has been disabled&#x22; error?">
+    This error means your database compute endpoint has been paused. To unpause it:
+
+    1. Open the **Database** pane and select **Development** from the dropdown.
+    2. If an **Unpause database** button appears, select it.
+    3. Switch the dropdown to **Production** and select **Unpause database** again if it appears.
+
+    If the button doesn't appear, a conflicting `DATABASE_URL` secret may be hiding it. Open the **Secrets** pane, compare any `DATABASE_URL` entry with the connection string in the **Database** pane, and update or remove the conflicting secret so they match.
+
+    Common causes are an unpaid invoice (pay it to prevent recurrence) or a transient pause during publishing (the unpause steps above resolve it). See [Production databases](/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="The status page shows a Production Database outage—do I need to file a ticket?">
+    No. If the outage is already listed on [status.replit.com](https://status.replit.com), the team is working on it and a ticket won't speed up the fix. Open the active incident and subscribe to updates to be notified as it progresses.
+
+    If your database problem is *not* listed on the status page, [contact Replit Support](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="How do I restore a deleted or dropped database table?">
+    Replit supports point-in-time restore for production databases. The restore window depends on your plan—7 days on [Core](/billing/plans/replit-core) and 28 days on [Pro](/billing/plans/replit-pro).
+
+    To restore, open the **Database** pane, go to the database, open its restore settings, select the timestamp you want, and confirm. If you're outside the restore window, [contact Replit Support](https://replit.com/support). See [Production databases](/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="My database is frozen and I don't see an Unpause button">
+    A conflicting database URL usually hides the **Unpause** button. Open the **Secrets** pane, find any `DATABASE_URL` entry, and compare it with the connection string in the **Database** pane. If they differ, the secret is overriding the correct URL—remove it, refresh, and check the **Database** pane again.
+
+    If the button still doesn't appear after removing the conflicting secret, [contact Replit Support](https://replit.com/support) with your project URL.
+  </Accordion>
+
+  <Accordion title="My app is throwing &#x22;connection pool exhausted&#x22; errors—what does that mean?">
+    Your app is opening more database connections at once than the pool allows. Common causes:
+
+    * Connections that aren't closed after each request
+    * A traffic spike
+    * Slow queries holding connections open
+
+    Most frameworks expect a single shared connection pool rather than a new connection per request.
+
+    For the fastest fix, open a new Agent chat, describe the error, and ask Agent to check how your app manages database connections.
+  </Accordion>
+
+  <Accordion title="How do I migrate from the development database to production?">
+    Replit keeps development and production databases separate so test changes don't hit live data. To run migrations against production, add your migration command to your deployment's build or pre-deploy step so it runs on each deploy. For example, use `drizzle-kit migrate` for Drizzle. You can also run the migration manually from a Shell in your production environment.
+
+    See [Create a production database when publishing](/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="My database shows &#x22;endpoint disabled&#x22; even though billing is current">
+    Sometimes this happens independently of billing. Try unpausing manually: open the **Database** pane, select **Development**, and select **Unpause database** if it appears, then repeat for **Production**.
+
+    If the button doesn't appear or the problem keeps recurring, [contact Replit Support](https://replit.com/support) with your project URL—this can require a manual unpause. See [Production databases](/features/data-and-storage/development-and-production).
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If your database question isn't answered here, [contact Replit Support](https://replit.com/support).

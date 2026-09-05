@@ -1,0 +1,235 @@
+---
+title: "Checkpoints e Rollbacks"
+description: "Aprenda como os checkpoints salvam seu trabalho automaticamente e como os rollbacks permitem desfazer alterações."
+---
+
+Com o Replit, você nunca precisa se preocupar em perder seu trabalho.
+
+O sistema de checkpoint e rollback do Replit fornece controle de versão abrangente e gerenciamento de estado para todo o seu ambiente de desenvolvimento.
+
+Quando você usa o Replit Agent, os checkpoints capturam automaticamente o estado completo do seu projeto. Isso inclui não apenas as alterações de código, mas também os arquivos do projeto, o contexto da conversa com a IA e os bancos de dados conectados.
+
+## O que são checkpoints?
+
+Um **checkpoint** é um snapshot completo do estado do seu Replit App criado automaticamente pelo Agent em marcos chave do desenvolvimento. Diferente do controle de versão tradicional que rastreia apenas alterações de código, os checkpoints do Replit capturam todo o seu contexto de desenvolvimento.
+
+Pense nos checkpoints como pontos de salvamento em um videogame — você sempre pode voltar a uma versão funcional do seu app.
+
+<Frame>
+  <img src="/assets/mirror/agent-checkpoint-8e5b8b315c02.png" alt="Interface de checkpoint do Agent mostrando opções de rollback" width="1554" height="876" data-path="images/replitai/agent-checkpoint.png" />
+</Frame>
+
+### Captura de estado completo
+
+Cada checkpoint preserva:
+
+* **Arquivos do projeto**: Todos os arquivos, diretórios, pacotes instalados e configuração do projeto
+* **Contexto da conversa com a IA**: O histórico completo da conversa e o contexto que levou ao estado atual
+* **Configuração do ambiente**: Configurações de runtime e configurações de publicação
+* **Memória do Agent**: O entendimento da IA sobre a arquitetura do seu projeto, preferências e padrões
+* **Conteúdo do banco de dados**: Os dados e o esquema do seu banco de dados no momento da criação do checkpoint
+
+Essa abordagem abrangente significa que você pode experimentar com confiança, sabendo que pode restaurar não apenas seu código, mas todo o seu contexto de desenvolvimento.
+
+## Como funcionam os rollbacks
+
+A funcionalidade de **rollback** permite restaurar seu Replit App a qualquer estado de checkpoint anterior com um único clique. Isso é muito mais poderoso do que as operações tradicionais de git revert.
+
+<Frame>
+  <img src="/assets/mirror/checkpoint-rollback-476fde84864b.png" alt="Interface de rollback de checkpoint mostrando opções de rollback" width="3154" height="2366" data-path="images/replitai/checkpoint-rollback.png" />
+</Frame>
+
+Os rollbacks foram projetados para ser seguros e previsíveis:
+
+* **Visualização não destrutiva**: Algumas interfaces permitem que você visualize os estados de checkpoint antes de fazer o rollback
+* **Limites claros**: Cada checkpoint representa um marco lógico de desenvolvimento
+* **Continuidade da conversa**: O contexto da IA é preservado, para que você possa continuar construindo a partir do estado restaurado
+* **Efeito imediato**: Os rollbacks são aplicados instantaneamente em todo o seu ambiente de desenvolvimento
+
+### Executar um rollback
+
+Quando você faz rollback para um checkpoint anterior, seu projeto retorna àquele estado anterior, incluindo:
+
+1. **Estado completo do projeto**: Todos os arquivos do projeto retornam ao estado exato no checkpoint selecionado
+2. **Contexto da conversa com o Agent**: As conversas do Agent são restauradas até o ponto do checkpoint, mantendo a continuidade do contexto
+3. **Configuração do projeto**: Dependências, pacotes e configurações de runtime
+4. **Ambiente de desenvolvimento**: Configurações de ferramentas e do Project Editor
+5. **Conteúdo do banco de dados (opcional)**: Quando selecionado, seu banco de dados será restaurado ao estado em que estava no momento do checkpoint
+
+<Info>
+  Por padrão, os rollbacks não alteram seu banco de dados. Para incluir seu banco de dados de desenvolvimento em um rollback, selecione "Database" em "Additional rollback options."
+
+  Note que a restauração do seu **[banco de dados de produção](/pt/features/data-and-storage/development-and-production)** não é realizada automaticamente por esse recurso de rollback.
+  Para aprender como restaurar seu banco de dados de produção a um momento anterior, consulte [a documentação sobre como realizar uma restauração point-in-time](/pt/features/data-and-storage/development-and-production).
+</Info>
+
+<Warning>
+  Quando você usa o recurso de rollback, você restaura o Replit App a um estado anterior. Isso remove todas as alterações feitas após aquele ponto, incluindo edições de código. As alterações no banco de dados também são revertidas se você optar por restaurar seu banco de dados.
+</Warning>
+
+### Avançar no histórico
+
+Os checkpoints no Replit funcionam bidirecionalmente — você pode se mover tanto para trás quanto para frente no histórico do seu projeto.
+Isso oferece flexibilidade completa para navegar pela sua linha do tempo de desenvolvimento sem medo de perder trabalho.
+
+Se você fez um rollback demais ou quer recuperar alterações de um checkpoint posterior, você pode **avançar** para se mover adiante no histórico de checkpoints. Isso permite que você navegue livremente pela linha do tempo do seu projeto sem perder trabalho.
+
+Para avançar, acesse a visualização de histórico na aba do Agent clicando no ícone de histórico <img class="icon-svg" src="/assets/mirror/history-51e5b63ccff4.svg" alt="history icon" width="24" height="24" data-path="images/icons/history.svg" />, então selecione um checkpoint que ocorra após sua posição atual.
+
+<Info>
+  Avançar no histórico só é possível se você tiver checkpoints à frente da sua posição atual na linha do tempo. Depois que você faz novas alterações após um rollback, esses checkpoints futuros se tornam parte de um ramo alternativo da história.
+</Info>
+
+Essa navegação bidirecional dá controle completo sobre a linha do tempo do seu projeto, garantindo que seu trabalho seja sempre recuperável.
+
+## Criação de checkpoints
+
+Os checkpoints são criados automaticamente pelas ferramentas de IA do Replit em momentos estratégicos durante o desenvolvimento.
+
+### Checkpoints do Agent
+
+O [Replit Agent](/pt/features/agent/overview) cria checkpoints quando:
+
+* **Conclusão de funcionalidade**: Após implementar com sucesso uma funcionalidade solicitada
+* **Marcos importantes**: Quando progresso significativo é feito em tarefas complexas
+* **Estados estáveis**: Após testes e validação das alterações implementadas
+* **Recuperação de erros**: Antes de tentar correções para problemas críticos
+
+### Características dos checkpoints
+
+Cada checkpoint inclui:
+
+* **Descrições geradas por IA**: Resumos claros e descritivos do que foi realizado
+* **Informações de timestamp**: Horário preciso de criação para fácil identificação
+* **Escopo das alterações**: Indicação de arquivos, funcionalidades ou sistemas modificados
+* **Informações de faturamento**: Para o Agent, rastreamento transparente de custos por checkpoint
+
+## Usando checkpoints e rollbacks
+
+### Encontrar checkpoints
+
+Os checkpoints aparecem em vários locais no Project Editor:
+
+**Aba Agent**: Visualize todos os checkpoints criados pelo Agent com descrições e opções de rollback
+**Painel do Git**: Veja os checkpoints como commits do Git com integração completa de controle de versão
+**Visualização de histórico**: No chat do Agent, clique no ícone de histórico <img class="icon-svg" src="/assets/mirror/history-51e5b63ccff4.svg" alt="history icon" width="24" height="24" data-path="images/icons/history.svg" /> para acessar uma linha do tempo completa de todos os checkpoints e sua progressão
+
+### Executar rollbacks
+
+O processo de rollback varia ligeiramente dependendo de onde você o inicia:
+
+#### Na aba Agent
+
+<Steps>
+  <Step title="Navegar para o Agent">
+    Abra a aba **Agent** no Project Editor para visualizar todos os checkpoints criados pelo Agent.
+  </Step>
+
+  <Step title="Selecionar checkpoint">
+    Localize o checkpoint que deseja restaurar e selecione **Rollback to here**.
+  </Step>
+
+  <Step title="Confirmar rollback">
+    Revise o aviso de rollback e confirme para restaurar seu app ao estado selecionado.
+  </Step>
+
+  <Step title="Verificar restauração">
+    Verifique se os arquivos do projeto, o banco de dados e o contexto da IA correspondem ao estado do checkpoint restaurado.
+  </Step>
+</Steps>
+
+### Melhores práticas
+
+**Use checkpoints estrategicamente**:
+
+* Teste seu app após cada checkpoint importante para garantir estabilidade
+* Crie commits manuais no Git para rastreamento de versão a longo prazo ao lado dos checkpoints automáticos
+* Revise as descrições dos checkpoints para entender o que mudou
+
+**Considerações sobre rollback**:
+
+* Sempre verifique o escopo das alterações antes de fazer um rollback
+* Considere o impacto no seu banco de dados e integrações externas
+* Comunique os rollbacks aos colaboradores para manter a consciência da equipe
+
+**Desenvolvimento iterativo**:
+
+* Construa incrementalmente para aproveitar os checkpoints frequentes
+* Use rollbacks para explorar diferentes abordagens de implementação com segurança
+* Aproveite a preservação do contexto da IA para continuar conversas após rollbacks
+
+## Integração com controle de versão
+
+Os checkpoints funcionam perfeitamente com o ecossistema mais amplo de controle de versão do Replit:
+
+### Integração com Git
+
+* **Geração de commits Git**: Cada checkpoint cria um commit Git correspondente
+* **Compatibilidade com branches**: Os checkpoints respeitam a estrutura de branches e os fluxos de trabalho de merge
+* **Sincronização remota**: A integração com o GitHub mantém a sincronização dos checkpoints
+* **Acesso à linha de comando**: Toda a funcionalidade do Git permanece disponível ao lado dos checkpoints
+
+### Recursos de colaboração
+
+* **Visibilidade da equipe**: Os checkpoints são visíveis para todos os colaboradores do projeto
+* **Prevenção de conflitos de merge**: O timing dos checkpoints reduz a probabilidade de conflitos
+* **Contexto compartilhado**: O contexto da conversa com a IA ajuda os membros da equipe a entender as alterações
+* **Atualizações em tempo real**: Os colaboradores veem a criação de checkpoints em tempo real
+
+## Recursos avançados
+
+### Visualizações de checkpoint
+
+Algumas interfaces suportam a funcionalidade de visualização de checkpoint:
+
+* **Comparação visual**: Veja a aparência do seu app em diferentes estados de checkpoint
+* **Exploração não destrutiva**: Visualize sem realmente fazer rollback
+* **Rastreamento de progresso**: Entenda como seu app evoluiu ao longo do tempo
+* **Comparação de iterações**: Compare diferentes abordagens de implementação
+
+### Rollbacks entre sessões
+
+Para construtores avançados e administradores de equipe:
+
+* **Histórico estendido**: Acesse checkpoints em várias sessões de desenvolvimento
+* **Controle administrativo**: Administradores de equipe podem executar rollbacks entre sessões de usuário
+* **Trilhas de auditoria**: Histórico completo de criação de checkpoints e ações de rollback
+
+## Casos de uso
+
+### Desenvolvimento experimental
+
+Os checkpoints permitem experimentação sem medo:
+
+* Experimente novos recursos sabendo que pode reverter facilmente
+* Teste diferentes abordagens arquiteturais
+* Explore designs de interface alternativos ou fluxos de usuário
+* Implemente integrações complexas com redes de segurança
+
+### Depuração e recuperação
+
+Quando surgem problemas, os checkpoints fornecem recuperação confiável:
+
+* Faça rollback para estados funcionais quando bugs são introduzidos
+* Isole problemas comparando estados de checkpoint
+* Restaure a integridade do banco de dados após corrupção de dados
+* Recupere-se de exclusões ou modificações acidentais
+
+### Aprendizado e iteração
+
+Os checkpoints apoiam o desenvolvimento educacional:
+
+* Compare diferentes estratégias de implementação
+* Aprenda com o processo de tomada de decisão da IA através da progressão dos checkpoints
+* Construa compreensão explorando como as funcionalidades evoluíram
+* Pratique novas técnicas com a segurança do rollback
+
+## Próximos passos
+
+Para saber mais sobre os recursos relacionados do Replit, explore:
+
+* [Replit Agent](/pt/features/agent/overview): Aprenda sobre o desenvolvimento de apps com IA e a criação de checkpoints
+* [Modos do Agent](/pt/features/agent/agent-modes): Descubra o Free Mode, o Power e o Max para trabalho do dia a dia ou tarefas mais exigentes
+* [Controle de Versão](/pt/learn/projects-and-artifacts/version-control): Entenda a integração com Git e as opções mais amplas de controle de versão
+* [Histórico de Arquivo](/pt/features/version-control/file-history): Explore o rastreamento granular de alterações no nível de arquivo
+* [Prompting Eficaz](/pt/learn/effective-prompting): Domine técnicas para desenvolvimento orientado a checkpoints

@@ -1,0 +1,247 @@
+---
+title: "Snowflakeコネクタ"
+description: "Replit Agentでデータ駆動型アプリケーションを構築するためのSnowflakeコネクタをセットアップします。"
+sidebarTitle: "Snowflake"
+icon: "snowflake"
+---
+
+<Info>
+  SnowflakeコネクタはEnterpriseプランでのみご利用いただけます。
+</Info>
+
+ウェアハウスコネクタにより、Replit Agentは組織のデータウェアハウスにクエリを実行できます。Snowflakeコネクタを使用すると、ビルダーは自然言語を使用してダッシュボード、レポートツール、データアプリケーションを作成できます — SQLの専門知識は不要です。
+
+セットアップはSnowflake管理者とReplitワークスペース管理者が必要な一度きりのプロセスです。設定が完了すると、組織のメンバー全員がサインインしてSnowflakeデータで構築を始めることができます。
+
+このガイドでは完全なセットアップの手順を説明します。3つの役割が関与します：
+
+1. **Snowflakeアカウント管理者** — SnowflakeでOAuth統合を作成します
+2. **Replitワークスペース管理者** — Replitでコネクタを設定します
+3. **ビルダー** — サインインして構築を開始します
+
+## SnowflakeでOAuth統合を作成する
+
+SnowflakeアカウントadminはReplitがSnowflakeで認証できるOAuthセキュリティ統合を作成します。
+
+### 前提条件
+
+* Snowflakeの`ACCOUNTADMIN`ロール
+* SnowflakeワークシートでSQLを実行できるアクセス権
+
+### セットアップスクリプトを実行する
+
+<Steps>
+  <Step title="Snowflakeにログインする">
+    Snowflakeアカウントを開き、`ACCOUNTADMIN`ロールを使用していることを確認します。右上のロールドロップダウンで確認できます。
+  </Step>
+
+  <Step title="SQLワークシートを開く">
+    左サイドバーの**Worksheets**をクリックして新しいワークシートを作成します。
+  </Step>
+
+  <Step title="OAuth統合スクリプトを実行する">
+    以下のSQLスクリプトをコピーして貼り付け、実行します：
+
+    ```sql Create OAuth integration theme={null}
+    -- 既存の統合を削除（必要な場合）
+    DROP INTEGRATION IF EXISTS REPLIT_OAUTH;
+
+    -- Replit用のOAuth統合を作成
+    CREATE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    <Warning>
+      リダイレクトURIは正確に`https://replit.com/connectors/oauth/callback`である必要があります。他の値を使用すると、認証中に404エラーが発生します。
+    </Warning>
+
+    <Note>
+      `BLOCKED_ROLES_LIST = ()`を設定すると、統合の使用からロールがブロックされないことが保証されます。この設定がないと、接続時に「invalid consent request」または「role blocked」エラーが発生する場合があります。
+    </Note>
+  </Step>
+
+  <Step title="OAuth認証情報を取得する">
+    このクエリを実行してクライアントIDとクライアントシークレットを取得します：
+
+    ```sql Get OAuth credentials theme={null}
+    -- 統合の詳細を表示
+    DESCRIBE INTEGRATION REPLIT_OAUTH;
+
+    -- クライアントIDとシークレットを取得
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+
+    出力から**Client ID**と**Client Secret**をコピーします。次のステップでこれらが必要になります。
+  </Step>
+</Steps>
+
+## Replitでコネクタを設定する
+
+ReplitワークスペースadminがSnowflakeの認証情報をReplitに追加します。設定が完了すると、組織内の誰でもサインインできます。
+
+<Note>
+  このステップにはエンタープライズプランと管理者アクセスが必要です。
+</Note>
+
+<Steps>
+  <Step title="Integrationsを開く">
+    組織の設定に移動して**Integrations**タブを選択します。
+  </Step>
+
+  <Step title="Snowflakeコネクタを追加する">
+    **Add New Connector**をクリックして**Snowflake**を選択します。
+  </Step>
+
+  <Step title="認証情報を入力する">
+    前のステップの**Client ID**と**Client Secret**を入力します。
+  </Step>
+
+  <Step title="スコープを設定する">
+    コネクタのスコープを`refresh_token`に設定します。
+
+    <Warning>
+      `refresh_token`スコープのみを使用してください。`session:role-any`や`session:role:PUBLIC`などの他のスコープは「invalid scope」エラーを引き起こす場合があります。
+    </Warning>
+  </Step>
+
+  <Step title="保存する">
+    **Save**をクリックしてコネクタを有効にします。
+  </Step>
+</Steps>
+
+## Snowflakeにサインインする
+
+コネクタへのアクセス権を持つ組織メンバーはサインインできます。Agentで使用する前に接続を確認するために、まず**Integrations**ページからサインインします。
+
+<Steps>
+  <Step title="Snowflakeコネクタを見つける">
+    Replitの**Integrations**に移動します。**Connectors**の下で**Snowflake**を見つけます。
+  </Step>
+
+  <Step title="Sign Inをクリックする">
+    Snowflakeコネクタの**Sign In**をクリックします。
+  </Step>
+
+  <Step title="SnowflakeアカウントIDを入力する">
+    OAuthプロンプトでSnowflakeアカウントIDを求められます。
+
+    アカウントIDを見つけるには、SnowflakeのURLを確認します：
+
+    ```
+    https://app.snowflake.com/myorg/myaccount
+    ```
+
+    `app.snowflake.com/`の後の2つの部分をハイフンで結合します：
+
+    ```
+    myorg-myaccount
+    ```
+
+    <Note>
+      URLでは2つの部分の間に`/`が使用されていますが、アカウントIDでは`-`を使用します。
+    </Note>
+  </Step>
+
+  <Step title="認証する">
+    Snowflakeがログインページにリダイレクトします。OAuthフローを完了するためにSnowflakeの認証情報を入力します。
+  </Step>
+</Steps>
+
+## Snowflakeデータで構築を始める
+
+接続後、2つの方法でAgentとSnowflakeコネクタを使用できます：
+
+* **スラッシュコマンド** — プロンプトに`/snowflake`と入力してコネクタを使用します
+* **自然言語** — AgentにSnowflakeデータを使用するよう直接依頼します
+
+プロンプトの例：
+
+```
+Snowflakeデータを使ってダッシュボードを作成してください。地域別の総収益を棒グラフで、四半期別のトレンドラインで、上位10顧客の表で表示してください。ダークテーマ、クリーンでモダンなデザインで。
+```
+
+Agentはお客様のSnowflakeデータに対してSQLクエリを作成・実行し、動作するアプリケーションを構築します。
+
+## トラブルシューティング
+
+<AccordionGroup>
+  <Accordion title="invalid consent requestまたはrole blockedエラー">
+    Snowflake統合でロールがデフォルトでブロックされている可能性があります。
+
+    統合が`BLOCKED_ROLES_LIST = ()`で作成されたことを確認します。この設定なしで既に作成した場合は、次を実行します：
+
+    ```sql Fix blocked roles theme={null}
+    CREATE OR REPLACE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    エラーが続く場合は、デフォルトロールがブロックされていないことを確認します：
+
+    ```sql Set default role theme={null}
+    ALTER USER "YOUR_USERNAME" SET DEFAULT_ROLE = 'PUBLIC';
+    ```
+  </Accordion>
+
+  <Accordion title="認証時に404エラー">
+    Snowflake統合のリダイレクトURIが正確に以下であることを確認します：
+
+    ```
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    不一致がある場合、OAuthフロー中に404エラーが発生します。
+  </Accordion>
+
+  <Accordion title="invalid scopeエラー">
+    Replitのコネクタスコープが`refresh_token`のみに設定されていることを確認します。`session:role-any`や`session:role:PUBLIC`などの他のスコープを削除してください。
+  </Accordion>
+
+  <Accordion title="Failed to connectエラー">
+    ReplitのクライアントIDとクライアントシークレットがSnowflakeが生成したものと一致することを確認します。以下を実行して再確認します：
+
+    ```sql Verify credentials theme={null}
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 関連ドキュメント
+
+* [ウェアハウスコネクタ概要](/ja/connectors/warehouses/overview) — サポートされているすべてのウェアハウスコネクタの概要
+* [Databricksに接続](/ja/connectors/warehouses/databricks) — Databricksのステップバイステップセットアップ
+* [コネクタの管理](/ja/replitai/managing-connectors) — コネクタの管理と設定
+* [Snowflake — カスタムクライアント用のOAuth設定](https://docs.snowflake.com/en/user-guide/oauth-custom) — SnowflakeのOAuthドキュメント

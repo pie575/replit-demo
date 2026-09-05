@@ -1,0 +1,190 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Project Security Center
+
+> Encontre vulnerabilidades de dependências, código e privacidade no seu projeto com varreduras automáticas e revisões de segurança com o Agent.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/m66KQX7992wJ3rkk/images/security-scanner/security-scanner-hero.png?fit=max&auto=format&n=m66KQX7992wJ3rkk&q=85&s=fe56b3d0d0735cc2a6dbdba2b252badc" alt="Project Security Center mostrando resultados da varredura de segurança do Agent com vulnerabilidades categorizadas por severidade" style={{ display: 'block', margin: '0 auto' }} width="3402" height="2058" data-path="images/security-scanner/security-scanner-hero.png" />
+</Frame>
+
+<Note>
+  Novo em segurança de dependências? Consulte [Conceitos de segurança](/pt/core-concepts/security/concepts) para definições de CVE, SBOM, exposição, Fix with Agent, Republish e Auto-Protect.
+</Note>
+
+## Como os resultados são categorizados
+
+Os resultados de ambos os tipos de varredura aparecem no painel Security, categorizados por nível de severidade:
+
+* **Critical**: Vulnerabilidades que representam um risco imediato e devem ser tratadas antes da publicação. Exemplos incluem execução remota de código, injeção de SQL em endpoints expostos e credenciais vazadas.
+* **High**: Problemas graves que podem ser explorados sob certas condições, como cross-site scripting (XSS), fluxos de autenticação inseguros ou dependências sem patches com exploits conhecidos.
+* **Medium**: Problemas que representam um risco potencial, mas são menos prováveis de ser exploráveis, como cabeçalhos de segurança ausentes ou configurações CORS excessivamente permissivas.
+* **Low / Informational**: Problemas menores ou recomendações de boas práticas, como uso de APIs obsoletas ou mensagens de erro detalhadas em produção.
+
+## O que é o Project Security Center?
+
+O Project Security Center é o hub central do seu projeto para encontrar e corrigir vulnerabilidades de segurança e privacidade antes de publicar. Abra o painel **Security** no seu Projeto para executar varreduras, revisar resultados e enviar problemas aceitos ao Agent para remediação.
+
+O Project Security Center suporta dois tipos de varreduras:
+
+1. **Varreduras automáticas de dependências**: Varreduras gratuitas e leves que verificam os pacotes do projeto contra registros públicos de vulnerabilidades
+2. **Varreduras de segurança com Agent**: Revisões assistidas por IA que combinam análise de modelos com ferramentas de análise estática de código para auditar toda a base de código
+
+Ambos os tipos de varredura exibem resultados no mesmo painel Security, organizados por severidade para que você possa focar nos problemas de maior impacto primeiro.
+
+## Varreduras automáticas de dependências
+
+As varreduras automáticas de dependências auditam os pacotes dos quais o projeto depende contra registros públicos de vulnerabilidades. Essas varreduras são **gratuitas** e executadas automaticamente. Quando uma nova entrada de Common Vulnerabilities and Exposures (CVE) é divulgada, o Replit a verifica contra as dependências do seu projeto e exibe qualquer correspondência no painel **Security** — sem necessidade de nova varredura manual.
+
+A varredura de dependências suporta Node.js/npm, Python, Go, Rust, PHP e Ruby. Por exemplo, uma varredura pode sinalizar uma vulnerabilidade conhecida em um pacote desatualizado como `express@4.18.2`.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/MuLW6SmzOLVKbNrI/images/project-security-center/fix-all-with-agent.png?fit=max&auto=format&n=MuLW6SmzOLVKbNrI&q=85&s=8d6a692c34d6d106462fa714bdc703aa" alt="O botão Fix all with Agent no cartão de varreduras automáticas de dependências no Project Security Center" width="1440" height="900" data-path="images/project-security-center/fix-all-with-agent.png" />
+</Frame>
+
+### Auto-Protect
+
+O Auto-Protect estende a varredura automática de dependências. Quando uma vulnerabilidade correspondente é detectada, o Replit Agent prepara e testa um patch e envia um link direto por e-mail. O Auto-Protect cobre apenas CVEs de dependências — para vulnerabilidades no código da sua aplicação, use as [varreduras de segurança com Agent](#agent-security-scans).
+
+Para cada nova vulnerabilidade correspondente às dependências do seu projeto, o Replit:
+
+1. Envia um e-mail com um resumo e um link direto para o painel **Security** do projeto afetado.
+2. Solicita ao Replit Agent que prepare e teste um patch que corrija a vulnerabilidade.
+3. Deixa o patch pendente para revisão no painel **Security**.
+
+Selecione **Go to Task** para inspecionar as alterações geradas antes de aplicá-las. Após aplicar o patch, a vulnerabilidade aparece como **pending republish** até que você publique uma nova versão.
+
+Sempre republique após aplicar um patch para garantir que o seu app em produção esteja seguro.
+
+O Replit envia no máximo um e-mail por Workspace para cada nova vulnerabilidade. O e-mail resume todos os projetos afetados nesse Workspace. Os administradores podem definir a severidade mínima que aciona o Auto-Protect — por exemplo, somente crítica.
+
+#### Ativar o Auto-Protect
+
+Ambas as configurações do Auto-Protect estão **desativadas por padrão**. Ativar o Auto-Protect requer duas configurações: uma configuração somente para administradores que autoriza o Replit a preparar patches, e uma configuração pessoal que controla se você recebe e-mails sobre novas vulnerabilidades.
+
+<Steps>
+  <Step title="Ativar a preparação de patches (somente administradores)">
+    Vá para **Settings** > **Account** > **Advanced** e selecione a severidade mínima (low, medium, high ou critical) na qual o Replit deve preparar remediações automaticamente. Definir um limite mais alto significa que o Replit só prepara patches para as vulnerabilidades mais graves.
+  </Step>
+
+  <Step title="Ativar e-mails de segurança">
+    Vá para **Settings** > **Personalization** > **Email Notifications** e selecione a severidade mínima na qual você deseja ser notificado sobre novos problemas de segurança. High ou critical é o habitual.
+  </Step>
+</Steps>
+
+<Note>
+  As remediações preparadas pelo Agent são cobradas como qualquer outro trabalho do Agent, mesmo quando
+  preparadas proativamente pelo Auto-Protect.
+</Note>
+
+## Varreduras de segurança com Agent
+
+As varreduras de segurança com Agent vão além das verificações de dependências para realizar uma auditoria abrangente de toda a base de código. O Security Agent combina revisão baseada em modelos com ferramentas de análise estática como [Semgrep](https://semgrep.dev/) e [HoundDog.ai](https://hounddog.ai) para encontrar vulnerabilidades que a correspondência de padrões sozinha não detectaria.
+
+As varreduras de segurança com Agent estão disponíveis para todos os desenvolvedores pagos do Replit. Para projetos maiores, uma auditoria profunda pode levar até 15 minutos para garantir uma avaliação completa.
+
+### O que o Security Agent faz
+
+Quando você inicia uma varredura de segurança com Agent, o Security Agent realiza uma revisão completa da sua base de código:
+
+1. **Mapeia a sua arquitetura** -- identifica rotas, APIs, fluxos de dados e pontos de entrada
+2. **Constrói um modelo de ameaças** -- cria um plano de modelagem de ameaças personalizável para a sua aplicação
+3. **Executa análise estática** -- usa Semgrep e HoundDog.ai para verificar vulnerabilidades no código e problemas de privacidade
+4. **Analisa os resultados com IA** -- avalia se os problemas sinalizados são realmente exploráveis no contexto da sua aplicação, reduzindo significativamente falsos positivos
+5. **Gera um relatório de resultados** -- apresenta os riscos identificados para revisão
+
+As varreduras de segurança com Agent cobrem uma ampla variedade de categorias de vulnerabilidades:
+
+* **Problemas de análise estática (SAST)**: Padrões de código inseguros como injeção de SQL, cross-site scripting (XSS) e cross-site request forgery (CSRF)
+* **Problemas de privacidade**: Dados sensíveis fluindo para destinos de risco como logs, arquivos ou APIs de terceiros
+* **Vulnerabilidades arquiteturais**: Lacunas de segurança na forma como as rotas, APIs e fluxos de dados estão estruturados
+
+Por exemplo, a revisão pode sinalizar uma consulta de banco de dados não parametrizada:
+
+```javascript theme={null}
+const query = `SELECT * FROM users WHERE username = '${userInput}'`;
+```
+
+Ou código que registra dados sensíveis de usuários:
+
+```javascript theme={null}
+logger.info("New signup", {
+  email: user.email,
+  phoneNumber: user.phoneNumber,
+  address: user.address,
+});
+```
+
+### Iniciar uma varredura de segurança com Agent
+
+<Steps>
+  <Step>
+    Abra o painel **Security** no seu Projeto para abrir o Project Security Center.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/MuLW6SmzOLVKbNrI/images/project-security-center/review-security-button.png?fit=max&auto=format&n=MuLW6SmzOLVKbNrI&q=85&s=f242cc14d62a515060f1a065f6ee7bb5" alt="O botão Review security no fluxo de publicação do projeto, que abre o painel Security" width="1440" height="900" data-path="images/project-security-center/review-security-button.png" />
+    </Frame>
+  </Step>
+
+  <Step>
+    Selecione **Run scan with Agent**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/MuLW6SmzOLVKbNrI/images/project-security-center/run-scan-with-agent.png?fit=max&auto=format&n=MuLW6SmzOLVKbNrI&q=85&s=32ae50df611a37d070e9640d775cca54" alt="O botão Run scan with Agent destacado no Project Security Center" width="1440" height="900" data-path="images/project-security-center/run-scan-with-agent.png" />
+    </Frame>
+  </Step>
+
+  <Step>
+    Opcionalmente, personalize o prompt de modelagem de ameaças para focar em áreas específicas
+    da sua aplicação.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/MuLW6SmzOLVKbNrI/images/project-security-center/scan-options.png?fit=max&auto=format&n=MuLW6SmzOLVKbNrI&q=85&s=2c47ea280383a22967df5daa7f323371" alt="O popover de opções de varredura com um campo Add context para restringir a varredura a áreas específicas do projeto" width="1440" height="900" data-path="images/project-security-center/scan-options.png" />
+    </Frame>
+  </Step>
+
+  <Step>
+    Aguarde a conclusão da revisão. Normalmente leva alguns minutos, mas pode
+    levar até 15 minutos para projetos maiores.
+  </Step>
+</Steps>
+
+Após a conclusão da revisão, o Security Agent gera um relatório dos riscos identificados. Você pode revisar os detalhes das vulnerabilidades, descartar os resultados que você entende e aceita, ou revisar os resultados antes de enviá-los para remediação.
+
+Após revisar os resultados, envie os problemas aceitos ao Replit Agent para remediação. O Security Agent organiza as vulnerabilidades em tarefas separadas para que o Agent possa trabalhar em múltiplas correções em paralelo. Após a aplicação das correções, execute outra varredura para confirmar que os problemas foram resolvidos.
+
+Após corrigir o primeiro conjunto de resultados, execute outra varredura. Projetos maiores podem revelar problemas adicionais após a resolução dos resultados de maior severidade.
+
+## Limitações e melhores práticas
+
+* **Privacidade e tratamento de dados**: Toda a varredura é executada na infraestrutura do Replit. O seu código e os dados não são enviados ao Semgrep, ao HoundDog.ai ou a terceiros. A configuração e os resultados da varredura permanecem vinculados ao seu Replit App.
+* **Suporte a linguagens**:
+  * A varredura de dependências suporta muitos ecossistemas populares (incluindo **Node.js/npm**, **Python**, **Go**, **Rust**, **PHP** e **Ruby**).
+  * A correção automática de dependências está atualmente focada em **Node.js/npm**.
+* **Não é uma revisão de segurança completa**: Use as varreduras junto com revisão de código, testes, revisão de dependências e verificações do app em funcionamento.
+* **Execute novamente após alterações**: Execute uma varredura novamente após:
+  * Adicionar ou atualizar dependências
+  * Fazer alterações importantes no código
+  * Antes de publicar uma nova versão
+
+## Verificações de publicação
+
+A configuração **Block publishing of critical vulnerabilities** fica nas configurações avançadas da aba Deploy (e no fluxo de republicação). O Replit sempre executa uma varredura de segurança antes de publicar; esse toggle decide o que acontece quando a varredura encontra um problema de severidade crítica:
+
+* **Ativado** — a publicação fica bloqueada até que o problema seja resolvido ou descartado.
+* **Desativado** — a publicação prossegue e o resultado é exibido para revisão.
+
+Ative isso para garantir que nada crítico seja publicado sem a sua revisão. Organizações com planos enterprise podem exigir essa configuração para todos os apps.
+
+<Note>
+  Esta configuração costumava ser chamada de "Security scan before publishing" e tinha a tag **Beta**. Agora saiu do Beta e foi renomeada para deixar o comportamento mais claro — a varredura em si sempre é executada de qualquer forma.
+</Note>
+
+## Próximas etapas
+
+* Saiba mais sobre [Publishing](/category/replit-deployments) e como publicar seu Replit App após limpar as varreduras.
+* Explore o [Replit Agent](/pt/core-concepts/agent) para corrigir problemas de segurança e privacidade diretamente do Project Editor.
+* Leia [How Replit Secures AI-Generated Code](https://blog.replit.com/securing-ai-generated-code) para saber mais sobre a abordagem de segurança do Replit.
+* Confira os [recursos do Editor](/pt/core-concepts/project-editor/editor-and-tools) para mais ferramentas de melhoria da qualidade, desempenho e confiabilidade do código.

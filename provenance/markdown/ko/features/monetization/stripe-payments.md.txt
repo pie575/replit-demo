@@ -1,0 +1,242 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Stripe 결제 연동
+
+> Agent를 사용하여 Stripe로 앱에 결제 및 구독을 추가하는 방법을 알아보세요.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Note>
+  Stripe 연동은 유료 플랜([Core](/ko/billing/plans/replit-core) 및 [Pro](/ko/billing/plans/replit-pro))에서만 사용할 수 있습니다. 무료 [Starter](/ko/billing/plans/starter-plan) 플랜에서는 사용할 수 없으며—Agent가 커넥터를 제안할 때 업그레이드를 안내합니다.
+</Note>
+
+## 빌드할 수 있는 것
+
+Agent를 사용하여 클릭 한 번으로 앱에 Stripe를 추가하세요. 별도의 설정이 필요하지 않습니다. 스토어프론트를 빌드하거나, 일회성 결제를 수락하거나, 구독을 만드세요. Agent가 연동, 데이터 모델, 테스트 환경을 연결합니다.
+
+## 작동 방식
+
+Agent는 실제 돈을 이동하지 않고도 결제를 안전하게 테스트할 수 있도록 Stripe 샌드박스부터 시작합니다. 즉시 흐름을 빌드하고 사용해 볼 수 있습니다. 준비가 되면 라이브 Stripe 계정으로 전환하여 게시하고 실제 결제를 수락하세요.
+
+<Info>
+  Stripe 샌드박스는 결제, 구독, 이벤트를 시뮬레이션할 수 있는 격리된 테스트 환경입니다.
+  [샌드박스에 대한 Stripe 문서](https://docs.stripe.com/sandboxes)에서 자세히 알아보세요.
+</Info>
+
+## 팀과 함께 Stripe 사용하기
+
+Stripe는 협업 워크스페이스에서 작동하므로 팀 전체가 같은 앱을 함께 빌드, 테스트, 수익화할 수 있습니다. 워크스페이스의 모든 사람이 연결된 Stripe 계정으로 작업할 수 있으며, 한 사람만 결제 기능을 빌드하지 않아도 됩니다.
+
+## 시작하기
+
+* **Agent에게 Stripe 사용 요청**
+  * 홈 화면에서 슬래시 명령을 사용하고 Stripe를 선택하거나 직접 요청하세요:
+    <AiPrompt>Build a storefront and integrate Stripe for payments</AiPrompt>
+
+<Note>
+  Stripe 연동에는 백엔드 기능이 있는 앱이 필요합니다. 시작하려면 홈페이지에서 **앱**을 선택하세요.
+</Note>
+
+## 샌드박스에서 결제 테스트하기
+
+1. 새 탭에서 앱의 **미리보기**를 여세요.
+2. 스토어프론트 또는 결제 페이지에서 테스트 구매를 하세요.
+3. Stripe의 표준 테스트 카드를 사용하세요:
+
+```text theme={null}
+Card number: 4242 4242 4242 4242
+Expiry: any future date
+CVC: any 3 digits
+Name, address: any mock values
+```
+
+<Tip>
+  샌드박스 구매는 실제 네트워크를 통해 처리되거나 돈을 이동하지 않습니다.
+  끝까지 안전하게 테스트할 수 있습니다.
+</Tip>
+
+## 상품 및 가격 관리하기
+
+두 가지 옵션이 있습니다:
+
+1. 앱에서 **게시**를 선택한 다음 Stripe 샌드박스를 청구하도록 선택합니다.
+   * Stripe 계정이 아직 없다면 샌드박스를 청구하기 위해 계정을 만드세요.
+2. Stripe 대시보드에서 **상품**을 열어 상품 및 가격을 추가하거나 수정하세요.
+   Stripe 샌드박스에서 변경한 내용은 Replit 앱에 자동으로 반영되고 앱의 데이터베이스에 동기화됩니다.
+
+### 동기화된 Stripe 데이터 보기
+
+* 프로젝트 편집기에서 **데이터베이스**를 여세요.
+* **MyData**를 선택하세요.
+* 스키마 선택기를 **Stripe**로 변경하여 결제 객체와 관련 레코드를 확인하세요.
+
+## 라이브 전환하기
+
+실제 결제를 수락하려면 Stripe Marketplace에서
+[Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments)
+앱을 설치하여 라이브 Stripe 계정을 연결하세요. 설치 흐름이 라이브 계정을 자동으로 연결합니다 — API 키를 복사하거나 붙여넣을 필요가 없습니다.
+
+<Warning>
+  샌드박스 연동은 프로덕션용이 아닙니다. 아래 단계를 완료할 때까지 실제 결제를 수락할 수 없습니다.
+</Warning>
+
+<Steps>
+  <Step title="게시 창 열기">
+    앱에서 **게시**를 선택하여 라이브 연결 흐름을 시작하세요.
+  </Step>
+
+  <Step title="Replit Integrated Payments 앱 설치하기">
+    **Install Stripe app**을 선택하세요. Stripe 창이 열리며
+    [Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments)
+    목록이 표시됩니다.
+
+    Stripe에서 계정을 선택하라는 메시지가 표시되면 **라이브** Stripe 계정을 선택하세요 — 샌드박스나 테스트 계정이 아닌 라이브 계정이어야 합니다.
+  </Step>
+
+  <Step>
+    Stripe의 안내를 따라 앱을 설치하세요. 라이브 계정이 아직 활성화되지 않았다면 Stripe가 먼저 KYB(기업 인증) 절차를 안내합니다.
+
+    설치가 완료될 때까지 Stripe 창을 열어 두세요.
+    Stripe가 설치를 확인하면 Replit이 백그라운드에서 프로덕션 연결을 완료합니다.
+  </Step>
+
+  <Step title="앱 게시하기">
+    Replit으로 돌아오세요. **게시** 창에 라이브 Stripe 계정이 연결된 것으로 표시됩니다. 앱을 게시하여 실제 결제 수락을 시작하세요.
+  </Step>
+</Steps>
+
+<Note>
+  Replit Integrated Payments 앱 설치는 Replit에 공개 키와 시크릿 키를 직접 복사하던 기존 방식을 대체합니다. 이 앱이 프로덕션 키를 설정하고 샌드박스-라이브 동기화를 유지합니다.
+</Note>
+
+## 연동 관리하기
+
+* **연동 > Stripe**로 이동하여 Stripe 커넥터를 여세요.
+* 연결을 테스트하고, 상태를 확인하고, 설정을 관리할 수 있습니다.
+
+## 자주 묻는 질문
+
+### 상품 가격은 어떻게 업데이트하나요?
+
+* Agent에게 요청: 변경 사항을 설명하면 Agent가 앱과 Stripe 객체를 업데이트합니다.
+* Stripe 대시보드 사용: **상품**을 열어 가격과 상품 세부 정보를 수정하세요.
+  * 샌드박스에서 변경 사항은 앱과 데이터베이스에 자동으로 다시 동기화됩니다.
+  * 프로덕션의 경우 먼저 라이브 계정으로 전환한 다음 가격을 업데이트하세요. 앱이 새 구성을 가져와야 하는 경우 다시 게시하세요.
+
+### Replit에서 거래를 어떻게 테스트하나요?
+
+새 탭에서 앱의 **미리보기**를 여세요. 표준 테스트 카드(4242 4242 4242 4242), 미래의 임의 만료일, 임의의 CVC로 Stripe Checkout 흐름을 실행하세요. 자세한 내용은 위의 [샌드박스에서 결제 테스트하기](#샌드박스에서-결제-테스트하기)를 참조하세요.
+
+### 라이브 Stripe 계정이란 무엇인가요?
+
+라이브 Stripe 계정은 비즈니스 세부 정보를 사용하여 실제 결제를 처리할 수 있는 활성화 및 인증된 계정입니다. 계정 생성 및 활성화에 대한 Stripe 가이드를 참조하세요: [Stripe 계정 만들기 및 관리하기](https://docs.stripe.com/get-started/account).
+
+### Stripe API 키를 직접 붙여넣어야 하나요?
+
+아니요. Replit Integrated Payments 앱이 라이브 Stripe 계정을 연결할 때 프로덕션 키를 자동으로 설정합니다. Stripe 대시보드에서 라이브 키를 복사할 필요가 없습니다.
+
+이전에 라이브 키를 직접 붙여넣어 Stripe를 연결했다면 해당 연결은 계속 작동합니다. **게시** 창에서 Stripe 연결을 제거하고 다시 연결하여 Stripe 앱 설치 방식으로 전환할 수 있습니다. 아래의 [Stripe 연결 업데이트 또는 제거하기](#stripe-연결-업데이트-또는-제거하기)를 참조하세요.
+
+## Stripe 연결 업데이트 또는 제거하기
+
+라이브 Stripe 연결로 게시할 준비가 되지 않은 경우 두 가지 옵션이 있습니다:
+
+### 옵션 A: Stripe 연동 수동으로 제거하기
+
+프로젝트에서 Stripe 연동을 완전히 제거할 수 있습니다.
+
+<Steps>
+  <Step title="연동 탭 열기">
+    Replit 앱으로 이동하여 상단의 **연동** 탭을 선택하세요. **커넥터** 아래에서 **Stripe**를 찾아 **관리**를 선택하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-1-integrations.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=6c13ffeb8b367ec950a48d264540f967" alt="커넥터에 Stripe 연동과 관리 버튼이 표시된 연동 탭" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="API 키 펼치기">
+    chevron을 선택하여 **Sandbox API keys**와 **Live account API keys**를 펼친 다음 **Edit**을 선택하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-2-edit-keys.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=60bbac9e871e84e28171ec9bfa22b28d" alt="편집 버튼이 있는 Stripe 샌드박스 및 라이브 계정 API 키 펼침" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="계정 연결 해제하기">
+    **Disconnect account**를 선택하여 샌드박스 연결을 제거하고, **Disconnect live account**를 선택하여 라이브 연결을 제거하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-3-disconnect.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=576034d8d4380747c4f8c5ccdc41c652" alt="계정 연결 해제 및 라이브 계정 연결 해제 버튼이 있는 Stripe 샌드박스 및 라이브 계정 API 키" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Agent에게 Stripe 코드 제거 요청하기">
+    Agent 채팅으로 이동하여 Agent에게 애플리케이션에서 Stripe 커넥터 코드를 제거하도록 요청하세요. 그러면 전체 Stripe 연동이 제거됩니다.
+  </Step>
+</Steps>
+
+### 옵션 B: Stripe 연동 이전 체크포인트로 롤백하기
+
+Stripe 연동을 완전히 취소하고 이전 상태로 돌아가려면 이전 체크포인트로 롤백할 수 있습니다.
+
+<Steps>
+  <Step title="연동 탭 열기">
+    Replit 앱으로 이동하여 상단의 **연동** 탭을 선택하세요. **커넥터** 아래에서 **Stripe**를 찾아 **관리**를 선택하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-1-integrations.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=6c13ffeb8b367ec950a48d264540f967" alt="커넥터에 Stripe 연동과 관리 버튼이 표시된 연동 탭" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="API 키 펼치기">
+    chevron을 선택하여 **Sandbox API keys**와 **Live account API keys**를 펼친 다음 **Edit**을 선택하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-2-edit-keys.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=60bbac9e871e84e28171ec9bfa22b28d" alt="편집 버튼이 있는 Stripe 샌드박스 및 라이브 계정 API 키 펼침" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="계정 연결 해제하기">
+    **Disconnect account**를 선택하여 샌드박스 연결을 제거하고, **Disconnect live account**를 선택하여 라이브 연결을 제거하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-3-disconnect.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=576034d8d4380747c4f8c5ccdc41c652" alt="계정 연결 해제 및 라이브 계정 연결 해제 버튼이 있는 Stripe 샌드박스 및 라이브 계정 API 키" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Stripe 연동 이전 체크포인트 찾기">
+    Agent 채팅으로 이동하여 Stripe 연동 이전에 만들어진 체크포인트를 찾으세요. 채팅 창 왼쪽 상단의 **시계 아이콘**을 선택하여 오래된 채팅 기록을 확인하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/YElKpLz4AJkoRVnw/images/replitai/stripe-rollback-5-clock-icon.png?fit=max&auto=format&n=YElKpLz4AJkoRVnw&q=85&s=5a8e86892fea6061d3af970dd6499a32" alt="채팅 기록과 체크포인트를 보기 위한 시계 아이콘" width="56" height="50" data-path="images/replitai/stripe-rollback-5-clock-icon.png" />
+    </Frame>
+  </Step>
+
+  <Step title="여기서 롤백 선택하기">
+    좋아 보이는 체크포인트를 찾으면 **여기서 롤백**을 선택하여 프로젝트를 해당 상태로 복원하세요.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/YElKpLz4AJkoRVnw/images/replitai/stripe-rollback-6-checkpoint.png?fit=max&auto=format&n=YElKpLz4AJkoRVnw&q=85&s=a48d19624a6740286ff9f004c302547d" alt="여기서 롤백 버튼이 있는 체크포인트" width="904" height="202" data-path="images/replitai/stripe-rollback-6-checkpoint.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## 참고 사항 및 제한 사항
+
+* 샌드박스 활동은 실제 잔액이나 고객에게 영향을 주지 않습니다.
+* 일부 Stripe 기능은 샌드박스에서 테스트할 수 없습니다(예: IC+ 가격 및 특정 Connect 흐름). [Stripe의 샌드박스 제한 사항](https://docs.stripe.com/sandboxes)을 참조하세요.

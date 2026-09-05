@@ -1,0 +1,74 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Pare-feu de packages
+
+> Le Pare-feu de packages bloque les packages malveillants et compromis au moment de l'installation, avant que tout code n'atteigne votre application. Activé par défaut, alimenté par Socket.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/PlH9o31JxmYssE0Q/images/package-firewall/blocked-package-message.png?fit=max&auto=format&n=PlH9o31JxmYssE0Q&q=85&s=cc7090969f43b07d55b734f38ab01426" alt="Le chat Agent affichant une installation de form-data bloquée par la politique de sécurité de Replit, avec une explication de la vulnérabilité connue du package" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
+</Frame>
+
+<Note>
+  Nouveau dans le domaine de la sécurité des dépendances ? Consultez les [Concepts de sécurité](/fr/features/security/concepts) pour les définitions de CVE, SBOM, exposition, Corriger avec Agent, Republier et Auto-Protect.
+</Note>
+
+Le Pare-feu de packages bloque les packages malveillants et compromis au niveau réseau, avant qu'ils ne soient jamais installés dans votre application. Il fait partie d'[Replit Auto-Protect](/fr/features/security/concepts#auto-protect), l'ensemble des protections activées par défaut pour chaque développeur, et est alimenté par [Socket](https://socket.dev), une société spécialisée dans la sécurité de la chaîne d'approvisionnement logicielle.
+
+Lorsque vous ou l'Agent exécutez une commande d'installation comme `npm install` ou `pip install`, la requête passe d'abord par le Pare-feu de packages. Les packages propres s'installent normalement et vous ne remarquerez rien. Les packages que Socket a signalés comme malveillants ou compromis sont bloqués avant que tout code n'atteigne votre environnement.
+
+Le Pare-feu de packages est **activé par défaut pour chaque développeur, sans rien à configurer ni à migrer**. Il protège les applications nouvelles et existantes, et il n'y a aucun paramètre à configurer.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/PlH9o31JxmYssE0Q/images/package-firewall/auto-protect-layers.png?fit=max&auto=format&n=PlH9o31JxmYssE0Q&q=85&s=29403621c1249c15a1e21dac90c8a4aa" alt="Le panneau Auto-Protect de Replit affichant trois protections activées par défaut : WAF Firewall, Pare-feu de packages alimenté par Socket et Chiffrement SSL/TLS" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
+</Frame>
+
+## Pourquoi la protection au moment de l'installation est importante
+
+La plupart des outils de chaîne d'approvisionnement n'analysent les dépendances qu'au moment de la publication, bien après l'installation d'un package. Pour les vulnérabilités ordinaires, cela peut suffire. Les logiciels malveillants sont différents : ils causent des dommages instantanément lors de leur installation — en volant des secrets, en ouvrant des portes dérobées ou en exfiltrant vos variables d'environnement. Au moment où une analyse au moment de la publication les signale, l'attaque a déjà eu lieu.
+
+Le Pare-feu de packages ferme cette fenêtre. En bloquant les packages malveillants avant leur téléchargement, il stoppe l'attaque avant qu'une seule ligne de code malveillant ne s'exécute.
+
+## Comment ça fonctionne
+
+1. Vous ou l'Agent exécutez une commande d'installation, comme `npm install <package>` ou `pip install <package>`.
+2. La requête passe par le Pare-feu de packages, qui vérifie le package par rapport aux renseignements sur les menaces de Socket.
+3. Si le package est propre, l'installation se déroule normalement sans différence perceptible.
+4. Si le package est malveillant ou compromis, l'installation est bloquée avant que tout code n'atteigne votre environnement.
+
+Lorsqu'un élément est bloqué, vous recevez un message clair sur ce qui a été arrêté et pourquoi, y compris la vulnérabilité ou la politique qui a déclenché le blocage. L'Agent voit le même signal, il peut donc suggérer une alternative sûre — comme corriger un nom de package mal orthographié — ou vous remettre la décision.
+
+### Gestionnaires de packages pris en charge
+
+Le Pare-feu de packages protège les installations sur :
+
+* **JavaScript** — npm, yarn et pnpm
+* **Python** — pip
+* **Go** — modules Go
+
+## Ce que le Pare-feu de packages détecte
+
+Le Pare-feu de packages bloque à la fois les logiciels malveillants purs et les versions compromises ou présentant des vulnérabilités connues de packages par ailleurs légitimes — y compris ceux largement utilisés. Beaucoup de ces vulnérabilités ont été divulguées après la date limite d'entraînement des modèles qui les recommandent, donc un modèle peut suggérer avec confiance une version de dépendance qui était correcte dans ses données d'entraînement mais qui a depuis été signalée. Ces risques ont des noms dans le domaine :
+
+* **Typosquats** — un package malveillant avec un nom à une touche de distance d'un vrai, comme `reqeusts` au lieu de `requests`. Vous demandez le mauvais package et téléchargez un logiciel malveillant.
+* **Slopsquats** — un modèle hallucine un nom de package qui n'existe pas, un attaquant enregistre ce nom exact et attend que le prochain agent l'installe.
+* **Recommandations obsolètes** — un vrai package avec une vulnérabilité divulguée que le modèle recommande parce qu'il était correct avant sa date limite d'entraînement.
+
+Cette dernière catégorie explique pourquoi le Pare-feu de packages est le plus important pour les applications créées par IA : un agent peut atteindre avec confiance une dépendance qui n'est plus sûre, et le Pare-feu de packages arrête l'installation avant que ce code ne s'exécute.
+
+## Comment le Pare-feu de packages s'intègre aux autres outils de sécurité de Replit
+
+Le Pare-feu de packages est l'une des trois couches complémentaires. Chacune protège un point différent du cycle de vie de votre application, alors utilisez-les ensemble plutôt que d'en choisir une.
+
+| Couche                                    | Quand elle s'exécute             | Ce qu'elle fait                                                                                                                                                                                                                               |
+| ----------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pare-feu de packages**                  | Au moment de l'installation      | Bloque les packages malveillants et compromis avant leur téléchargement (prévention).                                                                                                                                                         |
+| **Analyses automatiques des dépendances** | Après l'installation, en continu | Détecte les CVE nouvellement divulguées dans vos dépendances installées, avec des correctifs optionnels préparés par Agent. Voir le [Centre de sécurité du projet](/fr/features/security/project-security-center#automatic-dependency-scans). |
+| **Agent de sécurité**                     | Avant la publication             | Audite l'ensemble de votre base de code pour les vulnérabilités liées au code, aux dépendances et à la confidentialité. Voir les [Analyses de sécurité Agent](/fr/features/security/agent-security-scans).                                    |
+
+## Prochaines étapes
+
+* Examinez les résultats d'un seul projet dans le [Centre de sécurité du projet](/fr/features/security/project-security-center).
+* Auditez les dépendances de tous les projets dans le [Centre de sécurité de l'espace de travail](/fr/features/security/workspace-security-center).
+* Lisez [Comment Replit sécurise le code généré par l'IA](https://blog.replit.com/securing-ai-generated-code) pour plus d'informations sur l'approche de Replit en matière de sécurité.

@@ -1,0 +1,189 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Configurer un système de design
+
+> Configurez Agent avec le système de design de votre organisation — bibliothèque de composants, ressources de marque, jetons de design et standards visuels — afin que chaque application, site et artefact suive votre langage de design.
+
+Un système de design donne à Agent les connaissances nécessaires pour créer une interface utilisateur conforme à votre marque dans tout ce que votre organisation crée sur Replit — applications web, applications mobiles, diapositives et autres artefacts. En configurant votre bibliothèque de composants, vos jetons de design, vos ressources de marque et vos règles d'utilisation dans le monorepo pnpm standard de Replit, Agent applique votre langage visuel dès la première invite.
+
+<Note>
+  Les systèmes de design sont disponibles exclusivement sur le plan **Enterprise**. Seuls les administrateurs d'organisation peuvent configurer et gérer les systèmes de design.
+</Note>
+
+## Pourquoi configurer un système de design
+
+Sans système de design, chaque builder doit expliquer manuellement à Agent votre bibliothèque de composants, vos jetons de couleur et vos conventions de mise en page. La configuration d'un système de design résout ce problème en :
+
+* **Encodant vos standards visuels** : Agent utilise vos composants, couleurs et espacements exacts — pas des valeurs par défaut génériques
+* **Assurant la cohérence** : Chaque application suit le même langage de design
+* **Réduisant le temps d'intégration** : Les nouveaux builders produisent des résultats conformes à la marque immédiatement
+* **Capturant les connaissances tacites** : Les décisions de design et les patterns d'utilisation des composants qui vivent dans les têtes de votre équipe sont documentés pour Agent
+
+## Ce dont vous aurez besoin
+
+* Bibliothèque de composants frontend sous forme de tarfile ou d'un ensemble de tarfiles
+* Ressources de polices et icônes utilisées dans votre système de design
+* Toute documentation IA de votre système de design (MCP, Agent Skills)
+
+## Ce que vous pouvez configurer
+
+La configuration d'un système de design comporte trois parties :
+
+1. **Instructions personnalisées**. Votre fichier `custom_instruction/instructions.md` donne à Agent les règles générales qui s'appliquent à chaque projet : quelle bibliothèque de composants utiliser, quels jetons de design référencer et quels patterns suivre. Agent dispose toujours de ce fichier dans son contexte.
+
+2. **Skills**. Les skills dans `.agents/skills/` fournissent du matériel de référence détaillé qu'Agent charge à la demande. Utilisez-les pour la documentation de l'API des composants, les guides de thématisation, les bibliothèques de patterns de mise en page et autre contenu de référence approfondi qui serait trop volumineux pour le fichier d'instructions principal.
+
+3. **Ressources de design et de marque**. Placez vos logos, icônes, polices et autres ressources de marque dans un dossier dédié (par exemple, `src/assets/brand/`). Configurez un alias de chemin Vite afin qu'Agent et les builders puissent les référencer avec des imports propres comme `@brand/logo.svg` plutôt que des chemins relatifs fragiles. Cela maintient des références de ressources cohérentes dans l'ensemble du projet.
+
+## Guide étape par étape
+
+Ce guide vous accompagne dans la configuration d'un système de design de bout en bout en utilisant votre bibliothèque de composants existante packagée sous forme de tarfiles :
+
+1. **Créez une nouvelle application Replit** et téléchargez vos tarfiles.
+2. **Demandez à Replit Agent d'installer les packages et d'afficher tous les composants.** Agent configurera le projet et affichera votre bibliothèque de composants.
+3. **Vérifiez le résultat.** Assurez-vous que tous les composants s'affichent correctement et correspondent à vos attentes. Une fois tout vérifié, passez à [Créer le skill du système de design](#créer-le-skill-du-système-de-design).
+
+### Créer le skill du système de design
+
+Une fois vos composants prêts, l'étape finale consiste à créer un skill de système de design afin qu'Agent puisse référencer vos composants, jetons et patterns d'utilisation dans chaque projet.
+
+Copiez l'intégralité de l'invite ci-dessous et collez-la dans Agent. Remplacez `<your-design-system-name>` par le nom de votre système de design :
+
+````
+Create a `<your-design-system-name>` design system skill from the components and packages in this project.
+
+Use the file structure shown below with a `SKILL.md` at the root, a `references/` directory for guides and component docs, and a `packages/` directory containing all dependencies needed to function.
+
+Go through every component in the project and document each one in its own file under `references/components/`, including its props, variants, and example usage.
+
+Format `SKILL.md` as an index that links out to the guide and component reference files, with a "General Guidance" section and a "Components" section, following the example shown below.
+
+File structure:
+
+.agents/skills/your-design-system/
+├── SKILL.md
+├── references/
+│   ├── guides/
+│   │   ├── setup.md
+│   │   ├── guardrails.md
+│   │   ├── layout-and-spacing.md
+│   │   └── ...
+│   └── components/
+│       ├── component-index.md
+│       ├── button.md
+│       ├── checkbox.md
+│       └── ...
+└── packages/
+    └── (Tar files or code components)
+
+The `SKILL.md` file acts as an index that links out to separate markdown files for guides and component references. Each linked file covers one topic in detail. Here is an example of what the generated `SKILL.md` looks like:
+
+```markdown
+---
+name: your-design-system
+description: Use when building or modifying any UI. Provides component API references, layout guidance, and visual style rules for your design system.
+---
+
+# Your Design System
+
+## General Guidance
+
+- [Setup](references/guides/setup.md) — Installation, project configuration, and provider setup
+- [Guardrails](references/guides/guardrails.md) — Hard rules that must never be broken (banned patterns, required tokens, accessibility minimums)
+- [Layout & Spacing](references/guides/layout-and-spacing.md) — Grid system, spacing scale, responsive breakpoints, and page templates
+- ...
+
+## Components
+
+- [Component Index](references/components/component-index.md) — Full list of available components with status and category
+
+Individual component references (props, variants, examples):
+
+- [Button](references/components/button.md)
+- [Checkbox](references/components/checkbox.md)
+- ...
+```
+
+Guide files cover one topic each — setup and installation steps, best practices and rules, reference tables for token values, and short code examples showing correct usage.
+
+Component files document a single component each, including the component name, a brief description, a props table, usage examples, and any guidelines or constraints. The more complete these files are, the better Agent's output will be.
+````
+
+### Connecter votre skill à Agent
+
+Une fois le skill créé, assurez-vous que votre fichier `custom_instruction/instructions.md` pointe Agent vers celui-ci :
+
+```markdown theme={null}
+# Design System
+
+Read and follow the design system skill at `.agents/skills/your-design-system/`.
+Always apply the design system when building or modifying UI.
+```
+
+Enfin, pré-remplissez `replit.md` avec le contexte spécifique au système de design afin qu'Agent comprenne vos standards visuels dès le départ. Incluez une présentation du projet, votre bibliothèque de composants préférée, vos préférences de design clés (échelle d'espacement, exigences d'accessibilité) et la pile d'architecture.
+
+### Valider votre configuration
+
+Avant de déployer votre système de design, vérifiez ces éléments essentiels :
+
+* `custom_instruction/instructions.md` pointe Agent vers votre skill de système de design
+* `.agents/skills/` inclut le skill avec les références de composants, les guides et les packages
+* `replit.md` est pré-rempli avec la présentation du projet, les préférences et l'architecture
+* Le fichier de jetons de design est inclus (`tokens.css` ou équivalent)
+* Le package du système de design est pré-installé dans `package.json`
+* Créez une nouvelle application de test et vérifiez qu'Agent utilise correctement le système de design
+
+### Épingler le système de design à votre organisation
+
+Une fois votre système de design prêt, épinglez-le afin que tous les membres de l'organisation puissent l'utiliser :
+
+1. Accédez à l'application du système de design dans votre organisation
+2. Ouvrez le menu d'action de l'application (menu à trois points)
+3. Sélectionnez **Pin to Agent input box**
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-pin-to-agent.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=6633df41d207aa5e9215ce0f4f1e1683" alt="Menu d'action de l'application montrant l'option Épingler à la zone de saisie d'Agent" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  Seuls les administrateurs d'organisation (membres du rôle `system_admins`) peuvent épingler et désépingler les systèmes de design.
+</Note>
+
+Définissez l'accès des membres sur **Read-only** afin qu'ils puissent voir et utiliser le système de design épinglé sans pouvoir le modifier.
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-members-read-only.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=76e9519d8881090d5dce7f7634acb701" alt="Boîte de dialogue d'invitation montrant l'accès des membres défini sur Lecture seule" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+Le système de design apparaît désormais comme une pastille sélectionnable sous la zone de saisie d'Agent pour chaque membre de votre organisation. Pour le supprimer, ouvrez le même menu et sélectionnez **Unpin from Agent input box**.
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-input-box.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=627369c01a5a109f15ca0c61968a8505" alt="Système de design apparaissant comme une pastille sélectionnable dans la zone de saisie d'Agent" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+## Maintenir votre système de design dans le temps
+
+Les systèmes de design évoluent. Maintenez le vôtre à jour :
+
+* **Mettez à jour les fichiers de jetons** lorsque votre système de design introduit de nouvelles couleurs, valeurs d'espacement ou de typographie
+* **Mettez à jour les skills** lorsque les composants obtiennent de nouvelles props, variantes ou patterns d'utilisation
+* **Mettez à jour les instructions** lorsque les principes ou standards de design changent
+* **Mettez à jour les versions des packages** lorsque de nouvelles versions de votre système de design sont publiées
+* **Testez régulièrement** en créant une nouvelle application et en vérifiant qu'Agent produit un résultat correct
+
+## Systèmes de design vs. Modèles personnalisés
+
+Les systèmes de design et les [modèles personnalisés](/fr/teams/custom-templates) servent des objectifs différents :
+
+|                      | Systèmes de design                                                                           | Modèles personnalisés                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Objectif**         | Changer la pile frontend vers celle de votre équipe et utiliser vos composants de code       | Remplacer entièrement la pile par défaut (par exemple, Rust, Go, C++)                   |
+| **Pile**             | Fonctionne dans le monorepo pnpm standard de Replit                                          | Définit une structure de projet entièrement personnalisée                               |
+| **Ce qu'il fournit** | Règles de bibliothèque de composants, jetons de design, ressources de marque, skills visuels | Boilerplate complet : runtime, configuration de build, dépendances, structure du projet |
+| **S'applique à**     | Applications web, applications mobiles, diapositives, artefacts — tout ce qu'Agent construit | Uniquement les applications créées à partir de ce modèle spécifique                     |
+
+Utilisez un système de design lorsque vous souhaitez qu'Agent suive vos standards visuels dans le cadre de l'expérience Replit normale. Utilisez un modèle personnalisé lorsque vous avez besoin d'une pile fondamentalement différente.
+
+## Ressources associées
+
+* [Modèles personnalisés](/fr/teams/custom-templates) - Configurer des piles entièrement personnalisées pour votre organisation
+* [Agent Skills](/fr/features/agent/skills) - Comment fonctionnent les skills et comment les créer
+* [Utiliser un skill](/fr/build/use-agent-skills) - Guide pratique pour utiliser les skills
+* [replit.md](/fr/features/project-setup/replit-dot-md) - Personnaliser le comportement d'Agent avec le contexte du projet
+* [Présentation Enterprise](/fr/category/teams) - En savoir plus sur les fonctionnalités Enterprise

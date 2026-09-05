@@ -1,0 +1,154 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Replit MCPサーバー
+
+> ChatGPT、Claude、Slack、またはあらゆるMCPクライアントからReplitを使って、Replit Appの作成、更新、公開を行います。
+
+Replit MCPは[Model Context Protocol](https://modelcontextprotocol.io/)を使用して、すでに使用しているAIツールからReplit Appを作成・検索・確認・更新・公開できるようにします。
+
+## ChatGPT、Claude、SlackでReplitを使う
+
+Replitは ChatGPT、Claude、Slackにネイティブに接続します。接続手順と、そこで構築できるものの例については、お使いのプラットフォームを選んでください。
+
+<CardGroup cols={3}>
+  <Card title="ChatGPT" icon="https://mintcdn.com/replit/ULLdJVk-FThFx3Hf/images/icons/openai.svg?fit=max&auto=format&n=ULLdJVk-FThFx3Hf&q=85&s=3e591ab8189678eed0c8cb1985a4ba15" href="/ja/features/platforms/chatgpt" width="24" height="24" data-path="images/icons/openai.svg">
+    設定 → アプリとコネクタからReplitを接続し、どの会話からでもアプリを構築できます。
+  </Card>
+
+  <Card title="Claude" icon="https://mintcdn.com/replit/ULLdJVk-FThFx3Hf/images/icons/claude.svg?fit=max&auto=format&n=ULLdJVk-FThFx3Hf&q=85&s=239a017d980e5ea33ae0d6b13571b2ec" href="/ja/features/platforms/claude" width="24" height="24" data-path="images/icons/claude.svg">
+    コネクタディレクトリからReplitを接続し、Claudeにアプリの構築を依頼するか、デザインを送ります。
+  </Card>
+
+  <Card title="Slack" icon="https://mintcdn.com/replit/ULLdJVk-FThFx3Hf/images/icons/slack.svg?fit=max&auto=format&n=ULLdJVk-FThFx3Hf&q=85&s=8d842525c111e3534251b55944402629" href="/ja/features/platforms/slack" width="24" height="24" data-path="images/icons/slack.svg">
+    ワークスペースにReplitを追加し、アイデアから動作するプロトタイプを構築するようSlackbotに依頼します。
+  </Card>
+</CardGroup>
+
+## MCPクライアントを直接接続する
+
+MCPクライアントにReplitのネイティブ統合がない場合は、直接接続を使用してください。
+
+| プロパティ       | 値                                      |
+| ----------- | -------------------------------------- |
+| **URL**     | `https://replit-mcp.com/server/mcp`    |
+| **トランスポート** | Streamable HTTP                        |
+| **認証**      | protected-resource discoveryを使用したOAuth |
+
+Streamable HTTPとOAuth認可をサポートするMCPクライアントに、サーバーURLを追加します。クライアントはReplitのprotected-resourceメタデータを読み取り、続いてReplitへのサインインを求めます。
+
+カスタムOAuthサーバーを作成しないでください。Replit MCPサーバーが、クライアントに必要なOAuthメタデータを提供します。
+
+アプリを新しく作成することも、編集権限のあるアプリ（自分と共有されているアプリを含む）を操作することもできます。
+
+### Replit MCPを設定する
+
+CodexとClaude Codeは一例です。互換性のあるMCPクライアントであれば、どれにでもReplit MCPを追加できます。
+
+<Tabs>
+  <Tab title="Codex">
+    <Steps>
+      <Step title="MCPリストを開く">
+        Codexで、**Settings** → **Plugins** → **MCPs**を開きます。
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-add-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b55230326055b96644eca0cd1083ad87" alt="Replit、Streamable HTTP、Replitのエンドポイント、および空のベアラートークンとヘッダーフィールドが入力されたCodexのカスタムMCPフォーム" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replitを追加する">
+        カスタムMCPを追加します。`Replit`のような分かりやすい名前を使用します。**Streamable HTTP**を選択します。`https://replit-mcp.com/server/mcp`を入力して保存します。ベアラートークンやカスタムヘッダーは追加しないでください。
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-add-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b55230326055b96644eca0cd1083ad87" alt="Replit、Streamable HTTP、Replitのエンドポイント、および空のベアラートークンとヘッダーフィールドが入力されたCodexのカスタムMCPフォーム" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replitを認証する">
+        MCPリストで**Replit**を有効にし、**Authenticate**を選択します。接続するReplitワークスペースを選びます。次に**Allow**を選択します。
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-authenticate-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=bc9f9186c8727e8a32ff632f6de8f427" alt="Replitが有効になっており、Authenticateボタンが表示されたCodexのMCPリスト" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-authenticate-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-authorize-replit-workspace.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=f55c986af7326bcbb528fdeaa1d60d9c" alt="汎用のアカウントとワークスペースのプレースホルダー、ワークスペースの選択肢、Allowボタンを含むReplitの認可ダイアログ" width="1588" height="991" data-path="images/replitai/custom-mcp/codex-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="CodexでReplitを使う">
+        Codexに、Replitプロジェクトの作成、確認、更新を依頼します。例えば次のように依頼します:「最近更新したReplitプロジェクトを一覧表示してください」
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/codex-list-replit-projects.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=9108ae7d068f42f7d036ab3c32ba9ef7" alt="最近更新された3つのReplitプロジェクトを一覧表示するCodexの応答" width="2000" height="951" data-path="images/replitai/custom-mcp/codex-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Claude Code">
+    <Steps>
+      <Step title="Replitを追加する">
+        ターミナルで、HTTPトランスポートを使ってサーバーを追加します。
+
+        ```bash theme={null}
+        claude mcp add replit https://replit-mcp.com/server/mcp --transport http
+        ```
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-add-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b81bc9f93a87c4cbfd62c9a4dff41ac5" alt="HTTPサーバーコマンドと汎用のローカル設定パスを使ってReplit MCPを追加した後のClaude Codeターミナル" width="2000" height="1097" data-path="images/replitai/custom-mcp/claude-code-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replitを選択する">
+        Claude Codeを起動または再起動します。`/mcp`を実行し、`replit`を選択します。
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=b5dd66f1428a698eee19d89e1335e828" alt="ローカルのreplitサーバーが選択され、認証が必要と表示されたClaude CodeのMCPリスト" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Replitを認証する">
+        ローカルの`replit`サーバーで**Authenticate**を選択します。Replitへのサインインを完了し、接続するワークスペースを選び、**Allow**を選択します。
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=9fb01839630ffef454f8fa88089c3481" alt="直接のReplitエンドポイントとAuthenticateの選択を示すClaude Codeのローカルreplitサーバーの詳細" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=2814f71811da92d06d32a40d6ab90fe4" alt="汎用のアカウントとワークスペースのプレースホルダー、ワークスペースの選択肢、Allowボタンを含むClaudeの認可ダイアログ" width="1588" height="991" data-path="images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Claude CodeでReplitを使う">
+        Claude Codeに、Replitプロジェクトの作成、確認、更新を依頼します。例えば次のように依頼します:「最近更新したReplitプロジェクトを一覧表示してください」
+
+        <Frame>
+          <img src="https://mintcdn.com/replit/nfrowf7Tj6EJT_iY/images/replitai/custom-mcp/claude-code-list-replit-projects.png?fit=max&auto=format&n=nfrowf7Tj6EJT_iY&q=85&s=3d4d4c3ef1ce4c5783f80aaaf3e7efc6" alt="汎用のReplitプロジェクトとプレースホルダーのURLを一覧表示するClaude Codeの応答" width="2000" height="850" data-path="images/replitai/custom-mcp/claude-code-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## ツール
+
+| ツール                       | 必須の入力                         | オプションの入力                                                  | 用途                                                                                                                                                  |
+| ------------------------- | ----------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_app_from_prompt`  | `appDescription`, `app_stack` | `userSpecifiedAppName`, `userQuotes`, `attachmentSummary` | 新しいアプリを開始します。`app_stack`は`react_website`、`mobile_app`、`design`、`slides`、`animation`、`data_visualization`、`3d_game`、`document`、`spreadsheet`のいずれかです。 |
+| `search_apps`             | なし                            | `query`, `url`, `updatedAfter`, `updatedBefore`, `limit`  | タイトルのキーワード、URL、または最終更新時刻でアプリを検索します。`limit`は1から50です。                                                                                                 |
+| `resolve_app_by_name`     | `name`                        | なし                                                        | 正確なタイトルで1つのアプリを検索します。                                                                                                                               |
+| `list_apps`               | なし                            | `query`, `limit`                                          | 編集可能なアプリを、最近のアクティビティ順に一覧表示します。デフォルトの上限は25、最大は50です。                                                                                                  |
+| `ask_question`            | `replId`, `question`          | なし                                                        | アプリを変更せずに、Agentにそのアプリについて質問します。                                                                                                                     |
+| `update_app_using_prompt` | `replId`, `changeDescription` | `userQuotes`, `attachmentSummary`                         | 既存のアプリに対するAgentの更新を開始します。                                                                                                                           |
+| `publish_app`             | `replId`                      | なし                                                        | アプリを公開するか、最新の変更を再公開します。                                                                                                                             |
+| `get_publish_status`      | `replId`                      | なし                                                        | アプリが公開されているかどうか、現在の公開ステータス、公開URLを確認します。                                                                                                             |
+
+## トラブルシューティング
+
+| 問題                      | 対処法                                                                |
+| ----------------------- | ------------------------------------------------------------------ |
+| Replitが認証を求める           | MCPクライアントからOAuthサインインフローを再度完了してください。                               |
+| アプリが見つからない              | そのアプリを編集できるか確認してください。次にURLで検索するか、`list_apps`を使って一致するアプリから選択してください。 |
+| 作成、更新、または公開のリクエストがまだ実行中 | 再試行する前に待ってください。公開の場合は、`get_publish_status`で現在の結果を確認してください。         |

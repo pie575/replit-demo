@@ -1,0 +1,432 @@
+---
+title: "Databricksコネクタ"
+description: "Replit Agentがお客様のDatabricksワークスペースを基盤としたアプリケーションを構築できるように、Databricksコネクタを選択してセットアップします。"
+sidebarTitle: "Databricks"
+icon: "database"
+---
+
+<Info>
+  DatabricksコネクタはEnterpriseプランでのみご利用いただけます。
+</Info>
+
+<Frame>
+  <img src="/assets/mirror/templates-dropdown-zoom-9e06ca94568a.png" alt="TemplatesドロップダウンがオープンでDatabricks Appの組織テンプレートが表示されているReplitホームのプロンプトボックス" width="1680" height="300" data-path="images/connectors/databricks/templates-dropdown-zoom.png" />
+</Frame>
+
+Databricksコネクタにより、Replit Agentはお客様のDatabricksワークスペースにクエリを実行できます。ビルダーは自然言語を使用してダッシュボード、レポートツール、データアプリケーションを作成できます。SQLの専門知識は不要です。
+
+Replitは2種類のDatabricks接続タイプをサポートしています。各クエリを実行するべきIDに基づいて選択してください。
+
+## 接続タイプを選択する
+
+|               | **User-to-machine (U2M)**            | **Service principal (M2M)**    |
+| ------------- | ------------------------------------ | ------------------------------ |
+| Replitでのコネクタ名 | Databricks for Databricks Apps (U2M) | Databricks (Service Principal) |
+| クエリを実行するID    | 個々のビルダー                              | 共有サービスプリンシパル                   |
+| Databricksの権限 | 各ビルダーのUnity Catalog権限                | サービスプリンシパルの権限                  |
+| 監査の帰属         | クエリを実行したビルダー                         | サービスプリンシパル                     |
+| ビルダーのサインイン    | 各ビルダーが自分のDatabricksアカウントでサインイン       | 個別のDatabricksサインインは不要          |
+| 最適な用途         | ユーザーごとの権限と監査の帰属                      | 共有アクセスと非対話型ワークフロー              |
+
+<CardGroup cols={2}>
+  <Card title="ユーザーツーマシン（U2M）をセットアップする" icon="user" href="#set-up-the-u2m-connector">
+    各ビルダーのDatabricks ID、権限、監査の帰属を使用します。
+  </Card>
+
+  <Card title="サービスプリンシパル（M2M）をセットアップする" icon="server" href="#set-up-the-service-principal-connector">
+    認可されたビルダー向けに、1つの共有Databricks
+    IDと権限セットを使用します。
+  </Card>
+</CardGroup>
+
+## U2Mコネクタをセットアップする
+
+U2Mのセットアップには3つの役割が関わります。
+
+1. **Databricksアカウント管理者**：OAuthアプリ接続を作成し、SQLウェアハウスの詳細を提供します。
+2. **Replit組織管理者**：OAuth認証情報でコネクタを設定します。
+3. **ビルダー**：自分のDatabricksアカウントでサインインし、構築を開始します。
+
+### U2Mの前提条件
+
+開始する前に、以下を確認してください。
+
+* Databricksの**アカウント管理者**。アプリ接続はワークスペース管理設定ではなく、アカウントコンソールで設定します。
+* Replit組織管理者。
+* コネクタを使用するすべてのビルダーのDatabricksアカウント。
+* SQLウェアハウスの**Can use**権限と必要なUnity Catalog権限を含む、すべてのビルダーのワークスペースアクセス権。
+
+### ステップ1：OAuthアプリ接続を作成する
+
+<Note>このステップを完了するにはDatabricksアカウント管理者である必要があります。</Note>
+
+Databricksアカウント管理者は、ReplitをOAuthアプリケーションとして登録します。アプリ接続により、Replitの設定に使用するクライアントIDとクライアントシークレットが提供されます。
+
+<Steps>
+  <Step title="Databricksアカウントコンソールを開く">
+    Databricksワークスペースで、右上隅のワークスペースピッカーを開き、**Manage account**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/manage-account-6374ed6bf0f2.png" alt="Manage accountが表示されているDatabricksワークスペースピッカー" width="2000" height="1144" data-path="images/connectors/databricks/u2m/manage-account.png" />
+    </Frame>
+  </Step>
+
+  <Step title="App connectionsを開く">
+    アカウントコンソールで**Settings**を選択し、**App connections**タブを開きます。
+
+    <Frame>
+      <img src="/assets/mirror/app-connections-96228e7f0f2e.png" alt="App connectionsタブが選択され、Add connectionボタンが表示されているDatabricksアカウントのSettingsページ" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-connections.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Replit接続を設定する">
+    **Add connection**を選択します。Replitを識別できるアプリケーション名（例：`replit-u2m`）を入力します。
+
+    **Redirect URLs**に以下を入力します。
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    **Access scopes**で**All APIs**を選択します。これにより、AgentがDatabricks Appsの構築および管理に必要なDatabricks SQLとDatabricks APIを使用できるようになります。
+
+    **Generate a client secret**を選択します。Databricksでは、この接続を作成した後にシークレットを追加することはできません。
+
+    組織のセキュリティポリシーに従ってトークンの有効期間を設定してください。この例では、Databricksが表示する最大値である**Access token TTL** `1440`分（24時間）と**Refresh token TTL** `129600`分（90日間）を使用しています。リフレッシュトークンの有効期間を短くすると、ビルダーがより頻繁にサインインする必要が生じる場合があります。
+
+    **Add**を選択します。
+
+    <Warning>
+      **All APIs**はSQL単独よりも広い範囲のアクセス権を付与します。各ビルダーのDatabricks権限でコネクタの実質的なアクセス権を制御してください。
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/app-configuration-6799b5769326.png" alt="Replitのアプリケーション名、リダイレクトURL、All APIsアクセス、クライアントシークレットの生成、トークンの有効期間が設定されたDatabricksのAdd connectionフォーム" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-configuration.png" />
+    </Frame>
+  </Step>
+
+  <Step title="OAuth認証情報を保存する">
+    **Client ID**と**Client Secret**をコピーし、組織のシークレットマネージャーに保存します。
+
+    <Warning>
+      Databricksはクライアントシークレットを一度だけ表示します。有効期限を記録し、シークレットが期限切れになる前にアプリ接続をローテーションしてください。
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/oauth-credentials-15b2e6c67309.png" alt="クライアントIDとクライアントシークレットが伏せられ、ワンタイムシークレットの警告と有効期限が表示されているDatabricksのConnection createdダイアログ" width="2000" height="1144" data-path="images/connectors/databricks/u2m/oauth-credentials.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Note>
+  新規または更新されたOAuthアプリ接続が利用可能になるまで最大30分かかる場合があります。
+</Note>
+
+### ステップ2：SQLウェアハウスの詳細を共有する
+
+各ビルダーは、U2Mコネクタを認可する際にSQLウェアハウスの詳細を入力します。社内オンボーディングページなど、ビルダーがアクセスできる場所にこれらの値を公開してください。
+
+<Steps>
+  <Step title="SQL Warehousesを開く">
+    Databricksワークスペースで**SQL Warehouses**を選択し、ビルダーが使用するウェアハウスを開きます。
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="利用可能なウェアハウスが表示されているDatabricks SQLウェアハウスページ" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="接続詳細をコピーする">
+    **Connection details**を選択し、**Server hostname**と**HTTP path**をコピーします。
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="サーバーホスト名とHTTPパスが表示されているDatabricks SQLウェアハウスの接続詳細ページ" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+### ステップ3：ReplitでU2Mを有効にする
+
+<Note>コネクタを設定するにはReplit組織管理者である必要があります。</Note>
+
+<Steps>
+  <Step title="U2Mコネクタを開いて有効にする">
+    Replitアカウントホームから**Settings**、次に**Integrations**を開きます。`Databricks U2M`を検索し、**Databricks for Databricks Apps (U2M)**を見つけて**Enable**を選択します。
+
+    Databricksアプリ接続の**Client ID**と**Client Secret**を入力します。
+
+    Replitに表示されるリダイレクトURLがDatabricksで設定されたURLと一致していることを確認します。
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    **Connector Scopes**で`all-apis`と`offline_access`を有効にします。`offline_access`スコープにより、Replitは長期セッション用のリフレッシュトークンを取得します。
+
+    **Configure**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/enable-connector-39c1eeebd230.png" alt="Databricks U2Mでフィルタリングされ、リダイレクトURL、OAuth認証情報フィールド、コネクタスコープが表示されているReplitのIntegrations設定の有効化パネル" width="2000" height="1144" data-path="images/connectors/databricks/u2m/enable-connector.png" />
+    </Frame>
+  </Step>
+
+  <Step title="コネクタが有効になっていることを確認する">
+    **Your integrations**の下に\*\*Databricks for Databricks Apps (U2M)\*\*が表示されていることを確認します。
+  </Step>
+</Steps>
+
+### ステップ4：ビルダーとしてサインインする
+
+各ビルダーは、コネクタを使用する前に自分のDatabricksアカウントでサインインします。Replitはリフレッシュトークンが期限切れになるまでセッションを更新できます。
+
+<Steps>
+  <Step title="コネクタにサインインする">
+    **Integrations**ページで**Databricks for Databricks Apps (U2M)**を見つけて**Sign in**を選択します。接続の詳細を確認し、**Continue to Databricks for Databricks Apps**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/connect-modal-8ae2c2569658.png" alt="リダイレクト、プライバシー、権限制御について説明するConnect Databricks for Databricks Appsモーダル" width="2000" height="1144" data-path="images/connectors/databricks/u2m/connect-modal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="SQLウェアハウスの詳細を入力する">
+    Databricks管理者から提供されたSQLウェアハウスの**HTTP path**を入力し、**Next**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/http-path-9e8a8a14b6ab.png" alt="2ステップ中の1で、SQLウェアハウスのHTTPパスを求めるConnect Databricks for Databricks Appsダイアログ" width="2000" height="1144" data-path="images/connectors/databricks/u2m/http-path.png" />
+    </Frame>
+
+    次に、ReplitはSQLウェアハウスの**Server hostname**を求めます。入力してDatabricksに進みます。プロンプトが表示されたらサインインし、要求されたアクセス権を確認して、リクエストを承認します。
+
+    この接続を通じてAgentが実行するすべてのクエリは、お客様のDatabricks権限を使用し、Databricksの監査ログでお客様に帰属します。
+
+    承認後、DatabricksはReplitに戻り、コネクタが使用可能になります。
+  </Step>
+</Steps>
+
+## サービスプリンシパルコネクタをセットアップする
+
+サービスプリンシパルのセットアップには3つの役割が関わります。
+
+1. **Databricks管理者**：Databricksでサービスプリンシパルを作成して権限を付与します。
+2. **Replit組織管理者**：Replitでコネクタとアクセス権を設定します。
+3. **ビルダー**：共有Databricks IDを使って構築を開始します。
+
+### サービスプリンシパルの前提条件
+
+開始する前に、以下を確認してください。
+
+* Databricksアカウント管理者またはワークスペース管理者権限。
+* Replit組織管理者権限。
+
+### ステップ1：Databricksでサービスプリンシパルを作成する
+
+<Note>
+  このステップを完了するにはDatabricksアカウント管理者またはワークスペース管理者である必要があります。
+</Note>
+
+Databricks管理者は、Replitがdatabricksへの接続に使用するマシン間のID（[サービスプリンシパル](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)と呼ばれる）を作成します。
+
+<Steps>
+  <Step title="設定を開く">
+    Databricksで、右上隅のアバターを選択し、**Settings**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/settings-menu-8f2dcd4dbee3.png" alt="Settingsが選択されているDatabricksワークスペースメニュー" width="3438" height="1984" data-path="images/connectors/databricks/settings-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="IDとアクセスを選択する">
+    Settingsサイドバーで**Identity and access**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/settings-page-2a8bcd7c22a4.png" alt="サイドバーにIdentity and accessが表示されているDatabricks設定ページ" width="3438" height="1984" data-path="images/connectors/databricks/settings-page.png" />
+    </Frame>
+  </Step>
+
+  <Step title="サービスプリンシパルを管理する">
+    **Management and permissions**の下で**Service principals**を見つけ、**Manage**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/identity-and-access-0e79404ed30f.png" alt="Service principalsのManageボタンが表示されているIDとアクセス設定ページ" width="3438" height="1984" data-path="images/connectors/databricks/identity-and-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="新しいサービスプリンシパルを追加する">
+    **Add service principal**を選択し、**Add new**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-ac5b52f21f4c.png" alt="Add newボタンのあるサービスプリンシパルの追加ダイアログ" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="サービスプリンシパルに名前を付ける">
+    サービスプリンシパルの明確な名前を入力し、**Add**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-name-897df9e5f7ac.png" alt="サービスプリンシパル名が入力されたサービスプリンシパルの追加ダイアログ" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal-name.png" />
+    </Frame>
+  </Step>
+
+  <Step title="サービスプリンシパルの詳細を確認する">
+    Databricksがサービスプリンシパルを作成した後、アクティブであることを確認します。Replitコネクタを設定中にサービスプリンシパルの詳細が必要な場合は、このページを開いたままにしておきます。
+
+    <Frame>
+      <img src="/assets/mirror/service-principal-details-15a381d388bc.png" alt="Databricksサービスプリンシパルの詳細ページ" width="3438" height="1984" data-path="images/connectors/databricks/service-principal-details.png" />
+    </Frame>
+  </Step>
+
+  <Step title="アクセスを付与する">
+    **Permissions**タブを開き、**Grant access**を選択し、サービスプリンシパルを選択して、権限を**Manage**に設定し、**Save**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/grant-access-edbaa2541a7d.png" alt="Manage権限が選択されたDatabricksサービスプリンシパルのアクセス付与ダイアログ" width="3438" height="1984" data-path="images/connectors/databricks/grant-access.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+### ステップ2：SQLウェアハウスの接続詳細を取得する
+
+Replitコネクタは、クエリを正しいコンピュートリソースにルーティングするためにDatabricks SQLウェアハウスの接続詳細が必要です。
+
+<Steps>
+  <Step title="SQLウェアハウスを開く">
+    Databricksサイドバーで**SQL Warehouses**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="利用可能なウェアハウスが表示されているDatabricks SQLウェアハウスページ" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="ウェアハウスを選択または作成する">
+    Replit Agentに使用させるSQLウェアハウスを選択します。まだウェアハウスがない場合は、**Create SQL warehouse**を選択して新しいウェアハウスを作成します。
+  </Step>
+
+  <Step title="接続詳細をコピーする">
+    ウェアハウスを開いて**Connection details**を選択します。**Server hostname**と**HTTP path**の値を見つけます。ReplitでDatabricksコネクタを作成する際にこれらの値が必要です。
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="サーバーホスト名とHTTPパスが表示されているDatabricks SQLウェアハウスの接続詳細ページ" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+### ステップ3：ReplitでDatabricksコネクタを作成する
+
+<Note>コネクタを設定するにはReplit組織管理者である必要があります。</Note>
+
+Replit管理者がDatabricksの接続詳細をReplitに追加することで、ビルダーがコネクタを使用できるようになります。
+
+<Steps>
+  <Step title="Integrationsに移動する">
+    Replitアカウントホームから**Integrations**ページを開きます。**Connectors**の下で\*\*Databricks (Service Principal)\*\*を見つけ、**Sign in**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/integrations-databricks-signin-75d3367013da.png" alt="DatabricksでフィルタリングされたReplit IntegrationsページにSign inボタン付きのDatabricks (Service Principal)コネクタが表示" width="3436" height="1978" data-path="images/connectors/databricks/integrations-databricks-signin.png" />
+    </Frame>
+  </Step>
+
+  <Step title="接続を確認する">
+    Replitは認証のためにDatabricksにリダイレクトする前に確認ダイアログを表示します。詳細を確認し、**Continue to Databricks**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/connect-databricks-intro-e842722d93ea.png" alt="OAuthリダイレクト、データ使用、権限を説明するDatabricksの接続ダイアログ" width="3436" height="1978" data-path="images/connectors/databricks/connect-databricks-intro.png" />
+    </Frame>
+  </Step>
+
+  <Step title="SQLウェアハウスのHTTPパスを入力する">
+    DatabricksのSQLウェアハウス接続詳細の**HTTP path**を貼り付け（例：`/sql/1.0/warehouses/abcdef1234567890`）、**Next**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/connector-http-path-5c8ae35516f8.png" alt="SQLウェアハウスのHTTPパスを求めるDatabricks接続ダイアログのステップ1/2" width="3436" height="1978" data-path="images/connectors/databricks/connector-http-path.png" />
+    </Frame>
+  </Step>
+
+  <Step title="SQLウェアハウスのサーバーホスト名を入力する">
+    同じ接続詳細の**Server hostname**を貼り付け（例：`abc-12345678-wxyz.cloud.databricks.com`）、**Continue to Databricks**を選択して認証を完了します。
+
+    <Frame>
+      <img src="/assets/mirror/connector-server-hostname-b97fb74713f1.png" alt="SQLウェアハウスのサーバーホスト名を求めるDatabricks接続ダイアログのステップ2/2" width="3436" height="1978" data-path="images/connectors/databricks/connector-server-hostname.png" />
+    </Frame>
+  </Step>
+
+  <Step title="アクセスを設定する">
+    ロールベースのアクセス制御を使用して、組織内のどのメンバーまたはグループがこのコネクタを使用できるかを選択します。
+  </Step>
+
+  <Step title="コネクタがアクティブであることを確認する">
+    **Integrations**ページに戻り、**Databricks (Service Principal)**が**Connectors**の下に**Active**接続ステータスで表示されていることを確認します。
+
+    <Frame>
+      <img src="/assets/mirror/integrations-page-d3e1d6b88376.png" alt="Active接続ステータスのDatabricks (Service Principal)コネクタが表示されているReplit Integrationsページ" width="1680" height="1199" data-path="images/connectors/databricks/integrations-page.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Agentで構築する
+
+いずれかの方法で接続した後、ビルダーはAgentを使用してDatabricksデータを使用したアプリケーションを作成できます。
+
+<Steps>
+  <Step title="デプロイ用にDatabricks Appテンプレートを選択する">
+    完成したアプリをDatabricks環境にデプロイしたい場合は、**Databricks App**テンプレートを選択します。設定済みのコネクタを使用してDatabricksのデータやアセットにアクセスするだけであれば、このテンプレートは不要です。
+
+    Replitホームページからテンプレートセレクターを開き、**Databricks App**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/databricks-template-cdfbbba1a2ab.png" alt="プロンプトボックスの上にDatabricks Appテンプレートが選択されているReplitホームページ" width="1200" height="400" data-path="images/connectors/databricks/u2m/databricks-template.png" />
+    </Frame>
+  </Step>
+
+  <Step title="アプリケーションを説明する">
+    事前入力された指示の後に、プロンプトを追加します。インスピレーションについては、[Databricks Dev Hubテンプレート](https://www.databricks.com/devhub/templates)をご覧ください。
+  </Step>
+
+  <Step title="レビューと反復">
+    Agentが生成するSQL、クエリするテーブル、アプリケーション構造をレビューします。自然言語で変更を依頼できます。
+  </Step>
+</Steps>
+
+## トラブルシューティング
+
+<AccordionGroup>
+  <Accordion title="クエリが空の結果を返す">
+    クエリを実行しているIDのDatabricks権限を確認してください。U2Mの場合は個々のビルダー、サービスプリンシパルコネクタの場合は共有サービスプリンシパルです。IDにはメタデータへのアクセス権はあるが、データの読み取り権限がない場合があります。必要なカタログ、スキーマ、またはテーブルの権限を付与して再試行してください。
+  </Accordion>
+
+  <Accordion title="コネクタがSQLウェアハウスに到達できない">
+    **Server hostname**と**HTTP path**の値がDatabricksのSQLウェアハウス
+    接続詳細と一致していることを確認します。U2Mの場合は、該当するビルダーが
+    入力した値を確認してください。また、ウェアハウスが実行中であり、クエリを
+    実行するIDにそれを使用する権限があることも確認してください。
+  </Accordion>
+
+  <Accordion title="認証に失敗する">
+    U2Mの場合、Databricksアプリ接続の**Redirect URLs**に、末尾にスラッシュの
+    ない`https://replit.com/connectors/oauth/callback`が記載されていることを
+    確認してください。すべてのビルダーで認証が失敗する場合は、共有のClient IDと
+    Client Secretを確認し、シークレットが期限切れになっていないことを確認し、
+    Replitのスコープが
+    Databricksアプリ接続と一致していることを確認してください。
+
+    サービスプリンシパルコネクタの場合は、Replitに入力されたサービスプリンシパルの
+    詳細がDatabricksで作成されたサービスプリンシパルと一致していることを確認して
+    ください。認証情報がローテーションされた場合は、Replitのコネクタを更新して
+    ください。
+  </Accordion>
+
+  <Accordion title="コネクタが再度サインインを求めてくる">
+    これは、U2Mでリフレッシュトークンが期限切れになったか失効した場合に発生する
+    ことがあります。Databricksの認可フローを再度完了してください。ビルダーが
+    セキュリティポリシーで求められる頻度よりも頻繁に再接続する必要がある場合は、
+    アプリ接続のトークンの有効期間を見直してください。
+  </Accordion>
+</AccordionGroup>
+
+## 関連ドキュメント
+
+* [ウェアハウスコネクタ概要](/ja/connectors/warehouses/overview)：サポートされているすべてのウェアハウスコネクタ。
+* [Snowflakeに接続](/ja/connectors/warehouses/snowflake)：Snowflakeのステップバイステップセットアップ。
+* [コネクタの管理](/ja/replitai/managing-connectors)：コネクタの管理と設定。
+* [Databricks OAuthユーザーツーマシン認可](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-u2m)：U2M OAuthに関するDatabricksドキュメント。
+* [Databricksでカスタムアプリケーション認可（OAuth）を有効にする](https://docs.databricks.com/aws/en/integrations/enable-disable-oauth)：アプリ接続に関するDatabricksドキュメント。
+* [Databricksサービスプリンシパル](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)：サービスプリンシパルに関するDatabricksドキュメント。
+* [Databricks SQLウェアハウス](https://docs.databricks.com/aws/en/compute/sql-warehouse/)：SQLウェアハウスコンピュートに関するDatabricksドキュメント。

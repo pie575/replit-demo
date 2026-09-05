@@ -1,0 +1,103 @@
+---
+title: "Add a custom domain"
+description: "Move Velocity from velocity.replit.app to velocityrentals.com."
+sidebarTitle: "Add a custom domain"
+icon: "globe"
+---
+
+import { YouTubeEmbed } from "/snippets/shared-components.mdx";
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+By the end, Velocity will live at `velocityrentals.com` instead of `velocity.replit.app`.
+
+<YouTubeEmbed videoId="rGYdyb58wJY" />
+
+You've added sign-in, a database, payments, and a calendar integration to Velocity. Now give it a URL that looks like a real rental brand. This guide moves Velocity to `velocityrentals.com` — swap in whatever domain you own.
+
+## Confirm Velocity works on the Replit URL first
+
+Don't change anything until the public `velocity.replit.app` URL is solid. Open it in a new browser tab and check:
+
+* The fleet page loads.
+* A customer can sign in, reserve a car, and see the reservation after refresh.
+* Stripe deposit checkout opens and the test card confirms the reservation.
+* The Google Calendar event lands on the booking customer's calendar.
+
+If any of those break, fix them before touching DNS. See [Troubleshoot publishing](/build/troubleshooting).
+
+## Connect velocityrentals.com in Replit
+
+Open Velocity's Publishing settings and add `velocityrentals.com` as a custom domain. Replit will show you two DNS records — copy them exactly as shown.
+
+<Frame>
+  <img src="/assets/mirror/dns-records-d64f183fa655.png" alt="The Replit custom-domain dialog inside Velocity's Publishing settings with velocityrentals.com entered and the two DNS records (an A record and a TXT verification record) ready to copy" width="1280" height="720" data-path="images/velocity/add-custom-domain/dns-records.png" />
+</Frame>
+
+Then open the dashboard at your domain provider (Namecheap, Cloudflare, Google Domains, GoDaddy, etc.) and add those exact records. If you'd like Agent to walk you through the steps for your specific provider:
+
+<AiPrompt>
+  I'm moving Velocity from velocity.replit.app to velocityrentals.com. My domain is registered at \[name your domain provider].<br />
+  Walk me through exactly which DNS records to add, in the order I should add them.<br />
+  Use the values shown in Replit — don't make up record values.<br />
+  Tell me how to check that the domain is connected before I expect it to work.
+</AiPrompt>
+
+DNS changes can take a few minutes to a few hours to apply. Replit will show "Verified" next to `velocityrentals.com` once it sees the records.
+
+## Test Velocity on velocityrentals.com
+
+Once Replit shows the domain as verified:
+
+1. Open `https://velocityrentals.com` in a new browser tab. The green padlock should appear — HTTPS is automatic.
+2. Sign in as a customer. Sign-in should still work (Replit Auth handles the new domain automatically).
+3. Reserve a car, refresh, and confirm the booking persists.
+4. Open Stripe deposit checkout. The page should now show `velocityrentals.com` as the merchant URL.
+5. Confirm the booking and check that the Google Calendar event still lands on the customer's calendar.
+
+If sign-in, checkout, or the calendar integration misbehaves only on `velocityrentals.com`, tell Agent the exact symptom:
+
+<AiPrompt>
+  Velocity works at velocity.replit.app but \[describe what's broken] on velocityrentals.com.<br />
+  Tell me whether the fix is in DNS, in Replit's settings, or in a third-party provider's settings (like Stripe or Google).<br />
+  Give me the safest next check.
+</AiPrompt>
+
+Velocity now lives at a real rental-brand URL. Share `velocityrentals.com` with customers — they won't see "replit.app" anywhere.
+
+## Improve it next
+
+<CardGroup cols={2}>
+  <Card title="Troubleshoot publishing" icon="triangle-exclamation" href="/build/troubleshooting">
+    Fix issues when the public URL doesn't work.
+  </Card>
+
+  <Card title="Domain purchasing" icon="cart-shopping" href="/build/domain-purchasing">
+    Buy velocityrentals.com through Replit if you haven't already.
+  </Card>
+</CardGroup>
+
+## Need further help?
+
+* **`velocityrentals.com` doesn't load right away:** DNS changes can take a few hours. Wait and check again before changing more settings.
+* **The Replit URL works but the custom domain doesn't:** double-check the DNS records match what Replit shows exactly — common mistakes are a trailing dot, an extra subdomain, or a stale record.
+* **Stripe checkout still says `velocity.replit.app`:** ask Agent to update the Stripe redirect URLs to use `velocityrentals.com`.
+* **You don't own a domain yet:** buy one through Replit — see [Domain purchasing](/build/domain-purchasing).
+
+## Related
+
+* [Custom domains](/features/publishing/custom-domains)
+* [Domain purchasing](/build/domain-purchasing)

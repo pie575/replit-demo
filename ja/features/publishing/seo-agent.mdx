@@ -1,0 +1,105 @@
+---
+title: "SEO Agent"
+description: "ReplitのSEO AgentでSEOの技術的な監査を公開済みアプリに対して実行し、クロール性、メタデータ、構造化データのワンクリック修正を適用しましょう。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+SEO Agentはプロジェクト全体で技術的なSEO監査を実行し、サーチエンジンやAIクローラーがアプリを見つけて理解する能力を制限している問題を洗い出します。それぞれの発見事項は、Agentと一緒に確認して適用できるワンクリック修正になります。
+
+Project Editorの**Growth**パネルにあり、すでに公開済みのアプリに対して動作します。多くのビルダーにとってのワークフローは、アプリを公開し、SEO Agentを開き、スキャンを実行し、発見事項を確認し、修正を適用するというものです。
+
+## SEO Agentの機能
+
+SEO Agentは**技術的SEO**、つまりサーチエンジンやAIクローラーがアプリをどれだけ簡単に発見し、インデックスし、理解できるかを決める、アプリの構造的で機械が読み取れる部分に注目します。
+
+プロジェクトを確認し、次のような問題への修正を提案します。
+
+* **クロール性とインデックス作成**：`robots.txt`、`sitemap.xml`、そしてクロール可能なリンクとページ構造。
+* **ページのメタデータ**：すべてのページに固有で説明的な`<title>`タグとメタディスクリプションがあること。
+* **構造化データ**：サーチエンジンがリッチリザルトを表示するのに役立つJSON-LDマークアップ。
+* **Open Graphとソーシャルタグ**：共有時にリンクのプレビュー表示を制御するメタデータ。
+* **セマンティックマークアップ**：適切な見出しの順序、ランドマーク要素、画像の説明的な`alt`テキスト。
+
+<Note>
+  SEO Agentは、構築したアプリが検索の観点から技術的に健全であることを確認しますが、
+  コンテンツを書いたり、トピックの権威性を構築したりはしません。
+</Note>
+
+## 始める前に
+
+SEO Agentを利用するには次が必要です。
+
+* **公開済みのアプリ。** SEO Agentはライブで公開されているWebデプロイメントを監査するため、まだ公開していない場合は先にアプリを公開してください。SEOをサポートするデプロイメントタイプについては、[SEOスコア](/ja/features/publishing/seo-rating)をご覧ください。
+* **有料プラン。** SEO Agentは有料プランのビルダーが利用できます。無料プランの場合、Growthパネルにアップグレードオプションが表示されます。
+
+SEO Agentにアクセスする方法は2つあります。Project Editorで**Growth**パネルを直接開くか、**Publishing**ツールでSEOスコアの隣にある**Optimize SEO with Agent**を選択すると、スキャンの準備が整った状態でGrowthパネルが開きます。
+
+## 見つけ方
+
+SEO Agentは公開済みのアプリに対して動作します。公開するまでは、**Growth**パネルはロックされ、**Go to Publishing**が表示されます。
+
+<Frame caption="公開する前は、Go to PublishingプロンプトでGrowthパネルがロックされています">
+  <img src="/assets/mirror/01-growth-locked-b05c24711f10.png" alt="「アプリを公開してGrowthツールをアンロックする」という見出しとGo to Publishingボタンが表示された、ロック状態のGrowthパネル" width="1657" height="947" data-path="images/deployments/seo-agent/01-growth-locked.png" />
+</Frame>
+
+アプリを公開すると、Growthパネルの**SEO Rating**カードに現在のスコアと**Run scan with Agent**ボタンが表示されます。
+
+<Frame caption="公開後、SEO RatingカードにRun scan with Agentボタンが表示されます">
+  <img src="/assets/mirror/02-run-scan-94a2b8918fe9.png" alt="Run scan with Agentボタンを赤い枠でハイライトした、SEO Ratingカードの拡大表示" width="1656" height="946" data-path="images/deployments/seo-agent/02-run-scan.png" />
+</Frame>
+
+スキャンの実行、修正の適用、変更のマージまでの完全なステップバイステップガイドは、[アプリのSEOを改善する](/ja/build/improve-seo)をご覧ください。
+
+<Tip>
+  ソーシャルプラットフォームで共有された際のアプリのプレビュー表示を制御するには、
+  [カスタムドメイン](/ja/build/add-custom-domain)を接続して再公開してください。ソーシャルや
+  リンクのプレビューはアプリの公開済み本番URLを使用するため、公開済みのカスタムドメインが
+  あれば正確なプレビューが得られます。
+</Tip>
+
+## SEO AgentとSEOスコア
+
+SEO Agentの隣に表示される**SEOスコア**は、公開ごとに実行される自動[Lighthouse監査](/ja/features/publishing/seo-rating)から算出され、アプリをHealthy、Needs Work、Weakのいずれかで評価します。このスコアは\_アプリの現状\_を示すものです。
+SEO Agentは問題をスキャンして修正を適用することで、\_それを改善\_する手助けをします。修正後に再公開すると、スコアが更新されます。
+
+スキャンのUIを完全にスキップして、Agentに直接依頼することもできます。
+
+<AiPrompt>
+  Audit my site for SEO best practices and apply the fixes. Add a sitemap,
+  robots.txt, Open Graph tags, structured data where it makes sense, and make
+  sure every page has a unique title and meta description.
+</AiPrompt>
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="SEOスコア" icon="magnifying-glass-chart" href="/ja/features/publishing/seo-rating">
+    LighthouseによるSEOスコアの算出方法、各スコアの意味、対応するデプロイメントタイプを確認できます。
+  </Card>
+
+  <Card title="アプリのSEOを改善する" icon="chart-line-up" href="/ja/build/improve-seo">
+    アプリを公開し、スコアを確認し、SEOを最適化するためのステップバイステップガイドです。
+  </Card>
+
+  <Card title="カスタムドメインを追加する" icon="globe" href="/ja/build/add-custom-domain">
+    アプリを独自のドメインに移行し、正確なソーシャルプレビューとより強力な検索シグナルを得ましょう。
+  </Card>
+
+  <Card title="Static Deployments" icon="file-code" href="/ja/features/publishing/deployment-types#static">
+    コンテンツが多く、SEOが重要なサイトに最適なデプロイメントタイプです。
+  </Card>
+</CardGroup>

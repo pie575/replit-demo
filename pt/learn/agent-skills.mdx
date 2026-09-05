@@ -1,0 +1,176 @@
+---
+title: "Agent Skills"
+description: "Entenda quando e como usar Agent Skills — padrões proativos vs. reativos, ser seletivo, segurança e como as Skills diferem dos servidores MCP."
+sidebarTitle: "Agent Skills"
+icon: "puzzle-piece"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Skills ensinam o Agent novas capacidades. Elas permitem que você compartilhe sua experiência, padrões preferidos e conhecimento especializado com o Agent para que ele produza resultados melhores e mais consistentes.
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="Master Agent Skills: The game-changing framework for AI-assisted development" />
+
+## Por que Skills são importantes
+
+Toda vez que você constrói com o Agent, você cria contexto útil: soluções para problemas, decisões de design, preferências de framework. Mas esse contexto desaparece quando o chat termina. Skills preservam isso.
+
+Uma Skill de animação GSAP ensina o Agent como usar uma biblioteca específica corretamente. Uma Skill de sistema de design garante que ele aplique suas cores exatas e regras de espaçamento. Uma Skill de correção de bugs captura uma solução para que o Agent não repita o mesmo erro. Tarefas que antes eram inconsistentes se tornam confiáveis.
+
+Skills também são um [padrão aberto](https://agentskills.io/specification). Elas funcionam com qualquer agente, incluindo o Replit Agent, para que você possa carregá-las entre ferramentas.
+
+## Skills proativas vs. reativas
+
+Um framework para pensar sobre quando e como criar Skills. Entender ambos os padrões torna você mais eficaz.
+
+### Skills proativas
+
+Skills proativas são aquelas que você adiciona *antes* de começar a construir. Pesquise as bibliotecas ou padrões que você quer usar, encontre ou crie Skills para eles e, em seguida, comece a fazer prompts.
+
+**Exemplo:** Antes de construir um site de portfólio com animações SVG desenhadas à mão, pesquise bibliotecas de animação e encontre o GSAP. Instale uma Skill GSAP React e, em seguida, faça um prompt ao Agent para construir as animações. O Agent tem o conhecimento especializado que precisa desde o início — ele entende a API da biblioteca, melhores práticas e padrões comuns. Sem a Skill, ele pode produzir algo genérico ou incorreto.
+
+Esse padrão funciona bem quando:
+
+* Você está usando uma biblioteca popular mas com padrões nuançados que o Agent pode não acertar sozinho
+* Você quer escolhas de design consistentes em todo o projeto (tipografia, espaçamento, estilo de animação)
+* Você está iniciando um projeto e já sabe a direção técnica
+
+### Skills reativas
+
+Skills reativas são aquelas que você cria *após* resolver um problema. Você encontra um problema, o depura com o Agent, corrige e, em seguida, captura a solução para que não aconteça novamente.
+
+**Exemplo:** Enquanto constrói um Canvas para um app mobile, você nota bordas irregulares em imagens que pioram ao fazer zoom. Depurar com o Agent revela que isso é aliasing de minificação — um problema de renderização onde as imagens ficam piores à medida que encolhem, de forma contraintuitiva. Após implementar uma correção, peça ao Agent para criar uma Skill:
+
+<AiPrompt>
+  Create a skill that captures what we just learned about fixing minification aliasing. Include the root cause, the solution, and when this issue typically occurs so you can prevent it in the future.
+</AiPrompt>
+
+O Agent usa o histórico da conversa para escrever uma Skill específica do projeto. Da próxima vez que o problema surgir, você pode apontar o Agent para a Skill em vez de depurar do zero.
+
+Esse padrão funciona bem quando:
+
+* Você corrigiu um bug não óbvio e quer evitar que ele ocorra novamente
+* Você aprendeu algo sobre a arquitetura do seu app durante uma sessão de depuração
+* Você quer codificar uma solução que levou um esforço significativo para descobrir
+
+## Sendo seletivo com Skills
+
+Pense nas Skills como instruções que você daria a um amigo para encontrar seu apartamento. Uma lista direcionada de instruções funciona. Um fichário cheio de documentação não funciona — ninguém tem tempo para ler isso, e os detalhes importantes se perdem.
+
+O mesmo se aplica ao Agent. Se você adicionar muitas Skills, o Agent pode ficar confuso. Seja deliberado sobre quais Skills você ativa para um determinado projeto e remova as que você não precisa mais.
+
+<Note>
+  Skills funcionam melhor quando capturam padrões específicos e repetíveis em vez de orientação geral. Foque em fluxos de trabalho concretos, convenções estabelecidas e soluções comprovadas.
+</Note>
+
+## Criando skills de qualidade
+
+As skills podem ser complexas e intrincadas. Alguns princípios as mantêm eficazes:
+
+* **Descreva o caminho feliz.** Diga ao Agent como fazer a coisa certa. Se você se pegar listando o que *não* fazer, geralmente é um sinal de que deve reenquadrar toda a abordagem.
+* **Use scripts sempre que puder.** Um script determinístico tira a necessidade de raciocínio do Agent e é mais confiável do que pedir que ele percorra as mesmas etapas toda vez.
+* **Referencie outros arquivos.** Estruture uma skill para que aponte para outros arquivos Markdown, e o Agent carrega apenas os necessários para a tarefa em questão.
+* **Faça benchmarks regularmente.** Essa é a forma de confirmar que uma skill realmente funciona, em vez de supor que sim.
+* **Escreva-as você mesmo.** O objetivo é contexto conciso e deliberado, e você chega lá escrevendo skills à mão em vez de gerá-las em massa. O Agent pode ajudá-lo a rascunhar uma, mas refine-a você mesmo para que cada linha justifique seu espaço.
+* **Mantenha-as específicas.** Não crie skills genéricas para limpeza de código ou segurança — essas já vêm com o Agent. Suas skills devem capturar coisas específicas a você ou à sua organização.
+
+A maioria das skills falha de formas diagnosticáveis:
+
+* **Uma skill é acionada quando não deveria.** A descrição é ampla demais. Restrinja-a e diga quando *não* usá-la — "não para posts de blog ou documentação de ajuda" costuma ser mais útil do que qualquer instrução positiva.
+* **Uma skill é acionada, mas o resultado está errado.** As instruções são genéricas demais. Substitua orientações vagas como "deixe profissional" por regras específicas: nomes exatos, requisitos concretos, coisas explícitas a evitar.
+* **Duas skills conflitam.** Corrija as descrições para que as duas não sejam acionadas pela mesma tarefa. Conflitos são quase sempre um problema de escopo, não de instruções.
+
+Skills ficam desatualizadas, então trate-as como documentação que você realmente mantém.
+
+## Levando skills para todo o workspace
+
+Tudo até agora se aplica a skills em um único projeto. Em uma equipe, você também pode personalizar o Agent para todo o seu workspace, para que todos comecem pelas mesmas convenções sem precisar reexplicá-las em cada projeto. A personalização do workspace tem duas partes:
+
+* **Instruções personalizadas** — regras sempre ativas injetadas no contexto do Agent em cada projeto e cada mensagem, antes que alguém digite um prompt. Reserve-as para as poucas regras verdadeiramente universais, como "nunca armazene credenciais em texto simples." Como são carregadas a cada turno, cada palavra gasta parte do orçamento de contexto do Agent — mantenha-as curtas.
+* **Skills de workspace** — as mesmas skills descritas acima, disponibilizadas para todos no workspace e gerenciadas centralmente. Elas permanecem quase gratuitas até que uma tarefa relevante as invoque, então você pode oferecer muitas sem degradar a saída.
+
+Uma maneira simples de decidir o que vai para onde: se uma regra deve valer independentemente do que alguém estiver construindo, é uma instrução personalizada; se só importa para um determinado tipo de tarefa, é uma skill.
+
+Para saber como configurar instruções personalizadas e skills de workspace, e quem pode gerenciá-las, consulte [Personalização do Agent](/pt/features/agent/agent-customization).
+
+## Considerações de segurança
+
+Skills do painel de Skills do Replit são auditadas para segurança. Mas Skills podem ser instaladas de qualquer lugar — elas vêm de um [repositório de código aberto](https://github.com/vercel-labs/skills) onde qualquer pessoa pode contribuir.
+
+Como Skills são instruções que o Agent segue, uma Skill maliciosa poderia dizer ao Agent para exfiltrar dados sensíveis do seu projeto. Antes de instalar qualquer Skill de uma fonte externa:
+
+1. **Abra o arquivo.** Skills são apenas Markdown. Leia o conteúdo em `/.agents/skills/` antes de usá-las.
+2. **Verifique a fonte.** Confirme que a Skill vem de um repositório ou autor confiável.
+3. **Revise o que instrui.** Certifique-se de que a Skill não faz referência a URLs externas suspeitas ou solicita informações sensíveis.
+
+<Warning>
+  Sempre revise Skills de fontes externas antes de instalá-las. Skills no painel de Skills do Replit foram auditadas, mas Skills instaladas via CLI ou copiadas da internet não foram.
+</Warning>
+
+## Skills vs. servidores MCP
+
+Skills e servidores MCP são as duas principais formas de estender agentes, e servem a propósitos diferentes.
+
+**Skills** são eficientes em contexto. Apenas uma breve descrição é carregada até que a Skill seja invocada. Use Skills para:
+
+* Fluxos de trabalho e convenções ("como implantar", "checklist de revisão de código")
+* Materiais de referência (padrões de API, guias de estilo, sistemas de design)
+* Prompts reutilizáveis e conhecimento especializado (bibliotecas de animação, padrões de framework)
+
+**Servidores MCP** são pesados em contexto. Todas as descrições de ferramentas são carregadas antecipadamente, o que pode degradar a qualidade da saída se você adicionar muitos. Use servidores MCP para:
+
+* Conectar a serviços externos (Notion, Linear, Figma)
+* Ações que precisam de acesso à API
+* Ferramentas que *fazem* coisas, não apenas instruem
+
+A distinção principal: Skills definem *como* seu agente deve funcionar. Servidores MCP definem *o que* seu agente pode acessar. Ambos funcionam para agentes de codificação como o Replit Agent e para agentes que você constrói por conta própria.
+
+## Próximos passos
+
+<CardGroup cols={2}>
+  <Card title="Personalização do Agent" icon="sliders" href="/pt/features/agent/agent-customization">
+    Configure instruções personalizadas e skills de workspace para toda a sua equipe.
+  </Card>
+
+  <Card title="Usar uma Skill" icon="puzzle-piece" href="/pt/build/use-agent-skills">
+    Anexe uma Skill a uma mensagem, instale uma no seu projeto ou inicie um novo projeto a partir de uma.
+  </Card>
+
+  <Card title="Referência de Agent Skills" icon="book" href="/pt/features/agent/skills">
+    Detalhes técnicos sobre estrutura de Skills e como as Skills funcionam internamente.
+  </Card>
+
+  <Card title="Servidores MCP no Replit" icon="server" href="/pt/features/mcp/overview">
+    Conecte o Agent a serviços e ferramentas externos via Model Context Protocol.
+  </Card>
+
+  <Card title="Prompts eficazes" icon="wand-magic-sparkles" href="/pt/learn/effective-prompting">
+    Escreva instruções mais claras para que o Agent chegue mais perto na primeira tentativa.
+  </Card>
+</CardGroup>

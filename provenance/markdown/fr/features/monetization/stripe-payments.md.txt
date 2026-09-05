@@ -1,0 +1,262 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Intégration Stripe Payments
+
+> Apprenez à ajouter des paiements et des abonnements à votre application avec Stripe en utilisant Agent.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Note>
+  L'intégration Stripe est disponible uniquement sur les plans payants ([Core](/fr/billing/plans/replit-core) et [Pro](/fr/billing/plans/replit-pro)). Elle n'est pas disponible sur le plan gratuit [Starter](/fr/billing/plans/starter-plan)—Agent vous invite à effectuer une mise à niveau lorsqu'il propose le connecteur.
+</Note>
+
+## Ce que vous pouvez créer
+
+Utilisez Agent pour ajouter Stripe à votre application en un clic — aucune configuration requise. Créez une boutique, acceptez des paiements uniques ou mettez en place des abonnements. Agent configure l'intégration, les modèles de données et l'environnement de test.
+
+## Comment ça fonctionne
+
+Agent commence avec un bac à sable Stripe pour que vous puissiez tester les paiements en toute sécurité sans traiter de vrais montants. Vous pouvez créer et essayer des flux immédiatement. Lorsque vous êtes prêt, passez à votre compte Stripe en production pour publier et accepter de vrais paiements.
+
+<Info>
+  Un bac à sable Stripe est un environnement de test isolé où vous pouvez simuler
+  des paiements, des abonnements et des événements. En savoir plus dans
+  [la documentation Stripe sur les bacs à sable](https://docs.stripe.com/sandboxes).
+</Info>
+
+## Utiliser Stripe avec votre équipe
+
+Stripe fonctionne dans les espaces de travail collaboratifs, afin que toute votre équipe puisse créer, tester et monétiser la même application ensemble. Tous les membres de l'espace de travail peuvent travailler avec le compte Stripe connecté, plutôt qu'une seule personne qui développe les paiements seule.
+
+## Démarrer
+
+* **Demandez à Agent d'utiliser Stripe**
+  * Utilisez une commande slash sur l'écran d'accueil et sélectionnez Stripe, ou demandez directement :
+    <AiPrompt>Build a storefront and integrate Stripe for payments</AiPrompt>
+
+<Note>
+  L'intégration Stripe nécessite une application avec une fonctionnalité backend. Sélectionnez **App** sur la page d'accueil pour commencer.
+</Note>
+
+## Tester les paiements dans le bac à sable
+
+1. Ouvrez la **Preview** de votre application dans un nouvel onglet.
+2. Effectuez un achat de test depuis votre boutique ou page de paiement.
+3. Utilisez la carte de test standard de Stripe :
+
+```text theme={null}
+Card number: 4242 4242 4242 4242
+Expiry: any future date
+CVC: any 3 digits
+Name, address: any mock values
+```
+
+<Tip>
+  Les achats dans le bac à sable ne transitent pas par de vrais réseaux ni ne déplacent de l'argent. Ils sont
+  sûrs pour des tests de bout en bout.
+</Tip>
+
+## Gérer les produits et les tarifs
+
+Vous avez deux options :
+
+1. Depuis votre application, sélectionnez **Publier**, puis choisissez de revendiquer votre bac à sable Stripe.
+   * Si vous n'avez pas encore de compte Stripe, créez-en un pour revendiquer le bac à sable.
+2. Dans le tableau de bord Stripe, ouvrez **Produits** pour ajouter ou modifier des produits et des prix.
+   Les modifications effectuées dans le bac à sable Stripe se reflètent automatiquement dans votre application Replit
+   et se synchronisent avec la base de données de votre application.
+
+### Afficher les données Stripe synchronisées
+
+* Dans le Project Editor, ouvrez **Database**.
+* Sélectionnez **MyData**.
+* Changez le sélecteur de schéma sur **Stripe** pour voir les objets de paiement et les
+  enregistrements associés.
+
+## Mise en ligne
+
+Pour accepter de vrais paiements, connectez votre compte Stripe en production en installant l'application
+[Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments)
+depuis le Stripe Marketplace. Le processus d'installation connecte automatiquement votre compte en production — vous n'avez pas besoin de copier ou coller des clés API.
+
+<Warning>
+  Votre intégration de bac à sable n'est pas prête pour la production. Elle ne peut pas accepter de
+  vrais paiements tant que vous n'avez pas complété les étapes ci-dessous.
+</Warning>
+
+<Steps>
+  <Step title="Ouvrir le panneau Publier">
+    Dans votre application, sélectionnez **Publier** pour lancer le processus de connexion en production.
+  </Step>
+
+  <Step title="Installer l'application Replit Integrated Payments">
+    Sélectionnez **Installer l'application Stripe**. Une fenêtre Stripe s'ouvre avec la liste
+    [Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments).
+
+    Lorsque Stripe vous invite à choisir un compte, sélectionnez votre compte Stripe **en production** — pas un bac à sable ou un compte de test.
+  </Step>
+
+  <Step>
+    Suivez les instructions de Stripe pour installer l'application. Si votre compte en production
+    n'est pas encore activé, Stripe vous guide d'abord à travers la vérification KYB (Know Your
+    Business).
+
+    Gardez la fenêtre Stripe ouverte jusqu'à la fin de l'installation.
+    Replit finalise la connexion de production en arrière-plan une fois que
+    Stripe confirme l'installation.
+  </Step>
+
+  <Step title="Publier votre application">
+    Revenez dans Replit. Le panneau **Publier** affiche votre compte Stripe en production comme connecté. Publiez votre application pour commencer à accepter de vrais paiements.
+  </Step>
+</Steps>
+
+<Note>
+  L'installation de l'application Replit Integrated Payments remplace l'ancien flux manuel
+  consistant à copier les clés Publiable et Secrète dans Replit. L'application configure
+  vos clés de production pour vous et maintient la synchronisation bac à sable vers production.
+</Note>
+
+## Gérer l'intégration
+
+* Allez dans **Intégrations > Stripe** pour ouvrir le connecteur Stripe.
+* De là, vous pouvez tester la connexion, afficher le statut et gérer les paramètres.
+
+## Questions fréquentes
+
+### Comment mettre à jour les prix de mes produits ?
+
+* Demandez à Agent : Décrivez le changement et Agent met à jour votre application et les objets Stripe.
+* Utilisez le tableau de bord Stripe : Ouvrez **Produits** pour modifier les prix et les détails des produits.
+  * Dans le bac à sable, les modifications se synchronisent automatiquement avec votre application et votre base de données.
+  * Pour la production, passez d'abord à votre compte en production, puis mettez à jour les prix. Publiez à nouveau si votre application doit récupérer une nouvelle configuration.
+
+### Comment tester les transactions sur Replit ?
+
+Ouvrez la **Preview** de votre application dans un nouvel onglet. Exécutez le flux Stripe Checkout avec la
+carte de test standard (4242 4242 4242 4242), une date d'expiration future quelconque et un CVC quelconque. Voir
+[Tester les paiements dans le bac à sable](#test-payments-in-the-sandbox) ci-dessus pour plus de détails.
+
+### Qu'est-ce qu'un compte Stripe en production ?
+
+Un compte Stripe en production est un compte activé et vérifié qui peut traiter de vrais
+paiements en utilisant vos informations commerciales. Consultez les conseils de Stripe sur la création et l'activation de compte : [Créer et gérer votre compte Stripe](https://docs.stripe.com/get-started/account).
+
+### Dois-je encore coller mes clés API Stripe ?
+
+Non. L'application Replit Integrated Payments installe vos clés de production pour vous
+lorsque vous connectez votre compte Stripe en production. Vous n'avez pas besoin de copier les clés en production
+depuis le tableau de bord Stripe.
+
+Si vous avez précédemment connecté Stripe en collant des clés en production, cette connexion
+continue de fonctionner. Vous pouvez passer au flux d'installation de l'application Stripe en supprimant
+la connexion Stripe et en vous reconnectant depuis le panneau **Publier**. Voir
+[Mettre à jour ou supprimer la connexion Stripe](#update-or-remove-the-stripe-connection)
+ci-dessous.
+
+## Mettre à jour ou supprimer la connexion Stripe
+
+Si vous n'êtes pas prêt à publier avec une connexion Stripe en production, vous avez deux
+options :
+
+### Option A : Supprimer manuellement l'intégration Stripe
+
+Vous pouvez complètement supprimer l'intégration Stripe de votre projet.
+
+<Steps>
+  <Step title="Ouvrir l'onglet Intégrations">
+    Accédez à votre application Replit et sélectionnez l'onglet **Intégrations** en haut. Sous **Connecteurs**, trouvez **Stripe** et sélectionnez **Gérer**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-1-integrations.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=6c13ffeb8b367ec950a48d264540f967" alt="Onglet Intégrations affichant les Connecteurs avec l'intégration Stripe et un bouton Gérer" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Développer vos clés API">
+    Sélectionnez le chevron pour développer vos **Clés API Sandbox** et **Clés API du compte en production**, puis sélectionnez **Modifier**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-2-edit-keys.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=60bbac9e871e84e28171ec9bfa22b28d" alt="Clés API du bac à sable Stripe et du compte en production développées avec des boutons Modifier" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Déconnecter votre compte">
+    Sélectionnez **Déconnecter le compte** pour supprimer la connexion Sandbox et **Déconnecter le compte en production** pour supprimer la connexion en production.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-3-disconnect.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=576034d8d4380747c4f8c5ccdc41c652" alt="Clés API du bac à sable Stripe et du compte en production avec les boutons Déconnecter le compte et Déconnecter le compte en production" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Demander à Agent de supprimer le code Stripe">
+    Allez dans le chat Agent et demandez à Agent de supprimer le code du connecteur Stripe de votre application. Cela supprimera toute votre intégration Stripe.
+  </Step>
+</Steps>
+
+### Option B : Revenir à un checkpoint avant l'intégration Stripe
+
+Si vous souhaitez annuler complètement l'intégration Stripe et revenir à un état précédent, vous pouvez revenir à un checkpoint antérieur.
+
+<Steps>
+  <Step title="Ouvrir l'onglet Intégrations">
+    Accédez à votre application Replit et sélectionnez l'onglet **Intégrations** en haut. Sous **Connecteurs**, trouvez **Stripe** et sélectionnez **Gérer**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-1-integrations.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=6c13ffeb8b367ec950a48d264540f967" alt="Onglet Intégrations affichant les Connecteurs avec l'intégration Stripe et un bouton Gérer" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Développer vos clés API">
+    Sélectionnez le chevron pour développer vos **Clés API Sandbox** et **Clés API du compte en production**, puis sélectionnez **Modifier**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-2-edit-keys.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=60bbac9e871e84e28171ec9bfa22b28d" alt="Clés API du bac à sable Stripe et du compte en production développées avec des boutons Modifier" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Déconnecter votre compte">
+    Sélectionnez **Déconnecter le compte** pour supprimer la connexion Sandbox et **Déconnecter le compte en production** pour supprimer la connexion en production.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-3-disconnect.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=576034d8d4380747c4f8c5ccdc41c652" alt="Clés API du bac à sable Stripe et du compte en production avec les boutons Déconnecter le compte et Déconnecter le compte en production" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Trouver un checkpoint avant l'intégration Stripe">
+    Allez dans le chat Agent et recherchez un checkpoint créé avant l'intégration Stripe. Sélectionnez l'**icône d'horloge** en haut à gauche du panneau de chat pour afficher l'historique des conversations plus anciennes.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/YElKpLz4AJkoRVnw/images/replitai/stripe-rollback-5-clock-icon.png?fit=max&auto=format&n=YElKpLz4AJkoRVnw&q=85&s=5a8e86892fea6061d3af970dd6499a32" alt="Icône d'horloge pour afficher l'historique des conversations et les checkpoints" width="56" height="50" data-path="images/replitai/stripe-rollback-5-clock-icon.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Sélectionner Revenir ici">
+    Une fois que vous avez trouvé un checkpoint satisfaisant, sélectionnez **Revenir ici** pour restaurer votre projet à cet état.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/YElKpLz4AJkoRVnw/images/replitai/stripe-rollback-6-checkpoint.png?fit=max&auto=format&n=YElKpLz4AJkoRVnw&q=85&s=a48d19624a6740286ff9f004c302547d" alt="Checkpoint avec le bouton Revenir ici" width="904" height="202" data-path="images/replitai/stripe-rollback-6-checkpoint.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Notes et limitations
+
+* L'activité dans le bac à sable n'affecte pas les soldes ou les clients réels.
+* Certaines fonctionnalités Stripe ne peuvent pas être testées dans les bacs à sable (par exemple, les prix IC+
+  et certains flux Connect). Voir
+  [les limitations du bac à sable Stripe](https://docs.stripe.com/sandboxes).

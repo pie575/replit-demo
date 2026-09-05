@@ -1,0 +1,220 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Tokens de Acesso Externo
+
+> Permita que pipelines de CI, webhooks e outros serviços automatizados acessem seu app privado do Replit sem precisar fazer login.
+
+Os tokens de acesso externo são bearer tokens que você cria para um Replit App específico.
+Eles permitem que serviços automatizados — pipelines de CI, webhooks, verificadores de status de uptime, bots do Slack,
+scripts internos — acessem o app mesmo quando sua URL está bloqueada por
+[uma URL de Dev Privada](/pt/features/publishing/private-deployments)
+ou por um [Private Deployment](/pt/features/publishing/private-deployments).
+
+Trate cada token como uma senha: qualquer pessoa que o possua pode acessar seu app até que o token expire ou seja revogado.
+
+<Note>
+  Os tokens de acesso externo estão disponíveis quando você seleciona acesso
+  privado para um deployment. Não é necessária nenhuma adesão do workspace. Em
+  um workspace Enterprise, apenas administradores do workspace podem
+  gerenciar tokens.
+</Note>
+
+## Quando usar um token
+
+Use um token de acesso externo quando algo *fora* do seu navegador precisar chamar seu Replit App privado. Casos comuns:
+
+* Um workflow do GitHub Actions que executa um smoke test na sua URL de dev a cada commit.
+* Um monitor de uptime (Better Stack, Pingdom, UptimeRobot) acessando um endpoint de saúde no seu app publicado.
+* Um receptor de webhook — Stripe, Slack, GitHub — enviando um POST para um Private Deployment.
+* Uma chamada `curl` ou `fetch` da máquina de um colega de equipe durante a depuração.
+
+Os tokens de acesso externo são projetados para **tráfego de API**, não para abrir páginas de interface no navegador. Aplicações de página única (Vite, Next.js, etc.) carregam bundles de JavaScript em requisições subsequentes que não transportarão o seu token, fazendo com que essas requisições falhem. Para navegação interativa, faça login normalmente.
+
+## Ambientes de tokens
+
+Cada token está vinculado a um ambiente:
+
+| Ambiente      | Onde funciona                                                            | Para usar                                                   |
+| :------------ | :----------------------------------------------------------------------- | :---------------------------------------------------------- |
+| `Development` | A URL de dev do workspace do app (`*.replit.dev`)                        | Acessar um Repl em execução durante o desenvolvimento       |
+| `Production`  | O deployment publicado do app (`*.replit.app` e domínios personalizados) | Acessar um Private Deployment a partir de serviços externos |
+
+Um token `Production` sobrevive a uma republicação, incluindo a publicação de
+uma nova versão. O Replit o revoga quando você:
+
+* Remove a publicação do deployment.
+* Exclui o deployment.
+* Altera o acesso do app de privado para público.
+
+Um token também deixa de funcionar quando expira ou quando você o revoga.
+
+## Criar um token de acesso externo
+
+<Steps>
+  <Step>
+    Abra o app que deseja expor e, em seguida, abra a ferramenta **Publishing**.
+  </Step>
+
+  <Step>
+    Selecione **Adjust settings** para expandir as opções de republicação.
+  </Step>
+
+  <Step>
+    Na seção **Security**, localize **External access tokens**.
+  </Step>
+
+  <Step>
+    Selecione **Create access token** e preencha:
+
+    * **Label** (opcional): um nome curto para identificar o token posteriormente,
+      como `CI` ou `Stripe webhook`. Máximo de 120 caracteres.
+    * **Environment**: escolha `Development` ou `Production` conforme onde o
+      serviço chamador precisa acessar o app.
+    * **Expires after**: escolha um tempo de vida — `1 hour`, `24 hours`, `7 days`,
+      `30 days`, `3 months`, `1 year` ou `5 years`. Escolha a janela mais curta
+      que atenda à necessidade. Não há opção "nunca expira".
+  </Step>
+
+  <Step>
+    Selecione **Create**.
+  </Step>
+</Steps>
+
+O Replit exibe o token **uma única vez**. Copie-o agora — depois que você fechar o diálogo, não há como ver o token novamente. Se você o perder, revogue esse token e crie um novo.
+
+A tela de exibição oferece duas ações de cópia:
+
+* **Copy query parameter** — copia `?project-protection-bypass=<token>` para
+  ser adicionado a uma URL. Útil para verificações rápidas com `curl`.
+* **Copy token only** — copia o token bruto, adequado para enviar em um
+  cabeçalho `Authorization: Bearer`.
+
+<Info>
+  Criar o primeiro token ativa automaticamente o acesso externo para o app, caso
+  ainda não esteja ativo. Sem proteção, o token não teria nada a contornar.
+</Info>
+
+## Usar um token
+
+Apresente o token de uma das duas formas:
+
+### Cabeçalho Authorization (recomendado)
+
+```bash theme={null}
+curl -H "Authorization: Bearer <token>" https://your-app.replit.app/health
+```
+
+Esta é a escolha certa para quase tudo — webhooks, scripts de CI,
+chamadas backend para backend. O token nunca aparece em logs que capturam URLs
+e nunca fica no histórico do navegador.
+
+### Parâmetro de consulta
+
+```bash theme={null}
+curl "https://your-app.replit.app/health?project-protection-bypass=<token>"
+```
+
+Use a forma de parâmetro de consulta somente quando não for possível definir cabeçalhos — por exemplo, em um
+serviço que aceita apenas uma URL. URLs com tokens costumam acabar em logs de proxy,
+histórico do shell e capturas de tela, então prefira o cabeçalho sempre que possível.
+
+## Gerenciar tokens existentes
+
+A seção **External access tokens** lista todos os tokens que você criou para
+o app — do mais recente ao mais antigo — junto com o rótulo, o ambiente, a data de criação,
+a validade e o status de revogação. Os últimos caracteres do token são exibidos
+em cada linha para ajudar a diferenciá-los, já que o valor completo só é exibido
+no momento da criação.
+
+Você só vê os tokens que *você* criou. Os tokens de outros colaboradores são privados
+para eles, mesmo que você seja o proprietário do app.
+
+## Revogar um token
+
+Revogue um token sempre que ele não for mais necessário, ou assim que suspeitar que
+ele pode ter sido exposto. Para revogar:
+
+<Steps>
+  <Step>
+    Abra a seção **External access tokens** nas configurações de publicação do app.
+  </Step>
+
+  <Step>
+    Localize o token na lista e selecione o ícone de lixeira.
+  </Step>
+
+  <Step>
+    Confirme a revogação.
+  </Step>
+</Steps>
+
+A revogação é **imediata e irreversível**. Qualquer tráfego que ainda use o
+token começa a ser rejeitado em segundos. Se precisar de acesso novamente, crie um
+novo token.
+
+Você só pode revogar os tokens que criou. Remover um colaborador do
+workspace revoga automaticamente os tokens que ele criou para esse app.
+
+## Mantenha seus tokens seguros
+
+Os tokens de acesso externo são credenciais. Trate-os com o mesmo cuidado que
+você daria a uma chave de API ou senha.
+
+### O que fazer
+
+* **Armazene tokens em um gerenciador de secrets** — secrets do GitHub Actions, o cofre do seu
+  fornecedor de CI, o armazenamento de secrets do provedor de nuvem ou um gerenciador de senhas.
+  Nunca os confirme em um repositório.
+* **Use tempos de vida curtos** quando possível. Um token de 7 dias para uma
+  integração pontual é mais seguro do que um token de 5 anos deixado por aí.
+* **Rotule cada token** para que você saiba para que serve e se ainda está em uso. Tokens sem rótulo são os primeiros a vazar e os últimos a ser revogados.
+* **Crie um token separado por consumidor.** Um token por job de CI, um por
+  fonte de webhook, um por verificação de uptime. Quando algo for comprometido — ou
+  um fornecedor não for mais necessário — você revoga apenas aquele.
+* **Prefira o cabeçalho `Authorization`** em vez de parâmetros de consulta para evitar que o token
+  vaze por logs de URL, histórico do navegador ou cabeçalhos de referência.
+* **Revogue imediatamente** se um token puder ter sido exposto — um log vazado,
+  um commit em repositório público, uma gravação de tela, o laptop de um ex-funcionário.
+  A revogação tem efeito imediato; crie um substituto depois.
+
+### O que não fazer
+
+* **Não compartilhe um token entre colegas de equipe ou serviços.** Se dois sistemas compartilham
+  um token, você não pode revogar um sem quebrar o outro.
+* **Não cole tokens em chat, e-mail, capturas de tela ou rastreadores de issues.**
+  Esses canais são arquivados, indexados e compartilhados de formas que você não pode prever.
+* **Não incorpore tokens em código do lado do cliente** — apps de navegador, apps móveis,
+  binários desktop. Qualquer coisa entregue ao dispositivo de um usuário deve ser considerada pública.
+* **Não confie em tokens para sessões do navegador.** Tokens funcionam para chamadas de API,
+  não para carregar SPAs em uma aba do navegador. Use um login normal do Replit para isso.
+* **Não escolha uma validade de 5 anos por padrão.** Ajuste o tempo de vida a quanto tempo
+  o consumidor realmente precisa de acesso.
+
+## Solução de problemas
+
+<Accordion title="Meu token de produção parou de funcionar de repente">
+  Os tokens de produção permanecem válidos em republicações normais. Verifique
+  se o token expirou ou se você o revogou. Verifique também se você removeu a
+  publicação, excluiu o deployment ou alterou o app de privado para público.
+  Se o app não tiver mais um deployment privado, publique-o novamente como
+  privado. Em seguida, crie um novo token. Não é possível restaurar um token
+  expirado ou revogado.
+</Accordion>
+
+<Accordion title="Meu token funciona com `curl`, mas o navegador ainda mostra a página de login">
+  Os tokens de acesso externo são destinados ao tráfego de API, não a sessões do navegador. Quando um aplicativo de página única carrega no navegador, a requisição inicial de HTML pode carregar o token via parâmetro de consulta, mas as requisições subsequentes de bundles de JavaScript, CSS e chamadas de API não o incluirão e serão rejeitadas. Para navegar no app de forma interativa, faça login no Replit normalmente.
+</Accordion>
+
+<Accordion title="Perdi o token — posso vê-lo novamente?">
+  Não. O Replit exibe o token apenas uma vez, no momento da criação. A visualização em lista mostra
+  metadados (rótulo, ambiente, validade, últimos caracteres), mas nunca o valor completo do token. Se você o perdeu, revogue esse token e crie um novo.
+</Accordion>
+
+## Próximas etapas
+
+* [Private Deployments](/pt/features/publishing/private-deployments):
+  o recurso de controle de acesso subjacente que esses tokens contornam.
+* [Gerenciamento de acesso ao Replit App](/pt/teams/identity-and-access-management/repl-access-management):
+  gerencie quais usuários do Replit podem fazer login em seus apps privados.

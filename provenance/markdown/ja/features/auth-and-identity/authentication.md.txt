@@ -1,0 +1,152 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Replit Auth
+
+> Replit Authを使ってアプリにユーザー認証を追加する方法を説明します。ユーザーはReplitアカウントでサインインでき、セットアップは不要です。
+
+Replit Authを使うと、アプリでパーソナライズされたユーザー体験を作り出せます。ユーザーアカウントがあれば、ユーザー設定の保存、カスタムダッシュボードの作成、ソーシャル機能の構築、プレミアムコンテンツへのアクセス制御、ユーザーアクティビティの追跡など、アプリを魅力的で価値あるものにするすべての機能を実装できます。
+
+Replit AuthはReplitのログインシステムを使用しています。アプリにサインインするユーザーは、既存の**Replitアカウント**を作成または使用します。ログインページはReplitのブランドで統一されており、サインインの流れはreplit.com全体で使用されているものと同じです。
+
+<Note>
+  **Replit Auth vs. Clerk Auth** — Replitは2つの認証オプションを提供しています。**Replit Auth**（このページ）はReplitのログインシステムを使用し、アプリのユーザーはReplitアカウントでサインインし、Replitブランドのログインページを表示します。\*\*[Clerk Auth](/ja/features/auth-and-identity/clerk-auth)\*\*はClerkを基盤とした独自の専用認証テナントをアプリに提供し、完全にカスタマイズ可能なブランディングとReplitに依存しないユーザーアカウントを実現します。ログイン体験に独自のブランドを使いたい場合や、Replitに依存しないユーザーアカウントが必要な場合はClerk Authを選択してください。
+
+  すでにReplit Authを使用しているアプリの場合は、[Replit AuthからClerkへの移行](/ja/features/auth-and-identity/migrate-auth-to-clerk)で自動移行フローと、既存アプリデータへのアクセスを維持するためのテスト手順を確認してください。
+</Note>
+
+認証をゼロから構築するのに数ヶ月かかる代わりに、Replit AuthはAgentへの一度のプロンプトでエンタープライズグレードの機能を提供します。Fortune 500企業が使用するのと同じインフラ（Firebase、Google Cloud Identity Platform、reCAPTCHA、Stytch、Clearout）を基盤とし、プロフェッショナルレベルのセキュリティ、不正防止、グローバルスケールが内蔵されています。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/9NKf1XREDj9JhKJb/images/workspace/auth/auth-custom.jpg?fit=max&auto=format&n=9NKf1XREDj9JhKJb&q=85&s=279d3e12c4896346485ce5bfe5d893f5" alt="Auth設定" width="1920" height="1080" data-path="images/workspace/auth/auth-custom.jpg" />
+</Frame>
+
+## Replit Authを使う理由
+
+認証は、全体の会社が解決に専念するほど難しい問題です。アプリの主な目的はおそらく認証ではなく、あなたが構築しているユニークなアイデアやソリューションです。
+
+Replit Authが提供するもの：
+
+* **ゼロセットアップ** — Agentへの一度のプロンプトで認証を追加
+* **Replitアカウント統合** — ユーザーは既存のReplitアカウントでサインインできるため、別途アカウントを作成する必要がありません
+* **内蔵セキュリティ** — 一般的な攻撃に対する保護を備えたReplitインフラを使用
+* **ユーザー管理** — Authペインからシンプルなユーザー管理
+* **データベース統合** — データベースへのユーザーエントリの自動登録
+* **カスタマイズ可能なログインページ** — アプリのログイン体験をパーソナライズ（Replitブランディング付き）
+* **パスワードリセット** — Replitがパスワードリセットメールを代わりに送信するため、独自のメール配信プロバイダーを設定する必要なし
+* **紹介プログラム** — Replit Authを通じてサインアップしたユーザーがReplit紹介の保留中リストに追加されます
+* **開発・発行済みアプリ** — Replit Authは開発（replit.dev）と発行済みアプリ（replit.app、カスタムドメイン）の両方でシームレスに動作します
+
+## エンタープライズグレードのインフラ
+
+Replit Authは単純なユーザー管理以上のものです。エンタープライズグレードのインフラ上に構築された、フルマネージドの認証ソリューションです。この強力な組み合わせにより、Fortune 500企業が使用するのと同じ認証機能をアプリに提供します：
+
+* **Firebase & Google Cloud Identity Platform** - Googleの実績ある認証インフラによるエンタープライズ層SLA
+* **高度なセキュリティスキャン** - reCAPTCHAインテグレーションによるボットや悪意ある行為者への自動保護
+* **不正防止** - 偽アカウントを防ぐClearoutによるメール認証とバリデーション
+* **多要素認証** - Stytchのエンタープライズ認証プラットフォームを基盤とした安全なログインオプション
+* **グローバルスケール** - 自動スケーリングと信頼性を備え、何百万ものユーザーを処理できるよう構築
+
+このエンタープライズ基盤により、認証が十億ドル規模の企業を守るのと同じインフラで動作していることを知りながら、アプリのユニークな機能の構築に集中できます。複数のサービスを統合するのに数ヶ月かかる代わりに、Agentへの一度のプロンプトですべての機能を利用できます。
+
+## Replit Authを始める
+
+Replit Authを実装する唯一の方法はAgentを使用することです。プロンプトにReplit Authのリクエストを含めるだけです：
+
+```
+Help me create an app that [your app idea] and should feature Replit Auth.
+```
+
+Agentが認証に必要なすべてのコードと設定をセットアップします。Agentがすべての複雑さを処理するため、手動実装はサポートされていません。
+
+<Frame>
+  <iframe src="https://www.youtube.com/embed/FepR-sBZKCo?si=RKJjt0e1Gviioxqr" style={{border: "none", borderRadius: "8px"}} width="100%" height="420px" />
+</Frame>
+
+Agentの機能について詳しくは、[Replit Agentドキュメント](/ja/features/agent/overview)と[Agentインテグレーション](/ja/features/integrations/overview)を参照してください。
+
+効果的なプロンプトの書き方については、[Replitで効果的なプロンプティング](/ja/learn/effective-prompting)を参照してください。
+
+## ユーザーの管理
+
+Replit Authは、Project EditorのAuthペインからアクセスできる組み込みのユーザー管理インターフェースを提供します。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/9NKf1XREDj9JhKJb/images/workspace/auth/auth-users.jpg?fit=max&auto=format&n=9NKf1XREDj9JhKJb&q=85&s=ad81201db936e48c0a6b7368d7fb99d3" alt="Auth管理ペイン" width="1920" height="1080" data-path="images/workspace/auth/auth-users.jpg" />
+</Frame>
+
+このインターフェースから以下のことができます：
+
+* すべての認証済みユーザーの表示
+* アプリからのユーザーのBan
+* ユーザー詳細の表示
+* ユーザーアクティビティの追跡
+
+## ログインページのカスタマイズ
+
+<Frame>
+  <img src="https://mintcdn.com/replit/9NKf1XREDj9JhKJb/images/workspace/auth/auth-login.jpg?fit=max&auto=format&n=9NKf1XREDj9JhKJb&q=85&s=6bedf7a0a188d10f58477ece05edec2e" alt="Auth設定" width="1920" height="1080" data-path="images/workspace/auth/auth-login.jpg" />
+</Frame>
+
+ログインページをアプリのブランディングに合わせてカスタマイズできます：
+
+1. Project EditorのAuthペインに移動します
+2. **Configure**をクリックします
+3. 以下の要素をカスタマイズします：
+   * アプリ名
+   * アプリアイコン
+   * ログイン方法（Google、GitHub、X、Apple、メール）
+
+変更はすぐにアプリのログインページに反映されます。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/9NKf1XREDj9JhKJb/images/workspace/auth/auth-custom.jpg?fit=max&auto=format&n=9NKf1XREDj9JhKJb&q=85&s=279d3e12c4896346485ce5bfe5d893f5" alt="Auth設定" width="1920" height="1080" data-path="images/workspace/auth/auth-custom.jpg" />
+</Frame>
+
+## ユーザーデータとデータベースの連携
+
+Replit Authはデータベースにユーザーエントリを自動的に作成します。これにより、ユーザー固有のデータを簡単に保存できます。Agentがユーザーデータとデータベースを適切に連携させる方法をガイドします。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/9NKf1XREDj9JhKJb/images/workspace/auth/auth-db.jpg?fit=max&auto=format&n=9NKf1XREDj9JhKJb&q=85&s=a2a11e8ab5f88f9beeed83e8b2dc09f7" alt="Authデータベース" width="1920" height="1080" data-path="images/workspace/auth/auth-db.jpg" />
+</Frame>
+
+データベースの詳細については、[ReplitデータベースドキュメントK](/ja/features/data-and-storage/sql-database)を参照してください。
+
+## セキュリティについて
+
+Replit AuthはReplitのインフラを活用し、一般的なセキュリティ脅威に対する組み込みの保護を提供します。ただし、以下のベストプラクティスにも従ってください：
+
+* 機密性の高い操作を実行する前に、常にサーバーサイドでユーザー認証を検証してください
+* パスワードなどの機密情報をコードに保存しないでください
+* APIキーやシークレットには環境変数を使用してください
+* ユーザーデータに適切なアクセス制御を実装してください
+
+セキュリティの詳細については以下を参照してください：
+
+* [Replitの組み込みセキュリティ機能](/ja/features/security/overview)
+* [バイブコーディングのセキュリティチェックリスト](/ja/learn/security-checklist)
+* [Secretsの管理](/ja/core-concepts/project-editor/app-setup/secrets)
+
+## 紹介プログラム
+
+Replitについて学ぶ人々を増やすアプリケーションを促進するため、Replit Authを通じてサインアップしたユーザーは自動的に保留中のReplit Referralsに追加されます。後でReplit Coreにアップグレードした場合、現在の紹介プログラムの利用規約に従って紹介ボーナスを受け取れます。
+
+## トラブルシューティング
+
+### よくある問題
+
+1. **ログイン後にユーザーが認識されない**
+   * 問題が発生した場合は、[Replit Agent](/ja/features/agent/overview)に認証実装のデバッグを依頼してください。
+
+2. **カスタムアイコンが表示されない**
+   * アイコンURLがアクセス可能で、サポートされている形式（PNGまたはJPG）であることを確認してください。
+
+3. **新しくリンクしたカスタムドメインが機能しない**
+   * ドメインリスト（REPLIT\_DOMAINS環境変数）を更新するために再発行してください。
+
+## 追加リソース
+
+* [Replitデータベースドキュメント](/ja/features/data-and-storage/sql-database)
+* [Replit Agent](/ja/features/agent/overview)

@@ -1,0 +1,254 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# SSH
+
+> ローカル開発環境をReplitアプリに接続してセキュアなリモートアクセスとファイル同期を行うためのSSHのセットアップと使用方法を学びましょう。
+
+## SSHとは？
+
+SSHはSecure Shellの略で、Replitアプリのコマンドラインインターフェースへのリモートアクセスを容易にするセキュアなプロトコルです。SSHを使うと、ファイルをシームレスに転送し、Replitでのコード編集に好みのローカル統合開発環境（IDE）を活用でき、開発ワークフローのコラボレーションと生産性を向上させます。
+
+SSH機能はCore、Pro、その他すべての有料プランで利用可能です。
+
+プロセスの概要は以下の通りです：
+
+* ローカルマシンでSSHキーペアを生成する
+* 任意のReplitアプリ内の**SSH**ペインにそのSSHキーを追加する
+* SSHクライアントまたはSSHで動作するエディター（[VSCode](https://code.visualstudio.com/)や[Cursor](https://www.cursor.com/)など）を使って接続する
+
+<Note>
+  SSHキーは特定のReplitアプリではなく、アカウントに関連付けられています。つまり、公開キーを一度追加するだけで、アクセス権のある任意のReplitアプリに接続できます。
+</Note>
+
+## SSHを使う理由
+
+* **ReplitアプリとエディターのAutomatic updates**：Replitアプリで行われた変更はエディターに即座に反映され、エディターでの変更はReplitアプリに更新されます。このシームレスな同期により、コードベースが常に各プラットフォームで最新の状態に保たれます。
+
+* **ファイル管理の同期**：ファイルの追加、削除、更新に関わらず、これらの変更はエディターとReplitアプリ間でリアルタイムに同期されます。この機能により、変更がどこから開始されても、プロジェクト構造の一貫性が保たれます。
+
+* **フォルダー管理とファイル移動**：フォルダー間のファイル移動もエディターとReplitアプリ間で同期されます。これにより、一方の環境で行われた組織的な変更がもう一方に正確に反映され、プロジェクトの整合性と構造が維持されます。
+
+## キーペアの検索または作成
+
+アカウントにSSHを設定するには、SSH公開キーが必要です。
+
+### すでにキーペアがあるかどうかの確認
+
+ローカルコンピューターのターミナルで次のコマンドを実行すると、すでに公開キーがあるかどうかを確認できます：
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    ls -l ~/.ssh
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    dir %HOMEPATH%\.ssh
+    ```
+  </Tab>
+</Tabs>
+
+エラーが発生した場合は問題ありません。[新しいキーペアの生成](#generating-a-new-keypair)に進んでください。
+`replit.pub`というファイルが表示された場合は、[公開キーの内容を取得する](#get-the-contents-of-your-public-key)に進んでください。
+
+### 新しいキーペアの生成
+
+マシンでターミナル（またはコマンドプロンプト）ウィンドウを開き、次のコマンドを貼り付けます：
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```bash theme={null}
+    ssh-keygen -t ed25519 -f ~/.ssh/replit -q -N ""
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    ssh-keygen -t ed25519 -f %HOMEPATH%\.ssh\replit -q -N ""
+    ```
+  </Tab>
+</Tabs>
+
+このコマンドは特定のSSH公開キーファイルがすでに存在するかどうかを確認します。存在しない場合は、適切なパラメーターで新しいSSHキーを作成します。
+
+### 公開キーの内容を取得する
+
+キーペアを確認または作成したら、公開キー（`.pub`サフィックスが付いた2つの似た名前のファイルの一方）の内容を表示します。後で必要になります。
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    cat ~/.ssh/replit.pub
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    notepad %HOMEPATH%\.ssh\replit.pub
+    ```
+  </Tab>
+</Tabs>
+
+後でこの記事で使用するために`replit.pub`の内容を保存し、[アカウントにSSHキーを追加する](#add-the-ssh-key-to-your-account)に進みます。
+
+## アカウントにSSHキーを追加する
+
+### SSHペインを使用してReplitアプリに直接公開キーを追加する
+
+1. 任意のウィンドウのReplitアプリで、\*\*+\*\*ボタンを選択し、**SSH**を検索します。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/0UCOQvZyQpUEM03B/images/ssh-vscode/ssh-tool.png?fit=max&auto=format&n=0UCOQvZyQpUEM03B&q=85&s=6289b307a234f6f12066cc40ea67e9a8" alt="ReplitインターフェースのSSHツールボタン" width="846" height="328" data-path="images/ssh-vscode/ssh-tool.png" />
+</Frame>
+
+2. **Keys**タブに移動して**New SSH key**を選択します。
+3. ポップアップウィンドウで、キーの**Label**（例：my-ssh-key）を入力し、コピーした公開キーを**Key**セクションに貼り付けます。
+   **Add SSH Key**ボタンを選択します。キーが追加され、使用が承認されました。
+
+<Frame>
+  <img src="https://mintcdn.com/replit/0UCOQvZyQpUEM03B/images/ssh-vscode/add-ssh-key-with-values.png?fit=max&auto=format&n=0UCOQvZyQpUEM03B&q=85&s=45467b138e8bb5b4c73c7d747446c46e" alt="ラベルとキーフィールドが入力されたSSHキー追加ダイアログ" width="500" height="511" data-path="images/ssh-vscode/add-ssh-key-with-values.png" />
+</Frame>
+
+### Settingsから直接公開キーを追加する
+
+**Settings**を開いて、**Account**の下の**Advanced**（または**SSH keys**オプション）を選択してSSHキーを追加することもできます。**Add SSH key**を選択し、前のセクション[キーペアの検索または作成](#find-or-create-a-keypair)の`replit.pub`の内容を貼り付けます。
+
+<Note>
+  マシンに複数の公開キーがある場合は、SSH設定に適切なプライベートキーと公開キーの組み合わせを使用することが重要です。
+</Note>
+
+## Replitアプリへの接続
+
+### SSH設定の構成
+
+1. ターミナルで、`~/.ssh`ディレクトリと`~/.ssh/config`ファイルが存在することを確認します：
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/config && chmod 600 ~/.ssh/config
+    open -a 'TextEdit' ~/.ssh/config || nano ~/.ssh/config
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    if not exist %HOMEPATH%\.ssh mkdir %HOMEPATH%\.ssh && type \NUL > %HOMEPATH%\.ssh\config
+    notepad %HOMEPATH%\.ssh\config
+    ```
+  </Tab>
+</Tabs>
+
+2. すべての\*.replit.devドメインに対して`replit`キーペアを使用する設定ブロックを追加します：
+
+<Tabs>
+  <Tab title="Mac/Linux/Windows">
+    ```
+    Host *.replit.dev
+        Port 22
+        IdentityFile ~/.ssh/replit
+        StrictHostKeyChecking accept-new
+    ```
+  </Tab>
+</Tabs>
+
+### VSCodeまたはCursorから接続する
+
+1. Replitアプリから**SSH**ペインを開きます
+
+2. SSHペインで**Connect**タブに移動し、**Launch VS Code**を選択します。
+
+<Tabs>
+  <Tab title="VSCodeで接続する">
+    <img src="https://mintcdn.com/replit/0UCOQvZyQpUEM03B/images/ssh-vscode/ssh-connect.png?fit=max&auto=format&n=0UCOQvZyQpUEM03B&q=85&s=d7c538b8cf6e63db7264ff194dd583be" alt="Launch VS Codeオプションを表示するSSH接続タブ" width="788" height="482" data-path="images/ssh-vscode/ssh-connect.png" />
+  </Tab>
+</Tabs>
+
+3. `~/.ssh/config`の入力を求められた場合は、以下を入力します：
+
+   ```
+   Host *.replit.dev
+       Port 22
+       IdentityFile ~/.ssh/replit
+       StrictHostKeyChecking accept-new
+   ```
+
+   <Note>
+     SSH設定の追加はVS Codeや他のエディターへの初回接続時にのみ表示されます。設定ファイルに戻るには\*\*Configure SSH Hosts...\*\*を選択する必要があります。
+   </Note>
+
+4. 外部アプリケーションの警告が表示された場合は、**Yes**を選択して好みのエディターまたはVS Codeでプロジェクトを開くことを確認します。
+
+5. SSHエクステンションを定期的にインストールまたは更新するよう求められる場合があります。ReplitはこれらのIDEの最新バージョンとの互換性を維持するよう努め、重要なセキュリティアップデートも提供されることがあります。
+
+### 手動で接続する
+
+**SSH**ペインの「Connect」タブの下部に「Connect manually」があります。
+
+そのコマンドをコピーして、ローカルのターミナル（MacまたはLinux）またはローカルのコマンドプロンプト（Windows）に貼り付けて直接接続します。
+
+これはIDEとの接続の問題をデバッグするのにも良い方法で、Replitサポートにバグを報告する際に価値ある「詳細な」接続情報を収集するのにも役立ちます。
+
+**存在しないプライベートキーで接続しようとしているエラー**：
+
+```
+$ ssh -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+Warning: Identity file /Users/user/.ssh/replit not accessible: No such file or directory.
+```
+
+**バグレポートに含めるSSH接続試行の完全なデバッグログ**：
+
+```
+$ ssh -vvv -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+OpenSSH_9.6p1, LibreSSL 3.3.6
+debug1: Reading configuration data /Users/.../.ssh/config
+debug1: /Users/.../.ssh/config line 1: Applying options for *
+debug1: /Users/.../.ssh/config line 4: Applying options for *.replit.dev
+debug3: channel_clear_timeouts: clearing
+debug1: Connecting to c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev port 22.
+debug1: Connection established.
+debug1: identity file /Users/dstewart/.ssh/replit type 3
+debug1: Local version string SSH-2.0-OpenSSH_9.6
+debug1: Remote protocol version 2.0, remote software version Replit-SSH-Proxy
+debug1: compat_banner: no match: Replit-SSH-Proxy
+debug3: fd 5 is O_NONBLOCK
+...
+Welcome to the Replit SSH Proxy.
+
+Visit https:/.replit.com/replit-workspace/ssh to learn more about SSH on Replit.
+debug3: receive packet: type 51
+debug1: Authentications that can continue: password,publickey
+debug3: start over, passed a different list password,publickey
+debug3: preferred publickey,keyboard-interactive,password
+debug3: authmethod_lookup publickey
+debug3: remaining preferred: keyboard-interactive,password
+debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+...
+debug2: we did not send a packet, disable method
+debug3: authmethod_lookup password
+debug3: remaining preferred: ,password
+debug3: authmethod_is_enabled password
+debug1: Next authentication method: password
+```
+
+### ここに記載されていないツールで接続する
+
+さまざまなプラットフォームとオペレーティングシステム向けに多くのSSHクライアントがあり、異なる機能や統合を提供しています。
+
+「Connect Manually」に表示されるコマンドを構成要素に分解して、各クライアントの設定方法を決定することができます：
+
+```sh theme={null}
+ssh -i ~/.ssh/replit -p 22  c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+       ^-----v-----^    ^^  ^-----------------v----------------^ ^------------------------------v-------------------------------------^
+        Private Key   Port                   User               @                           Hostname
+```
+
+**Hostname**: `<your_hostname>.<cluster>.replit.dev`
+**Port**: `<port_number>`
+**User**: `Username`
+**Private Key**: コンピューター上のプライベートキーファイルへのパス。通常`replit.pub`の隣にあります。

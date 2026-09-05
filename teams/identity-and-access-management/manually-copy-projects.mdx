@@ -1,0 +1,267 @@
+---
+title: "Manually copy a project to another workspace"
+description: "Copy a live app to another workspace or account by hand: copy the code, set up the new app, point your users at it with minimal downtime, and know how to undo it"
+sidebarTitle: "Manual project copy"
+icon: "copy"
+---
+
+This guide walks you through copying an app to another workspace or account by hand. You copy the code, set up the new app, copy your data, and then point your users at the new app.
+
+Nothing is moved or deleted. The old project stays exactly where it is, and the two copies do not stay in sync. When you are done, you choose whether to keep or delete the old one.
+
+<Note>
+  Looking for the built-in one-click transfer? See [Transfer App to Teams](/teams/identity-and-access-management/transfer-app-to-teams). Use this guide when that option is unavailable or when you need to copy across accounts.
+</Note>
+
+## Before you start
+
+You need:
+
+* Access to both the old project and the new workspace or account.
+* About an hour of focused time for the final switch. The earlier steps can happen over several days.
+* If your app has a custom web address, access to wherever you manage that domain.
+
+Two things do not copy over automatically and take the most time: your **database** and your **web address**. This guide covers both.
+
+<Note>
+  If your workspace admin has enabled [Ban source code export](/teams/enterprise-privacy-settings#ban-source-code-export), you can't download the project as a zip. Work with your workspace admin before you start—they can confirm whether a manual copy is permitted and how to move the code and database.
+</Note>
+
+## Plan for downtime
+
+Think of it as opening a second shop and then closing the first. There is a short time when the old shop is closed and the new one is not open yet. During that time, nobody can use your app.
+
+**How long is the app offline?** Usually 15 to 60 minutes. It depends on how much data your database holds and how quickly your web address updates.
+
+**Will I lose data?** Only if someone adds data to the old app after you copy the database. To prevent this, you take the old app offline *before* you make the final copy. This guide is ordered so that happens.
+
+**Can I undo it?** Yes. The old project is not deleted. If something goes wrong, publish the old app again and it works exactly as before.
+
+**When should I do it?** Pick a time when few people use your app. Tell your users in advance if you can.
+
+## Step 1: Copy the code to a new project
+
+Choose one method. The old app stays live during this step. Both methods carry your code. GitHub always carries your commit history, while a zip carries history only when it includes the `.git` folder:
+
+|                        | Via GitHub                                         | Via zip file                                                                                                        |
+| ---------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Code files**         | Only files you commit and push                     | Everything on disk, including uncommitted changes                                                                   |
+| **Commit history**     | Full history on the remote                         | Full history if the zip includes the `.git` folder. No history if you exclude `.git` to stay under the import limit |
+| **Dependency folders** | Follows your `.gitignore`                          | Excluded (`node_modules`, `.venv`, `build`, and similar); reinstalled on import                                     |
+| **Requirements**       | A GitHub account connected to both Replit accounts | None                                                                                                                |
+| **Ongoing sync**       | Both copies can push and pull the same repository  | None—one-time snapshot                                                                                              |
+| **Best for**           | Projects you want backed up in Git long term       | Quick one-time copies                                                                                               |
+
+### Via GitHub
+
+<Steps>
+  <Step title="Push the old project to GitHub">
+    In the old project, open the [Git pane](/features/workspace-tools/git-interface), connect a GitHub repository, then commit and push. Use a private repository unless you want the code public.
+  </Step>
+
+  <Step title="Grant the new account access">
+    If the new workspace belongs to a different Replit account, its GitHub account needs access to the repository. For a private repository, add that GitHub account as a collaborator or use a shared GitHub organization.
+  </Step>
+
+  <Step title="Import in the new workspace">
+    Sign in to the new account, open [replit.com/import](https://replit.com/import), select **GitHub**, connect the GitHub account, and choose the repository. See [Import from a provider](/build/import-from-providers) for troubleshooting.
+  </Step>
+
+  <Step title="Verify the copy">
+    Open the new project and confirm the files and commit history are present. Replit installs dependencies and configures run commands during import.
+  </Step>
+</Steps>
+
+<Warning>
+  GitHub receives only what you commit and push. Files matched by `.gitignore` and uncommitted changes stay behind. Never commit secret values or database dumps to the repository.
+</Warning>
+
+### Via zip file
+
+<Steps>
+  <Step title="Download the old project">
+    In the old project, select the three-dot menu at the top of the file tree and choose **Download as zip**.
+
+    If the download works and the file is under 200 MB, skip to the next step.
+
+    A zip file larger than 200 MB can download successfully. However, [ZIP import](/build/import-from-providers#limitations) rejects files over 200 MB, so Replit cannot use it to create the new project. If the download fails or the zip is over 200 MB, make a smaller one:
+
+    1. In the old project, open the **Shell** tool.
+
+    2. Paste this command and press Enter. It creates a file called `project.zip` and leaves out folders that Replit can rebuild on its own:
+
+       ```bash theme={null}
+       zip -r project.zip . -x ".cache/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+    3. Check the size. Paste this command and press Enter. It prints the size in MB, such as `150M` for 150 MB:
+
+       ```bash theme={null}
+       du -h project.zip
+       ```
+
+    4. If the size is over 200 MB, make the file smaller by leaving out your edit history. Paste both lines and press Enter:
+
+       ```bash theme={null}
+       rm project.zip
+       zip -r project.zip . -x ".cache/*" ".local/*" ".git/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+       Only exclude `.local` and `.git` when you need to reduce the zip below 200 MB. These exclusions do not delete either folder from the old project. However, a zip without `.git` does not include the project's commit history. Use the GitHub method if you need to preserve history.
+
+    5. Find `project.zip` in the file tree, select the three-dot menu next to it, and select **Download**.
+
+    The `.cache` folder holds internal Replit state, including cached secret values. Always exclude it from zip files you create manually. If your project has other large generated folders, add them to the exclusion list.
+  </Step>
+
+  <Step title="Import in the new workspace">
+    Sign in to the new account, open [replit.com/import](https://replit.com/import), select **ZIP**, and upload the file.
+  </Step>
+
+  <Step title="Verify the copy">
+    Open the new project and confirm your files are present. If the zip includes the `.git` folder, your commit history came with it. If you used the smaller archive command, the new project starts without commit history. Replit reinstalls excluded dependencies during import.
+  </Step>
+</Steps>
+
+## Step 2: Set up the new app
+
+The old app is still live. In this step you get the new app fully working with a *test copy* of your data, so the final switch later is quick.
+
+<Steps>
+  <Step title="Add your Secrets">
+    Secret values (API keys, passwords) never leave the old project. Open the [Secrets](/core-concepts/project-editor/app-setup/secrets) tool in both projects and copy each one across by hand. Include any deployment secrets.
+  </Step>
+
+  <Step title="Reconnect Connectors and other services">
+    Reconnect each integration from **Tools → Connectors** in the new project. See [Re-create what doesn't copy over](#re-create-what-doesnt-copy-over) for App Storage, collaborators, and everything else.
+  </Step>
+
+  <Step title="Publish the new app">
+    [Publish](/features/publishing/overview) the new project. It gets its own `replit.app` web address and its own empty production database. Do not connect your custom domain yet.
+  </Step>
+
+  <Step>
+    Follow [Copy the database](#copy-the-database) below, using the **production** database in the new project as the target. This gives you real data to test with. Step 3 replaces this copy with your latest data.
+  </Step>
+
+  <Step>
+    Open the new app at its `replit.app` address and use it the way your users would. Fix anything that is broken before you move on. Your users have not been affected yet.
+  </Step>
+</Steps>
+
+## Step 3: Switch your users to the new app
+
+This is the part with downtime. Do it in one sitting.
+
+<Steps>
+  <Step title="Take the old app offline">
+    In the old project, open the **Publishing** tool and select **Unpublish**. Your app is now offline. Nobody can add new data from this point, so the copy you make next is complete.
+  </Step>
+
+  <Step title="Copy the database one final time">
+    Follow [Copy the database](#copy-the-database) below, using the **production** database in the new project as the target. This copy has all your latest data.
+  </Step>
+
+  <Step title="Point your web address at the new app">
+    If your app uses a custom domain: in the old project, open **Publishing → Domains** and disconnect the domain. In the new project, open **Publishing → Domains** and [connect it](/features/publishing/custom-domains#connect-a-domain-you-already-own). Update the records at your domain provider (for example GoDaddy or Namecheap) if Replit asks you to.
+
+    The new address can take a few minutes to a few hours to work for everyone. Until then, some visitors may see an error.
+
+    If your app only uses a `replit.app` address, share the new address with your users instead.
+  </Step>
+
+  <Step title="Confirm the new app is live">
+    Open your web address and confirm the new app loads with your data. Your app is back online.
+  </Step>
+</Steps>
+
+## Copy the database
+
+The code copy doesn't touch your database. Copy the data with PostgreSQL's `pg_dump` and `pg_restore` tools, available in the Shell of both projects. Both Step 2 and Step 3 point here. The commands are the same each time. Only the *target* changes.
+
+<Warning>
+  Data written after you run `pg_dump` doesn't make it into the copy. For the final copy in Step 3, take the old app offline first.
+</Warning>
+
+<Steps>
+  <Step title="Export the data from the old project">
+    Open the **Shell** tool in the old project. Paste this command and press Enter. It creates a file called `backup.dump` in your file tree:
+
+    ```bash theme={null}
+    pg_dump -Fc "$DATABASE_URL" --no-owner --no-privileges -f backup.dump
+    ```
+
+    This exports the **development** database. Your live data is usually in the **production** database instead. To export that:
+
+    1. Open the **Database** tool, select the production database, and open **Settings**.
+    2. Copy the connection string.
+    3. In the command above, replace `"$DATABASE_URL"` with the connection string, keeping the quotes.
+
+    See [Connection details](/features/data-and-storage/connection-details) if you cannot find it.
+  </Step>
+
+  <Step title="Move the dump file to the new project">
+    In the old project's file tree, select the three-dot menu next to `backup.dump` and download it. Then upload it into the new project with the file tree's **Upload files** option.
+
+    If you copied the code through GitHub, don't commit the dump. Move it separately so your data never lands in the repository.
+  </Step>
+
+  <Step title="Import the data in the new project">
+    Open the **Shell** tool in the new project. Paste this command and press Enter:
+
+    ```bash theme={null}
+    pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+    ```
+
+    As written, this imports into the new project's **development** database. That is what you want in Step 2.
+
+    For the final copy in Step 3, you want the **production** database instead. In the new project, open the **Database** tool, select the production database, open **Settings**, copy the connection string, and use it in place of `"$DATABASE_URL"`.
+
+    This drops any matching objects in the target database, then loads the data. When it finishes with no output, it worked.
+  </Step>
+</Steps>
+
+<Note>
+  If `pg_restore` fails with role or policy errors, your database uses custom PostgreSQL roles that don't exist in the new project yet. [Contact support](https://replit.com/support) for help.
+</Note>
+
+<Note>
+  If the new project uses a [legacy Neon development database](/features/data-and-storage/development-and-production#legacy-development-database), the publish flow offers **Set up your production database with your current development data**. That copies whatever is in the development database at the time you publish. It is fine for testing, but for the final switch use the steps above so you get the latest data.
+</Note>
+
+## Re-create what doesn't copy over
+
+The rest of the project's configuration lives outside the file system. Re-create each piece in the new project:
+
+| Item                | What to do                                                                                                                                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Secrets**         | Secret values never leave the old project. Add them again in the new project's [Secrets](/core-concepts/project-editor/app-setup/secrets) tool, including deployment secrets.                                                         |
+| **Account Secrets** | [Link them](/core-concepts/project-editor/app-setup/secrets#manage-account-secrets) in the new project. If the new project is under a different account, add them to that account first.                                              |
+| **App Storage**     | Buckets don't move. Within the same account, [add the existing bucket](/features/data-and-storage/object-storage#bucket-access-management) to the new project. Across accounts, download the objects and upload them to a new bucket. |
+| **Connectors**      | Reconnect each integration from **Tools → Connectors** in the new project. See the [integrations overview](/features/integrations/overview).                                                                                          |
+| **Deployments**     | The copy is unpublished. [Publish](/features/publishing/overview) it from the new workspace, as in [Step 2](#step-2-set-up-the-new-app).                                                                                              |
+| **Custom Domains**  | Remove the domain from the old deployment, link it to the new one, and update your DNS records. Covered in [Step 3](#step-3-switch-your-users-to-the-new-app).                                                                        |
+| **Collaborators**   | Invite collaborators again and set up [access](/teams/identity-and-access-management/groups-and-permissions) in the new workspace.                                                                                                    |
+| **Agent history**   | Agent conversations and [checkpoint](/features/version-control/checkpoints-and-rollbacks) rollbacks stay with the old project. Checkpoint commits travel with your Git history, but you can't roll back to them from the copy.        |
+
+## If something goes wrong
+
+The old project is still there. To go back:
+
+1. In the old project, open the **Publishing** tool and select **Publish**.
+2. If you moved a custom domain, move it back the same way.
+
+Your app is live again with the data it had when you took it offline. Nothing was lost.
+
+## Clean up
+
+Wait a week or so to be sure the new app is working. Then:
+
+* Remove `backup.dump` from both projects and from your device. Each copy contains a full export of your data.
+* Optionally, delete the old project.
+
+## Related resources
+
+* [Transfer App to Teams](/teams/identity-and-access-management/transfer-app-to-teams): The built-in transfer for moving a project into or between team workspaces
+* [Import from a provider](/build/import-from-providers): All supported import sources
+* [Fix a published app using a shared database](/features/data-and-storage/shared-database-migration): More `pg_dump` and `pg_restore` troubleshooting

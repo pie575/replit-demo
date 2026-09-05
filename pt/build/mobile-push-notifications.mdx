@@ -1,0 +1,89 @@
+---
+title: "Envie notificações push"
+description: "Avise os jogadores sobre novos jogos e atividade de amigos no PixelGames."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pushNotificationPrompt = "Avise um jogador quando um amigo bater seu recorde no PixelGames.";
+
+<AiPrompt>
+  {pushNotificationPrompt}
+</AiPrompt>
+
+<Frame caption="Uma notificação do PixelGames chegando na tela de bloqueio.">
+  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="Uma notificação push do PixelGames aparecendo na tela de bloqueio do celular" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
+</Frame>
+
+O Android pode testar isso imediatamente no Expo Go. O iOS precisa que o app seja
+[enviado e instalado a partir do TestFlight](/build/mobile-testflight) primeiro, a Apple exige
+que o app esteja registrado com ela antes de poder receber qualquer notificação, mesmo para
+teste.
+
+<Steps>
+  <Step title="Peça permissão">
+    iOS e Android solicitam uma vez antes da primeira notificação. Recusar significa silêncio
+    até o jogador reativar isso nas Configurações.
+  </Step>
+
+  <Step title="Registre o dispositivo">
+    O Agent registra um push token para o jogador logado, para que o PixelGames saiba qual
+    dispositivo notificar.
+  </Step>
+
+  <Step title="Envie">
+    Uma notificação é disparada quando um amigo bate o recorde daquele jogador.
+  </Step>
+</Steps>
+
+## Teste
+
+1. Conceda a permissão de notificação quando solicitado, o PixelGames não pode enviar nada até
+   que isso seja aceito, e o prompt só aparece uma vez.
+2. Acione a condição real, como bater o recorde de um amigo a partir de uma segunda conta, em
+   vez de apenas pedir ao Agent uma notificação de teste única. Isso confirma que todo o
+   caminho funciona: o salvamento do recorde, a verificação de quem notificar e o envio, não
+   apenas que a permissão foi concedida.
+3. Confirme que ela chega na tela de bloqueio, depois toque nela e confirme que ela abre o
+   PixelGames. Tocar verifica que a notificação realmente leva de volta ao app, não apenas que
+   ela é exibida.
+
+Faça isso em um celular real, notificações nunca chegam a um simulador. Veja
+[teste com o Expo Go](/build/mobile-preview-testing) para a configuração.
+
+## Solução de problemas
+
+* **A notificação nunca chega no iOS:** confirme que você está testando a partir do
+  [TestFlight](/build/mobile-testflight), o Expo Go não pode receber pushes no iOS.
+* **O jogador concedeu permissão mas não recebe nada:** verifique se o token foi realmente
+  salvo na conta dele, uma lacuna comum quando o login e a configuração de notificação
+  acontecem separadamente.
+
+## O que vem a seguir
+
+<CardGroup cols={2}>
+  <Card title="Adicione feedback tátil" icon="wave-square" href="/pt/build/mobile-haptics">
+    Combine uma notificação com um toque tátil.
+  </Card>
+
+  <Card title="Armazenar imagens no seu app mobile" icon="image" href="/pt/build/mobile-store-images">
+    Salve fotos de perfil no App Storage.
+  </Card>
+</CardGroup>
+
+## Relacionado
+
+* [Enviar para a App Store](/build/mobile-publish-ios)

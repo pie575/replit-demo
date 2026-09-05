@@ -1,0 +1,437 @@
+---
+title: "Databricks Connectors"
+description: "Choose and set up a Databricks connector so Replit Agent can build applications backed by your Databricks workspace."
+sidebarTitle: "Databricks"
+icon: "database"
+---
+
+<Info>
+  The Databricks connectors are available exclusively on the **Enterprise**
+  plan.
+</Info>
+
+<Frame>
+  <img src="/assets/mirror/templates-dropdown-zoom-9e06ca94568a.png" alt="Replit home prompt box with the Templates dropdown open, showing the Databricks App org template" width="1680" height="300" data-path="images/connectors/databricks/templates-dropdown-zoom.png" />
+</Frame>
+
+The Databricks connectors let Replit Agent query your Databricks workspace. Builders can create dashboards, reporting tools, and data applications using natural language. No SQL expertise is required.
+
+Replit supports two Databricks connection types. Choose one based on the identity that should run each query.
+
+## Choose a connection type
+
+|                          | **User-to-machine (U2M)**                               | **Service principal (M2M)**                 |
+| ------------------------ | ------------------------------------------------------- | ------------------------------------------- |
+| Connector name in Replit | Databricks for Databricks Apps (U2M)                    | Databricks (Service Principal)              |
+| Query identity           | The individual builder                                  | A shared service principal                  |
+| Databricks permissions   | Each builder's Unity Catalog permissions                | The service principal's permissions         |
+| Audit attribution        | The builder who ran the query                           | The service principal                       |
+| Builder sign-in          | Each builder signs in with their own Databricks account | No individual Databricks sign-in            |
+| Best for                 | Per-user permissions and audit attribution              | Shared access and non-interactive workflows |
+
+<CardGroup cols={2}>
+  <Card title="Set up user-to-machine (U2M)" icon="user" href="#set-up-the-u2m-connector">
+    Use each builder's Databricks identity, permissions, and audit attribution.
+  </Card>
+
+  <Card title="Set up a service principal (M2M)" icon="server" href="#set-up-the-service-principal-connector">
+    Use one shared Databricks identity and permission set for authorized
+    builders.
+  </Card>
+</CardGroup>
+
+## Set up the U2M connector
+
+U2M setup involves three roles:
+
+1. **Databricks account admin**: creates an OAuth app connection and provides SQL Warehouse details.
+2. **Replit organization admin**: configures the connector with the OAuth credentials.
+3. **Builder**: signs in with their Databricks account and starts building.
+
+### U2M prerequisites
+
+Before you start, confirm you have:
+
+* A Databricks **account admin**. App connections are configured in the account console, not the workspace admin settings.
+* A Replit organization admin.
+* A Databricks account for every builder who will use the connector.
+* Workspace access for every builder, including **Can use** permission on the SQL Warehouse and the required Unity Catalog permissions.
+
+### Step 1: Create an OAuth app connection
+
+<Note>You must be a Databricks account admin to complete this step.</Note>
+
+The Databricks account admin registers Replit as an OAuth application. The app connection provides the client ID and client secret used to configure Replit.
+
+<Steps>
+  <Step title="Open the Databricks account console">
+    In your Databricks workspace, open the workspace picker in the top-right corner and select **Manage account**.
+
+    <Frame>
+      <img src="/assets/mirror/manage-account-6374ed6bf0f2.png" alt="Databricks workspace picker open with Manage account visible" width="2000" height="1144" data-path="images/connectors/databricks/u2m/manage-account.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Open App connections">
+    In the account console, select **Settings**, then open the **App connections** tab.
+
+    <Frame>
+      <img src="/assets/mirror/app-connections-96228e7f0f2e.png" alt="Databricks account Settings page with the App connections tab selected and Add connection button visible" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-connections.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Configure the Replit connection">
+    Select **Add connection**. Enter an application name that identifies Replit, such as `replit-u2m`.
+
+    Under **Redirect URLs**, enter:
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    Under **Access scopes**, select **All APIs**. This allows Agent to use Databricks SQL and the Databricks APIs needed to build and manage Databricks Apps.
+
+    Select **Generate a client secret**. Databricks cannot add a secret to this connection after it is created.
+
+    Set the token lifetimes according to your organization's security policy. The example uses **Access token TTL** `1440` minutes (24 hours) and **Refresh token TTL** `129600` minutes (90 days), the maximum values shown by Databricks. A shorter refresh token lifetime can require builders to sign in more often.
+
+    Select **Add**.
+
+    <Warning>
+      **All APIs** grants broader access than SQL alone. Control the connector's effective access with each builder's Databricks permissions.
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/app-configuration-6799b5769326.png" alt="Databricks Add connection form configured with a Replit application name, redirect URL, All APIs access, client secret generation, and token lifetimes" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-configuration.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Store the OAuth credentials">
+    Copy the **Client ID** and **Client Secret**, then store them in your organization's secret manager.
+
+    <Warning>
+      Databricks displays the client secret once. Record its expiration date and rotate the app connection before the secret expires.
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/oauth-credentials-15b2e6c67309.png" alt="Databricks Connection created dialog with the client ID and client secret redacted, plus the one-time-secret warning and expiration date" width="2000" height="1144" data-path="images/connectors/databricks/u2m/oauth-credentials.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Note>
+  New or updated OAuth app connections can take up to 30 minutes to become
+  available.
+</Note>
+
+### Step 2: Share the SQL Warehouse details
+
+Each builder enters the SQL Warehouse details when authorizing the U2M connector. Publish these values somewhere your builders can access, such as an internal onboarding page.
+
+<Steps>
+  <Step title="Open SQL Warehouses">
+    In the Databricks workspace, select **SQL Warehouses** and open the warehouse builders should use.
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="Databricks SQL Warehouses page showing available warehouses" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Copy the connection details">
+    Select **Connection details**, then copy the **Server hostname** and **HTTP path**.
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="Databricks SQL Warehouse connection details page with server hostname and HTTP path" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+### Step 3: Enable U2M in Replit
+
+<Note>You must be a Replit organization admin to configure connectors.</Note>
+
+<Steps>
+  <Step title="Open and enable the U2M connector">
+    From your Replit account home, open **Settings**, then **Integrations**. Search for `Databricks U2M`, find **Databricks for Databricks Apps (U2M)**, and select **Enable**.
+
+    Enter the **Client ID** and **Client Secret** from the Databricks app connection.
+
+    Confirm that the redirect URL shown in Replit matches the URL configured in Databricks:
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    Under **Connector Scopes**, enable `all-apis` and `offline_access`. The `offline_access` scope gives Replit a refresh token for long-lived sessions.
+
+    Select **Configure**.
+
+    <Frame>
+      <img src="/assets/mirror/enable-connector-39c1eeebd230.png" alt="Replit Integrations settings filtered to Databricks U2M with the enable panel showing the redirect URL, OAuth credential fields, and connector scopes" width="2000" height="1144" data-path="images/connectors/databricks/u2m/enable-connector.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Verify the connector is enabled">
+    Confirm that **Databricks for Databricks Apps (U2M)** appears under **Your integrations**.
+  </Step>
+</Steps>
+
+### Step 4: Sign in as a builder
+
+Each builder signs in with their own Databricks account before using the connector. Replit can refresh the session until the refresh token expires.
+
+<Steps>
+  <Step title="Sign in to the connector">
+    On the **Integrations** page, find **Databricks for Databricks Apps (U2M)** and select **Sign in**. Review the connection details, then select **Continue to Databricks for Databricks Apps**.
+
+    <Frame>
+      <img src="/assets/mirror/connect-modal-8ae2c2569658.png" alt="Connect Databricks for Databricks Apps modal explaining the redirect, privacy, and permission controls" width="2000" height="1144" data-path="images/connectors/databricks/u2m/connect-modal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Enter the SQL Warehouse details">
+    Enter the SQL Warehouse **HTTP path** provided by your Databricks admin, then select **Next**.
+
+    <Frame>
+      <img src="/assets/mirror/http-path-9e8a8a14b6ab.png" alt="Connect Databricks for Databricks Apps dialog prompting for the SQL Warehouse HTTP path in step 1 of 2" width="2000" height="1144" data-path="images/connectors/databricks/u2m/http-path.png" />
+    </Frame>
+
+    Replit next asks for the SQL Warehouse **Server hostname**. Enter it and continue to Databricks. Sign in when prompted, review the requested access, and approve the request.
+
+    Every query Agent runs through this connection uses your Databricks permissions and is attributed to you in Databricks audit logs.
+
+    After approval, Databricks returns you to Replit and the connector is ready to use.
+  </Step>
+</Steps>
+
+## Set up the service principal connector
+
+Service principal setup involves three roles:
+
+1. **Databricks admin**: creates the service principal and grants permissions in Databricks.
+2. **Replit organization admin**: configures the connector and access in Replit.
+3. **Builder**: starts building with the shared Databricks identity.
+
+### Service principal prerequisites
+
+Before you start, confirm you have:
+
+* Databricks account admin or workspace admin access.
+* Replit organization admin access.
+
+### Step 1: Create a service principal in Databricks
+
+<Note>
+  You must be a Databricks account admin or workspace admin to complete this
+  step.
+</Note>
+
+The Databricks admin creates a machine-to-machine identity, called a [service principal](https://docs.databricks.com/aws/en/admin/users-groups/service-principals), that Replit uses to connect to Databricks.
+
+<Steps>
+  <Step title="Open Settings">
+    In Databricks, select your avatar in the top-right corner, then select **Settings**.
+
+    <Frame>
+      <img src="/assets/mirror/settings-menu-8f2dcd4dbee3.png" alt="Databricks workspace menu with Settings selected" width="3438" height="1984" data-path="images/connectors/databricks/settings-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Select Identity and access">
+    In the Settings sidebar, select **Identity and access**.
+
+    <Frame>
+      <img src="/assets/mirror/settings-page-2a8bcd7c22a4.png" alt="Databricks Settings page with Identity and access in the sidebar" width="3438" height="1984" data-path="images/connectors/databricks/settings-page.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Manage service principals">
+    Under **Management and permissions**, find **Service principals** and select **Manage**.
+
+    <Frame>
+      <img src="/assets/mirror/identity-and-access-0e79404ed30f.png" alt="Identity and access settings page showing the Service principals Manage button" width="3438" height="1984" data-path="images/connectors/databricks/identity-and-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Add a new service principal">
+    Select **Add service principal**, then select **Add new**.
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-ac5b52f21f4c.png" alt="Add service principal dialog with the Add new button" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Name the service principal">
+    Enter a clear name for the service principal, then select **Add**.
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-name-897df9e5f7ac.png" alt="Add service principal dialog with a service principal name entered" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal-name.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Confirm the service principal details">
+    After Databricks creates the service principal, confirm it is active. Keep this page open if you need the service principal details while configuring the Replit connector.
+
+    <Frame>
+      <img src="/assets/mirror/service-principal-details-15a381d388bc.png" alt="Databricks service principal details page" width="3438" height="1984" data-path="images/connectors/databricks/service-principal-details.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Grant access">
+    Open the **Permissions** tab, select **Grant access**, choose the service principal, set the permission to **Manage**, then select **Save**.
+
+    <Frame>
+      <img src="/assets/mirror/grant-access-edbaa2541a7d.png" alt="Grant access dialog for a Databricks service principal with Manage permission selected" width="3438" height="1984" data-path="images/connectors/databricks/grant-access.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+### Step 2: Get your SQL Warehouse connection details
+
+The Replit connector needs Databricks SQL Warehouse connection details to route queries to the right compute resource.
+
+<Steps>
+  <Step title="Open SQL Warehouses">
+    In the Databricks sidebar, select **SQL Warehouses**.
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="Databricks SQL Warehouses page showing available warehouses" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Select or create a warehouse">
+    Select the SQL Warehouse you want Replit Agent to use. If you do not already have one, select **Create SQL warehouse** and create a new warehouse.
+  </Step>
+
+  <Step title="Copy connection details">
+    Open the warehouse and select **Connection details**. Locate the **Server hostname** and **HTTP path** values. You need these values when creating the Databricks connector in Replit.
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="Databricks SQL Warehouse connection details page with server hostname and HTTP path" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+### Step 3: Create the Databricks connector in Replit
+
+<Note>You must be a Replit organization admin to configure connectors.</Note>
+
+The Replit admin adds the Databricks connection details to Replit so builders can use the connector.
+
+<Steps>
+  <Step title="Navigate to Integrations">
+    From your Replit account home, open the **Integrations** page. Under **Connectors**, find **Databricks (Service Principal)** and select **Sign in**.
+
+    <Frame>
+      <img src="/assets/mirror/integrations-databricks-signin-75d3367013da.png" alt="Replit Integrations page filtered to Databricks, showing the Databricks (Service Principal) connector with a Sign in button" width="3436" height="1978" data-path="images/connectors/databricks/integrations-databricks-signin.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Confirm the connection">
+    Replit shows a confirmation dialog before redirecting to Databricks for authentication. Review the details and select **Continue to Databricks**.
+
+    <Frame>
+      <img src="/assets/mirror/connect-databricks-intro-e842722d93ea.png" alt="Connect Databricks dialog explaining the OAuth redirect, data usage, and permissions" width="3436" height="1978" data-path="images/connectors/databricks/connect-databricks-intro.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Enter the SQL Warehouse HTTP path">
+    Paste the **HTTP path** from your Databricks SQL Warehouse connection details (for example, `/sql/1.0/warehouses/abcdef1234567890`), then select **Next**.
+
+    <Frame>
+      <img src="/assets/mirror/connector-http-path-5c8ae35516f8.png" alt="Connect Databricks dialog step 1 of 2 prompting for the SQL Warehouse HTTP path" width="3436" height="1978" data-path="images/connectors/databricks/connector-http-path.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Enter the SQL Warehouse server hostname">
+    Paste the **Server hostname** from the same connection details (for example, `abc-12345678-wxyz.cloud.databricks.com`), then select **Continue to Databricks** to complete authentication.
+
+    <Frame>
+      <img src="/assets/mirror/connector-server-hostname-b97fb74713f1.png" alt="Connect Databricks dialog step 2 of 2 prompting for the SQL Warehouse server hostname" width="3436" height="1978" data-path="images/connectors/databricks/connector-server-hostname.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Configure access">
+    Use Role-Based Access Control to choose which members or groups in your organization can use this connector.
+  </Step>
+
+  <Step title="Verify the connector is active">
+    Back on the **Integrations** page, confirm that **Databricks (Service Principal)** appears under **Connectors** with an **Active** connection status.
+
+    <Frame>
+      <img src="/assets/mirror/integrations-page-d3e1d6b88376.png" alt="Replit Integrations page showing the Databricks (Service Principal) connector with an Active connection status" width="1680" height="1199" data-path="images/connectors/databricks/integrations-page.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Build with Agent
+
+After connecting with either method, builders can create applications that use Databricks data with Agent.
+
+<Steps>
+  <Step title="Select the Databricks App template for deployment">
+    Select the **Databricks App** template when you want to deploy the finished app to your Databricks environment. You do not need the template to use a configured connector to access Databricks data and assets.
+
+    From the Replit home page, open the template selector and choose **Databricks App**.
+
+    <Frame>
+      <img src="/assets/mirror/databricks-template-cdfbbba1a2ab.png" alt="Replit home page with the Databricks App template selected above the prompt box" width="1200" height="400" data-path="images/connectors/databricks/u2m/databricks-template.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Describe your application">
+    Add your prompt after the prefilled instructions. For inspiration, browse the [Databricks Dev Hub templates](https://www.databricks.com/devhub/templates).
+  </Step>
+
+  <Step title="Review and iterate">
+    Review the SQL Agent generates, the tables it queries, and the application structure. Ask for changes in natural language.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Queries return empty results">
+    Check the Databricks permissions for the identity running the query. With
+    U2M, this is the individual builder. With the service principal connector,
+    it is the shared service principal. The identity may have metadata access
+    but no read permission on the data. Grant the required catalog, schema, or
+    table permissions and try again.
+  </Accordion>
+
+  <Accordion title="The connector cannot reach the SQL Warehouse">
+    Verify that the **Server hostname** and **HTTP path** match the SQL Warehouse
+    connection details in Databricks. For U2M, check the values entered by the
+    affected builder. Also confirm that the warehouse is running and the query
+    identity has permission to use it.
+  </Accordion>
+
+  <Accordion title="Authentication fails">
+    For U2M, confirm the Databricks app connection lists
+    `https://replit.com/connectors/oauth/callback` under **Redirect URLs**, with
+    no trailing slash. If authentication fails for every builder, verify the
+    shared Client ID and Client Secret, confirm the secret has not expired, and
+    make sure the scopes in Replit match the Databricks app connection.
+
+    For the service principal connector, verify that the service principal
+    details entered in Replit match the service principal created in Databricks.
+    If credentials were rotated, update the connector in Replit.
+  </Accordion>
+
+  <Accordion title="The connector asks me to sign in again">
+    This can happen with U2M when the refresh token expires or is revoked.
+    Complete the Databricks authorization flow again. If builders must reconnect
+    more often than your security policy requires, review the app connection's
+    token lifetimes.
+  </Accordion>
+</AccordionGroup>
+
+## Related documentation
+
+* [Warehouse connectors overview](/connectors/warehouses/overview): all supported warehouse connectors.
+* [Connect Snowflake](/connectors/warehouses/snowflake): step-by-step Snowflake setup.
+* [Managing your connectors](/replitai/managing-connectors): connector management and configuration.
+* [Databricks OAuth user-to-machine authorization](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-u2m): Databricks documentation on U2M OAuth.
+* [Enable custom OAuth applications in Databricks](https://docs.databricks.com/aws/en/integrations/enable-disable-oauth): Databricks documentation on app connections.
+* [Databricks service principals](https://docs.databricks.com/aws/en/admin/users-groups/service-principals): Databricks documentation on service principals.
+* [Databricks SQL Warehouses](https://docs.databricks.com/aws/en/compute/sql-warehouse/): Databricks documentation on SQL Warehouse compute.

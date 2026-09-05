@@ -1,0 +1,251 @@
+---
+title: "SSH"
+description: "SSH를 설정하고 사용하여 로컬 개발 환경을 Replit 앱에 연결하는 방법을 알아보고 안전한 원격 액세스와 파일 동기화를 수행하세요."
+---
+
+## SSH란 무엇인가요?
+
+SSH(Secure Shell)는 Replit 앱의 명령줄 인터페이스에 원격으로 접근할 수 있게 해주는 보안 프로토콜입니다. SSH를 사용하면 파일을 원활하게 전송하고 선호하는 로컬 통합 개발 환경(IDE)을 활용하여 Replit에서 코드를 편집할 수 있어 개발 워크플로의 협업과 생산성을 높일 수 있습니다.
+
+SSH 기능은 Core, Pro, 그리고 모든 다른 유료 플랜에서 사용할 수 있습니다.
+
+프로세스에 대한 개요는 다음과 같습니다:
+
+* 로컬 머신에서 SSH 키페어를 생성합니다
+* 해당 SSH 키를 원하는 Replit 앱 내의 **SSH** 창에 추가합니다
+* SSH 클라이언트나 SSH를 통해 작동할 수 있는 에디터(예: [VSCode](https://code.visualstudio.com/) 또는 [Cursor](https://www.cursor.com/))를 사용하여 연결합니다
+
+<Note>
+  SSH 키는 특정 Replit 앱이 아닌 계정에 연결됩니다. 즉, 공개 키를 한 번만 추가하면 액세스 권한이 있는 모든 Replit 앱에 연결할 수 있습니다.
+</Note>
+
+## SSH를 사용해야 하는 이유
+
+* **Replit 앱과 에디터 간 자동 업데이트**: Replit 앱에서 이루어진 모든 변경 사항은 에디터에 즉시 반영되며, 에디터에서의 모든 수정 사항도 Replit 앱에 업데이트됩니다. 이러한 원활한 동기화는 플랫폼 전반에서 코드베이스가 항상 최신 상태로 유지되도록 보장합니다.
+
+* **파일 관리 동기화**: 파일을 추가, 삭제, 업데이트하든 이러한 변경 사항은 에디터와 Replit 앱 사이에서 실시간으로 동기화됩니다. 이 기능은 변경이 시작된 위치와 관계없이 프로젝트 구조가 일관되게 유지되도록 보장합니다.
+
+* **폴더 관리 및 파일 이동**: 폴더 간 파일 이동도 에디터와 Replit 앱 사이에 동기화됩니다. 이는 한 환경에서 이루어진 구조적 변경이 다른 환경에도 정확하게 반영되어 프로젝트의 무결성과 구조를 유지하도록 보장합니다.
+
+## 키페어 찾기 또는 생성하기
+
+계정에 SSH를 구성하려면 SSH 공개 키가 필요합니다.
+
+### 이미 키페어가 있는지 확인하기
+
+로컬 컴퓨터의 터미널에서 다음 명령을 실행하여 이미 공개 키가 있는지 확인할 수 있습니다:
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    ls -l ~/.ssh
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    dir %HOMEPATH%\.ssh
+    ```
+  </Tab>
+</Tabs>
+
+오류가 발생해도 괜찮습니다. [새 키페어 생성](#generating-a-new-keypair)으로 진행하세요.
+`replit.pub`라는 파일이 보이면 [공개 키 내용 가져오기](#get-the-contents-of-your-public-key)로 진행하세요.
+
+### 새 키페어 생성하기
+
+머신에서 터미널(또는 명령 프롬프트) 창을 열고 다음 명령을 붙여넣으세요:
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```bash theme={null}
+    ssh-keygen -t ed25519 -f ~/.ssh/replit -q -N ""
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    ssh-keygen -t ed25519 -f %HOMEPATH%\.ssh\replit -q -N ""
+    ```
+  </Tab>
+</Tabs>
+
+이 명령은 특정 SSH 공개 키 파일이 이미 존재하는지 확인합니다. 존재하지 않으면 합리적인 매개변수로 새 SSH 키를 생성합니다.
+
+### 공개 키 내용 가져오기
+
+키페어가 있는지 확인했거나 새로 생성했다면, 이후에 필요하므로 공개 키(`.pub`로 끝나는 유사한 이름의 두 파일 중 하나)의 내용을 표시하세요.
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    cat ~/.ssh/replit.pub
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    notepad %HOMEPATH%\.ssh\replit.pub
+    ```
+  </Tab>
+</Tabs>
+
+`replit.pub`의 내용을 저장하여 이 문서에서 나중에 사용하고 [계정에 SSH 키 추가](#add-the-ssh-key-to-your-account)로 진행하세요.
+
+## 계정에 SSH 키 추가하기
+
+### SSH 창을 사용하여 Replit 앱에 직접 공개 키 추가하기
+
+1. 아무 창에서든 Replit 앱에서 **+** 버튼을 선택한 다음 **SSH**를 검색하세요.
+
+<Frame>
+  <img src="/assets/mirror/ssh-tool-2db02c6a83d0.png" alt="Replit 인터페이스의 SSH 도구 버튼" width="846" height="328" data-path="images/ssh-vscode/ssh-tool.png" />
+</Frame>
+
+2. **Keys** 탭으로 이동하여 **New SSH key**를 선택하세요.
+3. 팝업 창에서 키의 **Label**(예: my-ssh-key)을 입력하고 복사한 공개 키를 **Key** 섹션에 붙여넣으세요.
+   **Add SSH Key** 버튼을 선택하세요. 키가 추가되고 사용이 승인되었습니다.
+
+<Frame>
+  <img src="/assets/mirror/add-ssh-key-with-values-5d6f440e56ba.png" alt="레이블과 키 필드가 입력된 SSH 키 추가 대화상자" width="500" height="511" data-path="images/ssh-vscode/add-ssh-key-with-values.png" />
+</Frame>
+
+### 설정에서 직접 공개 키 추가하기
+
+**설정**을 열고 **계정** 아래에서 **고급**(또는 **SSH 키** 옵션)을 선택하여 SSH 키를 추가할 수도 있습니다. **Add SSH key**를 선택하고 이전 섹션인 [키페어 찾기 또는 생성하기](#find-or-create-a-keypair)에서 얻은 `replit.pub`의 내용을 붙여넣으세요.
+
+<Note>
+  머신에 여러 공개 키가 있는 경우 SSH 구성에 올바른 개인 키와 공개 키 조합을 사용하는 것이 중요합니다.
+</Note>
+
+## Replit 앱에 연결하기
+
+### SSH 구성 설정하기
+
+1. 터미널에서 `~/.ssh` 디렉터리와 `~/.ssh/config` 파일이 존재하는지 확인하세요:
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/config && chmod 600 ~/.ssh/config
+    open -a 'TextEdit' ~/.ssh/config || nano ~/.ssh/config
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    if not exist %HOMEPATH%\.ssh mkdir %HOMEPATH%\.ssh && type \NUL > %HOMEPATH%\.ssh\config
+    notepad %HOMEPATH%\.ssh\config
+    ```
+  </Tab>
+</Tabs>
+
+2. 모든 \*.replit.dev 도메인에 `replit` 키페어를 사용하도록 구성 블록을 추가하세요:
+
+<Tabs>
+  <Tab title="Mac/Linux/Windows">
+    ```
+    Host *.replit.dev
+        Port 22
+        IdentityFile ~/.ssh/replit
+        StrictHostKeyChecking accept-new
+    ```
+  </Tab>
+</Tabs>
+
+### VSCode 또는 Cursor에서 연결하기
+
+1. Replit 앱에서 **SSH** 창을 엽니다
+
+2. SSH 창에서 **Connect** 탭으로 이동하여 **Launch VS Code**를 선택하세요.
+
+<Tabs>
+  <Tab title="VSCode로 연결">
+    <img src="/assets/mirror/ssh-connect-439a3c150846.png" alt="Launch VS Code 옵션을 보여주는 SSH connect 탭" width="788" height="482" data-path="images/ssh-vscode/ssh-connect.png" />
+  </Tab>
+</Tabs>
+
+3. `~/.ssh/config`를 작성하라는 메시지가 표시되면 다음을 입력하세요:
+
+   ```
+   Host *.replit.dev
+       Port 22
+       IdentityFile ~/.ssh/replit
+       StrictHostKeyChecking accept-new
+   ```
+
+   <Note>
+     SSH 구성 추가는 VS Code나 다른 에디터에 처음 연결을 시도할 때만 표시됩니다. 구성 파일로 돌아가려면 \*\*Configure SSH Hosts...\*\*를 선택해야 합니다.
+   </Note>
+
+4. 외부 애플리케이션 경고가 표시되면 **Yes**를 선택하여 원하는 에디터나 VS Code에서 프로젝트를 열겠다는 것을 확인하세요.
+
+5. 주기적으로 SSH 확장을 설치하거나 업데이트하라는 요청을 받을 수 있습니다. Replit은 이러한 IDE의 최신 버전과 호환되도록 노력하며, 중요한 보안 업데이트도 받을 수 있습니다.
+
+### 수동으로 연결하기
+
+**SSH** 창의 "Connect" 탭 하단에서 "Connect manually"를 찾을 수 있습니다.
+
+해당 명령을 복사하여 로컬 터미널(Mac 또는 Linux) 또는 로컬 명령 프롬프트(Windows)에 붙여넣어 직접 연결하세요.
+
+이는 IDE와의 연결 문제를 디버깅하는 좋은 방법이며, Replit 지원팀에 버그를 신고할 때 유용한 "verbose" 연결 정보를 수집하는 데도 도움이 됩니다.
+
+**존재하지 않는 개인 키로 연결을 시도하는 오류의 예**:
+
+```
+$ ssh -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+Warning: Identity file /Users/user/.ssh/replit not accessible: No such file or directory.
+```
+
+**버그 신고에 포함할 SSH 연결 시도의 전체 디버그 로그**:
+
+```
+$ ssh -vvv -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+OpenSSH_9.6p1, LibreSSL 3.3.6
+debug1: Reading configuration data /Users/.../.ssh/config
+debug1: /Users/.../.ssh/config line 1: Applying options for *
+debug1: /Users/.../.ssh/config line 4: Applying options for *.replit.dev
+debug3: channel_clear_timeouts: clearing
+debug1: Connecting to c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev port 22.
+debug1: Connection established.
+debug1: identity file /Users/dstewart/.ssh/replit type 3
+debug1: Local version string SSH-2.0-OpenSSH_9.6
+debug1: Remote protocol version 2.0, remote software version Replit-SSH-Proxy
+debug1: compat_banner: no match: Replit-SSH-Proxy
+debug3: fd 5 is O_NONBLOCK
+...
+Welcome to the Replit SSH Proxy.
+
+Visit https:/.replit.com/replit-workspace/ssh to learn more about SSH on Replit.
+debug3: receive packet: type 51
+debug1: Authentications that can continue: password,publickey
+debug3: start over, passed a different list password,publickey
+debug3: preferred publickey,keyboard-interactive,password
+debug3: authmethod_lookup publickey
+debug3: remaining preferred: keyboard-interactive,password
+debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+...
+debug2: we did not send a packet, disable method
+debug3: authmethod_lookup password
+debug3: remaining preferred: ,password
+debug3: authmethod_is_enabled password
+debug1: Next authentication method: password
+```
+
+### 여기에 나열되지 않은 도구로 연결하기
+
+플랫폼과 운영 체제마다 다양한 SSH 클라이언트를 사용할 수 있으며, 많은 클라이언트가 서로 다른 기능이나 통합을 제공합니다.
+
+"Connect Manually"에 표시된 명령을 구성 요소로 분해하여 각 클라이언트를 구성하는 방법을 항상 파악할 수 있습니다:
+
+```sh theme={null}
+ssh -i ~/.ssh/replit -p 22  c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+       ^-----v-----^    ^^  ^-----------------v----------------^ ^------------------------------v-------------------------------------^
+        Private Key   Port                   User               @                           Hostname
+```
+
+**Hostname**: `<your_hostname>.<cluster>.replit.dev`
+**Port**: `<port_number>`
+**User**: `Username`
+**Private Key**: 컴퓨터의 개인 키 파일 경로. 보통 `replit.pub` 옆에 있습니다.

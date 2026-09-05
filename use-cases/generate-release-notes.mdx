@@ -1,0 +1,141 @@
+---
+title: "Generate release notes"
+description: "Every week, turn GitHub and Linear changes into release notes people can actually read."
+sidebarTitle: "Generate release notes"
+icon: "file-lines"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Every week, pull changes from GitHub and Linear, generate customer-facing release
+notes grouped by New, Improved, and Fixed, and publish them in Notion. Skip internal-only
+chores and flag anything that looks like a breaking change, so product, support, and
+customers share one story on a regular cadence.
+
+## Best for
+
+* Product managers who need a weekly changelog without waiting for a version tag.
+* Product marketing and support who need the same story as customers.
+
+## Connectors
+
+<Connectors
+  items={[
+{ id: "github", name: "GitHub", why: "Merged pull requests and tags" },
+{ id: "linear", name: "Linear", why: "Issues and customer-facing titles" },
+{ id: "notion", name: "Notion", why: "Published notes" },
+]}
+/>
+
+## Before you start
+
+Point Agent at the repo and Linear team. Connect Notion for the published page. Say which
+day the weekly run should happen.
+
+## Prompt the agent
+
+<AiPrompt>
+  Create a routine that runs every Monday at 9:00. Pull last week's changes from
+  GitHub and Linear, generate customer-facing release notes grouped by New,
+  Improved, and Fixed, and publish them in Notion. Skip internal-only chores.
+  Flag anything that looks like a breaking change.
+</AiPrompt>
+
+## What to expect
+
+Agent drafts last week's notes from pull requests and issues, then writes a Notion page.
+Edit the voice before you send them to customers. Skip anything that looks like an
+internal chore, and put breaking changes at the top. Compare the page to last week's
+merged pull requests before you publish.
+
+## Make it work for you
+
+<AiPrompt>
+  Write two versions: one for customers, one for the internal changelog. Keep
+  them in the same Notion page.
+</AiPrompt>
+
+<AiPrompt>
+  Add a Slack post in #ship that links the Notion page and lists the 3
+  highlights.
+</AiPrompt>
+
+## Troubleshooting
+
+* **Internal chores show up in the notes:** point Agent at the right repo and Linear team, and ask it again to skip chores that never ship to customers.
+* **A breaking change was buried:** tell Agent what "breaking" means for you (login, billing, or a required migration) and ask it to put those items at the top, flagged.
+* **The Notion page is the wrong one:** give the exact page or database link, and say whether to overwrite last week's notes or create a new page each run.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Source candidates" href="/use-cases/source-candidates">
+    Same GitHub connector for hiring, not shipping.
+  </Card>
+
+  <Card title="Analyze customer feedback" href="/use-cases/analyze-customer-feedback">
+    For product managers who also review tickets in Notion.
+  </Card>
+</CardGroup>

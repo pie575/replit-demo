@@ -1,0 +1,146 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Acompanhar assinaturas
+
+> Encontre pagamentos recorrentes no e-mail e calcule quanto custam por mês.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Vasculhe o Gmail em busca de e-mails de assinatura e recibo, identifique pagamentos
+recorrentes e calcule o custo mensal no Google Sheets. O Agent extrai fornecedor, valor e
+periodicidade, e sinaliza tudo que parecer um teste gratuito esquecido antes que ele renove.
+
+## Ideal para
+
+* Fundadores e líderes de operações que precisam saber o gasto mensal real com ferramentas e serviços.
+* Gerentes financeiros e administrativos que precisam identificar testes gratuitos esquecidos antes que renovem.
+
+## Conectores
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "Recibos e e-mails de renovação" },
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "Lista contínua de assinaturas e custo mensal",
+},
+]}
+/>
+
+## Antes de começar
+
+Conecte o Gmail e uma planilha do Google (ou peça ao Agent para criar uma). Diga ao Agent
+qual caixa de entrada ou marcador pesquisar.
+
+## Dê o prompt ao agente
+
+<AiPrompt>
+  Crie uma rotina que rode toda segunda-feira às 9h. Vasculhe o Gmail em busca
+  de e-mails de assinatura e recibo. Identifique pagamentos recorrentes,
+  extraia fornecedor, valor e periodicidade, e escreva uma planilha do Google
+  que calcule o custo mensal. Sinalize tudo que parecer um teste gratuito
+  esquecido.
+</AiPrompt>
+
+## O que esperar
+
+O Agent monta uma tabela de fornecedores, valores, periodicidade de cobrança e um total
+mensal. Faça uma checagem pontual de algumas linhas em relação aos e-mails originais. A
+primeira execução vai perder fornecedores que não dizem "assinatura" no assunto; adicione
+esses marcadores e execute novamente. Escolha três fornecedores que você conhece, abra o
+recibo no Gmail e confirme o valor e a periodicidade antes de confiar no total mensal.
+
+## Adapte ao seu caso
+
+<AiPrompt>
+  Agrupe as assinaturas por categoria (ferramentas de desenvolvimento, design,
+  IA, pessoal) e destaque tudo acima de \$\[valor] por mês.
+</AiPrompt>
+
+<AiPrompt>
+  Envie um lembrete no Slack 3 dias antes de qualquer renovação anual acima de
+  \$\[valor].
+</AiPrompt>
+
+## Solução de problemas
+
+* **A planilha está sem assinaturas que você conhece:** diga ao Agent qual marcador ou busca do Gmail usar, e inclua fornecedores que não dizem "assinatura" no assunto. Faça uma checagem pontual de algumas linhas em relação aos e-mails originais.
+* **Os valores ou a periodicidade parecem errados:** os recibos costumam mostrar imposto, créditos ou uma moeda diferente. Peça ao Agent para manter o valor do item de linha e o período de cobrança do e-mail, e sinalizar linhas que ele inferiu.
+* **O mesmo fornecedor aparece duas vezes:** peça ao Agent para mesclar por nome do fornecedor e manter o recibo mais recente, depois recalcular o total mensal.
+
+## Relacionados
+
+<CardGroup cols={2}>
+  <Card title="Colocar-se em dia após um período fora" href="/pt/use-cases/catch-up-while-away">
+    Mesmo conector do Gmail para fundadores e times de operações após uma folga.
+  </Card>
+
+  <Card title="Criar um painel de API em tempo real" href="/pt/use-cases/live-api-dashboard">
+    Um painel em tempo real em vez de uma tabela semanal.
+  </Card>
+</CardGroup>

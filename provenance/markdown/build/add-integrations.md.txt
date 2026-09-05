@@ -1,0 +1,98 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Add integrations
+
+> Send every Velocity booking to the customer's Google Calendar.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+By the end, every Velocity reservation will land on the customer's Google Calendar with the pickup and return times already filled in.
+
+Integrations let Velocity talk to other tools. You could send each booking to the customer's calendar, email a coordinator when a high-value rental is reserved, or pull weather into the trip-planning page. Pick one for now — Google Calendar gives every customer a clear, verifiable artifact ("the rental is on my calendar"), and you can check it on your own calendar during testing.
+
+## Tell Agent to add the calendar integration
+
+Replit ships a built-in **Google Workspace connector** that covers Google Calendar. Agent signs in to Google with a single click — there are no API projects to create, no OAuth credentials to copy, and no secrets to paste.
+
+<AiPrompt>
+  After a Velocity customer confirms a reservation, add the rental to their Google Calendar.<br />
+  Use Replit's Google Workspace connector for Google Calendar — don't ask me for any OAuth credentials.<br />
+  The event title should be "Velocity rental: \[car make and model]".<br />
+  The event should span pickup time to return time and include the pickup address and the reservation reference in the description.<br />
+  Update the calendar event automatically if the customer changes the dates or cancels the reservation.<br />
+  Add a clear message in Velocity if the calendar add fails, so the reservation still confirms.
+</AiPrompt>
+
+Agent will provision the Google Workspace connector, open a single Connect dialog in the workspace, and after you sign in with the Google account that owns the calendar, wire Velocity to add an event every time a reservation is confirmed.
+
+<Note>
+  Connectors are a Core, Pro, or Enterprise feature. On the free plan, ask Agent to use a Google OAuth project instead — you'll need to create a Google Cloud project, enable the Calendar API, and paste the resulting credentials into your app's Secrets pane.
+</Note>
+
+## Test it end-to-end
+
+1. Open your own Google Calendar in a new tab.
+2. Sign in to Velocity in Preview.
+3. Reserve a car for next Saturday-Sunday and confirm the booking.
+4. Switch to your Google Calendar tab. A new "Velocity rental: \[car]" event should appear on Saturday-Sunday with the pickup address in the description.
+5. Change the reservation in Velocity to Sunday-Monday. The calendar event should move automatically.
+6. Cancel the reservation. The calendar event should disappear.
+7. As a second test, open **Integrations** in the workspace and disconnect Google Workspace, then try to book. Velocity should still confirm the reservation and show a clear message like "Couldn't add to your calendar — your reservation is confirmed." Reconnect the connector once the test passes.
+
+If the reservation confirms but no event appears, paste the exact error back to Agent:
+
+<AiPrompt>
+  The integration failed with this error: \[paste the error from Velocity or the Replit logs].<br />
+  Tell me the likely cause and fix the smallest issue.<br />
+  Make sure reserving a car still works in Velocity even if Google Calendar is unreachable.
+</AiPrompt>
+
+## Publish and try it from the public URL
+
+Once the calendar integration works in Preview:
+
+1. Publish Velocity again from the Agent chat.
+2. Open the public URL and book a car from a real customer's perspective.
+3. Confirm the event appears on the calendar of the account that booked.
+4. Update and cancel a booking from the public URL and confirm the calendar event follows.
+
+Customers now leave Velocity with the rental already on their calendar. The reservation isn't just a confirmation email — it's an event they can't forget.
+
+## Improve it next
+
+<CardGroup cols={2}>
+  <Card title="Add a custom domain" icon="globe" href="/build/add-custom-domain">
+    Move Velocity to a branded URL customers can share.
+  </Card>
+
+  <Card title="Add payments" icon="credit-card" href="/build/add-payments">
+    Take a refundable deposit at booking.
+  </Card>
+</CardGroup>
+
+## Need further help?
+
+* **No event appears in Google Calendar:** open **Integrations** in the workspace, confirm the Google Workspace connector shows Connected, and that the Calendar scope is granted.
+* **The connector shows Connected but events still don't land:** ask Agent to log the calendar payload it sends, then fix the field mapping.
+* **Date or address fields land in the wrong place on the event:** ask Agent to log the event shape it sends, then fix the field mapping.
+* **You want a different integration:** swap "Google Calendar" for any other connector — Slack notifications for the team, HubSpot to log customers as CRM contacts, Airtable to track bookings in a shared base. Agent handles each the same way through the Integrations pane.
+
+## Related
+
+* [Integrations](/features/integrations/overview)
+* [Replit AI integrations](/features/integrations/replit-ai-integrations)

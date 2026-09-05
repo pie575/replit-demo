@@ -1,0 +1,128 @@
+---
+title: "Construa em paralelo"
+description: "Aprenda a construir vários recursos ao mesmo tempo com tarefas paralelas: delegue com segurança, divida o trabalho em partes pequenas e aplique alterações sem surpresas."
+sidebarTitle: "Construa em paralelo"
+icon: "layer-group"
+---
+
+Lidar com várias partes do trabalho ao mesmo tempo é uma daquelas habilidades que separam bons construtores de construtores excepcionais. Esta página ensina como construir vários recursos ao mesmo tempo, com segurança, mesmo que você nunca tenha trabalhado assim antes.
+
+## Uma nova forma de trabalhar com o Agent
+
+Até agora, você provavelmente trabalhou com o Agent como um parceiro sentado ao seu lado: você pergunta, observa, responde. Construir em paralelo é um tipo de relação diferente. Você entrega um recurso ao Agent como uma **tarefa**, e ele vai construí-la em segundo plano enquanto você faz outra coisa.
+
+Você já trabalha assim no dia a dia. Você não fica parado na frente da máquina de lavar até ela terminar. Você coloca a roupa para lavar e vai cozinhar. As tarefas funcionam da mesma forma: inicie uma e, enquanto ela roda, inicie outra, revise outra coisa ou simplesmente continue conversando com o Agent na conversa principal.
+
+Isso muda seu papel. Você deixa de ser um passageiro observando uma única construção e se torna o diretor de várias.
+
+## Seu app fica seguro enquanto as tarefas rodam
+
+A primeira pergunta que todo mundo faz: *uma tarefa em segundo plano pode quebrar meu app enquanto eu não estou olhando?*
+
+Não. Cada tarefa trabalha em sua própria **cópia** do seu projeto. Seu app não muda até que você revise o trabalho de uma tarefa e escolha aplicá-lo.
+
+Cada tarefa também recebe seu próprio Agent e herda todo o contexto do seu projeto, então você não precisa se repetir. As tarefas são independentes: você pode iniciar a próxima no momento em que a primeira estiver rodando.
+
+## Um exemplo prático: três recursos ao mesmo tempo
+
+Imagine um app de aluguel de carros que já lida com reservas e login. Você quer adicionar três recursos:
+
+* Uma página de eventos
+* Inscrição em eventos
+* Um formulário de contato
+
+Construídos um após o outro, levando cerca de cinco minutos cada, isso são quinze minutos. Construídos em paralelo, são cerca de cinco.
+
+Crie uma tarefa para cada recurso. As tarefas começam no modo Plan, então cada uma mostra um plano antes de começar a construir. Aprove os planos e observe o que acontece: a página de eventos e o formulário de contato começam a ser construídos imediatamente, mas a inscrição em eventos espera. Os visitantes não podem se inscrever em eventos se a página de eventos ainda não existir. O Agent percebe essa dependência sozinho, age como um gerente de projetos e executa essa tarefa depois daquela da qual ela depende.
+
+<Frame>
+  <img src="/assets/mirror/task-plan-sidebar-ecab81b06bb0.png" alt="Visualização de thread mostrando várias tarefas rodando em paralelo com indicadores de status" width="3430" height="1986" data-path="images/replitai/task-plan-sidebar.png" />
+</Frame>
+
+Para ver tudo de uma vez, abra o quadro de tarefas, onde cada tarefa se move pelas colunas de rascunho até concluída em tempo real.
+
+<Frame>
+  <img src="/assets/mirror/task-board-progress-f4d3b5e7e93e.png" alt="Quadro de tarefas mostrando tarefas organizadas em colunas de rascunho até concluída" width="3456" height="1984" data-path="images/replitai/task-board-progress.png" />
+</Frame>
+
+## Divida seu trabalho em partes pequenas
+
+A habilidade que faz a construção em paralelo funcionar é dividir os recursos em tarefas pequenas e autossuficientes. Tarefas pequenas terminam mais rápido, são mais fáceis de revisar e têm menos chance de interferir umas nas outras.
+
+Uma regra útil: **se a descrição da sua tarefa contém "e", considere dividi-la.**
+
+* Bom: "Adicionar uma página de eventos", "Adicionar um formulário de contato"
+* Grande demais: "Adicionar eventos e inscrição e notificações por e-mail e uma visão de administrador"
+
+A versão grande não está errada, mas força um único Agent a fazer tudo em sequência. Quatro tarefas pequenas dão ao Agent a chance de executá-las juntas.
+
+Teste a si mesmo. Quais destas poderiam rodar em paralelo?
+
+1. Adicionar um alternador de modo escuro
+2. Adicionar uma seção de avaliações de clientes
+3. Permitir que clientes respondam às avaliações
+4. Traduzir o app para o francês
+
+<Accordion title="Resposta">
+  As tarefas 1, 2 e 4 são independentes e podem rodar todas ao mesmo tempo. A tarefa 3 depende da tarefa 2: não há nada para responder até que as avaliações existam. Você não precisa perceber isso sozinho. O Agent detecta a dependência e sequencia essas duas tarefas para você.
+</Accordion>
+
+## Por que você atualiza antes de aplicar
+
+Aqui está o único conceito que confunde todo mundo, então vamos com calma.
+
+Dois amigos levam para casa uma cópia do mesmo convite de festa para melhorá-lo. Um adiciona um mapa. O outro reescreve o cronograma. Você aceita a versão do primeiro amigo, e ela se torna o convite real. Agora a cópia do segundo amigo tem um problema: sua reescrita se baseia em um convite que não existe mais. Antes de aceitar o trabalho dele, ele precisa refazê-lo na versão mais recente.
+
+As tarefas funcionam exatamente assim. Cada uma copiou seu projeto quando começou. No momento em que você aplica as alterações de uma tarefa, a cópia de todas as outras tarefas fica uma versão atrasada. Para recursos não relacionados, isso geralmente não é um problema, mas como você não está lendo o código, não é possível ter certeza de que duas tarefas não mexeram na mesma coisa.
+
+<Tip>
+  Antes de aplicar as alterações de uma tarefa, **atualize** a tarefa primeiro. Atualizar sincroniza a tarefa com a versão mais recente do seu app e resolve quaisquer conflitos, para que suas tarefas se construam umas sobre as outras em vez de se sobrescreverem.
+</Tip>
+
+## Revise como um gerente
+
+Construir em paralelo faz de você um gerente, e o erro clássico de gerente é aprovar um trabalho que você não conferiu. A disciplina é um loop simples, uma tarefa por vez:
+
+<Steps>
+  <Step title="Teste o trabalho da tarefa">
+    Abra a tarefa concluída e experimente o recurso. Clique em tudo como um usuário faria.
+  </Step>
+
+  <Step title="Aplique">
+    Gostou? Aplique as alterações ao seu app principal.
+  </Step>
+
+  <Step title="Atualize a próxima tarefa">
+    Antes de mexer na próxima tarefa concluída, atualize-a para que ela sincronize com a versão que você acabou de alterar.
+  </Step>
+
+  <Step title="Repita">
+    Teste, aplique, atualize, até que todas as tarefas tenham sido incorporadas.
+  </Step>
+</Steps>
+
+<Frame>
+  <img src="/assets/mirror/task-review-apply-3ef379c7e976.png" alt="Tela de revisão de tarefa mostrando o registro de trabalho do Agent, resultados de testes e o botão Aplicar alterações" width="3456" height="1984" data-path="images/replitai/task-review-apply.png" />
+</Frame>
+
+Nunca aprove em lote. Três recursos não revisados aplicados de uma vez significam três suspeitos quando algo parecer errado.
+
+## Quando permanecer sequencial
+
+Construir em paralelo é uma ferramenta, não uma regra. Fique na conversa principal, uma coisa de cada vez, quando:
+
+* **Duas ideias tocam a mesma tela.** "Redesenhar a página inicial" e "mudar a navegação" vão colidir. Faça-as em ordem.
+* **Você está explorando.** No trabalho de design, o resultado de uma tentativa muda o que você quer em seguida. Exploração é uma conversa, não uma ordem de serviço.
+* **Você não consegue descrever a tarefa em uma frase.** Se você não consegue declará-la de forma simples, ainda não está pronto para delegá-la.
+
+## Encontre seu limite
+
+O limite para construir em paralelo não é o Replit. É a sua atenção. Toda vez que você alterna entre tarefas, você paga um pequeno custo de foco, e o orçamento de cada pessoa é diferente.
+
+Comece com duas tarefas. Se revisá-las parecer confortável, tente três. Os agentes são bons o suficiente na construção para que você não precise supervisionar cada etapa, então a maioria dos construtores acha que a velocidade vale a troca de contexto. Mas essa é uma habilidade que se pratica, não uma configuração que se ativa.
+
+## Próximos passos
+
+* [Sistema de tarefas](/pt/core-concepts/agent/task-system): A referência completa de como as tarefas funcionam.
+* [Modos Plan e Build](/pt/learn/plan-vs-build-mode): Por que as tarefas começam com um plano.
+* [Vibe coding 101](/pt/learn/foundations/vibe-coding-101): A mentalidade de construir em pequenas partes que torna a divisão de tarefas natural.

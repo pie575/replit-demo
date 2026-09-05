@@ -1,0 +1,143 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Track subscriptions
+
+> Find recurring payments in email and calculate what they cost each month.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Scan Gmail for subscription and receipt emails, identify recurring payments, and calculate
+monthly cost in Google Sheets. Agent extracts vendor, amount, and cadence, and flags
+anything that looks like a forgotten trial before it renews.
+
+## Best for
+
+* Founders and ops leads who need the real monthly spend on tools and services.
+* Finance and office managers who need to catch forgotten trials before they renew.
+
+## Connectors
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "Receipts and renewal emails" },
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "Running list of subscriptions and monthly cost",
+},
+]}
+/>
+
+## Before you start
+
+Connect Gmail and a Google Sheet (or ask Agent to create one). Tell Agent which inbox or
+label to search.
+
+## Prompt the agent
+
+<AiPrompt>
+  Create a routine that runs every Monday at 9:00. Scan Gmail for subscription
+  and receipt emails. Identify recurring payments, extract vendor, amount, and
+  cadence, and write a Google Sheet that calculates monthly cost. Flag anything
+  that looks like a forgotten trial.
+</AiPrompt>
+
+## What to expect
+
+Agent builds a table of vendors, amounts, billing cadence, and a monthly total. Spot-check a
+few rows against the original emails. The first run will miss vendors that don't say
+"subscription" in the subject; add those labels and rerun. Pick three vendors you know,
+open the Gmail receipt, and confirm amount and cadence before you trust the monthly total.
+
+## Make it work for you
+
+<AiPrompt>
+  Group subscriptions by category (dev tools, design, AI, personal) and
+  highlight anything over \$\[amount] per month.
+</AiPrompt>
+
+<AiPrompt>
+  Send a Slack reminder 3 days before any annual renewal over \$\[amount].
+</AiPrompt>
+
+## Troubleshooting
+
+* **The sheet is missing subscriptions you know about:** tell Agent which Gmail label or search to use, and include vendors that don't say "subscription" in the subject. Spot-check a few rows against the original emails.
+* **Amounts or cadence look wrong:** receipts often show tax, credits, or a different currency. Ask Agent to keep the line-item amount and billing period from the email, and to flag rows it inferred.
+* **The same vendor appears twice:** ask Agent to merge by vendor name and keep the latest receipt, then recalculate the monthly total.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Catch up while away" href="/use-cases/catch-up-while-away">
+    Same Gmail connector for founders and ops after time off.
+  </Card>
+
+  <Card title="Build a live API dashboard" href="/use-cases/live-api-dashboard">
+    A live dashboard instead of a weekly table.
+  </Card>
+</CardGroup>

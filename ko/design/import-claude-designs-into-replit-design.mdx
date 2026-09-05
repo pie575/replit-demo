@@ -1,0 +1,135 @@
+---
+title: "Replit Design으로 Claude 디자인 가져오기"
+description: "Claude에서 Replit으로 디자인을 전송하고, 정적 HTML에서 프로젝트를 만들고, Agent가 대화형 앱으로 변환하도록 하세요."
+sidebarTitle: "Claude에서 가져오기"
+icon: "file-import"
+---
+
+export const platform_0 = "Claude"
+
+export const projectType_0 = "project"
+
+export const setupDescription_0 = "Agent가 정적 디자인을 대화형 앱으로 변환하고 Replit에서 실행되도록 구성합니다"
+
+Claude에서 만든 디자인은 경험이 어떻게 보여야 하는지 보여줍니다. Claude의 **Send to Replit** 옵션을 사용하면 그 디자인을 Replit에 전달할 수 있으며, Replit에서 프로젝트가 되고 Agent가 동작하는 대화형 앱으로 만들어줍니다.
+
+<Note>
+  이것은 새로운 통합입니다. **Send to Replit**은 Claude가 디자인의 목적지로 Replit을 제공할 때만 Claude의 **Send to…** 메뉴에 나타납니다. 사용 가능 여부는 Claude가 제어하므로 아직 모든 계정에 표시되지 않을 수 있습니다. 전달을 수락하면 Claude가 Replit 동의 화면에서 **Access apps**, **Create and manage apps**, **Stay signed in to this application** 권한을 요청합니다.
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/claude-design-canvas-fa8be1a1ea5a.png" alt="Claude의 디자인 캔버스에서 열린 Velocity 디자인 — Replit에 전달해 대화형 앱으로 만들 수 있는 자체 완결형 디자인" width="2000" height="1143" data-path="images/claude-to-app/claude-design-canvas.png" />
+</Frame>
+
+## 작동 방식
+
+전달 과정은 Claude에서 시작해 Replit에서 마무리됩니다:
+
+1. Claude의 디자인 캔버스에서 자체 완결형 디자인을 만듭니다.
+2. Claude의 **Share → Send to…** 메뉴에서 Replit으로 디자인을 전송합니다.
+3. Claude가 Replit 계정에 접근하도록 승인하고 워크스페이스를 선택합니다.
+4. Replit이 디자인을 정적 `index.html` 파일로 담은 프로젝트를 만듭니다.
+5. Agent가 **Turn this Claude design into a real app** 작업을 시작해 대화형으로 만듭니다.
+
+이는 Claude가 승인된 앱 연결을 통해 Replit으로 디자인을 *전송*하는 방식입니다. Replit에서 먼저 아무것도 설정할 필요가 없습니다 — 흐름은 Claude에서 시작됩니다.
+
+## 시작하기 전에
+
+다음이 필요합니다:
+
+* [Replit 계정](https://replit.com).
+* Claude의 디자인 캔버스에 디자인이 있는 Claude 계정.
+* 새 프로젝트를 만들 Replit 워크스페이스.
+
+## Claude에서 Replit으로 디자인 전송하기
+
+빌드하고 싶은 디자인이 있는 Claude에서 시작하세요.
+
+<Steps>
+  <Step title="Claude에서 디자인 열기">
+    Claude에서 앱으로 만들고 싶은 디자인을 엽니다.
+  </Step>
+
+  <Step title="Send to 메뉴 열기">
+    **Share**를 선택한 다음 **Send to…** 메뉴를 엽니다. Replit이 목적지로 나타납니다.
+
+    <Frame>
+      <img src="/assets/mirror/claude-send-to-menu-d4353906aea3.png" alt="Claude Code와 함께 Replit이 목적지로 나열된 Claude의 Send to… 메뉴" width="2000" height="1143" data-path="images/claude-to-app/claude-send-to-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Replit 선택하기">
+    **Replit**을 선택해 Replit 계정으로의 전달을 시작합니다.
+  </Step>
+
+  <Step title="Replit 접근 승인하기">
+    **Claude would like to access your Replit account**라는 제목의 Replit 동의 화면에서 Claude가 요청하는 권한 — **Access apps**, **Create and manage apps**, **Stay signed in to this application** — 을 검토한 다음 연결을 승인합니다.
+
+    <Frame>
+      <img src="/assets/mirror/replit-oidc-consent-76dfc4d92a2f.png" alt="'Claude would like to access your Replit account'라는 제목의 Replit 동의 화면 — Access apps, Create and manage apps, Stay signed in 권한과 워크스페이스 선택기가 표시됨" width="2000" height="1143" data-path="images/claude-to-app/replit-oidc-consent.png" />
+    </Frame>
+  </Step>
+
+  <Step title="워크스페이스 선택하기">
+    새 프로젝트를 만들 Replit 워크스페이스를 선택한 다음 확인합니다.
+  </Step>
+</Steps>
+
+확인하면 Replit이 디자인으로부터 프로젝트를 만들고 워크스페이스에서 엽니다.
+
+## 가져오는 항목
+
+Replit은 디자인을 단일 자체 완결형 `index.html` 파일로 가져옵니다. 가져오기는 Claude가 디자인에 포함한 시각적 레이아웃, 스타일링, 에셋을 그대로 보존합니다.
+
+가져오기는 동작하는 시작점을 제공합니다. 디자인이 정적 HTML로 전달되므로, 가져온 후에도 동작, 데이터, 대화형 기능은 직접 추가해야 합니다.
+
+## 가져오지 않는 항목
+
+전달되는 것은 디자인이지 완성된 애플리케이션이 아닙니다. 다음은 가져오기에 포함되지 않습니다:
+
+* 백엔드 로직과 서버 측 기능.
+* 데이터베이스 또는 저장된 데이터.
+* 동작하는 양식, 상태, 내비게이션 같은 대화형 기능.
+
+Agent가 디자인을 실제 앱으로 만들 때 이러한 기능을 추가합니다.
+
+## Agent가 디자인을 대화형으로 만들기
+
+가져온 후 Agent가 워크스페이스에서 **Turn this Claude design into a real app** 작업을 시작합니다. Agent는 정적 디자인을 바탕으로 그 디자인이 암시하는 대화형 동작을 빌드합니다.
+
+<Frame caption="Claude에서 전달된 Velocity 디자인이 Replit Design의 프레임으로 표시되고, Agent의 실행이 완료된 모습.">
+  <img src="/assets/mirror/claude-design-in-replit-design-ff81b055b1f5.webp" alt="Claude에서 전송된 Velocity 슈퍼카 렌탈 디자인이 Replit Design에서 Claude design 프레임으로 열려 있고, 채팅 패널에는 Agent 작업이 완료됨으로 표시됨" width="1600" height="1004" data-path="images/claude-to-app/claude-design-in-replit-design.webp" />
+</Frame>
+
+작업이 끝나면 Preview를 열어 결과를 테스트하세요. 실행 중인 앱을 원래 Claude 디자인과 비교해 다음을 확인합니다:
+
+* 레이아웃과 스타일링이 디자인과 충분히 일치하는지.
+* 버튼, 양식, 내비게이션이 예상대로 동작하는지.
+* 새로고침 후에도 앱이 계속 작동하는지.
+
+무언가 빠져 있거나 어긋난다면 Agent에게 변경 사항을 설명해 앱을 다듬도록 하세요.
+
+## Configure and run your app
+
+During import, {setupDescription_0}. If your app needs changes, use these Project Editor tools:
+
+* **[Agent](/features/agent/overview)**: Refine features, debug issues, and make code changes
+* **[Secrets](/core-concepts/project-editor/app-setup/secrets)**: Add API keys and environment variables
+* **[Workflows](/features/workspace-tools/workflows)**: Set the **Run** command for your app
+
+## Continue your journey
+
+Now that you've imported your {platform_0} {projectType_0}, explore these next steps:
+
+* [Replit Agent](/features/agent/overview): Get help with feature work, debugging, and refactoring
+* [Replit Deployments](/learn/projects-and-artifacts/replit-deployments): Publish your app
+* [Collaborate](/build/invite-teammates): Build with teammates
+
+## 요금
+
+디자인을 동작하는 앱으로 만드는 데는 Agent가 사용되며, 이는 크레딧을 소모할 수 있습니다. 크레딧 사용량은 Agent가 가져온 디자인 위에 얼마나 많이 빌드하는지에 따라 달라집니다.
+
+## 관련 항목
+
+* [제공업체에서 가져오기](/ko/build/import-from-providers)
+* [Replit Design으로 Figma 디자인 가져오기](/ko/design/import-figma-designs-into-replit-design)

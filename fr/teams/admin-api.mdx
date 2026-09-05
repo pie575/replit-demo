@@ -1,0 +1,82 @@
+---
+title: "Admin API"
+description: "Utilisez l'API Admin Entreprise de Replit pour accéder par programmation à l'utilisation du compte, aux workspaces, aux membres et aux projets."
+---
+
+<Note>
+  L'API Admin est en **bêta**. Les endpoints disponibles et leur comportement peuvent changer.
+</Note>
+
+L'API Admin donne aux admins de compte Entreprise un accès programmatique basé sur des scopes aux données d'analyse et aux fonctionnalités d'administration du compte. Utilisez l'API pour créer des rapports internes, des workflows opérationnels et des intégrations pour votre compte Entreprise.
+
+## Qui peut accéder à l'API Admin
+
+L'API Admin est disponible uniquement pour les **admins de compte** sur les comptes Entreprise. Les admins de compte peuvent créer et gérer des clés API. Les admins de workspace et les autres membres du compte ne peuvent pas accéder à l'API Admin ni créer ses clés.
+
+Pour en savoir plus sur les rôles d'admin Entreprise, consultez [Admins de compte et de workspace](/fr/teams/identity-and-access-management/account-and-workspace-admins).
+
+## Créer une clé API
+
+<Steps>
+  <Step title="Ouvrir les paramètres Développeur">
+    Ouvrez **Paramètres**. Sous **Compte**, sélectionnez **Développeur**.
+  </Step>
+
+  <Step title="Créer une clé API">
+    Sélectionnez **Créer une clé API** et choisissez un accès en lecture seule ou en lecture et écriture.
+  </Step>
+
+  <Step title="Stocker votre clé en toute sécurité">
+    Copiez la clé, qui commence par `rpl_`, et stockez-la dans un gestionnaire de secrets sécurisé. Traitez-la comme un mot de passe et ne la partagez jamais.
+  </Step>
+
+  <Step title="Authentifier votre intégration">
+    Envoyez la clé en tant que jeton Bearer avec vos requêtes API.
+  </Step>
+</Steps>
+
+## Ce que vous pouvez faire
+
+L'API Admin utilise des scopes pour contrôler ce que chaque clé peut faire. Ses scopes de lecture fournissent des données de compte pour le reporting, tandis que des scopes d'écriture spécifiques prennent en charge des actions telles que la mise à jour des budgets.
+
+* **Utilisation :** lisez l'utilisation du compte et le coût brut du grand livre, filtrés ou groupés par workspace, membre, projet ou période.
+* **Workspaces :** lisez les listes et détails des workspaces, y compris le nombre de membres et de projets, les admins et la date de création.
+* **Membres :** lisez l'appartenance au compte et aux workspaces, filtrée par rôle ou recherchée par nom, nom d'utilisateur ou e-mail.
+* **Projets :** lisez les projets dans les workspaces d'équipe, filtrés par visibilité ou statut de déploiement, ou recherchés par titre, slug ou description.
+* **Budgets :** lisez les budgets du compte, et utilisez le scope `write:budgets` pour les mettre à jour.
+
+Les réponses de l'API prennent en charge la pagination par curseur et incluent des en-têtes de limite de débit ainsi qu'un `X-Request-Id` pour le suivi des requêtes.
+
+## Créer des rapports et des workflows
+
+Utilisez les données de l'API Admin partout où vous suivez déjà vos opérations, comme un tableau de bord interne, une alerte Slack ou un rapport financier mensuel. Par exemple, regroupez l'utilisation par workspace pour créer un rapport de dépenses pour chaque workspace.
+
+## Créer avec Replit Agent
+
+Vous pouvez demander à Replit Agent de créer un tableau de bord personnalisé avec l'API Admin. Décrivez les données de compte que vous souhaitez suivre, comme l'utilisation par workspace ou les coûts par projet, et Agent peut créer le tableau de bord et son intégration API.
+
+<Steps>
+  <Step title="Ouvrir le sélecteur de compétences">
+    Dans un projet Replit, cliquez sur le bouton **+** à côté du champ de saisie du chat et sélectionnez **Utiliser une compétence**.
+  </Step>
+
+  <Step title="Sélectionner la compétence Admin API">
+    Sous **Compétences Replit**, sélectionnez **Admin API** pour donner à Agent le contexte de l'API et des conseils d'intégration.
+  </Step>
+
+  <Step title="Décrire le tableau de bord">
+    Indiquez à Agent ce que vous voulez suivre et comment vous voulez le visualiser. Par exemple, demandez à Agent de créer un tableau de bord qui affiche l'utilisation par workspace et le coût par projet.
+  </Step>
+
+  <Step title="Ajouter votre clé API en toute sécurité">
+    Lorsque Agent doit effectuer des requêtes API, ajoutez votre clé API Admin aux Secrets de votre projet. Ne collez pas la clé dans le chat et ne la validez pas dans votre projet.
+  </Step>
+</Steps>
+
+## Référence de l'API
+
+Pour les détails des endpoints, les paramètres de requête et des exemples d'intégration, consultez la [documentation développeur de l'API Admin](https://api.replit.com/docs).
+
+## Documentation associée
+
+* [Paramètres de l'espace de travail](/fr/features/collaboration/workspace-settings) : définissez la politique Enterprise pour les modèles Agent et les fournisseurs de modèles que chaque espace de travail peut utiliser.

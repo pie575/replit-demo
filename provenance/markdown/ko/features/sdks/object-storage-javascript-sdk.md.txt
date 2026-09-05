@@ -1,0 +1,394 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# App Storage JavaScript SDK
+
+> 공식 JavaScript SDK를 사용해 Replit App Storage에서 파일을 관리하는 방법을 알아보세요.
+
+이 참조 가이드는 `object-storage` 라이브러리의 `Client` 클래스를 설명하고 그 메서드에 대한 코드 예제를 제공합니다.
+
+## Client
+
+`Client` 클래스는 Replit App Storage와의 상호작용을 관리합니다. 이 클래스는 버킷 내 파일에 대한 작업을 수행하는 메서드를 제공합니다.
+
+라이브러리에서 클래스를 가져오려면 JavaScript 코드에 다음 줄을 추가하세요.
+
+```javascript theme={null}
+import { Client } from "@replit/object-storage";
+```
+
+다음 코드를 사용해 Replit Object Storage와 상호작용하는 `Client` 인스턴스를 생성하세요.
+
+```javascript theme={null}
+const client = new Client();
+```
+
+## 생성자
+
+**constructor**
+
+* **new Client**(`options?`): `Client`
+
+Replit App Storage와 상호작용할 새 Client 인스턴스를 생성합니다.
+
+**매개변수**
+
+| 이름         | 유형              | 설명                       |
+| :--------- | :-------------- | :----------------------- |
+| `options?` | `ClientOptions` | 클라이언트를 설정하기 위한 구성 옵션입니다. |
+
+**반환값**
+
+`Client`
+
+## 메서드
+
+### copy
+
+* **copy**(`objectName`, `destObjectName`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+동일한 버킷 내에서 객체를 복사합니다.
+이 메서드는 대상 경로에 이미 존재하는 객체를 덮어씁니다.
+
+**매개변수**
+
+| 이름               | 유형       | 설명                |
+| :--------------- | :------- | :---------------- |
+| `objectName`     | `string` | 복사할 객체의 전체 경로입니다. |
+| `destObjectName` | `string` | 객체를 복사할 전체 경로입니다. |
+
+**반환값**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+***
+
+### delete
+
+* **delete**(`objectName`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+버킷에서 객체를 삭제합니다.
+
+**매개변수**
+
+| 이름           | 유형              | 설명                |
+| :----------- | :-------------- | :---------------- |
+| `objectName` | `string`        | 삭제할 객체의 전체 경로입니다. |
+| `options?`   | `DeleteOptions` | 삭제 작업에 대한 구성입니다.  |
+
+**반환값**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+***
+
+### downloadAsBytes
+
+* **downloadAsBytes**(`objectName`, `options?`): `Promise`\<`Result`\<`Buffer`, `RequestError`>>
+
+객체를 다운로드하고 원본 내용을 버퍼로 반환합니다.
+
+**매개변수**
+
+| 이름           | 유형                | 설명                  |
+| :----------- | :---------------- | :------------------ |
+| `objectName` | `string`          | 다운로드할 객체의 전체 경로입니다. |
+| `options?`   | `DownloadOptions` | 다운로드 작업에 대한 구성입니다.  |
+
+**반환값**
+
+`Promise`\<`Result`\<`Buffer`, `RequestError`>>
+
+***
+
+### downloadAsStream
+
+* **downloadAsStream**(`objectName`, `options?`): `Readable`
+
+객체 내용의 읽기 가능한 스트림을 생성합니다.
+이 스트림은 다운로드 중 발생한 오류를 전달합니다.
+
+**매개변수**
+
+| 이름           | 유형                | 설명                  |
+| :----------- | :---------------- | :------------------ |
+| `objectName` | `string`          | 다운로드할 객체의 전체 경로입니다. |
+| `options?`   | `DownloadOptions` | 다운로드 작업에 대한 구성입니다.  |
+
+**반환값**
+
+`Readable`
+
+### downloadAsText
+
+* **downloadAsText**(`objectName`, `options?`): `Promise`\<`Result`\<`string`, `RequestError`>>
+
+객체를 다운로드하고 그 내용을 문자열로 반환합니다.
+
+**매개변수**
+
+| 이름           | 유형                | 설명                  |
+| :----------- | :---------------- | :------------------ |
+| `objectName` | `string`          | 다운로드할 객체의 전체 경로입니다. |
+| `options?`   | `DownloadOptions` | 다운로드 작업에 대한 구성입니다.  |
+
+**반환값**
+
+`Promise`\<`Result`\<`string`, `RequestError`>>
+
+### downloadToFilename
+
+* **downloadToFilename**(`objectName`, `destFilename`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+객체를 다운로드해 로컬 파일 시스템의 지정된 위치에 저장합니다.
+
+**매개변수**
+
+| 이름             | 유형                | 설명                             |
+| :------------- | :---------------- | :----------------------------- |
+| `objectName`   | `string`          | 다운로드할 객체의 전체 경로입니다.            |
+| `destFilename` | `string`          | 다운로드한 객체를 저장할 로컬 파일 시스템 경로입니다. |
+| `options?`     | `DownloadOptions` | 다운로드 작업에 대한 구성입니다.             |
+
+**반환값**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### exists
+
+* **exists**(`objectName`): `Promise`\<`Result`\<`boolean`, `RequestError`>>
+
+버킷에 객체가 존재하는지 확인합니다.
+
+**매개변수**
+
+| 이름           | 유형       | 설명                |
+| :----------- | :------- | :---------------- |
+| `objectName` | `string` | 확인할 객체의 전체 경로입니다. |
+
+**반환값**
+
+`Promise`\<`Result`\<`boolean`, `RequestError`>>
+
+### getBucket
+
+* **getBucket**(): `Promise`\<`Bucket`>
+
+**반환값**
+
+`Promise`\<`Bucket`>
+
+### init
+
+* **init**(`bucketId?`): `Promise`\<`Bucket`>
+
+**매개변수**
+
+| 이름          | 유형       |
+| :---------- | :------- |
+| `bucketId?` | `string` |
+
+**반환값**
+
+`Promise`\<`Bucket`>
+
+### list
+
+* **list**(`options?`): `Promise`\<`Result`\<`StorageObject`\[], `RequestError`>>
+
+버킷에 있는 모든 객체의 목록을 반환합니다.
+
+**매개변수**
+
+| 이름         | 유형            | 설명                  |
+| :--------- | :------------ | :------------------ |
+| `options?` | `ListOptions` | 목록 조회 작업에 대한 구성입니다. |
+
+**반환값**
+
+`Promise`\<`Result`\<`StorageObject`\[], `RequestError`>>
+
+### mapUploadOptions
+
+* **mapUploadOptions**(`options?`): `undefined` | `UploadOptions`
+
+**매개변수**
+
+| 이름         | 유형              |
+| :--------- | :-------------- |
+| `options?` | `UploadOptions` |
+
+**반환값**
+
+`undefined` | `UploadOptions`
+
+### uploadFromBytes
+
+* **uploadFromBytes**(`objectName`, `contents`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+메모리에 있는 바이트 표현을 사용해 객체를 업로드합니다.
+이 메서드는 같은 이름을 가진 기존 객체를 덮어씁니다.
+
+**매개변수**
+
+| 이름           | 유형              | 설명                   |
+| :----------- | :-------------- | :------------------- |
+| `objectName` | `string`        | 객체의 전체 대상 경로입니다.     |
+| `contents`   | `Buffer`        | 바이트 형식의 객체 원본 내용입니다. |
+| `options?`   | `UploadOptions` | 업로드 작업에 대한 구성입니다.    |
+
+**반환값**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### uploadFromFilename
+
+* **uploadFromFilename**(`objectName`, `srcFilename`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+로컬 파일 시스템의 파일을 버킷에 업로드합니다.
+이 메서드는 같은 이름을 가진 기존 객체를 덮어씁니다.
+
+**매개변수**
+
+| 이름            | 유형              | 설명                        |
+| :------------ | :-------------- | :------------------------ |
+| `objectName`  | `string`        | 객체의 전체 대상 경로입니다.          |
+| `srcFilename` | `string`        | 업로드할 로컬 파일 시스템의 파일 경로입니다. |
+| `options?`    | `UploadOptions` | 업로드 작업에 대한 구성입니다.         |
+
+**반환값**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### uploadFromStream
+
+* **uploadFromStream**(`objectName`, `stream`, `options?`): `Promise`\<`void`>
+
+제공된 스트림에서 내용을 읽어 객체를 업로드합니다.
+이 스트림은 업로드 중 발생한 오류를 전달합니다. 이 메서드는 같은 이름을 가진 기존 객체를 덮어씁니다.
+
+**매개변수**
+
+| 이름           | 유형              | 설명                        |
+| :----------- | :-------------- | :------------------------ |
+| `objectName` | `string`        | 객체의 전체 대상 경로입니다.          |
+| `stream`     | `Readable`      | 객체 내용을 읽어올 읽기 가능한 스트림입니다. |
+| `options?`   | `UploadOptions` | 업로드 작업에 대한 구성입니다.         |
+
+**반환값**
+
+`Promise`\<`void`>
+
+### uploadFromText
+
+* **uploadFromText**(`objectName`, `contents`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+메모리에 있는 텍스트 표현을 사용해 객체를 업로드합니다.
+이 메서드는 같은 이름을 가진 기존 객체를 덮어씁니다.
+
+**매개변수**
+
+| 이름           | 유형              | 설명                |
+| :----------- | :-------------- | :---------------- |
+| `objectName` | `string`        | 객체의 전체 대상 경로입니다.  |
+| `contents`   | `string`        | 텍스트 형식의 객체 내용입니다. |
+| `options?`   | `UploadOptions` | 업로드 작업에 대한 구성입니다. |
+
+**반환값**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+## 메서드 예제
+
+다음 섹션에서는 Replit Object Storage SDK를 사용해 파일을 관리하는 코드 예제를 제공합니다.
+
+### 객체를 텍스트로 가져오기
+
+```javascript theme={null}
+const { ok, value: textValue, error } = await client.downloadAsText('file.json');
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 객체를 원본 바이트 표현으로 가져오기
+
+```javascript theme={null}
+const { ok, value: bytesValue, error } = await client.downloadAsBytes('file.png');
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 객체를 스트림으로 가져오기
+
+```javascript theme={null}
+const { ok, value: stream, error } = await client.downloadAsStream('file.json');
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 객체를 파일 시스템으로 다운로드하기
+
+```javascript theme={null}
+const { ok, error } = await client.downloadToFilename('file.json', destFilename);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 버킷의 객체 목록 조회하기
+
+```javascript theme={null}
+const { ok, value, error } = await client.list();
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 텍스트로 객체 업로드하기
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromText('file.json', data);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 바이트로 객체 업로드하기
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromBytes('file.png', data);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 파일 시스템에서 객체 업로드하기
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromFilename('file.json', srcFilename);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 스트림에서 객체 업로드하기
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromStream('file.json', stream);
+if (!ok) {
+    // ... handle error ...
+}
+```
+
+### 버킷에서 객체 삭제하기
+
+```javascript theme={null}
+const { ok, error } = await client.delete('file.json');
+if (!ok) {
+    // ... handle error ...
+}
+```

@@ -1,0 +1,310 @@
+---
+title: "Provedores de login"
+description: "Configure credenciais OAuth personalizadas para login com Google, GitHub, Apple e X em apps que usam o Clerk Auth."
+---
+
+Quando seu app usa o [Clerk Auth](/pt/features/auth-and-identity/clerk-auth), os visitantes podem fazer login com provedores sociais. O Replit fornece credenciais compartilhadas prontas para uso; esta página cobre como trazer suas **próprias** credenciais OAuth para cada provedor, o que coloca o nome e a marca do seu app na tela de login.
+
+O fluxo é o mesmo para todos os provedores: crie um app OAuth no console do provedor, copie as URLs que o Replit mostra e cole as credenciais resultantes no painel de edição do provedor.
+
+<Note>
+  Credenciais OAuth personalizadas só estão disponíveis no ambiente de **Produção**, então seu app precisa estar [publicado](/pt/features/publishing/overview) primeiro. Abra o painel de edição de cada provedor na ferramenta **Users & Auth**: aba **Configure**, seção **SSO providers**, selecione o ambiente **Production** e selecione **Edit** ao lado do provedor. Para o fluxo completo, veja [Configurando credenciais OAuth para um provedor SSO](/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+</Note>
+
+## Google
+
+Este guia mostra como criar um app OAuth do Google no Google Cloud Console. Você vai coletar um **Client ID** e um **Client Secret**, além de configurar as origens JavaScript e os URIs de redirecionamento que o Clerk exige.
+
+Você precisa de: Acesso ao [Google Cloud Console](https://console.cloud.google.com/).
+
+### Etapa 1: Crie um app OAuth do Google
+
+Acesse o [Google Cloud Console](https://console.cloud.google.com/):
+
+#### Crie ou selecione um projeto
+
+1. Selecione um projeto existente ou crie um novo no menu suspenso de projetos
+2. Você será redirecionado para o Dashboard do seu projeto
+
+#### Configure a tela de consentimento OAuth
+
+1. Na barra lateral esquerda, selecione o ícone de menu (≡) e selecione **APIs & Services**
+2. Selecione **OAuth consent screen**
+3. Configure a tela de consentimento do seu app com as informações exigidas
+4. Salve suas alterações
+
+#### Crie credenciais OAuth
+
+1. Em **APIs & Services**, selecione **Credentials**
+2. Selecione **Create Credentials** no topo, depois selecione **OAuth client ID**
+3. Escolha **Web application** como tipo de aplicativo
+4. Defina **Authorized JavaScript origins** e **Authorized redirect URIs** com os valores exatos mostrados em **Provider setup** no **painel Auth**. Adicione todos os valores listados — tanto o seu domínio publicado quanto qualquer domínio personalizado são incluídos. Veja [Configurando credenciais OAuth para um provedor SSO](/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) para saber como encontrá-los.
+5. Selecione **Create**
+6. Salve seu **Client ID** e **Client Secret**
+
+<Warning>
+  Mantenha seu Client Secret seguro e nunca o envie para o controle de versão.
+</Warning>
+
+<Warning>
+  O login do Google não funciona em navegadores incorporados ou webviews dentro de apps. Os usuários precisam usar um navegador web padrão.
+</Warning>
+
+### Solução de problemas
+
+#### URI de redirecionamento incompatível (Redirect URI mismatch)
+
+* Verifique se o URI de redirecionamento no Google Cloud Console corresponde exatamente ao valor mostrado em **Provider setup** no **painel Auth**
+* Certifique-se de que não há barras finais ou erros de digitação
+* Aguarde alguns minutos para a configuração do Google se propagar
+
+#### Cliente inválido (Invalid client)
+
+* Verifique se o Client ID e o Client Secret foram copiados corretamente
+* Certifique-se de que não há espaços extras
+* Verifique se a tela de consentimento OAuth está configurada
+
+#### Não funciona em domínio personalizado
+
+* Adicione as entradas de domínio personalizado mostradas em **Provider setup** no **painel Auth** tanto em Authorized JavaScript origins quanto em Authorized redirect URIs
+
+## GitHub
+
+Este guia mostra como criar um app OAuth do GitHub nas Configurações de Desenvolvedor do GitHub. Você vai coletar um **Client ID** e um **Client Secret** para inserir no **painel Auth**.
+
+Você precisa de: Uma [conta do GitHub](https://github.com).
+
+### Etapa 1: Crie um app OAuth do GitHub
+
+1. Acesse as [Configurações de Desenvolvedor do GitHub](https://github.com/settings/developers)
+2. Selecione **OAuth Apps** na barra lateral
+3. Selecione **New OAuth App**
+4. Preencha os detalhes do aplicativo:
+
+**Application name:**
+
+Digite um nome para o seu aplicativo.
+
+**Homepage URL** e **Authorization callback URL:**
+
+Defina ambos com os valores exatos mostrados em **Provider setup** no **painel Auth**. Veja [Configurando credenciais OAuth para um provedor SSO](/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) para saber como encontrá-los.
+
+5. Selecione **Register application**
+
+### Etapa 2: Gere as credenciais do cliente
+
+1. Você vai ver o seu **Client ID** na página de configurações do app - copie-o
+2. Selecione **Generate a new client secret**
+3. Copie seu **Client Secret** imediatamente
+
+<Warning>
+  Salve seu Client Secret com segurança. Você não conseguirá visualizá-lo novamente após sair da página. Se perdê-lo, você precisará gerar um novo.
+</Warning>
+
+### Solução de problemas
+
+#### URI de redirecionamento incompatível (Redirect URI mismatch)
+
+* Verifique se a Authorization callback URL corresponde exatamente ao valor mostrado em **Provider setup** no **painel Auth**
+* Verifique se há erros de digitação ou protocolos incorretos
+* Sem barras finais
+
+#### Cliente inválido (Invalid client)
+
+* Verifique se o Client ID e o Client Secret foram copiados corretamente
+* Certifique-se de que não há espaços extras ao colar
+
+#### Não funciona em domínio personalizado
+
+* Atualize a Homepage URL e a Authorization callback URL para os valores de domínio personalizado mostrados em **Provider setup** no **painel Auth**
+
+## Apple
+
+Este guia mostra como criar o Apple App ID, o Services ID e a Private Key necessários para o Sign in with Apple. Você vai coletar um **Team ID**, **Services ID**, **Key ID** e **Private Key** para inserir no **painel Auth**.
+
+Você precisa de: Uma [conta Apple Developer](https://developer.apple.com/account) (requer inscrição no Apple Developer Program).
+
+### Etapa 1: Crie um Apple App ID
+
+1. Acesse o [portal Apple Developer](https://developer.apple.com/account)
+2. Vá em **Certificates, IDs & Profiles** e depois **Identifiers**
+3. Selecione **App IDs** no menu suspenso
+4. Selecione o ícone **+** para registrar um novo identificador
+5. Selecione **App IDs**, depois **Continue**
+6. Escolha **App**, depois **Continue**
+7. Preencha:
+   * **Description**: Nome para o seu App ID
+   * **Bundle ID**: Seu identificador único
+8. Habilite **Sign In with Apple** em Capabilities
+9. Selecione **Continue**, depois **Register**
+10. **Salve o seu App ID Prefix** (mostrado no topo) - este é o seu **Team ID**
+
+### Etapa 2: Crie um Apple Services ID
+
+1. Na página Identifiers, selecione **Services IDs** no menu suspenso
+2. Selecione **+** para registrar um novo identificador
+3. Selecione **Services IDs**, depois **Continue**
+4. Preencha:
+   * **Description**: Nome para o seu Services ID
+   * **Identifier**: Seu identificador único (salve isso - é o seu **Services ID**)
+5. Selecione **Continue**, depois **Register**
+
+#### Configure o Services ID
+
+1. Selecione o Services ID que você acabou de criar
+2. Habilite **Sign In with Apple**
+3. Selecione **Configure**
+4. Defina:
+
+   * **Primary App ID**: Selecione seu App ID da Etapa 1
+   * **Domains and Subdomains**: Copie o valor mostrado em **Provider setup** no **painel Auth** (sem o prefixo de protocolo `https://`)
+   * **Return URLs**: Copie o valor mostrado em **Provider setup** no **painel Auth**
+
+   Veja [Configurando credenciais OAuth para um provedor SSO](/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) para saber como encontrar esses valores.
+5. Selecione **Next**, depois **Done**, depois **Continue**, depois **Save**
+
+### Etapa 3: Crie uma Apple Private Key
+
+1. Na barra lateral do portal Apple Developer, selecione **Keys**
+2. Selecione **+** para registrar uma nova chave
+3. Digite um **Key Name**
+4. Habilite **Sign In with Apple**
+5. Selecione **Configure**, depois selecione seu App ID da Etapa 1
+6. Selecione **Save**, depois **Continue**, depois **Register**
+7. **Salve o Key ID**
+8. **Baixe** o arquivo da chave privada (.p8)
+
+<Warning>
+  Você só pode baixar a chave privada uma vez. Armazene-a com segurança — você não conseguirá baixá-la novamente.
+</Warning>
+
+### Etapa 4: Configure o Apple Private Email Relay
+
+O recurso Hide My Email da Apple permite que os usuários façam login sem revelar o e-mail real. Para enviar e-mails a esses usuários, registre sua fonte de e-mail.
+
+1. Na barra lateral do portal Apple Developer, selecione **Services**
+2. Em **Sign in with Apple for Email Communication**, selecione **Configure**
+3. Selecione **+** para adicionar uma Email Source
+4. Digite o valor de Email Source mostrado em **Provider setup** no **painel Auth**
+5. Selecione **Next**, depois **Register**, depois **Done**
+6. Aguarde a verificação de DNS (ícone verde de confirmação)
+
+<Info>
+  Em algumas regiões (China, Índia), os Apple IDs podem estar vinculados a números de telefone em vez de e-mail. Se o seu app exigir e-mail para todos os usuários, o Sign in with Apple pode falhar para usuários dessas regiões.
+</Info>
+
+### Solução de problemas
+
+#### Cliente inválido (Invalid client)
+
+* Verifique se todas as credenciais foram inseridas corretamente
+* Certifique-se de que a Private Key inclui as linhas BEGIN e END
+* Verifique se o seu Services ID está configurado corretamente
+
+#### URI de redirecionamento inválida (Invalid redirect URI)
+
+* Verifique se a Return URL na configuração do Apple Services ID corresponde exatamente ao valor mostrado em **Provider setup** no **painel Auth**
+* Verifique se o domínio em Domains and Subdomains corresponde ao seu domínio publicado (sem `https://`)
+
+#### Email relay não funciona
+
+* Verifique se a Email Source mostra um ícone verde de confirmação no portal Apple Developer
+* Aguarde a propagação do DNS se foi adicionada recentemente
+
+#### Não funciona em domínio personalizado
+
+* Adicione as entradas de domínio personalizado mostradas em **Provider setup** no **painel Auth** em Domains and Subdomains (sem `https://`) e em Return URLs
+
+### Recursos adicionais
+
+* [Documentação do Apple Sign in with Apple](https://developer.apple.com/sign-in-with-apple/)
+* [Guia do Private Email Relay Service](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)
+
+## X (Twitter)
+
+Este guia mostra como criar um app OAuth do X no X Developer Portal. Você vai coletar um **Client ID** e um **Client Secret** para inserir no **painel Auth**.
+
+Você precisa de: Uma [conta de desenvolvedor do X](https://developer.twitter.com/) (camada gratuita disponível).
+
+### Etapa 1: Configure o app de desenvolvedor do X
+
+#### Crie uma conta de desenvolvedor (se necessário)
+
+1. Acesse o [X Developer Portal](https://developer.twitter.com/en/portal/dashboard)
+2. Solicite uma conta de desenvolvedor se ainda não tiver uma
+3. Complete a inscrição descrevendo seu caso de uso
+
+#### Crie ou selecione um app
+
+1. No X Developer Portal, vá em **Projects & Apps**
+2. Use um app existente ou selecione **Add App**
+3. Digite um nome para o app e selecione **Next**
+4. Selecione **App settings**
+
+### Etapa 2: Configure a autenticação
+
+1. Role até **User authentication settings**
+2. Selecione **Set up**
+
+**App permissions:**
+
+Selecione o nível mínimo de permissão:
+
+* **Read** - Necessário para o perfil do usuário (mínimo)
+* **Write** - Para publicar em nome dos usuários (opcional)
+* **Direct Messages** - Para acesso a mensagens diretas (opcional)
+
+<Warning>
+  As permissões precisam corresponder aos scopes solicitados. Se o seu app solicitar `tweet.write` mas você só habilitou Read, a autenticação vai falhar.
+</Warning>
+
+**Type of app:**
+
+Selecione **Web App, Automated App or Bot**
+
+**App info:**
+
+* **Callback URI / Redirect URL**: Copie o valor mostrado em **Provider setup** no **painel Auth**
+* **Website URL**: Copie o valor mostrado em **Provider setup** no **painel Auth**
+
+Veja [Configurando credenciais OAuth para um provedor SSO](/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) para saber como encontrar esses valores.
+
+3. Selecione **Save**
+4. **Salve o seu Client ID e Client Secret**
+
+<Warning>
+  Armazene seu Client Secret com segurança. Se você o perder, gerar um novo invalida o antigo.
+</Warning>
+
+### Solução de problemas
+
+#### URI de redirecionamento incompatível (Redirect URI mismatch)
+
+* Verifique se o Callback URI corresponde exatamente ao valor mostrado em **Provider setup** no **painel Auth**
+* Verifique se há erros de digitação ou protocolos incorretos
+* Sem barras finais
+
+#### Cliente inválido (Invalid client)
+
+* Verifique novamente o Client ID e o Client Secret
+* Certifique-se de que não há espaços extras
+* Verifique se você está usando credenciais OAuth 2.0 (não OAuth 1.0a)
+
+#### Erros de scope/permissão
+
+* Verifique se os scopes correspondem às permissões habilitadas no X Developer Portal
+* Certifique-se de que a permissão Read está habilitada no mínimo
+
+#### App em modo de desenvolvimento
+
+* Os apps do X começam em modo de desenvolvimento com usuários limitados
+* Você pode precisar solicitar acesso elevado para uso em produção
+
+#### Não funciona em domínio personalizado
+
+* Atualize a Website URL e o Callback URI para os valores de domínio personalizado mostrados em **Provider setup** no **painel Auth**
+
+### Recursos adicionais
+
+* [Documentação do X OAuth 2.0](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
+* [Scopes do X OAuth](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)

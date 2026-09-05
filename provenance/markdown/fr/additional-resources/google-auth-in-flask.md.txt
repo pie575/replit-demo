@@ -1,0 +1,488 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Authentification Google en Python et Flask
+
+> Apprenez à implémenter l'authentification OAuth Google dans une application Flask sur Replit, incluant la connexion des utilisateurs et l'intégration de l'API Google Sheets.
+
+Permettre à vos utilisateurs de se connecter à votre site Web avec leur compte Google présente ces avantages :
+
+1. Vous n'avez pas à implémenter votre propre schéma d'authentification.
+2. Vous pouvez obtenir facilement le nom et les coordonnées des utilisateurs.
+3. Vous pouvez utiliser les mêmes identifiants pour accéder aux ressources Google des utilisateurs, comme Sheets et Drive.
+
+Ce guide vous expliquera comment faire cela avec Python et Flask sur Replit.
+
+Nous commencerons par expliquer comment configurer l'authentification OAuth de base, puis nous verrons comment utiliser les identifiants obtenus pour accéder aux ressources Google des utilisateurs.
+
+## Introduction à OAuth
+
+L'authentification Google est basée sur la norme OAuth. Le fonctionnement d'OAuth est le suivant :
+
+1. Quelque part sur votre site Web, vous dirigez un utilisateur vers une page de connexion.
+2. Lorsqu'il accède à la page de connexion, vous n'implémentez pas le formulaire de connexion sur votre site Web, mais redirigez plutôt vers le service de connexion de Google pour authentifier l'utilisateur.
+3. Lorsque le service de connexion de Google authentifie avec succès l'utilisateur, il redirige vers votre site Web à une URL prédéfinie de votre choix, par exemple `https://VOTRE_DOMAINE/oauth2callback`, tout en envoyant des informations relatives à l'utilisateur et à la session de connexion.
+4. Vous utilisez les informations de connexion de l'utilisateur pour obtenir un jeton d'accès, qui est comme un pass que vous pouvez utiliser pour accéder aux ressources de l'utilisateur, comme ses informations de profil, ses feuilles de calcul, ses documents et plus encore.
+
+## OAuth : montrez-moi le code
+
+Si vous êtes comme moi, la première chose que vous voulez, c'est du code fonctionnel. Le code ci-dessous est ce dont vous avez besoin. Cependant, vous devrez configurer certaines choses dans votre Google Cloud Console pour que tout fonctionne. Cela sera couvert dans la section suivante. Créez une nouvelle application Replit en utilisant le [modèle Flask](https://replit.com/@replit/Flask?v=1) et placez ce qui suit dans `main.py`. Les commentaires dans le code expliquent ce que font les différentes parties :
+
+```python theme={null}
+from flask import Flask, redirect, session, url_for, request
+import google_auth_oauthlib.flow
+import json
+import os
+import requests
+
+app = Flask('app')
+# `FLASK_SECRET_KEY` is used by sessions. You should create a random string
+# and store it as secret.
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
+
+# `GOOGLE_APIS_OAUTH_SECRET` contains the contents of a JSON file to be downloaded
+# from the Google Cloud Credentials panel. See next section.
+oauth_config = json.loads(os.environ['GOOGLE_OAUTH_SECRETS'])
+
+# This sets up a configuration for the OAuth flow
+oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
+    oauth_config,
+    # scopes define what APIs you want to access on behave of the user once authenticated
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+    ]
+)
+
+# This is entrypoint of the login page. It will redirect to the Google login service located at the
+# `authorization_url`. The `redirect_uri` is actually the URI which the Google login service will use to
+# redirect back to this app.
+@app.route('/signin')
+def signin():
+    # We rewrite the URL from http to https because inside the Replit App http is used,
+    # but externally it's accessed via https, and the redirect_uri has to match that
+    oauth_flow.redirect_uri = url_for('oauth2callback', _external=True).replace('http://', 'https://')
+    authorization_url, state = oauth_flow.authorization_url()
+    session['state'] = state
+    return redirect(authorization_url)
+
+# This is the endpoint that Google login service redirects back to. It must be added to the "Authorized redirect URIs"
+# in the API credentials panel within Google Cloud. It will call a Google endpoint to request
+# an access token and store it in the user session. After this, the access token can be used to access
+# APIs on behalf of the user.
+@app.route('/oauth2callback')
+def oauth2callback():
+    if not session['state'] == request.args['state']:
+        return 'Invalid state parameter', 400
+    oauth_flow.fetch_token(authorization_response=request.url.replace('http:', 'https:'))
+    session['access_token'] = oauth_flow.credentials.token
+    return redirect("/")
+
+# This is the home page of the app. It directs the user to log in if they are not already.
+# It shows the user info's information if they already are.
+@app.route('/')
+def welcome():
+    if "access_token" in session:
+        user_info = get_user_info(session["access_token"])
+        if user_info:
+            return f"""
+                Hello {user_info["given_name"]}!<br>
+                Your email address is {user_info["email"]}<br>
+                <a href="/logout">Log out</a>
+            """
+    return """
+        <h1>Hello!</h1>
+        <a href="/signin">Sign In via Google</a><br>
+    """
+
+# Call the userinfo API to get the user's information with a valid access token.
+# This is the first example of using the access token to access an API on the user's behalf.
+def get_user_info(access_token):
+    response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
+       "Authorization": f"Bearer {access_token}"
+   })
+    if response.status_code == 200:
+        user_info = response.json()
+        return user_info
+    else:
+        print(f"Failed to fetch user info: {response.status_code} {response.text}")
+        return None
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+```
+
+## Configurer votre application / client OAuth
+
+Pour que le code ci-dessus fonctionne, vous devrez effectuer ces étapes dans Google Cloud.
+
+1. Créer un projet Google Cloud (si vous n'en avez pas déjà un).
+2. Configurer l'écran de consentement OAuth.
+3. Créer un ID client OAuth pour votre application.
+
+### Créer un projet Google Cloud
+
+Si vous avez déjà un projet Google Cloud que vous souhaitez utiliser pour cet exercice, vous pouvez ignorer cette étape.
+
+1. Accédez à la [Google Cloud Console](https://console.cloud.google.com/)
+2. Cliquez sur le sélecteur de projet à côté du logo Google Cloud :
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/google-project-dropdown.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=a30f634d9a23d770a6d2f4011d0d9dae" alt="Menu déroulant du projet Google" width="734" height="94" data-path="images/google-auth-in-flask/google-project-dropdown.png" />
+</Frame>
+
+3. Sélectionnez un projet existant ou cliquez sur « Nouveau projet » pour en créer un.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/select-project.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=e74b58a12409487b6185d0c26768467c" alt="Sélectionner un projet" width="1092" height="868" data-path="images/google-auth-in-flask/select-project.png" />
+</Frame>
+
+4. Si vous créez un nouveau projet, entrez un nom de projet et cliquez sur « Créer ».
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/new-project.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=4435873966a96504d766496022464e75" alt="Nouveau projet" width="1110" height="868" data-path="images/google-auth-in-flask/new-project.png" />
+</Frame>
+
+Si votre nouveau projet apparaît dans une fenêtre contextuelle, cliquez sur « Sélectionner le projet » pour en faire le *projet actif*.
+
+### Configurer l'écran de consentement OAuth
+
+Maintenant que vous avez un projet, vous pouvez configurer l'écran de consentement OAuth pour celui-ci :
+
+1. Accédez à l'[écran de consentement OAuth](https://console.cloud.google.com/apis/credentials/consent)
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/oauth-consent-screen.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=49c9930fd4dcec9194a31221fb0dcdfa" alt="Écran de consentement OAuth" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-screen.png" />
+</Frame>
+
+2. Assurez-vous que le projet dans le menu déroulant est bien celui que vous souhaitez.
+3. Sélectionnez « Externe » pour permettre à n'importe quel utilisateur de se connecter à votre application avec un compte Google. « Interne » n'autorisera que les personnes de votre organisation.
+4. Cliquez sur « Créer ».
+5. Entrez un nom d'application et l'e-mail de la personne qui assure le support de cette application (vous ?)
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/oauth-consent-step-2.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=613070383292b3a679e1f9653036f660" alt="Écran de consentement OAuth" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-step-2.png" />
+</Frame>
+
+6. Entrez une adresse e-mail sous « Informations de contact du développeur ».
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/oauth-consent-step-2-b.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=82001a9c28a09f1ba232f2c6b80b3118" alt="Informations de contact du développeur" width="533" height="207" data-path="images/google-auth-in-flask/oauth-consent-step-2-b.png" />
+</Frame>
+
+7. Cliquez sur « Enregistrer et continuer ».
+8. Dans l'écran des portées, vous pouvez ajouter les API auxquelles vous souhaitez que votre application ait accès. Vous avez déjà accès aux API pour obtenir les informations de base de l'utilisateur.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/oauth-scopes.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=616e631af44331268912e1b054ed2d4d" alt="Portées OAuth" width="1093" height="647" data-path="images/google-auth-in-flask/oauth-scopes.png" />
+</Frame>
+
+Pour l'instant, laissez tel quel et cliquez sur « Enregistrer et continuer ».
+9\. Dans Utilisateurs de test, vous devez ajouter l'e-mail des utilisateurs que vous souhaitez autoriser à tester l'application pendant sa phase de test.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/test-users.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=2d3d6dd451cf47b3c5d49a6fe1362b2d" alt="Utilisateurs de test" width="1050" height="641" data-path="images/google-auth-in-flask/test-users.png" />
+</Frame>
+
+Cliquez sur « Ajouter des utilisateurs »
+10\. Ajoutez une ou plusieurs adresses e-mail Google, puis cliquez sur « Ajouter ».
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/test-users-add.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=d2b34047e7e9d45c5933f1abe3e29dcd" alt="Utilisateurs de test" width="1050" height="641" data-path="images/google-auth-in-flask/test-users-add.png" />
+</Frame>
+
+Puis cliquez sur « Enregistrer et continuer ».
+11\. Vérifiez l'écran de résumé. Vous pouvez toujours revenir en arrière et modifier n'importe quelle étape.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/summary.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=37a3ea92af93f314a105d4eb35b4cd14" alt="Utilisateurs de test" width="735" height="328" data-path="images/google-auth-in-flask/summary.png" />
+</Frame>
+
+### Créer un ID client OAuth pour votre application
+
+C'est la dernière partie. Pour que OAuth fonctionne, vous devez créer un ID client OAuth pour l'application.
+
+1. Accédez à [Identifiants](https://console.cloud.google.com/apis/credentials).
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/credentials.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=456919dc3158da1e521882c6dbebec9d" alt="Utilisateurs de test" width="1050" height="605" data-path="images/google-auth-in-flask/credentials.png" />
+</Frame>
+
+2. Cliquez sur « Créer des identifiants »
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/create-credentials.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=1d7d149734afd522a6b54787771b8614" alt="Utilisateurs de test" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials.png" />
+</Frame>
+
+et sélectionnez « ID client OAuth ».
+3\.  Sélectionnez « Application Web » pour le type d'application. Entrez un nom pour cet ID client.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/create-credentials-web.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=27d176683f267e10e559e91969936ec9" alt="Utilisateurs de test" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials-web.png" />
+</Frame>
+
+4. Maintenant, accédez à votre application Flask Replit. Ouvrez le shell et entrez : `echo https://$REPLIT_DEV_DOMAIN/oauth2callback`. Le résultat ressemblera à : `https://81309e9b-c4df-48e0-a2c2-0a8d3c0e3162-00-35ppsa0tcuv6v.infra-staging.replit.dev/oauth2callback`. Copiez ce texte et entrez-le comme l'un des « URI de redirection autorisés » en bas du formulaire
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/authorized-redirect-uris.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=0cbf4b9efec37c1d0d63241d1453eead" alt="Utilisateurs de test" width="800" height="271" data-path="images/google-auth-in-flask/authorized-redirect-uris.png" />
+</Frame>
+
+Plus tard, lorsque vous publierez votre application, vous voudrez revenir ici pour ajouter une autre entrée `https://VOTRE_DOMAINE_APP/oauth2callback`
+
+5. Cliquez sur « Créer »
+6. Cliquez sur « Télécharger JSON » :
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/secrets_json.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=b51a15e9157b0949d7fc6a1e69930acf" alt="Utilisateurs de test" width="573" height="607" data-path="images/google-auth-in-flask/secrets_json.png" />
+</Frame>
+
+7. Retournez dans votre application Replit, ouvrez le panneau Secrets. Créez un secret nommé `GOOGLE_OAUTH_SECRETS`, et collez le contenu du fichier téléchargé comme valeur du secret.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/google-auth-in-flask/add-secret.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=bd181325e743c64e07eb0f84e7d9ee05" alt="Utilisateurs de test" width="1060" height="677" data-path="images/google-auth-in-flask/add-secret.png" />
+</Frame>
+
+Ouf ! C'était fastidieux. Félicitations si vous êtes arrivé jusqu'ici ! Vous pouvez maintenant exécuter l'application Flask et vous connecter en utilisant un compte Google test. Pour rendre votre application accessible à n'importe quel utilisateur Google, vous devrez retourner à la [page de consentement](https://console.cloud.google.com/apis/credentials/consent) et cliquer sur « Publier l'application ». Un processus de vérification peut être requis si votre application nécessite des API Google supplémentaires comme Sheets et Drive.
+
+Ensuite, nous verrons comment intégrer une API Google comme Sheets. Suivez si vous souhaitez aller plus loin.
+
+## Configuration de l'API Google Sheets
+
+Pour ajouter une intégration d'API Google comme Google Sheets, vous devez d'abord activer l'API pour l'application. Vous pouvez [parcourir les API disponibles](https://console.cloud.google.com/apis/library). À titre d'exemple, nous utiliserons Google Sheets.
+
+1. Accédez à la [page de liste de l'API Google Sheets](https://console.cloud.google.com/apis/library/sheets.googleapis.com).
+2. Cliquez sur « Activer ».
+
+Terminé ! C'est toute la configuration Google Cloud que vous avez dû faire pour cette partie.
+
+## Intégration Google Sheets : montrez-moi le code
+
+Premièrement, dans la section du flux OAuth du code original, nous laissons tout identique, sauf que nous ajoutons `"https://www.googleapis.com/auth/spreadsheets.readonly"` à la liste des portées :
+
+```python theme={null}
+# This sets up a configuration for the OAuth flow
+oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
+    oauth_config,
+    # scopes define what APIs you want to access on behave of the user once authenticated
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
+    ]
+)
+```
+
+Maintenant, la façon d'accéder à une API Google avec la bibliothèque `googleapiclient.discovery` consiste à créer d'abord un objet `Credentials` à l'aide du jeton d'accès, puis à utiliser la fonction `build` pour créer un objet API appelable. Pour l'API Sheets, cela ressemble à :
+
+```python theme={null}
+credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
+service = build("sheets", "v4", credentials=credentials)
+sheets_api = service.spreadsheets()
+```
+
+Quant à l'utilisation réelle de l'API Sheets, j'ai créé quelques fonctions d'aide :
+
+```python theme={null}
+# fetch all sheets within a Google spreadsheet
+def get_sheets(sheets_api, spreadsheet_id) -> list[str]:
+    result = sheets_api.get(spreadsheetId=spreadsheet_id).execute()
+    return [sheet["properties"]["title"] for sheet in result["sheets"]]
+
+# fetch the data for a given sheet within a Google spreadsheet
+def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
+    result = (
+        sheets_api.values()
+        .get(spreadsheetId=spreadsheet_id, range=sheet_title)
+        .execute()
+    )
+    return result["values"]
+```
+
+Avec l'aide ci-dessus, nous pouvons créer un point de terminaison POST qui importe une feuille de calcul Google comme suit :
+
+```python theme={null}
+@app.route("/import_spreadsheet", methods = ['POST'])
+def import_spreadsheet():
+    if 'access_token' not in session:
+        return redirect('/signin')
+    spreadsheet_id = request.form["spreadsheet_id"]
+    credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
+    service = build("sheets", "v4", credentials=credentials)
+    sheets_api = service.spreadsheets()
+    try:
+        sheets = get_sheets(sheets_api, spreadsheet_id)
+        data_by_sheets = {}
+        for sheet in sheets:
+            data = get_sheet_data(sheets_api, spreadsheet_id, sheet)
+            data_by_sheets[sheet] = data
+    except googleapiclient.errors.HttpError as e:
+        return f"upload failure"
+    dirpath = os.path.join("static", "uploads", spreadsheet_id)
+    filepath = os.path.join(dirpath, "data.json")
+    os.makedirs(dirpath, exist_ok=True)
+    with open(filepath, "w") as file:
+        json.dump(data_by_sheets, file)
+    return "upload success!"
+```
+
+Voici le code complet fonctionnel :
+
+```python theme={null}
+from flask import Flask, redirect, session, url_for, request
+import google_auth_oauthlib.flow
+import json
+import os
+import requests
+from googleapiclient.discovery import build
+import googleapiclient.errors
+import google.oauth2.credentials
+
+app = Flask('app')
+# `FLASK_SECRET_KEY` is used by sessions. You should create a random string
+# and store it as secret.
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
+
+# `GOOGLE_APIS_OAUTH_SECRET` contains the contents of a JSON file to be downloaded
+# from the Google Cloud Credentials panel. See next section.
+oauth_config = json.loads(os.environ['GOOGLE_OAUTH_SECRETS'])
+
+# This sets up a configuration for the OAuth flow
+oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
+    oauth_config,
+    # scopes define what APIs you want to access on behave of the user once authenticated
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
+    ]
+)
+
+# This is entrypoint of the login page. It will redirect to the Google login service located at the
+# `authorization_url`. The `redirect_uri` is actually the URI which the Google login service will use to
+# redirect back to this app.
+@app.route('/signin')
+def signin():
+    # We rewrite the URL from http to https because inside the Replit App http is used,
+    # but externally it's accessed via https, and the redirect_uri has to match that
+    oauth_flow.redirect_uri = url_for('oauth2callback', _external=True).replace('http://', 'https://')
+    authorization_url, state = oauth_flow.authorization_url()
+    session['state'] = state
+    return redirect(authorization_url)
+
+# This is the endpoint that Google login service redirects back to. It must be added to the "Authorized redirect URIs"
+# in the API credentials panel within Google Cloud. It will call a Google endpoint to request
+# an access token and store it in the user session. After this, the access token can be used to access
+# APIs on behalf of the user.
+@app.route('/oauth2callback')
+def oauth2callback():
+    if not session['state'] == request.args['state']:
+        return 'Invalid state parameter', 400
+    oauth_flow.fetch_token(authorization_response=request.url.replace('http:', 'https:'))
+    session['access_token'] = oauth_flow.credentials.token
+    return redirect("/")
+
+# Call the userinfo API to get the user's information with a valid access token.
+# This is the first example of using the access token to access an API on the user's behalf.
+def get_user_info(access_token):
+    response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
+       "Authorization": f"Bearer {access_token}"
+   })
+    if response.status_code == 200:
+        user_info = response.json()
+        return user_info
+    else:
+        print(f"Failed to fetch user info: {response.status_code} {response.text}")
+        return None
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+# fetch all sheets within a Google spreadsheet
+def get_sheets(sheets_api, spreadsheet_id) -> list[str]:
+    result = sheets_api.get(spreadsheetId=spreadsheet_id).execute()
+    return [sheet["properties"]["title"] for sheet in result["sheets"]]
+
+# fetch the data for a given sheet within a Google spreadsheet
+def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
+    result = (
+        sheets_api.values()
+        .get(spreadsheetId=spreadsheet_id, range=sheet_title)
+        .execute()
+    )
+    return result["values"]
+
+# Render a form to allow importing a spreadsheet
+@app.route("/import_spreadsheet_form")
+def import_spreadsheet_form():
+    return """
+    <h3>Import Spreadsheet</h3>
+    <form action="/import_spreadsheet" method="POST">
+        <label>Spreadsheet ID</label>
+        <input type="text" name="spreadsheet_id">
+
+        <button type="submit">Import</button>
+    </form>
+    """
+
+@app.route("/import_spreadsheet", methods = ['POST'])
+def import_spreadsheet():
+    if 'access_token' not in session:
+        return redirect('/signin')
+    spreadsheet_id = request.form["spreadsheet_id"]
+    credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
+    service = build("sheets", "v4", credentials=credentials)
+    sheets_api = service.spreadsheets()
+    try:
+        sheets = get_sheets(sheets_api, spreadsheet_id)
+        data_by_sheets = {}
+        for sheet in sheets:
+            data = get_sheet_data(sheets_api, spreadsheet_id, sheet)
+            data_by_sheets[sheet] = data
+    except googleapiclient.errors.HttpError as e:
+        return f"upload failure"
+    dirpath = os.path.join("static", "uploads", spreadsheet_id)
+    filepath = os.path.join(dirpath, "data.json")
+    os.makedirs(dirpath, exist_ok=True)
+    with open(filepath, "w") as file:
+        json.dump(data_by_sheets, file)
+    return "upload success! Really!"
+
+@app.route('/')
+def welcome():
+    if "access_token" in session:
+        user_info = get_user_info(session["access_token"])
+        if user_info:
+            return f"""
+            Hello {user_info["given_name"]}!<br>
+            Your email address is {user_info["email"]}<br>
+            <a href="/signin">Sign In to Google</a><br>
+            <a href="/import_spreadsheet_form">Import a Sheet</a>
+            """
+    return """
+    <h1>Welcome to Google Sheet Importer</h1>
+    <a href="/signin">Sign In to Google</a><br>
+    <a href="/import_spreadsheet_form">Import a Sheet</a>
+    """
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+N'oubliez pas, si vous publiez l'application. Assurez-vous de :
+
+1. Ajouter l'URI de production `/oauth2callback` aux « URI de redirection autorisés ».
+2. Accéder à la [page de consentement](https://console.cloud.google.com/apis/credentials/consent) et cliquer sur « Publier l'application ».
+
+J'espère que vous avez passé une bonne expérience, et bonne continuation dans vos aventures.

@@ -1,0 +1,109 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Add payments
+
+> Take a refundable deposit when a customer reserves a Velocity car, then charge the balance on pickup.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+By the end, a Velocity customer will pay a refundable deposit to reserve a car and pay the balance at pickup.
+
+You added sign-in and a database to Velocity. Now turn it into a real booking business: hold each car with a refundable **deposit at booking**, then **charge the balance on pickup**. Replit handles payments through Stripe — you don't write any Stripe code yourself.
+
+## Decide the deposit and balance amounts
+
+Before asking Agent to build, pick the math:
+
+* **Deposit at booking:** a flat amount or a percentage of the total? A flat \$500 is simpler to communicate; 20% scales with the car.
+* **Balance at pickup:** the rest of the rental cost, charged when the customer collects the keys.
+* **Refund window:** how late can someone cancel and still get their deposit back? 48 hours is a common default.
+
+For this guide, Velocity holds a flat \$500 refundable deposit at booking, charges the balance at pickup, and refunds in full if a customer cancels more than 48 hours out. Adjust to whatever fits your real business.
+
+## Tell Agent to add Stripe checkout
+
+<AiPrompt>
+  Add deposit-and-balance payments to Velocity using Stripe in test mode.<br />
+  At booking, take a \$500 refundable deposit and save the customer's payment method on file.<br />
+  At pickup, charge the remaining balance to the saved payment method.<br />
+  If the customer cancels more than 48 hours before pickup, refund the deposit in full. Inside 48 hours, keep it.<br />
+  Save the deposit status and the saved-card reference in the database so a customer can see both on their booking.<br />
+  Tell me exactly which secret keys I need to paste from Stripe and where to paste them.<br />
+  Give me a test checklist for the deposit success, deposit cancel, balance charge, and cancellation refund cases.
+</AiPrompt>
+
+Agent will set up Stripe under the hood, add the deposit and balance flows, and tell you which secret keys to grab from Stripe. Paste them into your app's settings when Agent asks — your test keys live there, never in the code.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/TBbCBDsd8nVQwxq3/images/velocity/add-payments/stripe-secrets.png?fit=max&auto=format&n=TBbCBDsd8nVQwxq3&q=85&s=80f25ad62982cb96274ab45692f7baff" alt="Replit Secrets pane showing the Stripe API keys (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET) that Agent told the builder to paste" width="1280" height="720" data-path="images/velocity/add-payments/stripe-secrets.png" />
+</Frame>
+
+## Test the full flow in test mode
+
+Stripe gives you a special test card so you can run real-feeling payments without spending real money: `4242 4242 4242 4242`, any future expiry, any 3-digit CVC.
+
+1. Sign in to Velocity in Preview and reserve a car for next Saturday-Sunday.
+2. At checkout, you should see "Deposit today: $500" and "Balance at pickup: $1,900" (or whatever your math produces).
+3. Pay the deposit with the `4242` test card. You should return to a confirmation page showing the deposit paid and a payment method saved for the balance.
+4. Open the booking from "My bookings" and use the admin or pickup action to charge the balance. Confirm the balance shows as paid.
+5. Make a second reservation, then cancel it more than 48 hours out. The deposit should refund to the test card (you can verify in your Stripe test-mode dashboard).
+6. Make a third reservation and cancel inside 48 hours. The deposit should be kept and clearly explained to the customer.
+7. Try checkout with Stripe's decline test card (`4000 0000 0000 0002`). The reservation should not be confirmed and the customer should see a clear failure message.
+
+If the deposit succeeds but the reservation doesn't get confirmed, tell Agent:
+
+<AiPrompt>
+  The Stripe test deposit for Velocity succeeded but the reservation isn't showing as confirmed.<br />
+  Connect the deposit-success event to the reservation status in the database.<br />
+  Show me how to verify it with another test booking.
+</AiPrompt>
+
+## Switch to live payments when you're ready
+
+Test mode is for you. Live mode is for real customers handing over real money. When Velocity is ready:
+
+1. In Stripe, switch from test mode to live mode and copy the **live** secret keys.
+2. In your app's settings, replace the test keys with the live ones.
+3. Publish Velocity again from the Agent chat.
+4. Open the public URL, book a low-cost test car with your own real card, and confirm both the deposit and the balance flow work end-to-end.
+
+Run that real-card test once before sharing the public URL widely. Velocity now takes real bookings with real money.
+
+## Improve it next
+
+<CardGroup cols={2}>
+  <Card title="Add integrations" icon="plug" href="/build/add-integrations">
+    Send each booking to the customer's calendar.
+  </Card>
+
+  <Card title="Add a custom domain" icon="globe" href="/build/add-custom-domain">
+    Move Velocity to a branded URL before charging customers.
+  </Card>
+</CardGroup>
+
+## Need further help?
+
+* **Deposit succeeds but the reservation isn't confirmed:** ask Agent to connect the Stripe success event to the reservation status in the database.
+* **Test mode works, live mode doesn't:** make sure you replaced the test keys with the live ones in your app's settings.
+* **You want one upfront payment instead of deposit + balance:** tell Agent to switch Velocity to a single full payment at booking.
+* **You want recurring subscription pricing (monthly access to the fleet):** Replit also supports RevenueCat — ask Agent to use it instead of Stripe.
+
+## Related
+
+* [Stripe payments](/features/monetization/stripe-payments)
+* [RevenueCat subscriptions](/features/monetization/revenuecat-subscriptions)

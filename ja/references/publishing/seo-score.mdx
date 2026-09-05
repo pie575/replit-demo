@@ -1,0 +1,129 @@
+---
+title: "SEOスコア"
+description: "ReplitのSEOスコアとAgentを使って、発行済みアプリの検索エンジン最適化を測定・改善します。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Replitでウェブアプリを発行すると、ライブURLに対してSEO（検索エンジン最適化）の監査が自動的に実行され、Publishingツールに0〜100のSEOスコアが表示されます。スコアに改善の余地がある場合、ボタンひとつで具体的な問題をAgentに渡し、数秒で修正できます。
+
+ほとんどのビルダーにとって、ワークフロー全体は次のとおりです：アプリを発行し、スコアを確認して、Agentに「SEOを最適化して」と依頼する。このページでは、内部で何が起きているか、そして最大限に活用する方法について説明します。
+
+## SEOとは何か、なぜ重要なのか
+
+SEO（検索エンジン最適化）は、Googleなどのサーチエンジンがサイトをみつけやすくなるよう構築する手法です。SEOが充実していると、広告費をかけずに、ユーザーが関連する検索をしたときにアプリが上位に表示されます。
+
+SEOの結果に最も影響するのは、明確なページタイトルと説明文、セマンティックHTML、高速な読み込み、モバイルフレンドリーなレイアウト、画像への説明的なaltテキスト、クロール可能なサイト構造などです。検索エンジンは、人間にも機械にも読みやすいサイトを評価します。
+
+ランディングページ、マーケティングサイト、ブログ、ディレクトリなど、発見されることが重要なものを立ち上げる場合、SEOは早期に投資すべき最も効果的なことのひとつです。
+
+## ReplitがSEOの基礎を整える仕組み
+
+Replitはコンテンツやプロダクトに集中できるよう、SEOの多くの基礎を代わりに整えてくれます：
+
+* **高速かつグローバルに分散されたホスティング**：Replitのデプロイはスピードに最適化されたインフラからアプリを配信し、[発行リージョン](/ja/features/publishing/publishing-geography)でアプリの実行場所を選べます。
+* **デフォルトでHTTPS**：発行済みのすべてのアプリに、Replitが管理するTLS証明書が自動的に適用されます。これは検索エンジンのランキングシグナルの基本です。
+* **カスタムドメイン**：独自のドメインを接続して、信頼性とブランド権威を構築できます。[カスタムドメイン](/ja/features/publishing/custom-domains)を参照してください。
+* **コンテンツサイト向けスタティックデプロイ**：マーケティングページ、ブログ、ドキュメントには、[スタティックデプロイ](/ja/features/publishing/static-deployments)が事前レンダリングされたHTMLを配信し、検索エンジンが容易にクロールできます。
+* **AgentがSEOを意識したコードを生成**：Agentがページをビルドするとき、デフォルトでセマンティックなHTML、アクセシブルなマークアップ、メタタグを生成します。これらはSEOツールが確認する項目と同じです。
+* **SEOスコア機能**：発行後の自動監査でいつでも現状を把握でき、発見した問題をAgentに一クリックで渡せます。
+
+## SEOスコア機能
+
+発行が成功するたびに、ReplitはデプロイのURLに対してLighthouse監査を実行し、結果を保存します。Publishingツールにはアプリの総合SEOスコアが表示されます。
+
+<Frame caption="PublishingツールのSEOスコアバッジ">
+  <img src="/assets/mirror/seo-score-11a7aeef17ef.png" alt="スコア、色付きステータスピル、「Optimize SEO with Agent」ボタンが表示されたPublishingツールのSEOスコアバッジ" width="688" height="332" data-path="images/deployments/seo-score/seo-score.png" />
+</Frame>
+
+### 確認方法
+
+発行済みアプリで**Publishing**ツールを開きます。SEOスコアは他のビルド詳細と並んでデプロイ概要に表示されます。スコアにカーソルを合わせると、Lighthouseが各ページでフラグを立てた具体的なアクションアイテムが確認できます。
+
+### スコアの読み方
+
+ReplitはLighthouseの標準しきい値を使用しています：
+
+| スコア    | ステータス | 意味                                        |
+| :----- | :---- | :---------------------------------------- |
+| 90〜100 | 良好    | SEOのベストプラクティスに従っています。大きな変更後は引き続き監視してください。 |
+| 50〜89  | 要改善   | いくつかの問題が検索エンジンによるアプリの理解を妨げています。           |
+| 0〜49   | 不良    | 重要なSEOの基本が欠けています。修正は通常数分で完了します。           |
+
+アプリに複数のページがある場合、バッジはReplitがクロールしたすべてのURLの中で**最も低い**スコアを表示します。最悪のページが平均値に隠れることなく最初に表示されます。
+
+### スコアが計算されるタイミング
+
+監査は発行が成功するたびに自動的に実行されます。スコアリングはデプロイが公開されてから通常1〜2分以内に完了し、結果が出次第Publishingツールのバッジが更新されます。
+
+### 対応デプロイタイプ
+
+SEOスコアは、検索エンジンがURLをクロールできる公開向けウェブデプロイに対して計算されます：
+
+* [オートスケールデプロイ](/ja/features/publishing/autoscale-deployments)
+* [Reserved VMデプロイ](/ja/features/publishing/reserved-vm-deployments)
+* [スタティックデプロイ](/ja/features/publishing/static-deployments)
+
+スケジュールされたデプロイやプライベートデプロイは、公開ウェブトラフィックを配信しないためSEOスコアは算出されません。
+
+## AgentによるSEO最適化
+
+SEOスコアが90未満の場合、スコアの横に**Optimize SEO with Agent**ボタンが表示されます。これを選択すると、Lighthouseが確認したすべてのURLの具体的なアクションアイテムが、修正の指示とともに新しいAgentチャットに直接送られます。
+
+<Tip>
+  ボタンを使わなくても構いません。Agentを開いて\*\*「SEOを最適化して」\*\*と伝えるだけで、AgentはLighthouseの最新結果を取得して作業を進めます。
+</Tip>
+
+Agentが変更を完了したら、アプリを再発行します。SEOスコアが新しいビルドに対して再計算され、バッジが自動的に更新されます。
+
+Agentが適用する一般的な修正内容：
+
+* 欠落または汎用的な`<title>`タグを追加・書き直して、各ページに固有の説明的なタイトルを付ける
+* すべてのページにメタdescriptionを追加する
+* 画像に説明的な`alt`テキストを追加する
+* `<html>`要素に`lang`属性を設定する
+* リンクに識別可能なテキストを付ける（「こちらをクリック」や空のアンカーを避ける）
+* `robots.txt`と`sitemap.xml`を追加する
+* モバイルレンダリング用のviewportメタタグを追加する
+* アクセシビリティチェックに失敗したテキストの色コントラストを改善する
+* Open GraphとTwitterカードのメタタグを追加して、SNSでのリンクプレビューを改善する
+
+## Replitでの SEO最適化サイトのベストプラクティス
+
+Agentに任せるか自分で記述するかにかかわらず、Replitでビルドしたアプリで最も効果の高いポイントを紹介します：
+
+* **すべてのページに固有のタイトルとメタdescriptionを付ける。** タイトルは60文字以内、descriptionは150〜160文字程度を目安にします。
+* **セマンティックHTMLを使用する。** レイアウトを`<main>`、`<header>`、`<nav>`、`<footer>`で囲みます。`<h1>`はページごとに1回使用し、見出しレベルを順番に階層化します。
+* **すべての画像にaltテキストを追加する。** 画像が何であるかだけでなく、何を示しているかを説明します。
+* **`sitemap.xml`と`robots.txt`を生成する。** 検索エンジンが何をクロールすべきかわかるよう、Agentに両方を作成するよう依頼します。
+* **Open GraphとTwitterカードタグを追加する。** SNSで共有されたときのアプリの見え方をコントロールします。
+* **カスタムドメインを使用する。** ブランドドメインは訪問者と検索エンジンの両方からの信頼を構築します。[カスタムドメイン](/ja/features/publishing/custom-domains)を参照してください。
+* **適切なデプロイタイプを選択する。** コンテンツが多いサイトには、[スタティックデプロイ](/ja/features/publishing/static-deployments)が事前レンダリングされたHTMLを配信し、検索エンジンが瞬時に解析できます。
+* **構造化データを追加する。** JSON-LDマークアップは、検索エンジンが製品、記事、FAQ、イベントのリッチリザルトを表示するのに役立ちます。
+* **アプリを高速に保つ。** 画像を最適化し、レンダリングをブロックするスクリプトを避け、Replitのホスティングを活用してレスポンスタイムを低く保ちます。
+
+これらのほとんどを一度に適用するシンプルな方法：
+
+<AiPrompt>
+  Audit my site for SEO best practices and apply the fixes. Add a sitemap, robots.txt, Open Graph tags, structured data where it makes sense, and make sure every page has a unique title and meta description.
+</AiPrompt>
+
+## 次のステップ
+
+* [カスタムドメイン](/ja/features/publishing/custom-domains) — 発行済みアプリに独自のドメインを接続します。
+* [スタティックデプロイ](/ja/features/publishing/static-deployments) — コンテンツが多くSEOが重要なサイトに最適なデプロイタイプです。
+* [発行リージョン](/ja/features/publishing/publishing-geography) — アプリの実行場所を選択して、ユーザーへのレスポンスタイムを低く保ちます。
+* [Agent](/ja/features/agent/overview) — アプリでAgentを活用する方法についてもっと学びます。

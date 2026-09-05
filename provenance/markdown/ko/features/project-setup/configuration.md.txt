@@ -1,0 +1,355 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Replit App 구성
+
+> .replit 및 replit.nix 파일을 사용하여 Replit App을 구성하는 방법을 알아보세요.
+
+Replit App은 `.replit`와 `replit.nix` 두 파일로 구성됩니다. 이 파일들은 코드 실행부터 개발 도구 및 언어에 이르기까지 Replit App의 동작 방식에 영향을 줍니다.
+
+구성 파일은 기본적으로 숨겨져 있습니다. 파일 트리 메뉴에서 "숨김 파일 표시"를 선택하면 Replit App에서 볼 수 있습니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/rBzGsKp9NcWJ7sib/images/getting-started/show-hidden-files.png?fit=max&auto=format&n=rBzGsKp9NcWJ7sib&q=85&s=847e381d949d2432e58079ec166f1c08" alt="image" width="530" height="488" data-path="images/getting-started/show-hidden-files.png" />
+</Frame>
+
+## `replit.nix` 파일
+
+Replit은 패키지와 환경을 관리하기 위해 `Nix`를 사용합니다. `replit.nix` 파일은 다음 용도로 사용됩니다:
+
+**시스템 의존성 지정:** 패키지 관리자인 Nix를 통해 Replit App에 필요한 소프트웨어 패키지를 정확히 정의합니다.
+
+**재현 가능한 환경 생성:** 개발 환경을 일관되고 재현 가능하게 유지하여 협업 프로젝트 및 여러 시스템에서의 테스트에 이상적입니다.
+
+`Dependencies` 도구를 통해 Nix 패키지를 시각적으로 관리할 수 있습니다. 자세한 내용은 [시스템 의존성](/ko/features/project-setup/dependency-management#system-dependencies) 가이드를 참조하세요.
+
+`replit.nix` 파일로 패키지를 구성하려면 `deps` 배열에 `pkgs.` 접두사를 붙여 [Nix 패키지](https://search.nixos.org/packages)를 나열할 수 있습니다. 변경 사항은 Shell을 다시 로드한 후 동기화됩니다.
+
+```nix theme={null}
+{ pkgs }: {
+  deps = [
+    pkgs.nodejs-19_x
+    pkgs.nodePackages.typescript-language-server
+    pkgs.yarn
+    pkgs.replitPackages.jest
+  ];
+}
+```
+
+## `.replit` 파일
+
+`.replit` 파일은 Replit App의 동작을 제어합니다. `toml` [구성 형식](https://toml.io/en/)을 사용합니다. 구성할 수 있는 주요 항목은 다음과 같습니다:
+
+**실행 명령:** Run 버튼을 선택했을 때 실행되는 명령을 지정합니다. 각 템플릿에는 즉시 코드를 실행할 수 있도록 기본 실행 명령이 있습니다. 더 맞춤화되고 복잡한 앱의 경우 [Workflows](/ko/features/workspace-tools/workflows)를 사용하세요.
+
+**언어 서버 프로토콜(LSP)**: 자동 완성, 코드 탐색, 코드 하이라이팅, 실시간 린팅 및 오류 표시 등의 기능을 제공합니다.
+
+**환경 변수:** 애플리케이션이 올바르게 실행되는 데 필요한 환경 변수를 설정하고 관리합니다.
+
+**의존성 및 패키지:** `.replit` 파일을 통해 패키지 설치 및 구성을 직접 관리하여 Replit App 시작 시 필요한 모든 도구가 준비되도록 합니다. `Dependencies` 도구를 통해 의존성을 시각적으로 관리할 수 있습니다. 자세한 내용은 [시스템 모듈](/ko/features/project-setup/dependency-management#advanced-configuration) 가이드를 참조하세요.
+
+Python 애플리케이션의 경우 기본 `.replit` 파일은 다음과 같습니다:
+
+```toml theme={null}
+entrypoint = "main.py"
+modules = ["python-3.10:v18-20230807-322e88b"]
+
+[nix]
+channel = "stable-23_05"
+
+[unitTest]
+language = "python3"
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+[deployment]
+run = ["python3", "main.py"]
+deploymentTarget = "cloudrun"
+```
+
+다음 표는 `.replit` 파일의 각 설정과 그 기능 및 Replit App 환경에 미치는 영향을 보여줍니다.
+
+| **구성 키**                                        | **값/예시**                               | **설명**                                                                                                                     |
+| ----------------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| <a name="entrypoint" />`entrypoint`             | `main.py`                              | 편집기를 열었을 때 기본적으로 실행되고 표시되는 메인 파일을 지정합니다. 애플리케이션에 맞게 파일 이름을 변경할 수 있습니다.                                                     |
+| <a name="modules" />`modules`                   | `["python-3.10:v18-20230807-322e88b"]` | Replit에서 지원하는 프로그래밍 언어 또는 주요 의존성의 특정 버전을 정의합니다.                                                                            |
+| <a name="nix" />`[nix]`                         |                                        | 시스템 의존성을 관리하는 패키지 관리자인 Nix 사용을 위한 설정을 지정합니다. 자세한 내용은 [의존성 관리](/ko/features/project-setup/dependency-management) 문서를 참조하세요. |
+| <a name="channel" />`channel`                   | `stable-23_05`                         | 사용할 Nix 채널을 나타내며, 사용 가능한 시스템 의존성 버전에 영향을 줍니다.                                                                              |
+| <a name="packages" />`packages`                 | `["cowsay", "htop"]`                   | 설치할 Nix 패키지를 지정합니다. 더 세밀한 제어가 필요한 경우 `replit.nix`를 사용할 수도 있습니다.                                                            |
+| <a name="unitTest" />`[unitTest]`               |                                        | Replit App 내 단위 테스트 관련 설정을 구성합니다.                                                                                          |
+| <a name="language" />`language`                 | `python3`                              | 단위 테스트에 사용되는 언어를 지정합니다. Python 3이 테스트 작성에 사용됨을 나타냅니다.                                                                      |
+| <a name="gitHubImport" />`[gitHubImport]`       |                                        | GitHub에서 프로젝트를 가져올 때 영향을 미치는 설정으로, 포함되어야 하는 파일을 지정합니다.                                                                     |
+| <a name="requiredFiles" />`requiredFiles`       | `[".replit", "replit.nix"]`            | 프로젝트가 올바르게 작동하도록 가져올 때 반드시 존재해야 하는 파일 목록입니다.                                                                               |
+| <a name="deployment" />`[deployment]`           |                                        | Replit App에서 라이브 환경으로 애플리케이션을 배포하는 설정을 포함합니다.                                                                              |
+| <a name="run" />`run`                           | `["python3", "main.py"]`               | 배포 시 애플리케이션을 시작하기 위해 실행되는 명령입니다.                                                                                           |
+| <a name="deploymentTarget" />`deploymentTarget` | `cloudrun`                             | 애플리케이션 호스팅을 위한 배포 대상 플랫폼을 지정합니다.                                                                                           |
+
+이제 `.replit` 파일의 기본 구성에 대해 이해했으니, 다음 섹션에서 Replit App의 기본 및 고급 설정을 구성하는 방법을 알아보겠습니다.
+
+## 기본 설정 구성
+
+### 진입점(Entrypoint)
+
+프로젝트의 메인 파일입니다. `run` 속성을 정의하지 않으면 런타임에서 `entrypoint`로 지정된 파일을 실행합니다.
+
+```toml theme={null}
+entrypoint = "<file-name>.py"
+```
+
+### `Run` 명령
+
+`.replit` 파일의 `run` 속성은 Replit 환경에서 `Run` 버튼을 선택했을 때 초기 실행되는 명령 또는 일련의 명령을 결정하는 핵심 기능입니다. `Run` 명령은 실행할 명령을 나타내는 문자열이나 명령과 개별 인수를 나타내는 문자열 배열로 지정할 수 있습니다.
+
+`Run` 명령을 구성하는 일반적인 방법:
+
+* **단일 명령:**
+  Replit App에서 단일 명령을 직접 실행하는 방법입니다. `.replit` 파일에 이를 추가하면 `Run` 버튼을 누를 때 `Console` 창에 인사말이 표시됩니다:
+  **예시:** `run = "echo 'Hello, Replit!'"`
+
+* **명시적 인수:**
+  경우에 따라 따옴표 파싱이나 Shell 보간 규칙을 피하기 위해 더 명시적으로 작성하는 것이 유리할 수 있습니다. 위의 예시를 인수를 분리하여 다시 작성할 수 있습니다.
+  인사말을 `echo`의 첫 번째이자 유일한 인수로 명시적으로 전달하므로 `'`와 `"` 모두 필요하지 않습니다:
+  **예시:** `run = ["echo", "Hello, Replit!"]`
+
+* **여러 명령:**
+  프론트엔드와 백엔드 같은 여러 프로세스를 동시에 실행하는 방법입니다. 각 서버가 다른 포트에 바인딩되는 Python 백엔드와 TypeScript 프론트엔드를 개발할 때 유용합니다:
+  **예시:** `run = "python -m app & npm run start & wait"`
+
+#### 프로세스 관리
+
+`&`로 여러 명령을 동시에 실행할 수 있지만, 서비스 간 로그를 더 명확하게 구분하고 싶을 수 있습니다. [`process-compose`](https://github.com/F1bonacc1/process-compose)와 같은 [시스템 의존성](/ko/features/project-setup/dependency-management#system-dependencies)을 추가하면 여러 프로세스를 더 효과적으로 관리할 수 있습니다.
+
+#### `Build` 단계
+
+TypeScript, Golang, Java 같은 컴파일 언어나 다음 `run` 전에 환경, 데이터, 구성을 재설정해야 하는 경우 코드를 `run`하기 전에 별도의 컴파일 단계가 필요할 수 있습니다.
+
+* **컴파일:**
+  TypeScript 저장소에서는 코드를 실행하기 전에 `tsc`를 먼저 실행해야 할 수 있습니다.
+  **예시:**
+
+```toml theme={null}
+build = "tsc app.ts"
+run = "node app.js"
+```
+
+#### 환경 변수 포함
+
+실행 전에 서비스에 환경 변수를 제공하려면 `run` 속성을 [테이블](https://toml.io/en/v1.0.0#table)로 확장할 수 있습니다.
+
+이는 더 복잡한 변경으로, `.replit` 파일 내에서 `run = "..."` 속성의 위치를 이동해야 할 수 있습니다.
+
+다음 diff는 `[run]`의 `args`를 통해 명령을 전달하고 `[run.env]`에서 변수 `NAME`을 제공하는 방법을 보여줍니다:
+
+```diff theme={null}
+-run = ["bash", "-c", "echo \"Hello, $NAME!\""]
+
+ modules = ["nodejs-20"]
+
+ hidden = [".pythonlibs"]
+
++# 새로운 [run]은 `[`으로 시작하지 않는 모든 최상위 속성 아래에 있어야 합니다!
++[run]
++args = ["bash", "-c", "echo \"Hello, $NAME!\""]
++
++[run.env]
++NAME="Replit"
+
+ [nix]
+ channel = "stable-23_11"
+```
+
+#### 대화형 실행
+
+대화형 프로그램도 `Run` 버튼을 통해 실행할 수 있으며, 개발 환경과 프로그램이 실행되는 터미널을 구분하는 방법을 제공합니다.
+다음 집계 스크립트를 예로 들어 보겠습니다:
+
+**예시**
+
+```toml theme={null}
+[run]
+args = ["bash", "-c", """
+count=0
+while read -p "$PROMPT" -r next && [ -n "$next" ]; do
+    count=$((count+next))
+done
+echo "The numbers you entered sum to $count!"
+"""]
+
+[run.env]
+PROMPT = "Next number ([Enter] to end): "
+```
+
+## 고급 구성 옵션
+
+Replit App에서 사용 가능한 상세 구성 옵션을 살펴보세요. 개발 환경 사용자 정의, 실행 명령 관리, 언어 서비스 통합, 의존성 처리를 맞춤화할 수 있습니다.
+
+| **구성**     | **키**                               | **값/예시**                                    | **설명**                                         |
+| ---------- | ----------------------------------- | ------------------------------------------- | ---------------------------------------------- |
+| onBoot     | <a name="onBoot" />`onBoot`         | `onBoot = "npm install"`                    | Replit App 부팅 시 실행되는 명령입니다.                    |
+| compile    | <a name="compile" />`compile`       | (기본 예시 없음)                                  | `run` 명령 전에 실행되는 명령으로, C++과 같은 컴파일 언어에서 사용됩니다. |
+| language   | <a name="language" />`language`     | `language = "javascript"`                   | GitHub 가져오기나 Replit App 생성 시 언어를 지정합니다.        |
+| entrypoint | <a name="entrypoint" />`entrypoint` | `entrypoint = "index.js"`                   | 편집기를 열었을 때 실행 및 표시되는 메인 파일입니다.                 |
+| hidden     | <a name="hidden" />`hidden`         | `hidden = [".config", "package-lock.json"]` | 파일 트리에서 기본적으로 숨길 파일 또는 폴더입니다.                  |
+| audio      | <a name="audio" />`audio`           | `audio = true`                              | `true`로 설정하면 시스템 전체 오디오를 활성화합니다.               |
+
+### 시스템 전체 오디오 관련 참고 사항
+
+`.replit` 파일에서 `audio = true`를 설정하면 개발 환경을 재시작해야 할 수 있습니다. `Cmd+K`(Mac) 또는 `Ctrl+K`(Windows)로 명령 팔레트를 열고 **Restart compute**를 검색하여 선택하세요.
+
+그래픽 애플리케이션을 실행할 때 `Output` 창의 오른쪽 하단에 체크박스가 있는 헤드폰 아이콘이 표시됩니다.
+브라우저 제한으로 인해 새로 고침할 때마다 이 기능을 활성화해야 합니다.
+
+```toml theme={null}
+# `.replit` 파일의 최상단, `[`로 시작하는 섹션 밖에 위치시키세요
+audio = true
+```
+
+## 패키저 구성
+
+| **구성**            | **키**                                             | **값/예시**                                      | **설명**                                |
+| ----------------- | ------------------------------------------------- | --------------------------------------------- | ------------------------------------- |
+| packager          | <a name="language" />`language`                   | `packager.language = "python3"`               | 패키지 작업에 사용되는 언어입니다.                   |
+| packager features | <a name="guessImports" />`guessImports`           | `packager.features.guessImports = true`       | Replit App 실행 전에 설치할 패키지를 자동으로 감지합니다. |
+| packager features | <a name="packageSearch" />`packageSearch`         | `packager.features.packageSearch = true`      | `true`로 설정하면 패키저 지원을 활성화합니다.          |
+| packager features | <a name="enabledForHosting" />`enabledForHosting` | `packager.features.enabledForHosting = false` | Replit App 호스팅 시 패키지 설치 실행 여부를 설정합니다. |
+| packager          | <a name="afterInstall" />`afterInstall`           | `afterInstall = "echo 'package installed'"`   | 패키저를 통해 새 패키지가 설치된 후 실행되는 명령입니다.      |
+| packager          | <a name="ignoredPaths" />`ignoredPaths`           | `ignoredPaths = [".git"]`                     | 패키지 감지 시 무시할 경로입니다.                   |
+| packager          | <a name="ignoredPackages" />`ignoredPackages`     | `ignoredPackages = ["twitter", "discord"]`    | 설치 중 자동 감지를 시도하지 않을 모듈입니다.            |
+
+### 패키저 구성의 `.replit` 구성 예시
+
+```toml theme={null}
+# Replit App의 언어 정의
+packager.language = "python3"
+
+# 자동 패키지 관리를 위한 기능 활성화
+[packager.features]
+guessImports = true
+packageSearch = true
+enabledForHosting = false
+
+# 각 패키지 설치 후 실행할 명령
+packager.afterInstall = "echo 'Package installed successfully'"
+
+# 패키지 관리자가 무시해야 할 경로 및 패키지 정의
+packager.ignoredPaths = [".git", "node_modules"]
+packager.ignoredPackages = ["twitter", "discord"]
+
+# 추가 배포 설정
+[deployment]
+run = ["python3", "app.py"]
+```
+
+## 배포 구성
+
+| **구성**     | **키**                                 | **값/예시**                             | **설명**                                |
+| ---------- | ------------------------------------- | ------------------------------------ | ------------------------------------- |
+| deployment | <a name="run" />`run`                 | `deployment.run = "npm start"`       | 배포 컨테이너가 시작될 때 실행되는 명령입니다.            |
+| deployment | <a name="build" />`build`             | `deployment.build = "npm run build"` | 배포 실행 전에 실행되는 명령입니다.                  |
+| deployment | <a name="ignorePorts" />`ignorePorts` | `deployment.ignorePorts = true`      | `true`이면 배포 성공 시 열린 포트 확인이 필요하지 않습니다. |
+
+### 배포 구성의 `.replit` 구성 예시
+
+```toml theme={null}
+
+# 프로젝트의 메인 진입점 지정
+entrypoint = "app.js"
+
+# 애플리케이션 배포를 위한 구성 설정
+[deployment]
+run = "npm start"
+build = "npm run build"
+ignorePorts = true
+```
+
+<Note>
+  **인터프리터 구성**은 더 이상 사용되지 않으며 Replit에서 제공되지 않습니다. 대신 Replit App 환경 내에서 스크립트 및 애플리케이션이 실행되는 방식을 구성하려면 `Run` 명령을 사용하는 것을 권장합니다.
+</Note>
+
+## 포트 구성
+
+| **구성** | **키**                                   | **값/예시**            | **설명**                               |
+| ------ | --------------------------------------- | ------------------- | ------------------------------------ |
+| ports  | <a name="localPort" />`localPort`       | `localPort = 3000`  | Replit이 외부 포트에 바인딩할 포트입니다.           |
+| ports  | <a name="externalPort" />`externalPort` | `externalPort = 80` | `localPort`에 연결된 공개적으로 접근 가능한 포트입니다. |
+
+### 포트 관리를 위한 `.replit` 구성 파일 예시
+
+```toml theme={null}
+# 특정 포트에서 애플리케이션을 노출하기 위한 네트워킹 구성
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+## Replit App 환경 메타데이터 접근
+
+### Node.js
+
+모든 환경 변수에 접근하려면:
+
+`console.log(process.env);`
+
+단일 변수(REPL\_SLUG)에 접근하려면:
+
+`console.log(process.env.REPL_SLUG);`
+
+### Python
+
+모든 환경 변수에 접근하려면:
+
+```python theme={null}
+import os
+print(os.environ)
+```
+
+단일 변수(REPL\_SLUG)에 접근하려면:
+
+```python theme={null}
+import os
+variable = os.environ.get('REPL_SLUG')
+print(variable)
+```
+
+### Rust
+
+모든 환경 변수에 접근하려면:
+
+```rust theme={null}
+use std::env;
+fn main() {
+    for (key, value) in env::vars() {
+        println!("{}: {}", key, value);
+    }
+}
+```
+
+단일 변수(REPL\_SLUG)에 접근하려면:
+
+```rust theme={null}
+use std::env;
+fn main() {
+    let variable = env::var("REPL_SLUG").unwrap();
+    println!("{}", variable);
+}
+```
+
+## 환경 변수
+
+다음은 Replit App 내에서 접근 가능한 환경 변수입니다:
+
+| 키                                                 | 설명                                                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| <a name="REPL_OWNER" />`REPL_OWNER`               | Replit App 소유자의 사용자 이름입니다. Replit App이 텍스트 기반이고 웹 서버가 없는 경우 `REPL_OWNER`는 현재 Replit App에 접근 중인 사용자의 값을 반영합니다 |
+| <a name="REPL_ID" />`REPL_ID`                     | Replit App의 고유 UUID 문자열입니다                                                                                   |
+| <a name="HOME" />`HOME`                           | Replit App의 홈 경로입니다                                                                                          |
+| <a name="system" />`system`                       | Replit App에서 실행 중인 운영 체제입니다                                                                                  |
+| <a name="LANG" />`LANG`                           | Replit App의 언어 및 문자 인코딩을 설정하여 텍스트 처리 및 표시 방식에 영향을 줍니다                                                        |
+| <a name="REPL_IMAGE" />`REPL_IMAGE`               | Replit App에 해당하는 Docker 이미지입니다                                                                               |
+| <a name="REPL_LANGUAGE" />`REPL_LANGUAGE`         | Replit App에 구성된 프로그래밍 언어로, 런타임 환경 및 도구 결정에 사용됩니다                                                             |
+| <a name="REPL_PUBKEYS" />`REPL_PUBKEYS`           | 다양한 공개 API 키를 포함하는 JSON 문자열 객체입니다                                                                            |
+| <a name="REPL_SLUG" />`REPL_SLUG`                 | URL 및 파일 이름에 사용하기 적합한 Replit App 이름의 단순화된 기계 가독 버전입니다                                                        |
+| <a name="PRYBAR_FILE" />`PRYBAR_FILE`             | Replit App의 메인/진입점 파일입니다                                                                                     |
+| <a name="REPLIT_DEV_DOMAIN" />`REPLIT_DEV_DOMAIN` | Project Editor에서 Replit App의 `replit.dev` URL을 제공합니다. 이 환경 변수는 배포 환경에서는 사용할 수 없습니다                           |

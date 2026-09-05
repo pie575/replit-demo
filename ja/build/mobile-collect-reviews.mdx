@@ -1,0 +1,69 @@
+---
+title: "レビューと評価を集める"
+description: "各ストアのネイティブレビュープロンプトを使って、満足したプレイヤーに PixelGames を評価してもらいましょう。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const reviewPrompt = "Ask players to rate PixelGames using the native review prompt right after they set a new high score in Blocks.";
+
+評価が増えるほどアプリのランキングは上がり、新しいユーザーからの信頼も高まります。両方のストアには
+このためのネイティブプロンプトが用意されています。アプリ内で直接評価を求めるポップアップです。
+
+## 適切なタイミングでレビューを依頼する
+
+勝利後、ハイスコア更新時、レベルアップ時にレビューを依頼しましょう。依頼する頻度よりもタイミングの方が
+重要です。
+
+<AiPrompt>
+  {reviewPrompt}
+</AiPrompt>
+
+<Frame caption="ハイスコア更新後の PixelGames の Game Over 画面。評価を依頼する理想的なタイミングです。">
+  <img src="/assets/mirror/rate-app-dd66c937eaf7.webp" alt="ハイスコア更新を示す PixelGames の Game Over 画面" data-path="images/pixelgames/mobile/rate-app.webp" width="1516" height="852" data-path="images/pixelgames/mobile/rate-app.webp" />
+</Frame>
+
+iOS の StoreKit、Android の Google Play In-App Review API はどちらも、コードがどれだけ頻繁に依頼しても
+実際に表示される頻度に上限を設けています。
+
+<Note>
+  5つ星評価をした後にのみゲームをアンロックするなど、レビューを買収したり要求したりしないでください。
+  Apple と Google はどちらもインセンティブ付きレビューを禁止しており、違反すると PixelGames が却下または
+  削除される可能性があります。
+</Note>
+
+## トラブルシューティング
+
+* **プロンプトが表示されない:** これは時々起こる想定内の動作です。コードが API を何回呼び出しても、
+  両プラットフォームともシステムが表示する頻度に上限を設けています。
+* **テスト中は毎回プロンプトが表示される:** TestFlight や Internal Testing のビルドでは正常な動作です。
+  年間のレート制限は実際の本番インストールにのみ適用されます。
+* **プレイヤーから頻繁に聞かれすぎると苦情が来る:** 起動のたびに表示されるカスタムポップアップではなく、
+  ネイティブ API を呼び出していることを確認してください。カスタムポップアップは組み込みのレート制限を
+  回避してしまいます。
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="支払いを追加する" icon="credit-card" href="/ja/build/mobile-payments">
+    PixelGames 内のコンテンツに対してプレイヤーに課金しましょう。
+  </Card>
+</CardGroup>
+
+## 関連
+
+* [App Store に提出する](/build/mobile-publish-ios)
+* [Google Play に提出する](/build/mobile-publish-android)

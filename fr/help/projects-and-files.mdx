@@ -1,0 +1,94 @@
+---
+title: "Projets et fichiers"
+description: "Réponses aux questions courantes sur les projets—récupération de projets supprimés, exportation, partage, connexion à GitHub, secrets et retour à un point de contrôle."
+---
+
+Ces réponses couvrent le travail avec les projets et les fichiers. Pour les références connexes, consultez [Secrets](/fr/core-concepts/project-editor/app-setup/secrets), [Points de contrôle et restaurations](/fr/features/version-control/checkpoints-and-rollbacks) et la [présentation des intégrations](/fr/features/integrations/overview).
+
+<AccordionGroup>
+  <Accordion title="Comment connecter Resend ou un autre service d'e-mail à mon application Replit ?">
+    Ouvrez votre projet et allez dans **Outils → Connecteurs**, trouvez le service (tel que Resend) et connectez-le. Après autorisation, la clé API est enregistrée comme secret dans votre projet. Si vous configurez un domaine d'e-mail personnalisé, ajoutez les enregistrements DNS affichés par le service chez votre fournisseur DNS.
+
+    Consultez la [présentation des intégrations](/fr/features/integrations/overview) pour les connecteurs disponibles et [Ajouter des intégrations](/fr/build/add-integrations).
+  </Accordion>
+
+  <Accordion title="J'ai accidentellement supprimé un projet—puis-je le récupérer ?">
+    Les projets supprimés peuvent être restaurés pendant une durée limitée. Ouvrez un Shell dans n'importe quel projet et exécutez :
+
+    ```bash theme={null}
+    trash view
+    trash restore your-project-name
+    ```
+
+    Après la fin de la fenêtre de rétention, les projets supprimés sont définitivement retirés. Si vous êtes passé ce délai, [contactez le support Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Comment télécharger ou exporter un projet Replit ?">
+    Sélectionnez le menu à trois points en haut de l'arborescence de fichiers et choisissez **Télécharger en zip**. Pour les projets volumineux, le téléchargement peut prendre un moment. En cas d'échec, ouvrez un Shell et exécutez `zip -r project.zip .`, puis téléchargez `project.zip` depuis l'arborescence de fichiers.
+  </Accordion>
+
+  <Accordion title="Comment partager un projet ou ajouter un collaborateur ?">
+    Vous avez trois options :
+
+    * **Lecture seule**—définissez la confidentialité du projet sur public pour que quiconque dispose du lien puisse le voir.
+    * **Accès en modification par invitation**—sélectionnez **Inviter**, saisissez un nom d'utilisateur ou une adresse e-mail et définissez le niveau d'autorisation.
+    * **Lien de participation**—créez un lien de participation depuis **Inviter** pour que quiconque dispose du lien puisse rejoindre et modifier.
+
+    Core prend en charge jusqu'à 5 collaborateurs et Pro jusqu'à 15 ; les collaborateurs n'ont pas besoin d'un plan payant pour modifier votre projet. Consultez [Espaces de travail](/fr/features/collaboration/workspaces).
+  </Accordion>
+
+  <Accordion title="Comment connecter un dépôt GitHub à Replit ?">
+    Liez votre compte GitHub depuis les services connectés de votre compte, puis ouvrez l'[outil Git](/fr/features/workspace-tools/git-interface) dans votre projet et connectez le dépôt. Activez la synchronisation automatique dans le panneau Git pour une synchronisation bidirectionnelle. Pour importer un dépôt existant, consultez [Importer depuis des fournisseurs](/fr/build/import-from-providers).
+
+    Si la synchronisation Git s'arrête de fonctionner, reconnectez GitHub depuis vos services connectés. Un jeton d'accès personnel à granularité fine offre une connexion plus fiable.
+  </Accordion>
+
+  <Accordion title="Mon Repl est lent ou l'éditeur rame—que puis-je essayer ?">
+    Pour les ralentissements de l'éditeur, essayez ces solutions :
+
+    * Rechargez complètement avec `Cmd+Maj+R` (Mac) ou `Ctrl+Maj+R` (Windows).
+    * Fermez les onglets de fichiers inutilisés.
+    * Ouvrez la palette de commandes avec `Cmd+K` (Mac) ou `Ctrl+K` (Windows), recherchez **Restart compute**, puis sélectionnez-la.
+    * Essayez un autre navigateur pour exclure les extensions.
+
+    Pour une exécution de code lente plutôt qu'un ralentissement de l'éditeur, vérifiez les boucles lourdes ou les limites de mémoire. Vous pouvez voir l'utilisation du CPU et de la mémoire dans le panneau de ressources en bas de l'éditeur.
+  </Accordion>
+
+  <Accordion title="Comment utiliser les variables d'environnement et les secrets dans mon projet ?">
+    Ouvrez l'outil **Secrets** (l'icône de cadenas), sélectionnez **+ Nouveau secret** et saisissez une clé et une valeur. Lisez-la dans votre code avec `process.env.API_KEY` (Node.js) ou `os.environ["API_KEY"]` (Python).
+
+    Les secrets dans le panneau [Secrets](/fr/core-concepts/project-editor/app-setup/secrets) de développement ne sont disponibles que dans l'éditeur. Pour les applications déployées, ajoutez les mêmes clés dans vos secrets de déploiement—ils sont maintenus séparés par conception.
+  </Accordion>
+
+  <Accordion title="Comment utiliser les Secrets de compte (le Coffre-fort) ?">
+    Les [Secrets de compte](/fr/core-concepts/project-editor/app-setup/secrets) sont disponibles dans tous vos projets—utile pour les clés que vous réutilisez. Ajoutez-les depuis les paramètres de votre compte, et ils seront disponibles dans chaque projet que vous possédez. Si la même clé existe à la fois dans les Secrets de compte et dans le panneau Secrets d'un projet, la valeur au niveau du projet a la priorité.
+  </Accordion>
+
+  <Accordion title="Comment récupérer d'un conflit de fusion Git ou d'un état Git corrompu ?">
+    Ouvrez un Shell et exécutez `git status` pour voir les conflits.
+
+    <Warning>Les deux commandes suivantes suppriment les modifications non validées et ne peuvent pas être annulées. Sauvegardez d'abord tout ce que vous souhaitez conserver—par exemple, copiez les fichiers modifiés hors du projet.</Warning>
+
+    Pour annuler les modifications locales et revenir à votre dernier état propre, exécutez `git checkout -- .` ; pour réinitialiser au dernier commit, exécutez `git reset --hard HEAD`.
+
+    Si votre dossier `.git` est corrompu et que les commandes Git échouent, ouvrez un nouveau chat Agent et collez l'erreur—Agent peut souvent réparer le dépôt. Consultez [Récupération après sinistre](/fr/features/version-control/disaster-recovery).
+  </Accordion>
+
+  <Accordion title="Comment revenir à un point de contrôle antérieur de mon projet ?">
+    Replit enregistre des [points de contrôle](/fr/features/version-control/checkpoints-and-rollbacks) au fur et à mesure qu'Agent travaille. Dans le panneau Agent, trouvez le message précédant la modification que vous souhaitez annuler et sélectionnez l'option de restauration à côté, puis confirmez.
+
+    <Note>
+      Replit ne prend plus en charge le retour d'une application publiée à une version antérieure. Pour annuler une application publiée, ramenez d'abord votre projet à un point de contrôle antérieur (comme décrit ci-dessus), puis republiez pour redéployer cet état. Pour récupérer un seul fichier, ouvrez-le, sélectionnez son nom et utilisez **Afficher l'historique** pour restaurer une version précédente. Consultez [Historique des fichiers](/fr/features/version-control/file-history).
+    </Note>
+  </Accordion>
+
+  <Accordion title="Comment déplacer un projet vers un compte Replit différent ?">
+    Les projets ne peuvent pas être transférés directement, mais vous pouvez en copier un. La façon la plus simple est de partager le projet avec le compte de destination et de le forker depuis là-bas. Alternativement, téléchargez le projet en zip et réimportez-le dans un nouveau Repl sur l'autre compte.
+
+    Après la copie, configurez les secrets, la base de données et la configuration de déploiement dans le nouveau projet—ils ne sont pas inclus dans la copie. Pour des instructions détaillées, y compris comment déplacer les données de votre base de données, consultez [Copier manuellement un projet vers un autre espace de travail](/fr/teams/identity-and-access-management/manually-copy-projects).
+  </Accordion>
+</AccordionGroup>
+
+## Vous avez encore besoin d'aide ?
+
+Si votre question sur votre projet n'est pas répondue ici, [contactez le support Replit](https://replit.com/support).

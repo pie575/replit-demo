@@ -1,0 +1,160 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Buscar candidatos
+
+> A partir de uma descrição de vaga, encontre engenheiros compatíveis no GitHub, pule quem já está no Ashby e redija uma abordagem.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+O Ashby já faz a triagem das candidaturas recebidas. Este fluxo é outbound: lê a descrição
+da vaga no Drive, encontra engenheiros compatíveis no GitHub, pula quem já está no Ashby e
+redige uma abordagem para você enviar. O Agent registra as pessoas novas como buscadas com
+um breve motivo do encaixe e um rascunho no candidato. Você revisa e envia. Não use isso
+como a única decisão de contratação.
+
+## Ideal para
+
+* Recrutadores técnicos que precisam de uma lista buscada quando o volume de candidaturas recebidas é baixo demais.
+* Gerentes de contratação que precisam de engenheiros compatíveis no GitHub sem passar o dia inteiro pesquisando.
+
+## Conectores
+
+<Connectors
+  items={[
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "Descrição da vaga e critérios obrigatórios",
+},
+{
+  id: "github",
+  name: "GitHub",
+  why: "Repositórios públicos, contribuições e perfis",
+},
+{
+  id: "ashby",
+  name: "Ashby",
+  why: "Pular candidatos existentes e registrar pessoas buscadas",
+},
+]}
+/>
+
+## Antes de começar
+
+Tenha uma descrição de vaga com requisitos obrigatórios vs. desejáveis. Conecte o Drive, o
+GitHub e o Ashby. Diga a localização, a senioridade e quantos nomes você quer. Não use isso
+como a única decisão de contratação.
+
+## Dê o prompt ao agente
+
+<AiPrompt>
+  Crie uma rotina que rode toda segunda-feira às 9h. A partir desta descrição
+  de vaga \[link do Drive ou cole o texto], encontre 30 engenheiros no GitHub
+  que atendam aos requisitos obrigatórios. Pule quem já está no Ashby. Para
+  cada pessoa, escreva um motivo do encaixe em 3 linhas e um breve rascunho de
+  abordagem. Não envie nada. Adicione as pessoas novas ao Ashby como buscadas,
+  com a nota e o rascunho no candidato.
+</AiPrompt>
+
+## O que esperar
+
+O Agent lê a descrição da vaga, pesquisa no GitHub, pula quem já está no Ashby e retorna uma
+lista com rascunhos. Você revisa e envia. A primeira passada será barulhenta. Ajuste os
+requisitos obrigatórios depois de ver o resultado. Abra três perfis do GitHub da lista,
+confira se atendem aos requisitos obrigatórios e confirme que essas pessoas ainda não estão
+no Ashby antes de enviar qualquer coisa.
+
+## Adapte ao seu caso
+
+<AiPrompt>
+  Inclua apenas pessoas com commits recentes em \[linguagem / tipo de
+  repositório] e \[n]+ anos de experiência relevante. Descarte quem parecer ser
+  cliente atual ou funcionário de um concorrente.
+</AiPrompt>
+
+<AiPrompt>
+  Reescreva a abordagem no meu tom a partir destes exemplos \[colar]. Mantenha
+  abaixo de 80 palavras. Não mencione que um agente escreveu.
+</AiPrompt>
+
+## Solução de problemas
+
+* **A lista está barulhenta:** ajuste os requisitos obrigatórios vs. desejáveis depois da primeira passada. Peça commits recentes em uma linguagem ou tipo de repositório específico, e descarte quem parecer ser cliente atual ou funcionário de um concorrente.
+* **Pessoas que já estão no Ashby continuam aparecendo:** confirme que o Ashby está conectado ao workspace certo e que o Agent está comparando por e-mail ou nome de usuário do GitHub, não só pelo nome de exibição.
+* **A abordagem foi enviada:** este fluxo deveria apenas rascunhar. Se algo foi enviado, pare a rotina e diga ao Agent para nunca enviar e-mail ou mensagem a candidatos.
+
+## Relacionados
+
+<CardGroup cols={2}>
+  <Card title="Gerar notas de versão" href="/pt/use-cases/generate-release-notes">
+    Mesmo conector do GitHub para o que a equipe já lançou.
+  </Card>
+
+  <Card title="Criar um pitch deck para investidores" href="/pt/use-cases/pitch-deck-from-website">
+    Mesmo conector do Google Drive para gerentes de contratação que também apresentam a empresa.
+  </Card>
+</CardGroup>

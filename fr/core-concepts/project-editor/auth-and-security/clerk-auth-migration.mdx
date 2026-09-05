@@ -1,0 +1,71 @@
+---
+title: "Migration d'une application existante vers Clerk Auth"
+description: "Meilleures pratiques pour migrer une application existante avec sa propre authentification vers Clerk Auth sans perdre les comptes utilisateurs ni les données historiques."
+---
+
+Si votre application dispose déjà d'un système d'authentification fonctionnel et d'une base de données d'utilisateurs réels, l'intégration de [Clerk Auth](/fr/core-concepts/project-editor/auth-and-security/clerk-auth) n'est **pas seulement un changement de code**, c'est une migration de données. Sans un plan délibéré, chaque ligne existante dans votre table `users` devient inconnue de Clerk : de nouveaux comptes sont provisionnés à la première connexion, aucun d'entre eux ne correspond à vos données historiques, et les clients de retour semblent avoir « perdu » leur compte.
+
+Il n'y a vraiment que deux choses à réussir.
+
+<Note>
+  Cette page est destinée aux développeurs qui exécutent déjà une application avec sa propre authentification. Si vous démarrez une nouvelle application, consultez l'[aperçu de Clerk Auth](/fr/core-concepts/project-editor/auth-and-security/clerk-auth), aucune migration n'est alors nécessaire.
+</Note>
+
+## 1. Importez vos utilisateurs existants dans Clerk
+
+Chaque utilisateur actif dans votre application doit exister en tant qu'utilisateur Clerk *avant* que Clerk Auth soit mis en ligne. Au minimum, chaque importation doit inclure :
+
+* **E-mail** (requis)
+* **Métadonnées de profil disponibles** : nom, statut vérifié, tout ce que vous souhaitez visible dans le panneau Auth
+* **Condensé de mot de passe** : le hachage de mot de passe existant de l'utilisateur
+* **Algorithme de hachage** : l'algorithme/format de ce hachage, exactement tel que Clerk l'attend
+
+L'algorithme de hachage est la partie la plus facile à mal configurer. Clerk n'accepte qu'un ensemble défini de formats de hachage de mot de passe, et chacun a un identifiant de chaîne spécifique (`bcrypt`, `scrypt_firebase`, `argon2i`, `pbkdf2_sha256`, etc.). Voir la liste complète et le format exact de condensé requis par chacun dans la [référence API de création d'utilisateur Clerk](https://clerk.com/docs/reference/backend/user/create-user).
+
+Cette étape nécessite plus qu'un prompt en une ligne. L'Agent pilotant la migration a besoin d'une **compréhension approfondie de la façon dont les mots de passe sont hachés dans votre base de code actuelle** — quelle bibliothèque, quels paramètres (facteur de coût, disposition du sel, poivre, etc.) et comment cela correspond à l'un des algorithmes de hachage pris en charge par Clerk. Un prompt bien formulé ressemble à ceci :
+
+```
+Lisez mon code d'authentification existant et identifiez exactement comment les mots de passe
+sont hachés (bibliothèque, algorithme, paramètres, et comment la valeur stockée est formatée).
+Ensuite, écrivez un script d'importation en une seule passe qui, pour chaque utilisateur de ma table users,
+appelle l'API backend Clerk avec l'e-mail, les métadonnées de profil, le condensé de mot de passe
+dans le format exact attendu par l'algorithme de hachage Clerk correspondant, et la valeur correcte
+de `passwordHasher`. Dites-moi quel algorithme de hachage Clerk vous avez choisi et pourquoi
+avant de l'exécuter.
+```
+
+Si votre schéma de hachage ne correspond pas proprement à l'un des algorithmes de hachage pris en charge par Clerk, les utilisateurs importés ne pourront pas se connecter avec leur mot de passe existant. Dans ce cas, importez-les sans condensé et envoyez un e-mail de réinitialisation de mot de passe lors du basculement.
+
+## 2. Résolvez les utilisateurs Clerk vers vos ID utilisateurs existants
+
+Une fois que les utilisateurs importés se connectent, chaque requête authentifiée porte une identité Clerk. Votre serveur doit mapper cette identité vers la ligne dans votre table `users` — sinon l'ID utilisateur Clerk ne correspondra à aucune de vos clés étrangères existantes (`orders.user_id`, `documents.owner_id`, etc.) et les données historiques sembleront perdues.
+
+Replit-managed Clerk simplifie cela : lorsque vous importez un utilisateur avec son ID existant comme `externalId` de l'utilisateur Clerk, cette valeur est automatiquement écrite dans les claims de session sous `sessionClaims.userId`. Votre middleware n'a qu'à le préférer à l'ID utilisateur Clerk brut :
+
+```ts theme={null}
+import { getAuth } from "@clerk/express";
+
+const requireAuth = (req: any, res: any, next: any) => {
+  const auth = getAuth(req);
+  const userId = auth?.sessionClaims?.userId || auth?.userId;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  req.userId = userId;
+  next();
+};
+```
+
+Avec ce modèle :
+
+* **Les utilisateurs importés** se résolvent vers votre `users.id` existant via `sessionClaims.userId` — toutes leurs données historiques restent attachées.
+* **Les nouveaux utilisateurs** (qui se sont inscrits après le basculement et n'ont pas d'`externalId`) utilisent `auth.userId`, qui est leur ID utilisateur Clerk. Utilisez l'ID utilisateur Clerk comme clé primaire pour ces nouvelles lignes, ou créez une ligne à la première connexion et liez-la.
+
+## C'est tout
+
+Tout le reste — maintenir votre ancien système d'authentification en parallèle, effectuer un test à blanc sur de vrais comptes, surveiller la création d'utilisateurs en double après le basculement, décommissionner l'ancien système — relève de l'hygiène de migration standard et n'est pas spécifique à Clerk Auth.
+
+## Ressources supplémentaires
+
+* [Aperçu de Clerk Auth](/fr/core-concepts/project-editor/auth-and-security/clerk-auth) — Comment Clerk Auth fonctionne sur Replit
+* [Clerk : API de création d'utilisateur](https://clerk.com/docs/reference/backend/user/create-user) — Algorithmes de hachage pris en charge et formats de condensé

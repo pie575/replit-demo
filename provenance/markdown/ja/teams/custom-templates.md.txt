@@ -1,0 +1,319 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# カスタムテンプレート
+
+> Replit EnterpriseでカスタムテンプレートをセットアップおよびManager し、組織がAgentでビルドする方法を標準化しましょう。
+
+## はじめに
+
+Replitは、あらゆるフレームワークやスタックを記述・実行できるクラウド開発環境です。カスタムテンプレートを構築するには、2つの推奨パスがあります：
+
+1. **[Gitプロバイダーからインポート](https://replit.com/import)** — GitHub、GitLab、またはBitbucketから既存のスターターStack（または好みに合ったもの）をインポートします。
+2. **Blankテンプレートをフォーク** — [Blankテンプレート](https://replit.com/@replit/Nothing?v=1)をフォークして、完全に空の開発環境からゼロベースで始めます。
+
+お客様はRust、Python、Java、C++、その他多くのスタックに対応したテンプレートを正常にビルドしています—実行できるものであれば、Replitでも実行できます。
+
+<Tip>
+  最初のテンプレートを構築する際は、Replitの**フィールドエンジニアリングチーム**との連携をお勧めします。彼らは幅広いスタックにわたるカスタムテンプレートのセットアップに豊富な経験を持ち、サポートを提供できます。アカウントエグゼクティブにお問い合わせの上、繋いでもらってください。
+</Tip>
+
+カスタムテンプレートを使用すると、Enterpriseの管理者は事前設定済みのスタートポイントを作成し、組織のすべてのメンバーのAgentインプットボックスに直接表示させることができます。ビルダーがカスタムテンプレートを選択すると、AgentはそれをフォークしてテンプレートのConfiguration、Instructions、およびSkillsを使用してすべての後続作業をガイドします。追加のセットアップは不要です。
+
+<Note>
+  カスタムテンプレートは**Enterprise**プランでのみ利用可能です。Orgの管理者のみがテンプレートをピン留めおよびManageできます。
+</Note>
+
+## カスタムテンプレートの仕組み
+
+カスタムテンプレートは、組織内の標準的なReplit Appで、**Agentインプットボックスにピン留め**されたものです。ビルダーが選択すると：
+
+1. AgentはテンプレートをフォークしてNew Appを作成します（すべてのファイルがコピーされます）
+2. Agentは計画フェーズをスキップして、直接ビルドモードに移行します
+3. テンプレートの`custom_instruction/instructions.md`ファイルがAgentのContextに注入されます
+4. `.agents/skills/`からのカスタム[スキル](/ja/features/agent/skills)が検出されて利用可能になります
+5. [`replit.md`](/ja/features/project-setup/replit-dot-md)ファイルが継続的なプロジェクトコンテキストを提供します
+
+これにより、組織の標準、パターン、ツールが最初のインタラクションから組み込まれます。
+
+## テンプレートファイル構造
+
+カスタムテンプレートの推奨レイアウトは次のとおりです：
+
+```
+my-template/
+├── .replit                              # App configuration (run commands, ports, modules)
+├── replit.md                            # Agent memory: project overview and preferences
+├── custom_instruction/
+│   └── instructions.md                  # Company instructions injected into Agent's prompt
+├── .agents/
+│   └── skills/
+│       └── my-skill/
+│           └── SKILL.md                 # Custom skills Agent can invoke on demand
+└── ...                                  # The rest of your repo structure
+```
+
+各ファイルは個別の役割を担っています。以下のセクションでは、各ファイルの設定方法について説明します。
+
+## カスタムテンプレートのセットアップ
+
+### ベースAppの作成
+
+組織内にNew Replit Appを作成します。ビルダーがスタートポイントとして必要なすべてのファイル、依存関係、およびConfigurationでプロジェクトをセットアップします。これには次が含まれます：
+
+* ソースコードのScaffolding（コンポーネント、ユーティリティ、設定ファイル）
+* 事前インストール済みの依存関係（`package.json`、`requirements.txt`など）
+* [`.replit`ファイル](/replit-app/configuration)の環境Configuration
+
+### 共有Secretの設定
+
+テンプレートがAPIキー、トークン、またはその他の認証情報に依存している場合は、ピン留め前にテンプレートの**Secrets**（ツールパネル配下）に追加してください。ビルダーがテンプレートからNew Appを作成すると、すべてのSecretsが新しいAppに自動的にコピーされるため、ビルダーは認証情報を自分で設定せずにすぐに作業を開始できます。
+
+すべてのSecretを`custom_instruction/instructions.md`（または専用のSkill）に記録して、ビルダーが利用可能なものと各キーの用途を把握できるようにしてください。
+
+<Warning>
+  Secretsはフォーク時にコピーされ、動的に同期されません。テンプレートのキーをローテーションしたり新しいSecretを追加したりしても、以前にフォークされた既存のAppは更新されません。ビルダーはそれらのAppで手動でSecretsを追加または更新する必要があります。
+</Warning>
+
+### カスタムInstructionsの作成
+
+プロジェクトルートの`custom_instruction/instructions.md`にファイルを作成します。これはテンプレートで最も重要なファイルです—組織がソフトウェアをどのようにビルドするかをAgentに伝えます。
+
+<Warning>
+  フォルダー名は`custom_instruction`（単数形）であり、`custom_instructions`ではありません。
+</Warning>
+
+AgentはこのファイルをシステムプロンプトにPreambleとともに直接注入し、会社提供のガイダンスとして示します。Markdownで記述し、以下を含めてください：
+
+* **アーキテクチャパターン**: Appをどのように構造化するか
+* **コーディング標準**: 命名規則、ファイル整理ルール、リンティング要件
+* **コンポーネントの使用**: 使用するライブラリとコンポーネント（および避けるもの）
+* **APIパターン**: バックエンドサービスの呼び出し方法、認証処理、エラー管理
+* **テスト要件**: 期待されるテストとその実行方法
+* **デプロイガイドライン**: 環境固有の設定とデプロイワークフロー
+
+````markdown theme={null}
+# Company Engineering Standards
+
+## Architecture
+All web applications use React with TypeScript. Use functional components
+with hooks exclusively. State management uses Zustand for local state
+and React Query for server state.
+
+## Component Library
+Use our internal design system package `@acme/ui`. Never use raw HTML
+elements for buttons, inputs, forms, or modals — always use the
+corresponding component from `@acme/ui`.
+
+Import components like this:
+```tsx
+import { Button, TextField, Modal } from '@acme/ui';
+```
+
+## API Integration
+All API calls go through the `@acme/api-client` package. Never use
+raw fetch or axios directly. Authentication is handled automatically
+by the client.
+
+## Testing
+Every component must have a corresponding test file. Use Vitest
+for unit tests and Playwright for integration tests.
+````
+
+**サイズ制限**: コンテンツは約25 KBにソフト制限されています。この制限を超えるコンテンツは段階的に切り捨てられる場合があります。Instructionsが大きくなった場合は、`instructions.md`にすべてを保持するのではなく、`.agents/skills/`の[スキル](/ja/features/agent/skills)に詳細な参照資料を移動してください。スキルは関連するときにオンデマンドで読み込まれるため、Instruction のサイズ制限にカウントされず、メインのInstructionsを高レベルのルールに集中させることができます。
+
+### カスタムスキルの追加
+
+Agentが従うべき専門的なワークフロー用に`.agents/skills/`ディレクトリにスキルを作成します。各スキルはYAML Frontmatterを含む`SKILL.md`ファイルを含むディレクトリです。
+
+```
+.agents/skills/
+├── use-design-system/
+│   └── SKILL.md
+├── api-integration/
+│   └── SKILL.md
+└── run-tests/
+    └── SKILL.md
+```
+
+各`SKILL.md`のFrontmatterには`name`と`description`が必要です：
+
+```markdown theme={null}
+---
+name: use-design-system
+description: Use when building UI components. Provides component patterns, theming rules, and accessibility requirements for the Acme design system.
+---
+
+# Acme Design System
+
+## Available components
+
+- `Button` — Primary, secondary, and ghost variants
+- `TextField` — Text input with validation support
+- `Modal` — Dialog overlay with focus trapping
+...
+```
+
+| フィールド         | 必須  | 詳細                                      |
+| ------------- | --- | --------------------------------------- |
+| `name`        | はい  | 最大64文字。小文字のアルファベット、数字、ハイフンのみ。           |
+| `description` | はい  | 最大1,024文字。スキルが何をするか、いつ使用するかを説明します。      |
+| `enabled`     | いいえ | デフォルトは`true`。削除せずに無効にするには`false`に設定します。 |
+
+**スキルの読み込み方**: Agentはプロンプト内で`name`と`description`のみを認識します。現在のタスクにスキルが関連する場合、オンデマンドで完全な`SKILL.md`コンテンツを読み込みます。つまり、`description`が重要です—Agentがスキルを使用すべきシナリオに一致するように記述してください。
+
+スキルには`SKILL.md`とともにサポートファイルを含めることもできます：
+
+```
+.agents/skills/use-design-system/
+├── SKILL.md
+├── references/
+│   └── component-api.md
+└── assets/
+    └── theme-tokens.json
+```
+
+スキルの詳細については、[Agentスキル](/ja/features/agent/skills)および[スキルの使用](/ja/build/use-agent-skills)をご覧ください。
+
+### replit.mdの設定
+
+プロジェクトルートの`replit.md`にテンプレートのアーキテクチャ概要を事前入力します。このファイルは常にAgentのContextに読み込まれ、継続的なプロジェクトメモリとして機能します。
+
+ファイルには次の4つのセクションが必要です：
+
+```markdown theme={null}
+# Overview
+Task management application built with React, TypeScript, and the Acme
+design system. Uses Express.js backend with PostgreSQL.
+
+# User Preferences
+- Use TypeScript for all files
+- Prefer functional components with hooks
+- Follow Acme coding standards
+
+# System Architecture
+- Frontend: React + TypeScript + @acme/ui
+- Backend: Express.js + TypeScript
+- Database: PostgreSQL with Drizzle ORM
+- Auth: Acme SSO via @acme/auth
+
+# External Dependencies
+- @acme/ui: Internal design system
+- @acme/api-client: API integration layer
+- @acme/auth: Authentication SDK
+```
+
+Agentはプロジェクトの進化に合わせて`replit.md`を更新します。ファイルが約4,000トークンを超えると、Agentは自動的にサマリー化して、フォーカスを保ち有用性を維持します。
+
+詳細については、[replit.md](/ja/features/project-setup/replit-dot-md)をご覧ください。
+
+### テンプレートを組織にピン留めする
+
+テンプレートの準備ができたら：
+
+1. 組織内のテンプレートAppに移動します
+2. Appのアクションメニュー（三点メニュー）を開きます
+3. **Agentインプットボックスにピン留め**を選択します
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-pin-to-agent.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=6633df41d207aa5e9215ce0f4f1e1683" alt="AgentインプットボックスへのPin to Agent input boxオプションを示すAppアクションメニュー" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  テンプレートをピン留めおよびピン解除できるのは、Orgの管理者（`system_admins`ロールのメンバー）のみです。
+</Note>
+
+メンバーアクセスを**読み取り専用**に設定して、メンバーがピン留めされたテンプレートを編集できずに表示および使用できるようにします。
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-members-read-only.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=76e9519d8881090d5dce7f7634acb701" alt="メンバーアクセスが読み取り専用に設定されていることを示す招待ダイアログ" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+テンプレートは組織のすべてのメンバーのAgentインプットボックスの下に選択可能なPillとして表示されます。削除するには、同じメニューを開いて**Agentインプットボックスからピン解除**を選択します。
+
+### テンプレートアクセスの制御
+
+ピン留めによりテンプレートはすべてのOrgメンバーに表示されます。より絞り込んだ配布のためには、テンプレートAppの**Invite**ボタンを使用して特定の[グループまたは個別ユーザー](/ja/teams/identity-and-access-management/groups-and-permissions)と共有します。これにより、Orgワイドのインプットボックスにピン留めせずに、特定のチームや人物がテンプレートを表示・フォークできる対象を制限できます。
+
+## ビルダーがテンプレートを選択した場合の動作
+
+<img src="https://mintcdn.com/replit/uqviMSOK8jcxVPwq/images/teams/custom-templates-input-box.png?fit=max&auto=format&n=uqviMSOK8jcxVPwq&q=85&s=627369c01a5a109f15ca0c61968a8505" alt="Agentインプットボックスに選択可能なPillとして表示されるテンプレート" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+Orgメンバーがエージェント入力ボックスからピン留めされたテンプレートを選択すると：
+
+1. **フォーク**: すべてのファイルを含むテンプレートのコピーとしてNew Appが作成されます
+2. **計画スキップ**: Agentは初期計画会話をバイパスして、直接ビルドモードに移行します
+3. **Instructionsの読み込み**: `custom_instruction/instructions.md`が読み込まれ、会社提供のガイダンスとしてAgentのシステムプロンプトに注入されます
+4. **スキルの検出**: `.agents/skills/`のスキルが識別され、オンデマンド読み込み用にAgentのContextにリストされます
+5. **プロジェクトコンテキストの読み込み**: `replit.md`が読み込まれてAgentのContextに注入されます（存在しない場合は自動生成されます）
+6. **Configurationの継承**: `.replit`ファイル、依存関係、およびすべてのテンプレートファイルがNew Appに引き継がれます
+
+ビルダーはすぐに特定の要件をAgentにPromptし始めることができ、AgentはテンプレートによってEstablishされたガードレール内で動作します。
+
+## ファイルの連携方法
+
+各設定ファイルは個別の役割を担っています：
+
+| ファイル                                 | 目的                 | Agentが読み込むタイミング  | Agentによる変更可否            |
+| ------------------------------------ | ------------------ | ---------------- | ----------------------- |
+| `custom_instruction/instructions.md` | 組織の標準とルール          | 常時（システムプロンプトに注入） | 不可                      |
+| `.agents/skills/*/SKILL.md`          | 専門的なワークフローとパターン    | オンデマンド（関連する場合）   | 可（AgentもスキルをCreateできます） |
+| `replit.md`                          | プロジェクト概要と設定        | 常時（システムプロンプトに注入） | 可（Agentが時間をかけて更新します）    |
+| `.replit`                            | ランタイムConfiguration | Appを設定する場合       | 可                       |
+
+**主要な区別**: `custom_instruction/instructions.md`は組織の標準に対する静的で権威ある情報源です。`replit.md`はプロジェクトが進化するにつれてAgentが維持するリビングドキュメントです。スキルは特定のワークフロー向けのオンデマンド参照資料です。
+
+## ベストプラクティス
+
+### Instructionsをフォーカスした状態に保つ
+
+`custom_instruction/instructions.md`は最も重要なパターンに向けて記述します。以下に焦点を当ててください：
+
+* 取り消しが難しい決定（アーキテクチャ、データモデル）
+* 一貫している必要があるパターン（コンポーネントの使用、API規約）
+* ビルダーが知らないかもしれない標準（内部ライブラリ、チーム規約）
+
+Changelog、実装の詳細、または頻繁に変わる情報の追加は避けてください。
+
+### 検出可能なスキルDescriptionを記述する
+
+`SKILL.md` FrontmatterのDescriptionフィールドは、Agentがスキルをいつ読み込むかを決定するために使用するものです。スキルが関連するタスクに一致するDescriptionを記述してください：
+
+```yaml theme={null}
+# 良い例 — いつ使用するかを説明している
+description: フォームのビルドやユーザー入力の処理時に使用します。Acmeデザインシステムのバリデーションパターン、エラー表示規約、アクセシブルなフォームレイアウトを提供します。
+
+# 効果が低い例 — 曖昧すぎる
+description: フォームのユーティリティとヘルパー。
+```
+
+### ワークフロー別にスキルを整理する
+
+技術的なカテゴリーではなく、ワークフロー別にスキルをグループ化します：
+
+| アプローチ       | 例                                          |
+| ----------- | ------------------------------------------ |
+| **ワークフロー別** | `build-a-form`、`connect-to-api`、`add-auth` |
+| **技術分野別**   | `react-utils`、`api-helpers`、`auth-config`  |
+
+ワークフローアプローチにより、Agentは適切なタイミングでスキルを検出できます。
+
+### テンプレートを改善し続ける
+
+テンプレートは使用を通じて改善されます。チームがテンプレートでビルドを開始した後：
+
+1. AgentがミスするパターンをWatchして`instructions.md`に追加します
+2. Agentが問題をうまく解決した場合はNew Skillを作成して解決策を記録します
+3. スタックの進化に合わせてベースの依存関係とConfigurationを更新します
+4. テンプレートからNew Appを作成してエクスペリエンスを確認することで変更をテストします
+
+### テンプレートの更新と既存のApp
+
+テンプレートAppへの変更は、それから作成された**新しい**Appに反映されます。以前にテンプレートからフォークされた既存のAppは独立したコピーであり、更新を受け取りません。
+
+## 関連リソース
+
+* [Agentスキル](/ja/features/agent/skills) — スキルの仕組みとその作成方法を学ぶ
+* [スキルの使用](/ja/build/use-agent-skills) — スキルの使用とビルドに関するハンズオンガイド
+* [replit.md](/ja/features/project-setup/replit-dot-md) — プロジェクトレベルのContextでAgentの動作をカスタマイズする
+* [デザインシステム](/ja/teams/custom-design-system) — AgentのためのOrganizationのデザインシステムをセットアップする
+* [App Configuration](/replit-app/configuration) — `.replit`ファイルを設定する
+* [デベロッパーフレームワーク](/replit-workspace/templates) — コミュニティテンプレートとその公開方法
+* [Enterpriseの概要](/ja/category/teams) — Enterprise機能について学ぶ

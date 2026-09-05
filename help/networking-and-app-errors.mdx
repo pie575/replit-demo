@@ -1,0 +1,91 @@
+---
+title: "Networking and app errors"
+description: "Answers to common published-app errors—403 Forbidden, Application failed to respond, CORS, 502 Bad Gateway, and outbound request issues."
+sidebarTitle: "Networking and app errors"
+icon: "triangle-exclamation"
+---
+
+These answers cover errors you might see on a published app. For broader troubleshooting, see [Troubleshooting deployments](/build/troubleshooting).
+
+<AccordionGroup>
+  <Accordion title="My published app is returning 403 Forbidden errors—how do I fix it?">
+    A 403 on a published app usually comes from one of these:
+
+    * **Oversized request headers**—too many cookies can make headers large enough to be rejected at the edge. Clear your browser cookies for the domain and test again.
+    * **Missing authentication**—the request doesn't include a required login token or session.
+    * **An access restriction**—your app may be configured to block some traffic. See [private deployments](/features/publishing/private-deployments) and [external access tokens](/features/deployment-customization/external-access-tokens).
+
+    For a detailed diagnosis, paste your deployment logs into a new Agent chat.
+  </Accordion>
+
+  <Accordion title="My app shows &#x22;Application failed to respond&#x22;—what does that mean?">
+    Your app process isn't listening on the port Replit expects. Replit passes the correct port through the `PORT` environment variable, so bind to it instead of a hard-coded value:
+
+    ```js theme={null}
+    const PORT = process.env.PORT || 3000;
+    ```
+
+    ```python theme={null}
+    port = int(os.environ.get("PORT", 3000))
+    ```
+
+    Your app may also have crashed before binding—check your deployment logs for startup errors. With [Autoscale deployments](/features/publishing/deployment-types#autoscale), the first request after a quiet period can take a few seconds (a cold start), which is normal.
+  </Accordion>
+
+  <Accordion title="How do I fix CORS errors in my published Replit app?">
+    A CORS error means your frontend and backend are on different origins and the backend hasn't been set up to allow that. If they're part of the same app, use relative URLs like `/api/endpoint` to avoid CORS entirely.
+
+    Otherwise, configure your backend to allow your frontend's origin. For Express, for example:
+
+    ```js theme={null}
+    const cors = require("cors");
+    app.use(cors({ origin: "https://your-frontend.replit.app" }));
+    ```
+
+    Allow only the specific origins you need before publishing. See [Troubleshooting deployments](/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="My app works locally but returns network errors when published">
+    Deployed apps fail when the production environment differs from your local setup. Check three things:
+
+    1. **Hard-coded localhost URLs**—replace `localhost:3000` or `127.0.0.1` with relative paths or environment-based URLs, then redeploy.
+    2. **Missing production secrets**—confirm every required key is set in your deployment secrets. See [Secrets](/core-concepts/project-editor/app-setup/secrets).
+    3. **Migrations not run in production**—run pending migrations against the production database before publishing.
+
+    If errors continue, [contact Replit Support](https://replit.com/support) with your error message and the steps you tried.
+  </Accordion>
+
+  <Accordion title="How do I debug a 502 Bad Gateway error on my published app?">
+    A 502 usually means your app process crashed or returned output the server couldn't use. Check your deployment logs for crash errors just before the 502s appear—unhandled promise rejections and uncaught exceptions can crash a Node.js process silently.
+
+    Add a handler to surface crashes:
+
+    ```js theme={null}
+    process.on("uncaughtException", (err) => console.error("Uncaught:", err));
+    ```
+
+    Once you can see the underlying error in your logs, paste it into a new Agent chat for help fixing it.
+  </Accordion>
+
+  <Accordion title="My app can't make requests to external APIs—what should I check?">
+    First confirm whether the request is being blocked rather than failing in your code. Open your deployment logs and look for messages about blocked or redirected outbound requests.
+
+    Common causes and fixes:
+
+    * **Self-referencing URLs**—if your backend calls its own public URL (such as `fetch("https://myapp.replit.app/api/...")`), use a relative path like `fetch("/api/...")` instead.
+    * **Requests during the build phase**—make outbound calls at runtime, not during the build.
+    * **Network restrictions**—on a corporate or school network, outbound connections may be blocked; check with your network admin.
+
+    If none of these apply and requests are still blocked, [contact Replit Support](https://replit.com/support) with the relevant log lines.
+  </Accordion>
+
+  <Accordion title="My app URL changed after I republished—can I get my old subdomain back?">
+    The `.replit.app` subdomain is derived from your project name and isn't guaranteed to stay the same when you unpublish and republish, especially if the project was renamed.
+
+    The permanent fix is a [custom domain](/features/publishing/custom-domains), which stays the same across redeployments. To try to restore the old subdomain, make sure your project name matches the original (rename it back if needed) and republish—Replit can't manually reassign a released subdomain. See [Project geography](/features/publishing/project-geography).
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If your error isn't covered here, [contact Replit Support](https://replit.com/support).

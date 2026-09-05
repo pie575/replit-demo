@@ -1,0 +1,252 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Ouvrir dans Replit
+
+> Apprenez à créer un bouton « Ouvrir dans Replit » qui permet aux visiteurs de commencer à construire depuis votre application ou site web.
+
+export const CreateUrlLinkBuilder = () => {
+  if (typeof document !== 'undefined' && !window.LZString) {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js';
+    document.head.appendChild(script);
+  }
+  const getLink = () => {
+    if (typeof document === 'undefined' || !window.LZString) {
+      return 'https://replit.com/?stack=Design&prompt=';
+    }
+    const promptEl = document.getElementById('create-url-prompt');
+    const stackEl = document.querySelector('input[name="stack-mode"]:checked');
+    const referrerEl = document.getElementById('create-url-referrer');
+    const prompt = promptEl?.value || '';
+    const stack = stackEl?.value || 'Design';
+    const referrer = referrerEl?.value || '';
+    if (!prompt.trim()) {
+      return '';
+    }
+    const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+    let url = `https://replit.com/?stack=${stack}&prompt=${encoded}`;
+    if (referrer.trim()) {
+      url += `&referrer=${encodeURIComponent(referrer)}`;
+    }
+    return url;
+  };
+  const updateOutputs = () => {
+    if (typeof document === 'undefined') return;
+    const link = getLink();
+    const badgeUrl = 'https://replit.com/badge?caption=Build%20with%20Replit';
+    const emptyPlaceholder = 'Enter a prompt above to generate a link';
+    const badgeMarkdown = link ? `[![Build with Replit](${badgeUrl})](${link})` : emptyPlaceholder;
+    const outputEl = document.getElementById('create-url-output');
+    const badgeMarkdownEl = document.getElementById('create-url-badge-markdown');
+    if (outputEl) outputEl.textContent = link || emptyPlaceholder;
+    if (badgeMarkdownEl) badgeMarkdownEl.textContent = badgeMarkdown;
+  };
+  const handleBadgeClick = e => {
+    e.preventDefault();
+    const link = getLink();
+    if (link) {
+      window.open(link, '_blank');
+    }
+  };
+  return <div className="space-y-4">
+      <div>
+        <label htmlFor="create-url-prompt" className="block text-sm font-medium mb-1">
+          Prompt
+        </label>
+        <textarea id="create-url-prompt" onInput={updateOutputs} placeholder="Create a todo app with a clean, modern design" rows={4} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-2">Stack mode</label>
+        <div className="flex gap-4">
+          <label className="flex items-center cursor-pointer">
+            <input type="radio" name="stack-mode" value="Design" defaultChecked onChange={updateOutputs} className="mr-2" />
+            <span className="text-sm">Design</span>
+          </label>
+          <label className="flex items-center cursor-pointer">
+            <input type="radio" name="stack-mode" value="Build" onChange={updateOutputs} className="mr-2" />
+            <span className="text-sm">Build</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <label htmlFor="create-url-referrer" className="block text-sm font-medium mb-1">
+          Referrer <span className="text-gray-500 font-normal">(optional)</span>
+        </label>
+        <input id="create-url-referrer" type="text" onInput={updateOutputs} placeholder="Your website or app name" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+        <p className="mt-1 text-xs text-gray-500">
+          The name or URL of the page containing this link. Used for
+          attribution.
+        </p>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Generated link</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="create-url-output">
+            https://replit.com/?stack=Design&amp;prompt=
+          </code>
+        </pre>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Badge preview</label>
+        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-md">
+          <a href="#" onClick={handleBadgeClick} style={{
+    cursor: 'pointer'
+  }}>
+            <img src="https://replit.com/badge?caption=Open%20in%20Replit" alt="Open in Replit badge" noZoom />
+          </a>
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Badge markdown</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="create-url-badge-markdown">
+            [![Open in
+            Replit](https://replit.com/badge?caption=Open%20in%20Replit)](https://replit.com/?stack=Design&amp;prompt=)
+          </code>
+        </pre>
+      </div>
+    </div>;
+};
+
+<Frame caption="Cliquer sur ce badge ouvre automatiquement Replit et remplit l'invite et les paramètres.">
+  <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
+    <a href="https://replit.com/?stack=Build&prompt=A4Jw9gtsAuQ&referrer=replit-docs" target="_blank">
+      <img src="https://replit.com/badge?caption=Open%20in%20Replit" alt="Open in Replit" noZoom />
+    </a>
+  </div>
+</Frame>
+
+## Créer un lien
+
+Pour créer un lien, utilisez le format ci-dessous.
+
+```
+https://replit.com/?stack=Build&prompt=A4Jw9gtsAuQ&referrer=replit-docs
+```
+
+### Paramètres d'URL
+
+Assurez-vous d'inclure les paramètres suivants dans votre URL.
+
+| Paramètre  | Type   | Description                                                                                                                                                                                                                                       | Requis/Optionnel |
+| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `stack`    | string | Le mode de construction à utiliser. Doit être soit `Design` soit `Build`. `Design` ouvre [Canvas](/fr/design/canvas) pour le prototypage visuel. `Build` ouvre [Agent](/fr/features/agent/overview) pour le développement d'applications complet. | Requis           |
+| `prompt`   | string | Texte décrivant l'application à créer, **compressé avec [LZ-string](https://pieroxy.net/blog/pages/lz-string/index.html)**. L'invite non compressée peut contenir jusqu'à 50 000 caractères.                                                      | Requis           |
+| `referrer` | string | Le nom ou l'URL de la page contenant ce lien. Utilisé pour l'attribution.                                                                                                                                                                         | Optionnel        |
+
+<Note>
+  Le paramètre `prompt` doit être compressé avec la compression LZ-string avant
+  d'être ajouté à l'URL. Cela aide les URL à rester dans les limites de longueur
+  du navigateur et à être analysées correctement.
+</Note>
+
+### Générateur de lien interactif
+
+Utilisez l'outil ci-dessous pour générer votre lien **Ouvrir dans Replit**. Entrez votre invite, sélectionnez le mode stack, et le lien sera généré automatiquement avec la compression LZ-string appliquée.
+
+<CreateUrlLinkBuilder />
+
+### Compresser les invites
+
+Pour créer un lien **Ouvrir dans Replit** valide, vous devez compresser votre invite en utilisant la compression LZ-string. Voici comment :
+
+#### JavaScript/TypeScript
+
+```javascript theme={null}
+import LZString from 'lz-string';
+
+const prompt = 'Create a todo app with a clean, modern design';
+const compressed = LZString.compressToEncodedURIComponent(prompt);
+const url = `https://replit.com/?stack=Design&prompt=${compressed}`;
+```
+
+#### Python
+
+```python theme={null}
+import lzstring
+
+prompt = "Create a todo app with a clean, modern design"
+compressed = lzstring.LZString().compressToEncodedURIComponent(prompt)
+url = f"https://replit.com/?stack=Design&prompt={compressed}"
+```
+
+<Tip>
+  Utilisez `compressToEncodedURIComponent` pour vous assurer que la chaîne
+  compressée est compatible avec les URL.
+</Tip>
+
+### Exemples
+
+**Canvas avec invite simple**
+
+```
+https://replit.com/?stack=Design&prompt=AoUwTgzg9gdghgGwAQAcpgC4DMoIJZRIR4YgB0QA
+```
+
+**Mode Build avec invite détaillée**
+
+```
+https://replit.com/?stack=Build&prompt=LIQw1gpgBCUE4HsQBMC2IAOUMBsQDt8BLfAcygBcEEcoB3ACwjmg0WQFcBjCqdfEKWYBnKFwJiWICtALIoANyLCOIHEQBe0AI6q4MuDgCe2dt16IU6DMIB0UAJL4uODsmjI4g0iABGOaHE4ZFEAMwQ4KBIiCiJpIgUIYQAaUyIImJMKQRSYfHkuGgixBGQScl8siBBUewARJKJSfCjeOhiGGFMEUKThdIFaWNQIdXxoJQg6PIKAglTUUuYWgFUHWyA&referrer=replit%20docs
+```
+
+## Modes stack
+
+### Canvas
+
+Utilisez `stack=Design` pour ouvrir votre invite dans [Canvas](/fr/design/canvas), qui est optimisé pour :
+
+* La conception visuelle et le prototypage d'interface
+* L'itération rapide sur les mises en page et le style
+* La création de maquettes de design
+* Le développement centré sur le front-end
+
+### Mode Build
+
+Utilisez `stack=Build` pour ouvrir votre invite dans [Agent](/fr/features/agent/overview), qui est optimisé pour :
+
+* Le développement d'applications full-stack
+* La logique back-end et les API
+* L'intégration de bases de données
+* Les fonctionnalités complexes
+
+## Bonnes pratiques
+
+* Gardez les invites concises et centrées sur les fonctionnalités principales pour de meilleurs résultats de génération.
+* Utilisez un langage clair et descriptif qui explique ce que vous souhaitez créer.
+* Choisissez le mode `stack` approprié à votre cas d'utilisation (Design pour l'UI/UX, Build pour les applications complètes).
+* Testez vos URL compressées pour vous assurer qu'elles s'analysent correctement avant de les partager.
+* Tenez compte du niveau technique de votre audience lors de la création des invites.
+
+### Authentification utilisateur
+
+Quel que soit votre état d'authentification Replit, vous devrez fournir une entrée avant de créer l'application. Habituellement, cela signifie soumettre l'invite.
+
+### Gestion des erreurs
+
+Si l'URL est malformée ou si les paramètres sont invalides, Replit ne remplira pas l'invite. Les causes possibles incluent :
+
+* Paramètres requis manquants (`stack` ou `prompt`)
+* Valeur `stack` invalide (doit être `Design` ou `Build`)
+* Échec de la décompression du paramètre `prompt`
+* Erreurs « URL trop longue » du navigateur (bien que la compression aide à atténuer ce problème)
+
+### Considérations de sécurité
+
+<Warning>
+  Les liens **Ouvrir dans Replit** pourraient être utilisés pour créer des applications avec un comportement non souhaité ou des vulnérabilités de sécurité. Ne cliquez que sur des liens provenant de sources fiables.
+</Warning>
+
+Lors du partage de liens **Ouvrir dans Replit** :
+
+* Examinez attentivement les invites avant de les partager publiquement
+* Tenez compte des implications de sécurité des applications générées
+* Évitez d'inclure des informations sensibles dans les invites
+* Soyez transparent sur ce que le lien va créer
+
+## Ressources associées
+
+* [Documentation Canvas](/fr/design/canvas)
+* [Documentation Agent](/fr/features/agent/overview)
+* [Intégrations IA Replit](/fr/features/integrations/overview)

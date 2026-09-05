@@ -1,0 +1,134 @@
+---
+title: "종속성 관리"
+description: "여러 언어에서 Replit App의 패키지와 종속성을 설치하고 관리하는 방법을 알아보세요."
+---
+
+Replit은 Replit App의 패키지를 설치하고 관리할 수 있는 여러 방법을 제공합니다. [셀](/ko/features/workspace-tools/shell)을 사용해 패키지를 설치하거나, [Agent](/ko/features/agent/overview/)에게 처리를 맡기거나, Replit App을 실행할 때 누락된 종속성을 Replit이 자동으로 감지하고 설치하도록 할 수 있습니다.
+
+## 셀을 사용해 패키지 설치하기
+
+프로젝트 편집기에서 **셀** 도구를 열고 사용 중인 언어의 패키지 관리자에 맞는 명령을 실행합니다.
+
+<CodeGroup>
+  ```bash Node.js (npm) theme={null}
+  npm install <package-name>
+  ```
+
+  ```bash Node.js (pnpm) theme={null}
+  pnpm add <package-name>
+  ```
+
+  ```bash Python (poetry) theme={null}
+  poetry add <package-name>
+  ```
+
+  ```bash Python (pip) theme={null}
+  pip install <package-name>
+  ```
+
+  ```bash Ruby theme={null}
+  bundle add <gem-name>
+  ```
+</CodeGroup>
+
+Replit의 [Universal Package Manager(UPM)](https://github.com/replit/upm/)를 사용해 지원되는 여러 언어에서 패키지를 설치할 수도 있습니다.
+
+```bash theme={null}
+upm add <package-name>
+```
+
+특정 버전을 설치하려면 다음과 같이 실행합니다.
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+지원되는 모든 언어와 패키지 관리자는 [UPM: 지원 언어](https://github.com/replit/upm/#supported-languages)를 참조하세요.
+
+## Agent를 사용해 패키지 설치하기
+
+채팅에서 [Agent](/ko/features/agent/overview/)에게 직접 패키지 설치를 요청할 수 있습니다. 예를 들어:
+
+* "axios 패키지를 설치해줘"
+* "내 프로젝트에 Flask와 SQLAlchemy를 추가해줘"
+* "TailwindCSS를 설정해줘"
+
+Agent는 프로젝트에 맞는 패키지 관리자를 사용해 패키지를 설치하고 관련 구성 파일을 업데이트합니다.
+
+## 자동 임포트 감지
+
+Replit은 **실행**을 선택할 때마다 코드에서 누락된 종속성을 자동으로 분석합니다. 코드에서 아직 설치되지 않은 패키지를 임포트하면 Replit이 이를 감지하고 최신 버전을 자동으로 설치합니다.
+
+예를 들어 `main.py`에 `import flask`를 추가하면 다음번에 **실행**을 선택할 때 **콘솔**에 **Flask**가 설치되고 있다는 메시지가 표시됩니다.
+
+<Note>
+  [.replit](/ko/features/project-setup/configuration#replit-file) 파일에서 `packager.features.guessImports` 설정을 사용해 자동 임포트 감지를 구성할 수 있습니다.
+</Note>
+
+### 자동 감지 재정의
+
+잘못된 패키지가 감지되었거나 특정 버전이 필요하다면 셀에서 올바른 설치 명령을 실행하세요. 예를 들어:
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+[.replit](/ko/features/project-setup/configuration#replit-file) 파일에서 특정 패키지나 경로를 자동 감지 대상에서 제외할 수도 있습니다.
+
+## Python 패키지 관리자
+
+Python Replit App을 만들면 기본 패키지 관리자는 **poetry**입니다. 즉, `pip install`은 종속성을 관리하지 않습니다. 대신 셀에서 `poetry add <package>` 또는 `upm add <package>`를 사용하세요.
+
+### poetry에서 pip로 전환하기
+
+`pip` 사용을 원한다면 다음 단계를 따르세요.
+
+<Steps>
+  <Step>
+    셀을 열고 다음을 실행합니다.
+
+    패키징 인프라가 pip로 전환되도록 잠금 파일을 삭제합니다.
+
+    ```bash theme={null}
+    rm poetry.lock
+    ```
+  </Step>
+
+  <Step title="종속성 이동하기">
+    `pyproject.toml`의 `[tool.poetry.dependencies]` 섹션에 있는 종속성을 `requirements.txt`로 옮기세요. 예를 들어 `flask = "^3.0.2"`는 `flask>=3.0.2,<4`가 됩니다.
+  </Step>
+
+  <Step title="pyproject.toml 정리하기">
+    `pyproject.toml`에서 `[tool.poetry...]` 섹션을 삭제하세요.
+  </Step>
+</Steps>
+
+이 작업을 마치면 패키징 인프라는 이후 모든 작업에 `pip`를 사용하며, 자동 임포트 감지도 예상대로 계속 동작합니다.
+
+## Nix를 활용한 시스템 종속성
+
+Replit은 [Nix](https://nixos.org/)와의 통합을 통해 모든 프로그래밍 언어를 지원합니다. 표준 언어 패키지 이상의 시스템 수준 종속성이 필요하다면 [replit.nix](/ko/features/project-setup/configuration#replit-nix-file) 파일에 추가할 수 있습니다.
+
+### Nix 패키지
+
+`replit.nix`를 직접 편집해 시스템 수준 종속성을 추가하세요. 사용 가능한 패키지는 [search.nixos.org](https://search.nixos.org/packages)에서 검색할 수 있습니다.
+
+### 모듈
+
+모듈은 프로그래밍 언어, 포맷터, 패키저에 대한 지원을 결합합니다. 이는 Replit App의 기반을 제공합니다. 템플릿이나 GitHub 저장소로 Replit App을 만들면 Replit이 필요한 모듈을 자동으로 설치합니다.
+
+[.replit](/ko/features/project-setup/configuration#replit-file) 파일을 사용해 모듈과 기타 Nix 설정을 사용자 지정할 수 있습니다.
+
+## 패키저 구성
+
+[.replit](/ko/features/project-setup/configuration#replit-file) 파일에서 패키지 관리 동작을 세밀하게 조정할 수 있습니다.
+
+| 설정                                    | 설명                         | 기본값     |
+| ------------------------------------- | -------------------------- | ------- |
+| `packager.language`                   | 패키지 작업에 사용되는 언어            | 자동 감지됨  |
+| `packager.features.guessImports`      | 실행 시 누락된 패키지를 자동으로 감지하고 설치 | `true`  |
+| `packager.features.packageSearch`     | 패키지 검색 지원 활성화              | `true`  |
+| `packager.features.enabledForHosting` | 호스팅 시 패키지 설치 요구            | `false` |
+| `packager.afterInstall`               | 패키지 설치 후 실행할 명령            | —       |
+| `packager.ignoredPaths`               | 임포트 감지에서 제외할 경로            | `[]`    |
+| `packager.ignoredPackages`            | 자동 감지에서 제외할 패키지            | `[]`    |

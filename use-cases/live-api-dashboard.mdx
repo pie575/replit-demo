@@ -1,0 +1,86 @@
+---
+title: "Build a live API dashboard"
+description: "Turn a public API into a dashboard that stays up to date."
+sidebarTitle: "Build a live API dashboard"
+icon: "chart-mixed"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Build a live dashboard of key metrics, charts, and filters from an API. It refreshes automatically,
+supports export, and shows only what the data really contains. Store anything that needs to
+persist in Replit Database.
+
+## Best for
+
+* Product managers who need a dashboard people can review, not a screenshot.
+* Ops and data leads who need a private dashboard that stays up to date from an API.
+
+## Before you start
+
+Write down the decision the dashboard should support. Have the API URL ready, or use the
+DummyJSON endpoints below.
+
+<Info>
+  For testing purposes, you can try with these free DummyJSON API endpoints:
+
+  * Orders: `https://dummyjson.com/carts?limit=0`
+  * Customers: `https://dummyjson.com/users?limit=0`
+  * Catalog: `https://dummyjson.com/products?limit=0`
+  * Categories: `https://dummyjson.com/products/categories`
+</Info>
+
+## Prompt the agent
+
+<AiPrompt>
+  Build a live dashboard from this API \[URL]. Show key metrics, charts, and
+  filters that answer \[the decision]. Refresh automatically and support export.
+  Store anything that needs to persist in Replit Database. Show only what the
+  data really contains.
+</AiPrompt>
+
+## What to expect
+
+Agent loads the data, picks summary metrics and charts, and adds filters. Verify at least
+one number against the source. If you used DummyJSON, pick an order and open
+`https://dummyjson.com/carts/{id}` to confirm the totals match. Toggle a filter and confirm
+every card and chart updates. Export once and check a row against the API.
+
+## Make it work for you
+
+<AiPrompt>
+  Add a category filter that recomputes every number on the page.
+</AiPrompt>
+
+<AiPrompt>Cache API responses so the dashboard stays fast on load.</AiPrompt>
+
+## Troubleshooting
+
+* **The API is unavailable or the shape looks wrong:** check the URL and that the response includes the fields you expect. For a quick test, use the DummyJSON endpoints above.
+* **Numbers look different than expected:** ask Agent to show the query or transformation, then verify at least one number against the source.
+* **Filters don't update the charts:** ask Agent to connect each filter to both summary cards and chart data. If the dashboard is slow, cache API responses or reduce records loaded on startup.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Generate a weekly sales report" href="/use-cases/weekly-pipeline-report">
+    A weekly snapshot instead of a live dashboard.
+  </Card>
+
+  <Card title="Launch a paid event website" href="/use-cases/launch-event-website">
+    Another live Replit app from data you already have.
+  </Card>
+</CardGroup>

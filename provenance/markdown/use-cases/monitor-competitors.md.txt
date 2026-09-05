@@ -1,0 +1,144 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Monitor competitors
+
+> Detect pricing and feature changes, then keep a competitive intel page up to date.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Monitor competitor pricing, changelog, and feature pages. When something material changes,
+summarize what changed, ping Slack, and keep a competitive intel page in Notion up to date.
+Confirm a change on the live site before you brief sales.
+
+## Best for
+
+* Product managers who need a living competitor page.
+* Account executives who need a pricing change before a deal goes sideways.
+
+## Connectors
+
+<Connectors
+  items={[
+{
+  id: "slack",
+  name: "Slack",
+  why: "Alert when something material changes",
+},
+{ id: "notion", name: "Notion", why: "Competitive intel page" },
+]}
+/>
+
+## Before you start
+
+Give Agent the competitor list and which pages to watch (pricing, changelog, features).
+Connect Slack and Notion.
+
+## Prompt the agent
+
+<AiPrompt>
+  Create a routine that runs every morning at 8:00. Monitor these competitors:
+  \[list URLs]. Detect pricing or feature changes, summarize what changed, ping
+  Slack when it's material, and keep a competitive intel page in Notion up to
+  date.
+</AiPrompt>
+
+## What to expect
+
+Agent compares each page to the last version, writes a short "what changed," and
+updates Notion. Confirm a change on the live site before you brief sales. The first
+days will be noisy if a page redesigns; say what counts as material. When Slack pings,
+open the live URL and check the change yourself before you forward it.
+
+## Make it work for you
+
+<AiPrompt>
+  Only ping Slack for pricing or packaging changes. Log other page edits in
+  Notion without alerting.
+</AiPrompt>
+
+<AiPrompt>
+  When pricing changes, draft a 5-line sales brief in Notion: what changed, who
+  it affects, and how we compare.
+</AiPrompt>
+
+## Troubleshooting
+
+* **Every redesign looks like a pricing change:** tell Agent which pages to watch (pricing, changelog, features) and what counts as material. Confirm a change on the live site before you brief sales.
+* **Nothing ever alerts:** the pages may not be reachable, or the competitor list is too narrow. Give full URLs and ask Agent to say when it couldn't load a page.
+* **Notion is a pile of one-off notes:** point Agent at a single competitive intel page and ask it to update that page in place instead of creating a new one each morning.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Monitor brand mentions" href="/use-cases/monitor-brand-mentions">
+    Same Slack and Notion setup for what people say, not just competitor sites.
+  </Card>
+
+  <Card title="Generate a weekly sales report" href="/use-cases/weekly-pipeline-report">
+    For account executives and sales managers who need pipeline movement.
+  </Card>
+</CardGroup>

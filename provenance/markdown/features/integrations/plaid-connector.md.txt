@@ -1,0 +1,182 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Connect Plaid
+
+> Set up the Plaid connector so builders can use Agent to build apps that connect financial accounts with Plaid Link for balances, transactions, and investment data.
+
+export const WistiaEmbed = ({videoId, title = "Wistia video", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+  if (!videoId) {
+    return null;
+  }
+  const url = "https://fast.wistia.net/embed/iframe/" + videoId + "?seo=false&playerColor=" + playerColor + "&controlsVisibleOnLoad=" + controlsVisibleOnLoad;
+  return <Frame>
+      <iframe src={url} title={title} allow="autoplay; fullscreen" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Info>
+  The Plaid connector is available on paid Replit plans and requires a [team workspace](/features/collaboration/team-workspaces#create-a-team-workspace).
+</Info>
+
+<WistiaEmbed videoId="fcqtulftwk" title="See how it was built with Replit and Plaid" />
+
+Plaid connects apps to financial institutions. With the Plaid connector, builders can create apps that use account balances, transactions, and investment data where supported by the connected institution.
+
+Setup has two parts. A workspace admin configures the Plaid credentials once in Replit, then each person who uses your app connects their own financial accounts through Plaid Link. Plaid access tokens are scoped per person and stored securely, so your app can use financial data without handling Plaid secrets directly.
+
+## What you can build
+
+Use the Plaid connector to build apps like:
+
+* Personal finance dashboards
+* Budgeting and expense categorization tools
+* Transaction search and analytics apps
+* Portfolio trackers for supported investment accounts
+* Financial coaches that summarize spending patterns
+
+## Prerequisites
+
+Before you configure Plaid in Replit, you need:
+
+* A [team workspace](/features/collaboration/team-workspaces#create-a-team-workspace) — Plaid is configured at the team level
+* A [Plaid account](https://dashboard.plaid.com/signup)
+* A Plaid **Client ID** from the [Plaid dashboard](https://dashboard.plaid.com/developers/keys)
+* A Plaid **Secret** for the environment you want to use
+* A decision on whether to use Plaid `sandbox` or `production`
+
+Use `sandbox` while testing with Plaid's sample institutions and credentials. Use `production` when your app is ready to connect real financial accounts.
+
+## Configure the Plaid connector in Replit
+
+A workspace admin adds the Plaid credentials to Replit. After the connector is configured, builders can use Plaid data with Agent.
+
+<Steps>
+  <Step title="Open Integrations">
+    Open your workspace or app settings in Replit and select **Integrations**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/integrations-panel.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=8bc11cb25ea92696a154d99240ae5278" alt="Avenger team Workspace Integrations panel showing Replit-managed integrations and the Connectors section, with the Add new connector button highlighted in the upper right" width="1440" height="900" data-path="images/replitai/plaid-connector/integrations-panel.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Add the Plaid connector">
+    Select **Add new connector**, then choose **Plaid**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/plaid-connector-search.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=24449d0a433bb175808daf57cd0b19bb" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-search.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Choose the environment">
+    Select `sandbox` or `production`. This must match the Plaid Secret you plan to use.
+  </Step>
+
+  <Step title="Enter Plaid credentials">
+    Paste your Plaid **Client ID** and **Secret** from the Plaid dashboard.
+  </Step>
+
+  <Step title="Set the client name">
+    Enter the app name that should appear in Plaid Link. The field is pre-filled with `My Plaid App`; replace it with the name your users should see. Keep it 30 characters or fewer so Plaid can display it correctly.
+  </Step>
+
+  <Step title="Save the connector">
+    Select **Configure** to save the connector. Replit stores the credentials securely and uses them when builders connect Plaid accounts.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/plaid-config-dialog.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=2d6367edf76b21a6b520dfeee37a88df" alt="Enable Plaid configuration dialog with fields for Environment, Client Id, Client Secret, and Client Name, plus a Configure button to save" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-config-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+To change the configuration later, open **Manage connectors** from the Integrations panel and select **Manage** next to Plaid.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/plaid-connector-manage.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=8ae2a857432719ca0827c65ee8d1c193" alt="Plaid connector Manage panel with the saved Environment, Client Id, Client Secret, and Client Name, and an Update button to save changes" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-manage.png" />
+</Frame>
+
+For organization-wide connector management, see [Managing your connectors](/replitai/managing-connectors).
+
+## Sign in with Plaid Link
+
+Plaid uses [Plaid Link](https://plaid.com/docs/link/) instead of a standard OAuth redirect. To start the flow, find Plaid in the Connectors table and select **Sign in**. Replit shows a brief consent screen that confirms the connection, then opens Plaid Link.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/S8pkAHcCKNXM_bfw/images/replitai/plaid-connector/connect-plaid-consent.png?fit=max&auto=format&n=S8pkAHcCKNXM_bfw&q=85&s=738d4366039cefb0e4671ba805133342" alt="Connect Plaid consent dialog with the Replit and Plaid logos, three reassurance bullets about connecting to Plaid, data use, and revocable permissions, and a Continue to Plaid button" width="1440" height="900" data-path="images/replitai/plaid-connector/connect-plaid-consent.png" />
+</Frame>
+
+Plaid Link then opens an embedded flow where each person selects their financial institution and authenticates with that institution.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/EnyLbFHisfL7qzsL/images/replitai/plaid-connector/plaid-link-picker.png?fit=max&auto=format&n=EnyLbFHisfL7qzsL&q=85&s=fb920d84d88c5d3b3d69344f1a5b8448" alt="Plaid Link institution picker titled Select your institution, with a search input and logos for major US banks including Chase, Bank of America, Wells Fargo, Citibank, US Bank, Capital One, PNC, USAA, American Express, TD, Regions, and Navy Federal, with a Sandbox mode banner at the bottom" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-link-picker.png" />
+</Frame>
+
+Each person links their own accounts. Replit stores the resulting Plaid access token for that person's connection and uses it when Agent or your app requests Plaid data.
+
+## Start building with Plaid data
+
+After Plaid is connected, ask Agent to build with the connected financial data. For example:
+
+<AiPrompt>
+  Build a personal finance dashboard where people connect bank accounts with Plaid Link. Show account balances, monthly spending by category, and the five largest recent transactions.
+</AiPrompt>
+
+<AiPrompt>
+  Create a budgeting app where each person connects accounts through Plaid Link. Import transactions, group them by merchant and category, and show whether they are over budget this month.
+</AiPrompt>
+
+<AiPrompt>
+  Build a portfolio tracker where people connect supported investment accounts through Plaid Link. Show holdings, account balances, and changes over time where data is available.
+</AiPrompt>
+
+Plaid data availability depends on the connected institution and the Plaid products enabled for your Plaid account.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Plaid does not appear in Integrations">
+    Plaid requires a paid Replit plan. If you are on a paid plan and still do not see Plaid, refresh the page and verify that you are in the correct workspace.
+
+    If setup shows **This feature requires an enterprise plan**, refresh the page and verify that you are using the correct workspace.
+
+    If Plaid still does not appear, contact Replit support so the team can check your workspace configuration.
+  </Accordion>
+
+  <Accordion title="Plaid Link shows This Application instead of my app name">
+    Plaid may show **This Application** when the configured client name is missing or too long. Edit the Plaid connector configuration and use an app name with 30 characters or fewer.
+  </Accordion>
+
+  <Accordion title="The connection shows as disconnected">
+    A Plaid connection can become disconnected if the financial institution requires the account holder to sign in again, if credentials changed, or if permissions were revoked.
+
+    Reconnect Plaid from the Integrations or Connectors panel to open Plaid Link and restore access.
+  </Accordion>
+
+  <Accordion title="Sandbox and production data do not match">
+    Plaid sandbox and production use different credentials and tokens. Make sure the connector environment matches the Plaid Secret you entered and the type of financial accounts you are testing.
+  </Accordion>
+</AccordionGroup>
+
+## Related documentation
+
+* [Agent integrations](/features/integrations/overview) — Overview of Replit-managed integrations, Connectors, external integrations, and Agent services
+* [Managing your connectors](/replitai/managing-connectors) — Configure and manage connectors for your workspace
+* [Plaid documentation](https://plaid.com/docs/) — Plaid API, Link, and product documentation
+* [Plaid dashboard](https://dashboard.plaid.com/developers/keys) — Find your Plaid Client ID and Secrets
+* [Replit x Plaid](https://replit.com/partners/plaid) — Partner page with demos and setup resources

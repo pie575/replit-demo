@@ -1,0 +1,102 @@
+---
+title: "データベース"
+description: "ReplitのビルトインSQLデータベースを使ってアプリのデータを保存・取得する方法を説明します。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Replitデータベースは完全マネージドのSQLデータベースを使用し、プロジェクトエディターからReplit Appに永続的なデータストレージを追加できます。
+
+<Note>
+  最も簡単な始め方は、**Agent**にデータベースをアプリに追加するよう依頼することです。Agentがインテグレーションを設定し、データベーススキーマを作成し、データを保存・取得するようにアプリを更新します。
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/database-editor-cbaa1fe049f8.jpg" alt="データベースエディターのスクリーンショット" width="1389" height="871" data-path="images/databases/database-editor.jpg" />
+</Frame>
+
+## 機能
+
+Replitデータベースツールは以下の機能を提供します：
+
+* **データベースツール**：組み込みのSQLツールでクエリを実行し、データベーススキーマを管理し、データを視覚化します
+* **タイムトラベル**：任意の**Agent**チェックポイントにデータベースを復元します。詳細は[データリカバリー](/ja/features/data-and-storage/data-recovery)を参照してください
+* **無料ストレージ**：すべてのReplit Appに20GBの無料ストレージが含まれます
+* **環境変数**：Replit Appで環境変数を使ってデータベースに安全にアクセスします
+
+<Info>
+  2025年12月4日以前、開発データベースはNeonでホストされており、いくつかの重要な違いがあります。
+  詳細は[開発環境と本番環境](/ja/features/data-and-storage/development-and-production#legacy-development-database)を参照してください。
+</Info>
+
+## 使い方
+
+<YouTubeEmbed videoId="zbyRuoPNIc8" title="Replitでデータベースを使う方法" />
+
+プロジェクトエディターから直接Replitデータベースツールにアクセスできます。
+以下のセクションでは、データベースのセットアップと管理方法を説明します。
+
+<Accordion title="データベースツールへのアクセス方法">
+  1. **Tools**パネルを開き、**Replit Cloud**の下にある**Database**を選択します。
+  2. ランディングビューにデータベースの一覧が表示されます。**Development Database**などを選択して開きます。
+</Accordion>
+
+データベースツールはデータベースの一覧を中心に構成されています。ランディングビューには各データベースのストレージ使用量と、現在の**Billing Period**および**Hours of Compute Used**が表示されます。データベースを開くと3つのタブが表示されます：
+
+* **Overview**：データベース内のテーブル。
+* **My Data**：行を閲覧・編集したり、SQLクエリを実行したりします。
+* **Settings**：接続文字列、ストレージ使用量、接続の詳細。
+
+### データベースを追加する
+
+すべてのReplit Appにはデフォルトでデータベースが付属しています。プロジェクトエディターの<img class="icon-svg" src="/assets/mirror/postgres-c4cb2a1e2de3.svg" alt="PostgreSQLデータベースアイコン" width="24" height="24" data-path="images/icons/postgres.svg" /> **データベース**ツールを選択してアクセスできます。
+
+**Agent**にPostgreSQLデータベースをReplit Appに追加するよう依頼し、アプリが保存すべきデータの詳細を指定することで、データベースをインテグレーションできます。Agentがデータベーススキーマを作成し、データベースと通信するようにアプリを更新します。
+
+### セキュリティ機能
+
+**Agent**を使ってデータベースインテグレーションを追加すると、組み込みのセキュリティでデータベース通信を処理するオブジェクト・リレーショナル・マッパー（ORM）が追加されます。
+
+このORMレイヤーとAgentのセキュリティベストプラクティスの実装により、以下の機能を通じてアプリが攻撃から保護されます：
+
+* **スキーマ検証**：データが期待される形式に準拠しているか検証します
+* **データサニタイズ**：SQLインジェクション攻撃を防ぐためにビルダーの入力を自動的にクリーンアップします
+
+## 次のステップ
+
+2025年12月4日以前、開発データベースは<a href="https://neon.com/" target="_blank">Neon</a>でホストされていました。
+このデータベースは廃止され、新しい開発データベースはすべてReplitの独自データベースインフラでホストされています。
+
+`DATABASE_URL`[環境変数](#view-connection-credentials-and-usage)を確認することで、開発データベースがNeonでホストされているかどうかを確認できます。
+
+<Info>
+  `DATABASE_URL`に`neon.tech/neondb`が含まれている場合、開発データベースはまだNeonでホストされています。
+  `helium/heliumdb`が含まれている場合は、開発データベースがReplitでホストされています。
+</Info>
+
+以下は、レガシーNeon開発データベースと新しいReplit開発データベースの主な違いです：
+
+| **機能**       | **Replit（現在）**                                                                                          | **Neon（レガシー）**                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **ホスティング**   | Replit独自のインフラでホスト                                                                                       | Neon（サードパーティプロバイダー）でホスト                                                          |
+| **請求**       | すべてのReplit Appに無料で含まれる                                                                                  | 使用量ベースの請求。詳細は[発行とデータベースの請求](/ja/billing/about-usage-based-billing#databases)を参照。 |
+| **復元機能**     | [ロールバック機能](/ja/features/version-control/checkpoints-and-rollbacks/)を使って任意のチェックポイントにデータベースを復元できます        | ポイントインタイム復元（PITR）— バックアップ保持期間内の任意の時点に復元できます。                                     |
+| **接続セキュリティ** | アプリ内からのみアクセス可能で、公開されることはありません。                                                                          | 完全な接続文字列を使用 — 漏洩した場合、誰でもデータベースにアクセス・変更できます。                                      |
+| **リミックス動作**  | [リミックス](/ja/features/projects-and-artifacts/remix-an-app)すると、分離とセキュリティのためにデータがコピーされた新しい開発データベースが作成されます。 | リミックスは同じデータベースをすべてのコピーで再利用するため、リミックスの変更が元のアプリに影響する可能性があります。                      |
+| **データベース作成** | 各Replit Appに自動的に作成されます。                                                                                 | 明示的なセットアップが必要でした。                                                                |
+| **発行ワークフロー** | デプロイまたは発行には、環境間の分離のために[本番データベース](/ja/features/data-and-storage/development-and-production)の作成が必要です。     | 開発と本番は同じデータベースを共有しており、意図しない開発の変更が本番アプリに影響する可能性がありました。                            |
+
+<Warning>
+  レガシーNeonデータベースの使用中にアプリがフォークまたはリミックスされた場合、発行したアプリはまだ元のアプリのデータベースURLを参照している可能性があります。[データベースアップグレード](/ja/features/data-and-storage/development-and-production)後、この共有接続は機能しなくなります。発行したアプリの更新方法については[共有データベースを使用する発行済みアプリの修正](/ja/features/data-and-storage/shared-database-migration)を参照してください。
+</Warning>

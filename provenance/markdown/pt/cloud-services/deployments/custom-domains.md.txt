@@ -1,0 +1,98 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Custom Domains
+
+> Saiba como conectar o seu próprio nome de domínio ao seu app Replit publicado.
+
+Os domínios personalizados permitem atribuir o seu nome de domínio, como `www.meu-app-incrivel.com`, ao seu app Replit publicado.
+Enquanto o Replit fornece um subdomínio gratuito no formato `<nome-do-subdominio-do-app>.replit.app`, usar
+um domínio personalizado permite criar um endereço mais memorável.
+
+Um nome de domínio personalizado pode ajudar no reconhecimento de marca e na confiança dos usuários do seu app.
+
+Assista ao vídeo a seguir para uma visão geral rápida da configuração de domínios personalizados:
+
+<Frame>
+  <iframe src="https://www.youtube.com/embed/rGYdyb58wJY" title="Custom Domains with Publishing" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+</Frame>
+
+## Recursos
+
+Os domínios personalizados estão disponíveis para os seguintes tipos de Deployment:
+
+* [Autoscale](/pt/cloud-services/deployments/autoscale-deployments/)
+* [Reserved VM](/pt/cloud-services/deployments/reserved-vm-deployments/)
+* [Static](/pt/cloud-services/deployments/static-deployments/)
+
+A tabela a seguir compara os subdomínios do Replit com domínios personalizados:
+
+| Recurso                             | Subdomínio Replit     | Domínio personalizado            |
+| :---------------------------------- | :-------------------- | :------------------------------- |
+| Personalização do hostname          | Apenas subdomínio     | Qualquer domínio que você possua |
+| Tempo de atualização do DNS         | Instantâneo           | Até 48 horas                     |
+| Certificados de segurança (TLS/SSL) | Fornecido pelo Replit | Fornecido pelo Replit            |
+| Preço                               | Gratuito              | Pague ao seu provedor de domínio |
+
+## Uso
+
+<Accordion title="Como acessar os domínios personalizados">
+  1. Após publicar o seu app, abra a ferramenta <img class="icon-svg" src="https://mintcdn.com/replit/rJldsgYVucXB_6kW/images/icons/deploy-icon.svg?fit=max&auto=format&n=rJldsgYVucXB_6kW&q=85&s=853c5ef39a8a7ac3648b3a2ce182fcb8" width="16" height="16" data-path="images/icons/deploy-icon.svg" /> **Publishing**.
+  2. Selecione a aba **Domains**.
+  3. Selecione **Link a domain** ou **Manually connect from another registrar** conforme mostrado na captura de tela a seguir.
+
+  <Frame>
+    <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/deployments/custom-domains/01.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=5dc58a0cab37877093e55c9a2b3b1367" alt="Domains tab" width="2422" height="1130" data-path="images/deployments/custom-domains/01.png" />
+  </Frame>
+</Accordion>
+
+Siga os passos abaixo para configurar o seu domínio personalizado:
+
+<Warning>
+  Você pode ter problemas de configuração se tiver um dos seguintes casos: - Vários
+  registros `A` para o mesmo nome de domínio apontando para servidores diferentes. - Registros `A`
+  e `AAAA` coexistindo para o mesmo domínio, pois o Replit suporta apenas registros `A`. - Registros de domínio com proxy do Cloudflare, pois o Replit não consegue renovar automaticamente
+  os certificados de segurança para esse tipo.
+</Warning>
+
+<Steps>
+  <Step title="Adicionar o seu domínio personalizado">
+    Insira o nome do seu domínio personalizado no campo de texto. Você pode usar um domínio registrado ou incluir um subdomínio.
+
+    Por exemplo, `hat-tip.cc` é o domínio registrado e `my.hat-tip.cc` inclui o subdomínio `my`.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/deployments/custom-domains/02.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=38485a8680fe6ae256ec2d7b0665a784" alt="screenshot of the DNS settings" width="1940" height="718" data-path="images/deployments/custom-domains/02.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Adicionar os registros DNS ao seu registrador de domínio">
+    O Replit gera registros DNS que você deve fornecer ao seu **registrador de domínio**.
+    Um registrador de domínio é o serviço que gerencia o seu nome de domínio, como GoDaddy ou Namecheap.
+
+    Copie os valores dos registros `A` e `TXT` do Replit e cole-os na seção de gerenciamento de DNS do seu registrador de domínio. Se o seu registrador de domínio não suportar `@` como hostname, use o seu nome de domínio registrado.
+  </Step>
+
+  <Step title="Opcional: Adicionar um subdomínio">
+    Para adicionar um subdomínio ao seu app publicado, adicione um novo registro `A` com o mesmo endereço IP
+    na seção de gerenciamento de DNS do seu provedor.
+    Por exemplo, se você quiser adicionar `meu-subdominio.hat-tip.cc`, você deve:
+
+    * Copiar os valores dos registros `A` e `TXT` do Replit para o seu registrador
+    * Adicionar um novo registro `A` com um valor de hostname `meu-subdominio` usando o mesmo endereço IP do seu domínio principal
+  </Step>
+
+  <Step title="Aguardar a conclusão da propagação do DNS">
+    Após adicionar os registros, você deve aguardar que eles se propaguem online.
+    Isso pode levar de alguns minutos a 48 horas.
+
+    Quando a propagação for concluída, a sua aba Domains deve exibir o status "Verified" ao lado do nome do domínio, conforme mostrado abaixo:
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/jSmYU1wBTvl8UMyc/images/deployments/custom-domains/domain-verified.png?fit=max&auto=format&n=jSmYU1wBTvl8UMyc&q=85&s=fe5c99d84ff0334119d2e94b2f07c99a" alt="screenshot of the verified domain status" width="1866" height="890" data-path="images/deployments/custom-domains/domain-verified.png" />
+    </Frame>
+
+    Carregue o domínio no seu navegador para verificar que está funcionando.
+  </Step>
+</Steps>

@@ -1,0 +1,240 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Start your first mobile app
+
+> Build PixelGames, a retro-style game app, as a native iOS and Android app with Agent.
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Copied!";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Copy the prompt
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Build on Replit ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pixelGamesPrompt = "Create a mobile app called PixelGames: a retro handheld console UI styled like a classic Game Boy, cream plastic shell, grey screen bezel, olive-green LCD screen with grid lines. Add a D-pad and two round A/B buttons, plus MENU and START buttons below the screen. Show a menu with four games: Blocks, Snake, Racer, and Pinball.";
+
+Building a mobile app on Replit works the same way as building a web app: you describe what
+you want, and Agent writes the code. This guide walks through that process with one example,
+so you can see the pattern before applying it to your own idea.
+
+<Frame caption="End result: PixelGames' menu and the Blocks game running on a phone.">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/pixelgames-home-screen.webp?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=dfae6a8f1698297aeda472c149fe9610" alt="PixelGames menu listing Blocks, Snake, Racer, and Pinball, with Blocks selected" width="420" height="420" data-path="images/pixelgames/mobile/pixelgames-home-screen.webp" />
+</Frame>
+
+<PromptActions prompt={pixelGamesPrompt} campaign="docs-mobile-first-app" />
+
+## Before you start
+
+All you need is a [Replit account](https://replit.com/), free to create.
+
+The goal is to complete one full loop:
+
+* Build it with [Agent](/features/agent/overview)
+* Test it as a mobile app
+* Publish it, and share it
+
+Agent is Replit's AI builder. You describe what you want, and it creates the app, explains
+what it did, and fixes what's broken.
+
+## 1. Tell Agent to build the app
+
+Open Replit and start a new app. Describe what you want to build, then select **Mobile app**
+as the app type.
+
+<AiPrompt>
+  {pixelGamesPrompt}
+</AiPrompt>
+
+<Frame caption="Agent setting up the mobile project and the console shell UI.">
+  <img src="https://mintcdn.com/replit/WuaQIOfW5oxRlxex/images/pixelgames/mobile/pixelgames-scaffolding.png?fit=max&auto=format&n=WuaQIOfW5oxRlxex&q=85&s=f65c88aa83300af9e0aca0528175646a" alt="The PixelGames build prompt entered on Replit's homepage, with Mobile mode selected" data-path="images/pixelgames/mobile/pixelgames-scaffolding.png" width="877" height="411" data-path="images/pixelgames/mobile/pixelgames-scaffolding.png" />
+</Frame>
+
+## 2. Confirm it works in preview
+
+Replit simulates PixelGames as iOS or Android directly in the preview pane. This is the
+fastest way to check a change.
+
+<Steps>
+  <Step title="The simulator starts automatically">
+    Replit launches the simulation as soon as PixelGames is ready, no setup needed.
+  </Step>
+
+  <Step title="Switch platforms with the dropdown">
+    Use the **Simulate on...** dropdown in the preview pane toolbar (next to the wrench and
+    refresh icons) to switch between **iOS**, **Android**, and **Web**.
+  </Step>
+</Steps>
+
+<Frame caption="The Simulate on... dropdown in the Replit preview pane.">
+  <img src="https://mintcdn.com/replit/wpDFPJulnZRpqmW6/images/pixelgames/mobile/replit-simulate-dropdown.png?fit=max&auto=format&n=wpDFPJulnZRpqmW6&q=85&s=261e1358d3acd58025b1f4f00d779a5b" alt="Replit preview pane with the Simulate on Web, iOS, or Android dropdown open" data-path="images/pixelgames/mobile/replit-simulate-dropdown.png" width="1920" height="992" data-path="images/pixelgames/mobile/replit-simulate-dropdown.png" />
+</Frame>
+
+### Check that it actually works
+
+Use PixelGames like a player would:
+
+* See the **MENU** screen with **Blocks** selectable and the other three games marked "SOON."
+* Open Blocks and play a few pieces with the D-pad and A/B buttons.
+* Confirm the score, level, and lines in the HUD update as you play.
+
+If something looks wrong, describe what you saw to Agent, you don't need to find the bug
+yourself.
+
+## You've got PixelGames running
+
+You went from a single prompt to a playable game, previewed right inside Replit.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The preview pane stays blank">
+    The first build takes a minute or two, so give it a moment before assuming it's stuck.
+    If it's still blank after that, check the console for an error and share it with Agent.
+  </Accordion>
+
+  <Accordion title="Changes aren't appearing in the preview">
+    Press **R** in the console to reload PixelGames, then use the refresh icon in the preview
+    pane toolbar if it still looks stale.
+  </Accordion>
+
+  <Accordion title="Red error screen in the preview">
+    This usually means a JavaScript error or a missing package. Read the message, it often
+    points to the exact file and line, then share it with Agent and ask for a fix.
+  </Accordion>
+
+  <Accordion title="App works on web but breaks on iOS or Android (or vice versa)">
+    Some packages behave differently across platforms, one that works on web might not
+    support native, or need different setup. Ask Agent "Does this package support native?"
+    before relying on it.
+  </Accordion>
+
+  <Accordion title="Build takes a long time">
+    The first build is always slower since nothing is cached yet, later ones should be
+    quicker. If it stays slow, ask Agent to check for unnecessary packages in the project.
+  </Accordion>
+
+  <Accordion title="Module not found errors">
+    This means a package isn't installed, or is installed but the cache is stale. Ask Agent to
+    install it or clear the cache, and double check the package name isn't misspelled.
+  </Accordion>
+</AccordionGroup>
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Test it on your phone" icon="mobile" href="/build/mobile-preview-testing">
+    Feel PixelGames as a real phone app: buttons under your thumb, haptics, the real screen
+    size.
+  </Card>
+
+  <Card title="Add login" icon="right-to-bracket" href="/build/mobile-login">
+    Let players sign in and save progress.
+  </Card>
+
+  <Card title="Store images in your mobile app" icon="image" href="/build/mobile-store-images">
+    Save profile photos to App Storage.
+  </Card>
+
+  <Card title="Send push notifications" icon="bell" href="/build/mobile-push-notifications">
+    Tell players when a new game ships.
+  </Card>
+
+  <Card title="Add payments" icon="credit-card" href="/build/mobile-payments">
+    Charge players for content in PixelGames.
+  </Card>
+</CardGroup>

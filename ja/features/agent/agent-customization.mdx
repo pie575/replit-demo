@@ -1,0 +1,162 @@
+---
+title: "Agent カスタマイズ"
+description: "ワークスペース全体のカスタムインストラクションとスキルでAgentにチームのルールを教え、Workspace Settingsで一元管理します。"
+---
+
+Agent カスタマイズは、最初のプロンプトから、あなたとあなたのチームの作業スタイルで動作するために必要なコンテキストをAgentに提供します。すべてのプロジェクトでルールを再説明する代わりに、ワークスペースに一度定義すれば、Agentはどこでもそれを適用します。
+
+2つの機能があります：
+
+* **カスタムインストラクション**: ワークスペース内のすべてのプロジェクトに適用される常時オンのガイドライン。
+* **スキル**: 関連するタスクが発生したときにのみAgentが読み込む再利用可能なインストラクション。
+
+どちらも **Workspace Settings → Customization** で管理します。
+
+<Frame>
+  <img src="/assets/mirror/agent-customization-create-skill-fcb794e6de4e.png" alt="Workspace SettingsのCustomizationタブ、SkillsとCustom instructionsサブタブ、スキル作成フォームが開いた状態" width="2168" height="1350" data-path="images/replitai/agent-customization-create-skill.png" />
+</Frame>
+
+## カスタムインストラクションとスキルの違い
+
+カスタムインストラクションはすべてのメッセージで読み込まれます。スキルはAgentがタスクに関連すると判断した場合にのみ読み込まれます。常に真であるいくつかのガイドラインにはカスタムインストラクションを使用し、特定のワークフロー、ルール、参照資料にはスキルを使用します。
+
+その分け方の根拠 — コンテキスト予算、何をどこに置くか、スキルをうまく作成する方法 — については [Agent スキル](/ja/learn/agent-skills) を参照してください。スキルの構造とAgentがスキルを読み込む仕組みについては [Agent Skills](/ja/features/agent/skills) を参照してください。
+
+## カスタムインストラクション
+
+カスタムインストラクションは、誰かがプロンプトを入力する前に、すべてのプロジェクトとすべてのセッションでAgentのコンテキストに注入される常時オンのガイドラインです。Workspace Settingsに一度書けば、ワークスペース全体でAgentがそれを適用します。セキュリティやコンプライアンス要件、承認済みライブラリやフレームワーク、データ処理ポリシーなど、常に真であるガイドラインに最適です。
+
+短く保ちましょう。焦点が絞られた具体的なインストラクションほど忠実に従われやすく、Agentが実際に行う作業のためのスペースがより多く残ります。
+
+<Warning>
+  カスタムインストラクションはAgentのパフォーマンスに影響する場合があります。Agentはそれに従うよう誘導されますが、厳格な要件は保証されません。短く具体的なガイドラインほど確実に従われます。
+</Warning>
+
+<Note>
+  ワークスペースのカスタムインストラクションは、プロジェクトの `custom_instruction/instructions.md` ファイルとは異なります。ワークスペースのカスタムインストラクションはWorkspace Settingsで一度設定され、すべてのプロジェクトに適用されます。プロジェクトごとのファイルは単一プロジェクト内に存在します — そのパターンについては [カスタムデザインシステムを作成する](/ja/teams/custom-design-system) を参照してください。
+</Note>
+
+## スキル
+
+スキルは、関連するタスクが発生したときにのみAgentが読み込む再利用可能なインストラクションのセットです。ワークスペーススキルはワークスペース内のすべてのプロジェクトの **+** メニューの先頭に表示されるため、チーム全体が同じセットを共有します。
+
+スキルは3つの方法で作成できます：
+
+* **アップロード** — 既存のスキルフォルダをアップロードします。
+* **作成** — フォームに直接新しいスキルを書きます。
+* **Agentに依頼** — Agentにスキルの下書きを作ってもらい、それを改善します。
+
+<Note>
+  AgentにWorkspaceのスキルをアップロードさせることができます。Agentにスキルをダウンロードするよう依頼してください。Agentはスキルをダウンロード可能な `.zip` アーカイブとしてパッケージ化し、**Download file** ボタンが表示されます（下図参照）。zipをダウンロードし、**Workspace Settings → Customization → Skills** の **Create skill → Choose file or folder** からアップロードして、ワークスペース全体で共有されるようにします。
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/agent-customization-download-skill-3727b188c5a8.png" alt="Agentがワークスペーススキルをダウンロードできるux-designer-skill.zipアーカイブとしてパッケージ化し、Download fileボタンが表示されている" width="1716" height="864" data-path="images/replitai/agent-customization-download-skill.png" />
+</Frame>
+
+スキルの完全な構造（`SKILL.md`、サポートファイル、オープン標準）については [Agent Skills](/ja/features/agent/skills) を参照してください。Replitとパートナーがすでにビルドしたスキルをブラウズするには、[Skills directory](/ja/features/agent/skills-directory) を参照してください。
+
+<Note>
+  スキルは控えめに使いましょう。Agentはタスクごとにすべてのスキルの名前と説明を読みます。多すぎたり重複していたりすると焦点が散漫になり、Agentが適切なスキルを選びにくくなります。各スキルは範囲を絞り込み、不要になったものは削除しましょう。
+</Note>
+
+## 利用可能なプランと権限
+
+| 機能            | 利用可能なプラン           | 管理できるユーザー                                   |
+| ------------- | ------------------ | ------------------------------------------- |
+| カスタムインストラクション | Pro および Enterprise | Enterprise: 管理者。Pro: ワークスペースメンバー全員          |
+| スキル           | すべての有料プラン          | Enterprise: 管理者。Core および Pro: ワークスペースメンバー全員 |
+
+Enterpriseワークスペースでは、管理者のみがカスタムインストラクションとスキルを作成、編集、削除できます。Proワークスペースでは、ワークスペースのメンバー全員ができます。Coreワークスペースでは、メンバー全員がスキルを管理できます — カスタムインストラクションはCoreでは利用できません。いずれにせよ、ワークスペースのすべてのメンバーが作成されたスキルを使用できます。
+
+## カスタムインストラクションを作成する
+
+<Steps>
+  <Step title="Workspace Settingsを開く">
+    **Workspace Settings → Customization** に移動します。
+
+    <Frame>
+      <img src="/assets/mirror/agent-customization-tab-930af2e8ed74.png" alt="Workspace SettingsのCustomizationタブ、SkillsとCustom instructionsサブタブが表示されている" width="1065" height="394" data-path="images/replitai/agent-customization-tab.png" />
+    </Frame>
+  </Step>
+
+  <Step title="インストラクションを書く">
+    **Custom instructions** セクションに、すべてのプロジェクトでAgentに適用させたいガイドラインを書きます。
+  </Step>
+
+  <Step title="保存する">
+    変更を保存します。インストラクションはワークスペースの新しいプロジェクトに適用されます。
+  </Step>
+</Steps>
+
+## スキルを作成する
+
+<Steps>
+  <Step title="Workspace Settingsを開く">
+    **Workspace Settings → Customization** に移動します。
+  </Step>
+
+  <Step title="スキルを作成する">
+    **Skills** セクションで **Create skill** をクリックし、スキルフォルダをアップロードするか、インストラクションを書くか、Agentに下書きを依頼します。
+
+    <Frame>
+      <img src="/assets/mirror/agent-customization-create-skill-fcb794e6de4e.png" alt="Workspace SettingsのCustomizationタブ、SkillsとCustom instructionsサブタブ、スキル作成フォームが開いた状態" width="2168" height="1350" data-path="images/replitai/agent-customization-create-skill.png" />
+    </Frame>
+  </Step>
+
+  <Step title="わかりやすい説明を書く">
+    スキルにいつ使うか — そしていつ使わないか — を明確に示す説明を付けます。これがAgentがスキルを適用するかどうかを決める際に読むものです。
+  </Step>
+
+  <Step title="保存する">
+    スキルを保存します。ワークスペース内のすべてのプロジェクトの **+** メニューで利用可能になります。
+  </Step>
+</Steps>
+
+## プロジェクトでワークスペーススキルを使う
+
+スキルの説明が明確であることが重要です。Agentはすべてのワークスペーススキルの説明を読み、プロンプトがスキルの目的に大まかに一致する場合は自動的にスキルを取り込むため、自分でスキルを選ばなくてもよい場合があります。確実に適用させたい場合は、スキルを明示的に選択することもできます。
+
+手動で選択するには：
+
+<Steps>
+  <Step title="スキルピッカーを開く">
+    プロジェクトで、チャット入力欄の隣の **+** ボタンをクリックします。ワークスペーススキルが先頭にまとめて表示されます。
+
+    <Frame>
+      <img src="/assets/mirror/agent-customization-skill-picker-4643f3a453c7.png" alt="+ ボタンから開いたスキルピッカー、Workspace skills グループがReplit skillsの上に表示されている" width="1668" height="1170" data-path="images/replitai/agent-customization-skill-picker.png" />
+    </Frame>
+  </Step>
+
+  <Step title="スキルを選択する">
+    使用するスキルを選択します。`/` の後にスキル名を入力して直接呼び出すこともできます。
+  </Step>
+
+  <Step title="プロンプトを続ける">
+    通常通り続けます。タスクがスキルの説明に一致する場合、Agentはそのスキルを使用します。
+  </Step>
+</Steps>
+
+## インストラクションとスキルを管理する
+
+すべての管理は **Workspace Settings → Customization** で行います。そこからカスタムインストラクションを編集し、スキルを編集、無効化、削除できます。変更は今後のチャットに適用されますが、進行中のチャットには適用されません。
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card icon="users" href="/ja/learn/agent-skills">
+    チームにスケールするインストラクションとスキルを書くためのメンタルモデルとベストプラクティス。
+  </Card>
+
+  <Card icon="puzzle-piece" href="/ja/features/agent/skills">
+    スキルの構造とAgentがスキルを読み込む仕組み。
+  </Card>
+
+  <Card title="Skills directory" icon="grid" href="/ja/features/agent/skills-directory">
+    ReplitとパートナーによるスキルをブラウズしてインストールできるSkills directory。
+  </Card>
+
+  <Card title="スキルを使う" icon="wand-magic-sparkles" href="/ja/build/use-agent-skills">
+    メッセージにスキルをアタッチするか、プロジェクトにインストールします。
+  </Card>
+</CardGroup>

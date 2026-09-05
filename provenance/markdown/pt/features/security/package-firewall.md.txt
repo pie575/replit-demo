@@ -1,0 +1,74 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Firewall de pacotes
+
+> O Package Firewall bloqueia pacotes maliciosos e comprometidos no momento da instalação, antes que qualquer código chegue ao seu aplicativo. Ativado por padrão, com tecnologia da Socket.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/PlH9o31JxmYssE0Q/images/package-firewall/blocked-package-message.png?fit=max&auto=format&n=PlH9o31JxmYssE0Q&q=85&s=cc7090969f43b07d55b734f38ab01426" alt="O chat do Agent mostrando a instalação do form-data bloqueada pela política de segurança do Replit, com uma explicação da vulnerabilidade conhecida do pacote" style={{ display: 'block', margin: '0 auto' }} width="1372" height="1144" data-path="images/package-firewall/blocked-package-message.png" />
+</Frame>
+
+<Note>
+  Novo em segurança de dependências? Consulte [Conceitos de segurança](/pt/features/security/concepts) para definições de CVE, SBOM, exposição, Fix with Agent, Republish e Auto-Protect.
+</Note>
+
+O Package Firewall bloqueia pacotes maliciosos e comprometidos no nível de rede, antes que eles sejam instalados no seu aplicativo. Ele faz parte do [Replit Auto-Protect](/pt/features/security/concepts#auto-protect), o conjunto de proteções ativadas por padrão para todos os criadores, e é desenvolvido com tecnologia da [Socket](https://socket.dev), uma empresa de segurança de cadeia de suprimentos de software.
+
+Quando você ou o Agent executam um comando de instalação como `npm install` ou `pip install`, a solicitação passa primeiro pelo Package Firewall. Pacotes limpos são instalados normalmente e você não notará nada diferente. Pacotes que a Socket sinalizou como maliciosos ou comprometidos são bloqueados antes que qualquer código chegue ao seu ambiente.
+
+O Package Firewall está **ativado por padrão para todos os criadores, sem nada para configurar e nada para migrar**. Ele protege aplicativos novos e existentes da mesma forma, e não há nenhuma configuração a ser feita.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/PlH9o31JxmYssE0Q/images/package-firewall/auto-protect-layers.png?fit=max&auto=format&n=PlH9o31JxmYssE0Q&q=85&s=29403621c1249c15a1e21dac90c8a4aa" alt="O painel Replit Auto-Protect mostrando três proteções ativadas por padrão: WAF Firewall, Package Firewall com tecnologia da Socket e criptografia SSL/TLS" width="1328" height="566" data-path="images/package-firewall/auto-protect-layers.png" />
+</Frame>
+
+## Por que a proteção no momento da instalação é importante
+
+A maioria das ferramentas de cadeia de suprimentos verifica as dependências apenas no momento da publicação, muito depois de o pacote já ter sido instalado. Para vulnerabilidades comuns, isso pode ser suficiente. Malware é diferente: ele causa dano no instante em que é instalado — roubando segredos, abrindo backdoors ou exfiltrando suas variáveis de ambiente. Quando uma verificação no momento da publicação o sinaliza, o ataque já ocorreu.
+
+O Package Firewall fecha essa janela. Ao bloquear pacotes maliciosos antes que sejam baixados, ele impede o ataque antes que uma única linha de código malicioso seja executada.
+
+## Como funciona
+
+1. Você ou o Agent executam um comando de instalação, como `npm install <package>` ou `pip install <package>`.
+2. A solicitação passa pelo Package Firewall, que verifica o pacote em relação à inteligência de ameaças da Socket.
+3. Se o pacote estiver limpo, a instalação ocorre normalmente, sem diferença perceptível.
+4. Se o pacote for malicioso ou comprometido, a instalação é bloqueada antes que qualquer código chegue ao seu ambiente.
+
+Quando algo é bloqueado, você recebe uma mensagem clara sobre o que foi interrompido e por quê, incluindo a vulnerabilidade ou a política que acionou o bloqueio. O Agent recebe o mesmo sinal, podendo sugerir uma alternativa segura — como corrigir um nome de pacote digitado incorretamente — ou devolver a decisão para você.
+
+### Gerenciadores de pacotes suportados
+
+O Package Firewall protege instalações em:
+
+* **JavaScript** — npm, yarn e pnpm
+* **Python** — pip
+* **Go** — módulos Go
+
+## O que o Package Firewall detecta
+
+O Package Firewall bloqueia tanto malware evidente quanto versões comprometidas ou conhecidamente vulneráveis de pacotes legítimos — incluindo pacotes amplamente utilizados. Muitas dessas vulnerabilidades foram divulgadas após a data limite de treinamento dos modelos que os recomendam, então um modelo pode sugerir com confiança uma versão de dependência que era considerada segura nos dados de treinamento, mas que desde então foi sinalizada. Esses riscos têm nomes conhecidos no setor:
+
+* **Typosquats** — um pacote malicioso com um nome que difere de um pacote real por apenas uma tecla, como `reqeusts` em vez de `requests`. Você solicita o pacote errado e baixa malware.
+* **Slopsquats** — um modelo alucina um nome de pacote que não existe, um atacante registra exatamente esse nome e espera que o próximo agente o instale.
+* **Recomendações desatualizadas** — um pacote real com uma vulnerabilidade divulgada que o modelo recomenda porque era considerado seguro antes da sua data limite de treinamento.
+
+Essa última categoria é o motivo pelo qual o Package Firewall é mais importante para aplicativos construídos com IA: um agente pode buscar com confiança uma dependência que não é mais segura, e o Package Firewall impede a instalação antes que esse código seja executado.
+
+## Como o Package Firewall se encaixa com as outras ferramentas de segurança do Replit
+
+O Package Firewall é uma de três camadas complementares. Cada uma protege um ponto diferente do ciclo de vida do seu aplicativo, então use-as em conjunto em vez de escolher entre elas.
+
+| Camada                                       | Quando é executada               | O que faz                                                                                                                                                                                                                              |
+| -------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Package Firewall**                         | No momento da instalação         | Bloqueia pacotes maliciosos e comprometidos antes que sejam baixados (prevenção).                                                                                                                                                      |
+| **Verificações automáticas de dependências** | Após a instalação, continuamente | Detectam CVEs recém-divulgados nas suas dependências instaladas, com correções opcionais preparadas pelo Agent. Consulte o [Centro de Segurança do Projeto](/pt/features/security/project-security-center#automatic-dependency-scans). |
+| **Security Agent**                           | Antes de publicar                | Audita toda a sua base de código em busca de vulnerabilidades de código, dependências e privacidade. Consulte [Verificações de segurança do Agent](/pt/features/security/agent-security-scans).                                        |
+
+## Próximos passos
+
+* Revise os achados de um único projeto no [Centro de Segurança do Projeto](/pt/features/security/project-security-center).
+* Audite as dependências em todos os projetos no [Centro de Segurança do Workspace](/pt/features/security/workspace-security-center).
+* Leia [Como o Replit protege código gerado por IA](https://blog.replit.com/securing-ai-generated-code) para saber mais sobre a abordagem do Replit em relação à segurança.

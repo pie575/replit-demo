@@ -1,0 +1,236 @@
+---
+title: "Solucionar problemas de publicação"
+description: "Diagnostique problemas comuns quando um app do Replit funciona no Preview, falha ao publicar, ou se comporta de forma diferente na URL pública."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Publicar transforma seu projeto em um app público. Se a publicação falhar ou a URL pública se comportar de forma diferente do Preview, trabalhe o problema na ordem indicada.
+
+Esta página é tanto um guia de recuperação de Build quanto uma referência de solução de problemas de implantação. Comece com a pergunta mais simples: o app funciona no Preview?
+
+## O que você vai conquistar
+
+Ao final desta página, você saberá se o problema está no seu app, na configuração de publicação, nos Secrets de produção, no tipo de implantação, na configuração de porta ou no acesso à rede/DNS.
+
+## Comece com o Preview
+
+Antes de publicar, verifique se o app executa corretamente no Editor de Projeto.
+
+Selecione **Run** no topo do Editor de Projeto e abra o Preview. Se o Preview não exibir seu app com uma URL `replit.dev`, corrija o app antes de publicar.
+
+Peça ao Agent para diagnosticar o Preview primeiro:
+
+<AiPrompt>
+  Este app não funciona no Preview.<br />
+  Verifique o comando de execução, instalação de dependências, erros do app, portas e Secrets ausentes.<br />
+  Corrija o menor problema primeiro e me diga como verificar que o Preview funciona antes de publicar.
+</AiPrompt>
+
+Se o Preview estiver quebrado, publicar não vai resolver.
+
+## Se o Preview funciona mas a publicação falha
+
+Quando o Preview funciona mas a publicação falha, verifique a configuração específica de publicação.
+
+### Verificar logs
+
+Abra a aba **Logs** no painel de **Publicação**. Procure por stack traces, pacotes ausentes, comandos com falha, variáveis de ambiente ausentes ou erros de inicialização.
+
+Cole o erro relevante no Agent:
+
+<AiPrompt>
+  A publicação falhou com esta saída de log: \[cole o erro].<br />
+  Explique a causa provável.<br />
+  Diga-me se é um erro de comando, dependência, Secret, porta, build ou app.<br />
+  Recomende a menor correção e como devo verificá-la.
+</AiPrompt>
+
+### Verificar comandos de execução e build
+
+Erros comuns incluem erros de digitação, flags incorretas, arquivos de entrada errados ou comandos que funcionam apenas localmente.
+
+Revise os comandos no painel de **Publicação**. Se o app precisar de um comando de build e um comando de inicialização, confirme que ambos estão corretos.
+
+### Verificar Secrets de produção
+
+Os Secrets definidos no Editor de Projeto não são transferidos automaticamente para o app publicado. Adicione todos os Secrets de produção e variáveis de ambiente no painel de **Publicação**.
+
+Secrets ausentes podem causar erros sobre valores indefinidos, chamadas de API com falha, falhas de conexão com banco de dados, erros de login ou falhas de pagamento.
+
+Veja [Secrets](/pt/core-concepts/project-editor/app-setup/secrets).
+
+### Verificar comportamento de processo de longa duração
+
+Apps publicados esperam que o programa continue em execução. Se o programa executar uma vez e encerrar, a plataforma o reinicia automaticamente.
+
+Certifique-se de que sua aplicação inicia um processo de longa duração, como um servidor web.
+
+### Verificar configuração de host e porta
+
+Se você estiver executando um servidor web, as Implantações podem detectar automaticamente qual porta o servidor usa, mas o servidor deve escutar em `0.0.0.0`. Escutar apenas em `localhost` ou `127.0.0.1` não funciona para apps publicados.
+
+Se você tiver [portas especificadas na configuração `.replit`](/pt/references/configuration/configuration), a detecção automática de porta é desativada. Você deve especificar uma porta com `externalPort` definido como `80` para que a etapa de promoção seja concluída. Verifique se o servidor escuta na `localPort` especificada.
+
+Peça ao Agent para verificar isso cuidadosamente:
+
+<AiPrompt>
+  Verifique se este app está configurado corretamente para publicação.<br />
+  Confirme que o servidor inicia um processo de longa duração, escuta em 0.0.0.0, usa a porta esperada e corresponde a qualquer configuração de porta no .replit.<br />
+  Não altere o comportamento do app além da correção para publicação.
+</AiPrompt>
+
+### Verificar tempo de health check
+
+Antes de marcar o app publicado como ativo, o Replit envia uma requisição HTTP para o app. Se a página inicial demorar mais de cinco segundos para responder, o health check pode expirar e a publicação pode falhar na etapa final.
+
+Se a inicialização for lenta, peça ao Agent para reduzir o trabalho de inicialização, mover trabalhos pesados para trás de uma ação do usuário ou armazenar dados em cache quando apropriado.
+
+## Se a publicação for bem-sucedida mas a URL pública estiver quebrada
+
+Se o Preview funcionar e a publicação for bem-sucedida, mas a URL pública estiver quebrada, compare o comportamento do Preview com o de produção.
+
+Verifique:
+
+* Secrets de produção e variáveis de ambiente.
+* Configurações de conexão com banco de dados.
+* URLs de callback ou redirecionamento de login.
+* Configurações de webhook ou redirecionamento de pagamento.
+* Allowlists de API ou configurações de CORS.
+* Arquivos que foram gravados localmente em vez de armazenados em um banco de dados ou serviço de armazenamento.
+* Layout mobile e diferenças entre navegadores.
+
+Peça ao Agent para comparar os ambientes:
+
+<AiPrompt>
+  O app funciona no Preview mas não na URL publicada.<br />
+  Ajude-me a comparar o comportamento do Preview com o de produção.<br />
+  Verifique Secrets, configurações de banco de dados, chamadas de API, redirecionamentos de login, redirecionamentos de pagamento, saída de build e logs.<br />
+  Me dê a próxima verificação mais segura.
+</AiPrompt>
+
+## Problemas com implantações estáticas
+
+Implantações Estáticas servem arquivos estáticos como HTML, CSS e JavaScript.
+
+Se o app incluir comportamento do lado do servidor, rotas de API, callbacks de autenticação, chamadas de banco de dados do servidor ou lógica de backend de longa duração, pode não ser um bom candidato para Implantações Estáticas. Altere o tipo de implantação para Autoscale no painel de **Publicação**.
+
+Problemas com implantações estáticas geralmente ocorrem por causa de um diretório público incorreto ou por escolher Estático para um app que precisa de um servidor.
+
+## Limites de arquivo e tamanho
+
+Implantações de VM Reservada e Autoscale suportam apps Replit de até 8 GB. Implantações Estáticas suportam até 1 GB.
+
+Para reduzir o tamanho do app, exclua arquivos desnecessários, evite confirmar saída gerada ou use armazenamento externo para assets grandes.
+
+<Warning>
+  O sistema de arquivos em apps publicados não é persistente e é redefinido toda vez que você publica. Para persistência de dados, use um banco de dados como o [SQL Database](/pt/features/data-and-storage/sql-database).
+</Warning>
+
+Se arquivos enviados ou dados gerados desaparecerem após a publicação, armazene-os em um banco de dados ou serviço de armazenamento em vez do sistema de arquivos do app.
+
+## Problemas de acesso com URLs `replit.app` e `replit.dev`
+
+Se você tiver problemas para acessar o app no domínio `replit.app` ou `replit.dev`, filtros da web ou restrições de rede podem ser a causa.
+
+Tente usar resolvedores de DNS públicos como o Google DNS (`8.8.8.8`) ou Cloudflare DNS (`1.1.1.1`).
+
+### Alterar configurações de DNS
+
+<Tabs>
+  <Tab title="Windows">
+    1. Abra o **Painel de Controle**.
+    2. Acesse **Central de Rede e Compartilhamento**.
+    3. Selecione **Alterar configurações do adaptador** à esquerda.
+    4. Clique com o botão direito na conexão de rede ativa e selecione **Propriedades**.
+    5. Selecione **Protocolo IP Versão 4 (TCP/IPv4)** e selecione **Propriedades**.
+    6. Escolha **Usar os seguintes endereços de servidor DNS**.
+    7. Digite um endereço IP de servidor DNS público, como `8.8.8.8` para o Google DNS ou `1.1.1.1` para o Cloudflare DNS.
+    8. Selecione **OK** para salvar as alterações.
+
+    Para instruções mais detalhadas, consulte o [guia de configuração de DNS da Microsoft](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace).
+  </Tab>
+
+  <Tab title="macOS">
+    1. Abra **Preferências do Sistema**.
+    2. Selecione **Rede**.
+    3. Selecione sua conexão de rede ativa à esquerda.
+    4. Selecione **Avançado** no canto inferior direito.
+    5. Acesse a aba **DNS**.
+    6. Selecione o botão **+** para adicionar um servidor DNS.
+    7. Digite um endereço IP de servidor DNS público, como `8.8.8.8` para o Google DNS ou `1.1.1.1` para o Cloudflare DNS.
+    8. Selecione **OK** e depois **Aplicar**.
+
+    Para instruções mais detalhadas, consulte o [guia de configuração de DNS da Apple](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac).
+  </Tab>
+
+  <Tab title="Linux">
+    1. Edite o arquivo `/etc/resolv.conf` para adicionar servidores DNS públicos. O método exato varia por distribuição.
+    2. Adicione as seguintes linhas:
+
+    ```bash theme={null}
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+
+    Para mais informações sobre configuração de DNS em diferentes distribuições, consulte o [guia de configuração de rede do Wiki Debian](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers).
+  </Tab>
+</Tabs>
+
+### Limpar cache de DNS
+
+Após alterar as configurações de DNS, limpe o cache de DNS para aplicar a nova configuração:
+
+* **Windows**: Execute `ipconfig /flushdns` no Prompt de Comando.
+* **macOS e Linux**: Execute `sudo systemctl restart NetworkManager` no Terminal. O comando exato pode variar por distribuição.
+
+<Note>
+  Para melhorar o desempenho regional e a estabilidade, as URLs `replit.dev` dos
+  seus apps Replit podem mudar ocasionalmente durante migrações de cluster. Após
+  a conclusão da migração, as URLs permanecem estáveis por aproximadamente um ano,
+  a menos que você solicite explicitamente uma mudança de localização.
+</Note>
+
+## Publicar uma aplicação Streamlit
+
+Aplicações Streamlit funcionam com as Implantações do Replit. A forma mais fácil de começar é com o [template Streamlit](https://replit.com/@replit/Streamlit?v=1).
+
+Como alternativa, defina o comando de execução para publicação como:
+
+```bash theme={null}
+streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
+```
+
+Se sua aplicação usar um arquivo de entrada diferente, substitua `main.py` pelo nome do seu arquivo.
+
+## Você terminou quando
+
+* O Preview funciona.
+* A publicação é concluída.
+* A URL pública carrega.
+* O fluxo principal do app funciona na URL pública.
+* Os Secrets e configurações de produção estão configurados.
+* Os logs não mostram erros ocultos de inicialização.
+
+## Relacionado
+
+* [Implantações do Replit](/pt/learn/projects-and-artifacts/replit-deployments)
+* [Adicionar um domínio personalizado](/pt/build/add-custom-domain)
+* [Domínios personalizados](/pt/features/publishing/custom-domains)
+* [Secrets](/pt/core-concepts/project-editor/app-setup/secrets)
+* [SQL Database](/pt/features/data-and-storage/sql-database)
+
+Se você precisar de ajuda adicional depois de tentar essas etapas, visite o [Replit Community Hub](https://replit.com/community) para mais recursos.

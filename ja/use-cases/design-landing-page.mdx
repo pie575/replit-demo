@@ -1,0 +1,152 @@
+---
+title: "ランディングページをデザインする"
+description: "Notionのブリーフとブランド素材から、Replit Designで待機リストやローンチページをデザインします。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+新しい製品、待機リスト、キャンペーンなど、まだページがない状態から始めます。Notionの
+ブリーフとGoogleドライブ内のブランド素材をもとに、Replit Designでランディングページを
+デザインします。構成はヒーロー、実績、仕組みの説明、そして1つのコールトゥアクションです。
+AgentはNotion内のオファーや文言、ドライブ内のロゴ・カラー・タイポグラフィを使用します。
+これはページのビジュアルシステムであり、コーディング済みのサイトではありません。構築時には
+フレームを仕様として使用してください。
+
+## 最適な用途
+
+* 製品公開前に待機リストやローンチページが必要なプロダクトデザイナー。
+* Notionのブリーフとドライブの素材から、ブランドに沿った最初のレイアウトが必要な創業者。
+
+## コネクタ
+
+<Connectors
+  items={[
+{
+  id: "notion",
+  name: "Notion",
+  why: "ブリーフ:オファー、対象者、実績、コールトゥアクション",
+},
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "ロゴ、カラー、タイポグラフィ、ブランド素材",
+},
+]}
+/>
+
+## 始める前に
+
+オファー、対象者、コールトゥアクションを記載したNotionページと、ドライブ内のブランド素材を
+用意してください。NotionとDriveを接続します。ページの対象者と、メインのコールトゥアクション
+(登録、待機リスト登録、デモ予約、購入など)を伝えてください。
+
+## エージェントへの指示
+
+<AiPrompt>
+  このNotionページ\[リンク]とGoogleドライブ内のブランド素材から、\[待機リスト/ローンチ/
+  デモ予約]用のランディングページをReplit Designでデザインして。Notionのオファー、
+  対象者、実績、コールトゥアクションを使って。デスクトップとモバイルのフレームを
+  作成して:1つのコールトゥアクションを含むヒーロー、社会的証明、仕組みの説明、
+  最後のコールトゥアクション。既存のロゴ、カラー、タイポグラフィを使って。
+</AiPrompt>
+
+## 期待できること
+
+AgentはNotionのブリーフとドライブのブランド素材を読み込み、Replit Designでフレームを
+レイアウトします。得られるのはデスクトップページとモバイル版のクロップであり、デプロイ
+済みのアプリではありません。構築時にはフレームを仕様として使うか、後続のBuildワークフロー
+での実装をAgentに依頼してください。デスクトップとモバイルを並べてプレビューしてください。
+フレームを最終版として扱う前に、コールトゥアクション、実績、カラーをNotionとドライブと
+照らし合わせて確認してください。
+
+## 自分に合わせてカスタマイズする
+
+<AiPrompt>
+  待機リスト用のランディングページにして:1つの約束、3つの実績、メールアドレスの取得、
+  余計なナビゲーションなし。実績はNotionから引用して。
+</AiPrompt>
+
+<AiPrompt>
+  このNotionテーブル\[リンク]から3段階の料金セクションを追加して。ビジュアル
+  システムは維持して。真ん中のプランを強調して。
+</AiPrompt>
+
+## トラブルシューティング
+
+* **文言がブリーフのものと違う:** Notionページのリンクを渡し、サイトから書き直すのではなく、そこにあるオファー、対象者、実績、コールトゥアクションを使うようAgentに依頼してください。
+* **カラーやタイポグラフィがブランドと合わない:** ドライブを接続し、ロゴ、カラー、タイポグラフィのファイルを指定してください。
+* **ライブサイトを期待していた:** このワークフローはReplit Designのフレームを生成するもので、デプロイ済みアプリではありません。フレームを仕様として使うか、後続のBuildワークフローでの実装をAgentに依頼してください。
+
+## 関連情報
+
+<CardGroup cols={2}>
+  <Card title="ソーシャル用アイコンとバナーを作成する" href="/ja/use-cases/create-social-kit">
+    プロフィール素材とカバー素材にも、同じGoogleドライブのブランド素材を使用できます。
+  </Card>
+
+  <Card title="有料イベントサイトを公開する" href="/ja/use-cases/launch-event-website">
+    フレームだけでなく公開ページにも、同じNotionのソースを使用できます。
+  </Card>
+</CardGroup>

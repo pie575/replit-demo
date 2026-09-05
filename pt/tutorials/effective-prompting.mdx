@@ -1,0 +1,190 @@
+---
+title: "Prompting eficiente com o Replit AI"
+description: "Aprenda princípios e veja exemplos de como escrever prompts eficazes ao usar o Replit Agent."
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Criar prompts eficazes é sobre dar instruções claras a um assistente capaz. Guie o [**Agent**](/pt/core-concepts/agent) bem e você irá do conceito ao aplicativo rapidamente.
+
+<YouTubeEmbed videoId="7m5SjKZBw6I" title="10 dicas para programar melhor com IA" />
+
+## Exemplos rápidos
+
+Veja a diferença entre prompts vagos e eficazes:
+
+<AccordionGroup>
+  <Accordion title="Corrigindo código" icon="bug">
+    **Vago:** "Corrija meu código."
+
+    **Eficaz:** "Meu script falha ao processar a entrada do usuário. O erro parece estar na função de validação. Você pode ajudar a depurar a parte `validate_input`? Aqui está a mensagem de erro: \[detalhes]"
+
+    O prompt eficaz identifica a área do problema, a função suspeita e fornece contexto.
+  </Accordion>
+
+  <Accordion title="Desenvolvendo funcionalidades" icon="hammer">
+    **Vago:** "Faça um site."
+
+    **Eficaz:** "Crie um site de portfólio simples com seções para Início, Sobre Mim e Formulário de Contato. Use um tema de design moderno e limpo com conteúdo de exemplo."
+
+    O prompt eficaz define o propósito, as funcionalidades principais e a estética desejada.
+  </Accordion>
+
+  <Accordion title="Melhorias de desempenho" icon="gauge-high">
+    **Vago:** "Não deixe ficar lento."
+
+    **Eficaz:** "Refatore a função de processamento de dados para lidar com entradas maiores de forma mais eficiente. Poderíamos usar um algoritmo ou estrutura de dados diferente?"
+
+    Diga ao Agent *como* melhorar em vez de usar restrições negativas.
+  </Accordion>
+
+  <Accordion title="Alterações na interface" icon="paintbrush">
+    **Vago:** "Adicione animação."
+
+    **Eficaz:** "Anime a imagem principal na página inicial para que ela apareça suavemente com um efeito de fade quando a página carregar pela primeira vez, criando uma experiência acolhedora."
+
+    Identifique o elemento específico, o efeito desejado, o tempo e a experiência pretendida.
+  </Accordion>
+
+  <Accordion title="Sistemas complexos" icon="server">
+    **Vago:** "Construa o backend."
+
+    **Eficaz:** "Configure a lógica do lado do servidor. Implemente autenticação de usuário (cadastro/login) e crie um endpoint de API para recuperar dados de perfil do usuário com segurança."
+
+    Divida tarefas grandes em funcionalidades específicas.
+  </Accordion>
+</AccordionGroup>
+
+## Princípios fundamentais
+
+<Frame>
+  <img src="/assets/mirror/10-tips-59c524521960.png" alt="Dez dicas para prompting eficaz com o Replit Agent" width="1259" height="1101" data-path="images/tutorials/10-tips.png" />
+</Frame>
+
+### Planeje primeiro
+
+<Tip>Antes de criar prompts, descreva as funcionalidades e os fluxos de usuário do seu aplicativo. Um plano claro leva a prompts mais focados.</Tip>
+
+Pense na estrutura do seu aplicativo como um gerente de produto faria. Divida o objetivo geral em etapas lógicas.
+
+**Em vez de:** "Crie um aplicativo de gerenciamento de tarefas."
+
+**Tente:** "1. Crie a estrutura HTML básica com um campo de entrada e uma lista de tarefas. 2. Adicione JavaScript para adicionar tarefas. 3. Use um banco de dados para armazenar as tarefas. 4. Adicione funcionalidade para marcar tarefas como concluídas."
+
+Em seguida, crie prompts para o Agent em cada etapa.
+
+### Construa incrementalmente
+
+Use [**Checkpoints**](/pt/core-concepts/agent#checkpoints) para salvar o progresso após cada etapa bem-sucedida. Se algo quebrar, você pode voltar a um estado funcional e tentar uma abordagem diferente.
+
+**Em vez de:** "Construa uma plataforma completa de e-commerce."
+
+**Tente:** "Configure um projeto básico full-stack para um site de e-commerce com cadastro e login de usuário usando o Replit Auth." Em seguida, siga com prompts para listagens de produtos, carrinho e checkout.
+
+### Seja específico
+
+Defina exatamente o que você precisa: formatos de saída, restrições, casos extremos.
+
+**Em vez de:** "Adicione um formulário de contato."
+
+**Tente:** "Crie uma página de formulário de contato em `/contact` com campos para:
+
+* Nome (obrigatório)
+* E-mail (obrigatório, deve ter formato válido)
+* Mensagem (obrigatória, mínimo de 10 caracteres)
+
+Ao enviar, mande os dados do formulário para `contact@mydomain.com`."
+
+### Use linguagem positiva
+
+Diga o que você *quer*, não o que evitar.
+
+**Em vez de:** "Não deixe a página de perfil do usuário confusa."
+
+**Tente:** "Crie uma página de perfil de usuário limpa. Exiba o nome de usuário com destaque, seguido do e-mail e da data de cadastro. Inclua um botão 'Editar Perfil'."
+
+### Mantenha a simplicidade
+
+Use linguagem clara e direta. Divida solicitações complexas em marcadores.
+
+**Em vez de:** "Implemente a infraestrutura necessária do lado do servidor para facilitar a geração dinâmica e a recuperação de artefatos de conteúdo gerado pelo usuário."
+
+**Tente:** "Crie funcionalidade no backend para os usuários enviarem posts de blog. Os usuários devem inserir um título e o corpo do conteúdo. Armazene os posts no banco de dados."
+
+## Trabalhando com contexto
+
+### Forneça arquivos relevantes
+
+Mencione arquivos específicos em vez de anexar todo o seu projeto.
+
+**Em vez de:** (Anexando tudo) "Implemente a página de perfil do usuário com base em nosso sistema de design."
+
+**Tente:** "Crie a página de perfil do usuário. Busque os dados do usuário no endpoint do servidor. Estilize de acordo com \[URL para os docs de design] e combine com este mockup: \[anexe `profile_mockup.jpg`]."
+
+<Tip>Inicie uma nova conversa ao trocar para tarefas não relacionadas. Isso evita confusão causada pelo acúmulo de contexto.</Tip>
+
+### Mostre exemplos
+
+Reduza a ambiguidade fornecendo exemplos concretos — trechos de código, dados de amostra ou capturas de tela.
+
+**Em vez de:** "Melhore a aparência dos cards de produto."
+
+**Tente:** "Redesenhe os cards de produto na página da loja. Cada card deve exibir a imagem do produto, o nome, o preço e um botão 'Adicionar ao Carrinho', semelhante a este layout: \[anexe screenshot]. Use uma borda cinza claro."
+
+## Depuração eficaz
+
+Quando ocorrerem erros, forneça:
+
+* A mensagem de erro **exata**
+* Trechos de código relevantes
+* Nomes dos arquivos onde o erro ocorre
+* O que você estava tentando realizar
+* Etapas que você já tentou
+
+**Em vez de:** "Minha página de login está quebrada."
+
+**Tente:** "Quando faço login com credenciais corretas em `/login`, recebo um erro 'User not found' no console do navegador. A verificação no banco de dados parece não estar funcionando. Aqui está o código de tratamento de login em `auth.js`."
+
+## Peça orientação
+
+<Tip>Alterne para o modo Plan para explorar opções antes de construir. Pergunte ao Agent sobre bibliotecas, abordagens e trade-offs.</Tip>
+
+**Em vez de:** "Adicione pagamentos."
+
+**Tente:** "Quais são boas opções para aceitar pagamentos com cartão de crédito em um aplicativo web construído no Replit? Preciso de algo relativamente simples de integrar."
+
+## Itere nos seus prompts
+
+Seu primeiro prompt pode não ser perfeito — isso é normal. Se o resultado não estiver certo:
+
+* Adicione mais detalhes
+* Forneça um exemplo
+* Simplifique a instrução
+* Tente uma forma diferente de explicar
+
+**Inicial:** "Crie um cabeçalho para o meu site."
+
+**Refinado:** "Crie um componente de cabeçalho fixo com o logotipo do site à esquerda e links de navegação (Início, Sobre, Contato) à direita."
+
+## Resumo
+
+Um prompting eficaz se resume a:
+
+* **Planejar** antes de criar prompts
+* **Construir** incrementalmente com Checkpoints
+* **Ser específico** sobre os requisitos
+* **Fornecer contexto** por meio de exemplos e arquivos relevantes
+* **Iterar** quando os resultados não estiverem totalmente certos
+
+Domine esses princípios e você construirá aplicativos mais rapidamente com o Agent.

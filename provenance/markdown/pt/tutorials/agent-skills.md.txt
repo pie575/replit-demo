@@ -1,0 +1,195 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Como usar Agent Skills nos seus projetos
+
+> Aprenda como as Agent Skills expandem o que você pode construir com o Replit Agent — o que são, como aplicá-las e uma estrutura para obter melhores resultados.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+As Skills ensinam novas capacidades ao Agent. Elas permitem que você compartilhe sua expertise, padrões preferidos e conhecimento especializado com o Agent para que ele produza resultados melhores e mais consistentes.
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="Master Agent Skills: The game-changing framework for AI-assisted development" />
+
+## Por que as skills importam
+
+Toda vez que você constrói com o Agent, você cria contexto útil — como soluções para problemas, decisões de design ou preferências de frameworks. Mas esse contexto desaparece quando o chat termina. As Skills preservam isso.
+
+Uma skill de animação GSAP ensina o Agent a usar uma biblioteca específica corretamente. Uma skill de sistema de design garante que ele aplique suas cores e regras de espaçamento exatas. Uma skill de correção de bugs captura uma solução para que o Agent não repita o mesmo erro. Tarefas que antes eram inconsistentes tornam-se confiáveis.
+
+As Skills também são um [padrão aberto](https://agentskills.io/specification). Elas funcionam com qualquer agente, incluindo o Replit Agent, para que você possa utilizá-las entre diferentes ferramentas.
+
+## Início rápido: use uma skill no chat
+
+A maneira mais rápida de experimentar skills é anexar uma a uma mensagem:
+
+<Steps>
+  <Step title="Abra o seletor de skills">
+    Clique no botão **+** ao lado da entrada de chat e selecione **Usar uma skill**.
+  </Step>
+
+  <Step title="Navegue e selecione uma skill">
+    Navegue pelas skills por categoria — Negócios e finanças, Criativo, Pesquisa e análise, e mais. Selecione uma ou mais skills para anexar à sua mensagem.
+  </Step>
+
+  <Step title="Envie sua mensagem">
+    Digite sua solicitação e envie. O Agent usa a skill selecionada apenas para essa mensagem. O chip da skill aparece na sua mensagem para que você possa ver quais skills estão ativas.
+  </Step>
+</Steps>
+
+Por exemplo, selecione **Analisador de Ações** e peça ao Agent para construir um relatório de pesquisa de ações, ou escolha **Pesquisa Aprofundada** para que o Agent investigue um tópico complexo com descobertas estruturadas.
+
+<Tip>
+  Você não precisa instalar nada para usar skills do seletor de chat. Elas estão disponíveis instantaneamente em todos os projetos.
+</Tip>
+
+## Instale skills no seu projeto
+
+Quando você quer que o Agent aplique uma skill de forma consistente em todas as conversas de um projeto, instale-a. As skills instaladas ficam no diretório `/.agents/skills` do seu projeto e persistem entre as sessões de chat.
+
+### Descubra e instale pelo painel de Skills
+
+Abra o **painel de Skills** no Editor de Projetos e selecione a aba **Descobrir** para pesquisar skills contribuídas pela comunidade. Encontre uma skill que deseja, clique em **Instalar** e ela será adicionada ao seu projeto automaticamente.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/gerX13Tz1112Sdux/images/replitai/agent-skills-discover.png?fit=max&auto=format&n=gerX13Tz1112Sdux&q=85&s=25ed47eb8abea795f960b132c3e44b61" alt="Aba de descoberta de skills mostrando skills contribuídas pela comunidade com botões de instalação" width="2542" height="1850" data-path="images/replitai/agent-skills-discover.png" />
+</Frame>
+
+Por exemplo, ao construir um [site de portfólio](https://palmer.gg) com animações avançadas, você pode instalar:
+
+* **GSAP React** — Ensina o Agent animações acionadas por rolagem, revelações de texto e desenho de caminhos SVG
+* **Tailwind design system** — Fornece ao Agent conhecimento de padrões Tailwind CSS para tipografia, espaçamento e transições de visualização
+* **Find skills** — Ensina o Agent a descobrir e instalar novas skills em seu nome
+
+<Tip>
+  Você também pode instalar skills via [npx skills CLI](https://github.com/vercel-labs/skills):
+
+  ```bash theme={null}
+  npx skills <skill> -a replit
+  ```
+</Tip>
+
+### Crie skills por meio de conversas
+
+A maneira mais natural de criar uma skill é por meio de uma conversa com o Agent. Após resolver um problema juntos ou pesquisar uma nova biblioteca, peça ao Agent para capturar o que aprendeu:
+
+<AiPrompt>
+  Research best practices for GSAP React integration and create a skill for this project.
+</AiPrompt>
+
+O Agent usa todo o contexto da conversa para escrever um arquivo de skill detalhado. Isso funciona particularmente bem após sessões de depuração em que você construiu uma compreensão compartilhada de um problema.
+
+### Escreva skills personalizadas
+
+Para casos de uso avançados, escreva skills diretamente seguindo a [especificação de Agent Skills](https://agentskills.io/specification). Ative **Mostrar Arquivos Ocultos** na barra lateral de arquivos, abra `/.agents/skills/` e crie um novo arquivo Markdown. Isso lhe dá controle total sobre o que o Agent sabe e como ele se comporta.
+
+## Skills proativas vs. reativas
+
+Esta é uma estrutura para pensar sobre quando e como criar skills. Entender ambos os padrões torna você mais eficaz.
+
+### Skills proativas
+
+Skills proativas são aquelas que você adiciona *antes* de começar a construir. Você pesquisa as bibliotecas ou padrões que deseja usar, encontra ou cria skills para eles e, em seguida, começa a criar prompts.
+
+**Exemplo real:** Antes de construir um site de portfólio com animações SVG desenhadas à mão, você pesquisa bibliotecas de animação e encontra o GSAP. Você instala uma skill de GSAP React e, em seguida, pede ao Agent para construir as animações. O Agent tem o conhecimento especializado de que precisa desde o início — ele entende a API da biblioteca, as melhores práticas e os padrões comuns. Sem a skill, ele pode produzir algo genérico ou incorreto.
+
+Este padrão funciona bem quando:
+
+* Você está usando uma biblioteca popular, mas com padrões sutis que o Agent pode não dominar sozinho
+* Você quer escolhas de design consistentes em todo o projeto (tipografia, espaçamento, estilo de animação)
+* Você está iniciando um projeto e já conhece a direção técnica
+
+### Skills reativas
+
+Skills reativas são aquelas que você cria *após* resolver um problema. Você encontra um problema, depura com o Agent, corrige e, em seguida, captura a solução para que não aconteça novamente.
+
+**Exemplo real:** Ao construir um canvas para um aplicativo móvel, você percebe bordas irregulares nas imagens que pioram ao fazer zoom in. A depuração com o Agent revela que é aliasing de minificação — um problema de renderização em que as imagens ficam piores à medida que encolhem, de forma contraintuitiva. Após implementar uma correção, você pede ao Agent para criar uma skill:
+
+<AiPrompt>
+  Create a skill that captures what we just learned about fixing minification aliasing. Include the root cause, the solution, and when this issue typically occurs so you can prevent it in the future.
+</AiPrompt>
+
+O Agent usa o histórico da conversa para escrever uma skill específica do projeto. Na próxima vez que o problema surgir, você pode apontar o Agent para a skill em vez de depurar do zero.
+
+Este padrão funciona bem quando:
+
+* Você corrigiu um bug não óbvio e quer evitar que ele se repita
+* Você aprendeu algo sobre a arquitetura do seu aplicativo durante uma sessão de depuração
+* Você quer codificar uma solução que exigiu esforço significativo para descobrir
+
+## Seja seletivo com as skills
+
+Pense nas skills como as instruções que você daria a um amigo para encontrar seu apartamento. Uma lista direcionada de instruções funciona. Uma pasta cheia de documentação não funciona — ninguém tem tempo para ler tudo isso, e os detalhes importantes se perdem.
+
+O mesmo se aplica ao Agent. Se você adicionar muitas skills, o Agent pode se confundir. Seja criterioso sobre quais skills você ativa para um determinado projeto e remova as que não são mais necessárias.
+
+<Note>
+  As Skills funcionam melhor quando capturam padrões específicos e repetíveis, em vez de orientações gerais. Concentre-se em fluxos de trabalho concretos, convenções estabelecidas e soluções comprovadas.
+</Note>
+
+## Considerações de segurança
+
+As Skills do painel de Skills do Replit são auditadas para segurança. Mas as skills podem ser instaladas de qualquer lugar — elas vêm de um [repositório de código aberto](https://github.com/vercel-labs/skills) onde qualquer pessoa pode contribuir.
+
+Como as skills são instruções que o Agent segue, uma skill maliciosa poderia instruir o Agent a exfiltrar dados sensíveis do seu projeto. Antes de instalar qualquer skill de uma fonte externa:
+
+1. **Abra o arquivo** — Skills são apenas markdown. Leia o conteúdo em `/.agents/skills/` antes de usá-las.
+2. **Verifique a fonte** — Confirme que a skill vem de um repositório ou autor confiável.
+3. **Revise o que ela instrui** — Certifique-se de que a skill não referencia URLs externos suspeitos ou solicita informações sensíveis.
+
+<Warning>
+  Sempre revise skills de fontes externas antes de instalá-las. As skills no painel de Skills do Replit foram auditadas, mas skills instaladas via CLI ou copiadas da internet não foram.
+</Warning>
+
+## Skills vs. servidores MCP
+
+Estas são as duas principais formas de estender agentes em 2026, e elas servem a propósitos diferentes.
+
+**Skills** são eficientes em termos de contexto. Apenas uma breve descrição é carregada até que a skill seja invocada. Use skills para:
+
+* Fluxos de trabalho e convenções ("como fazer deploy", "checklist de revisão de código")
+* Materiais de referência (padrões de API, guias de estilo, sistemas de design)
+* Prompts reutilizáveis e conhecimento especializado (bibliotecas de animação, padrões de frameworks)
+
+**Servidores MCP** são pesados em contexto. Todas as descrições de ferramentas são carregadas antecipadamente, o que pode degradar a qualidade do resultado se você adicionar muitos. Use servidores MCP para:
+
+* Conexão com serviços externos (Notion, Linear, Figma)
+* Ações que precisam de acesso à API
+* Ferramentas que *fazem* coisas, não apenas instruem
+
+A distinção chave: as skills definem *como* seu agente deve trabalhar. Os servidores MCP definem *o que* seu agente pode acessar. Ambos funcionam para agentes de codificação como o Replit Agent e para agentes que você mesmo constrói com ferramentas como o [Claude Agent SDK](/pt/tutorials/claude-agent-sdk).
+
+## Próximos passos
+
+* Leia a [referência de Agent Skills](/pt/features/agent/skills) para detalhes técnicos sobre estrutura e gerenciamento de skills
+* Navegue pelas skills da comunidade em [skills.sh](https://skills.sh)
+* Revise a [especificação de Agent Skills](https://agentskills.io/specification) para escrever as suas próprias
+* Saiba mais sobre o [Agent](/pt/features/agent/overview) e como ele constrói aplicações
+* Explore os [servidores MCP no Replit](/pt/features/mcp/overview) para conectar o Agent a serviços externos

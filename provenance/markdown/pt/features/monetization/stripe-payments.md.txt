@@ -1,0 +1,268 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Integração Stripe Payments
+
+> Aprenda a adicionar pagamentos e assinaturas ao seu app com o Stripe usando o Agent.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Note>
+  A integração com o Stripe está disponível apenas em planos pagos ([Core](/pt/billing/plans/replit-core) e [Pro](/pt/billing/plans/replit-pro)). Ela não está disponível no plano gratuito [Starter](/pt/billing/plans/starter-plan) — o Agent solicita que você faça upgrade quando propõe o connector.
+</Note>
+
+## O que você pode construir
+
+Use o Agent para adicionar o Stripe ao seu app com um clique — sem necessidade de configuração. Construa uma loja, aceite pagamentos únicos ou crie assinaturas. O Agent configura a integração, os modelos de dados e o ambiente de teste.
+
+## Como funciona
+
+O Agent começa com um sandbox do Stripe para que você possa testar pagamentos com segurança sem movimentar dinheiro real. Você pode construir e testar fluxos imediatamente. Quando estiver pronto, mude para sua conta Stripe ao vivo para publicar e aceitar pagamentos reais.
+
+<Info>
+  Um sandbox do Stripe é um ambiente de teste isolado onde você pode simular
+  pagamentos, assinaturas e eventos. Saiba mais na
+  [documentação do Stripe sobre sandboxes](https://docs.stripe.com/sandboxes).
+</Info>
+
+## Use o Stripe com sua equipe
+
+O Stripe funciona em workspaces colaborativos, para que toda a sua equipe possa construir, testar e monetizar o mesmo app juntos. Todos no workspace podem trabalhar com a conta Stripe conectada, em vez de uma única pessoa construir os pagamentos sozinha.
+
+## Como começar
+
+* **Peça ao Agent para usar o Stripe**
+  * Use um comando de barra na tela inicial e selecione Stripe, ou peça diretamente:
+    <AiPrompt>Construa uma loja e integre o Stripe para pagamentos</AiPrompt>
+
+<Note>
+  A integração com o Stripe requer um App com funcionalidade de backend. Selecione **App** na página inicial para começar.
+</Note>
+
+## Teste pagamentos no sandbox
+
+1. Abra o **Preview** do seu app em uma nova aba.
+2. Faça uma compra de teste na sua loja ou página de pagamento.
+3. Use o cartão de teste padrão do Stripe:
+
+```text theme={null}
+Card number: 4242 4242 4242 4242
+Expiry: any future date
+CVC: any 3 digits
+Name, address: any mock values
+```
+
+<Tip>
+  As compras no sandbox não são processadas por redes reais e não movimentam dinheiro. Elas são
+  seguras para testar de ponta a ponta.
+</Tip>
+
+## Gerencie produtos e preços
+
+Você tem duas opções:
+
+1. No seu app, selecione **Publish** e escolha reivindicar seu sandbox do Stripe.
+   * Se você ainda não tiver uma conta Stripe, crie uma para reivindicar o sandbox.
+2. No Stripe Dashboard, abra **Products** para adicionar ou editar produtos e preços.
+   As alterações feitas no sandbox do Stripe são refletidas automaticamente no seu app Replit
+   e sincronizadas com o banco de dados do seu app.
+
+### Visualize os dados sincronizados do Stripe
+
+* No Project Editor, abra **Database**.
+* Selecione **MyData**.
+* Mude o seletor de schema para **Stripe** para ver objetos de pagamento e registros
+  relacionados.
+
+## Vá para produção
+
+Para aceitar pagamentos reais, conecte sua conta Stripe ao vivo instalando o app
+[Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments)
+a partir do Stripe Marketplace. O fluxo de instalação conecta sua conta ao vivo
+automaticamente — você não precisa copiar ou colar chaves de API.
+
+<Warning>
+  Sua integração em sandbox não está pronta para produção. Ela não pode aceitar pagamentos
+  reais até que você conclua as etapas abaixo.
+</Warning>
+
+<Steps>
+  <Step title="Abra o painel Publish">
+    No seu app, selecione **Publish** para iniciar o fluxo de conexão ao vivo.
+  </Step>
+
+  <Step title="Instale o app Replit Integrated Payments">
+    Selecione **Install Stripe app**. Uma janela do Stripe abre com a listagem do
+    [Replit Integrated Payments](https://marketplace.stripe.com/apps/replit-integrated-payments).
+
+    Quando o Stripe solicitar que você escolha uma conta, selecione sua conta Stripe
+    **ao vivo** — não uma conta sandbox ou de teste.
+  </Step>
+
+  <Step>
+    Siga as instruções do Stripe para instalar o app. Se sua conta ao vivo
+    ainda não estiver ativada, o Stripe primeiro guia você pela verificação KYB
+    (Know Your Business).
+
+    Mantenha a janela do Stripe aberta até que a instalação seja concluída.
+    O Replit finaliza a conexão de produção em segundo plano depois que o
+    Stripe confirma a instalação.
+  </Step>
+
+  <Step title="Publique seu app">
+    Volte ao Replit. O painel **Publish** mostra sua conta Stripe ao vivo
+    como conectada. Publique seu app para começar a aceitar pagamentos
+    reais.
+  </Step>
+</Steps>
+
+<Note>
+  Instalar o app Replit Integrated Payments substitui o fluxo manual antigo
+  de copiar as chaves Publishable e Secret para o Replit. O app configura
+  suas chaves de produção para você e mantém a sincronização entre o sandbox e a
+  conta ao vivo.
+</Note>
+
+## Gerencie a integração
+
+* Vá até **Integrations > Stripe** para abrir o connector do Stripe.
+* A partir daí, você pode testar a conexão, ver o status e gerenciar as configurações.
+
+## Perguntas frequentes
+
+### Como atualizo os preços dos meus produtos?
+
+* Peça ao Agent: descreva a mudança e o Agent atualiza seu app e os objetos do Stripe.
+* Use o Stripe Dashboard: abra **Products** para editar preços e detalhes dos produtos.
+  * No sandbox, as alterações são sincronizadas automaticamente de volta para o seu app e banco de dados.
+  * Para produção, mude primeiro para sua conta ao vivo e depois atualize os preços. Publique novamente se o seu app precisar captar a nova configuração.
+
+### Como testo transações no Replit?
+
+Abra o **Preview** do seu app em uma nova aba. Execute o fluxo do Stripe Checkout com o
+cartão de teste padrão (4242 4242 4242 4242), qualquer data de validade futura e qualquer CVC. Veja
+[Teste pagamentos no sandbox](#teste-pagamentos-no-sandbox) acima para mais detalhes.
+
+### O que é uma conta Stripe ao vivo?
+
+Uma conta Stripe ao vivo é uma conta ativada e verificada que pode processar pagamentos
+reais usando os dados da sua empresa. Veja as orientações do Stripe sobre criação e
+ativação de conta: [Create and manage your Stripe account](https://docs.stripe.com/get-started/account).
+
+### Ainda preciso colar minhas chaves de API do Stripe?
+
+Não. O app Replit Integrated Payments instala suas chaves de produção para você
+quando você conecta sua conta Stripe ao vivo. Você não precisa copiar chaves ao vivo
+do Stripe Dashboard.
+
+Se você conectou o Stripe anteriormente colando chaves ao vivo, essa conexão
+continua funcionando. Você pode mudar para o fluxo de instalação do app Stripe removendo
+a conexão do Stripe e reconectando a partir do painel **Publish**. Veja
+[Atualizar ou remover a conexão do Stripe](#atualizar-ou-remover-a-conexão-do-stripe)
+abaixo.
+
+## Atualizar ou remover a conexão do Stripe
+
+Se você não estiver pronto para publicar com uma conexão Stripe ao vivo, você tem duas
+opções:
+
+### Opção A: Remover a integração do Stripe manualmente
+
+Você pode remover completamente a integração do Stripe do seu projeto.
+
+<Steps>
+  <Step title="Abra a aba Integrations">
+    Navegue até seu app Replit e selecione a aba **Integrations** no topo. Em **Connectors**, encontre **Stripe** e selecione **Manage**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-1-integrations.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=6c13ffeb8b367ec950a48d264540f967" alt="Aba Integrations mostrando Connectors com a integração do Stripe e um botão Manage" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Expanda suas chaves de API">
+    Selecione o chevron para expandir suas **Sandbox API keys** e **Live account API keys**, depois selecione **Edit**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-2-edit-keys.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=60bbac9e871e84e28171ec9bfa22b28d" alt="Chaves de API do sandbox e da conta ao vivo do Stripe expandidas com botões Edit" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Desconecte sua conta">
+    Selecione **Disconnect account** para remover a conexão do Sandbox e **Disconnect live account** para remover a conexão Ao vivo.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-3-disconnect.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=576034d8d4380747c4f8c5ccdc41c652" alt="Chaves de API do sandbox e da conta ao vivo do Stripe com botões Disconnect account e Disconnect live account" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Peça ao Agent para remover o código do Stripe">
+    Vá até o chat do Agent e peça para remover o código do connector do Stripe da sua aplicação. Isso removerá toda a sua integração com o Stripe.
+  </Step>
+</Steps>
+
+### Opção B: Voltar a um checkpoint anterior à integração com o Stripe
+
+Se você quiser desfazer completamente a integração com o Stripe e voltar a um estado anterior, você pode voltar a um checkpoint anterior.
+
+<Steps>
+  <Step title="Abra a aba Integrations">
+    Navegue até seu app Replit e selecione a aba **Integrations** no topo. Em **Connectors**, encontre **Stripe** e selecione **Manage**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-1-integrations.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=6c13ffeb8b367ec950a48d264540f967" alt="Aba Integrations mostrando Connectors com a integração do Stripe e um botão Manage" width="2000" height="1110" data-path="images/replitai/stripe-disconnect-1-integrations.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Expanda suas chaves de API">
+    Selecione o chevron para expandir suas **Sandbox API keys** e **Live account API keys**, depois selecione **Edit**.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-2-edit-keys.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=60bbac9e871e84e28171ec9bfa22b28d" alt="Chaves de API do sandbox e da conta ao vivo do Stripe expandidas com botões Edit" width="2000" height="1274" data-path="images/replitai/stripe-disconnect-2-edit-keys.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Desconecte sua conta">
+    Selecione **Disconnect account** para remover a conexão do Sandbox e **Disconnect live account** para remover a conexão Ao vivo.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/B2FfFcjSO2_7EVcu/images/replitai/stripe-disconnect-3-disconnect.png?fit=max&auto=format&n=B2FfFcjSO2_7EVcu&q=85&s=576034d8d4380747c4f8c5ccdc41c652" alt="Chaves de API do sandbox e da conta ao vivo do Stripe com botões Disconnect account e Disconnect live account" width="2000" height="1271" data-path="images/replitai/stripe-disconnect-3-disconnect.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Encontre um checkpoint anterior à integração com o Stripe">
+    Vá até o chat do Agent e procure um checkpoint criado antes da integração com o Stripe. Selecione o **ícone de relógio** no canto superior esquerdo do painel de chat para ver o histórico de chat mais antigo.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/YElKpLz4AJkoRVnw/images/replitai/stripe-rollback-5-clock-icon.png?fit=max&auto=format&n=YElKpLz4AJkoRVnw&q=85&s=5a8e86892fea6061d3af970dd6499a32" alt="Ícone de relógio para visualizar o histórico de chat e os checkpoints" width="56" height="50" data-path="images/replitai/stripe-rollback-5-clock-icon.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Selecione Rollback here">
+    Depois de encontrar um checkpoint que pareça adequado, selecione **Rollback here** para restaurar seu projeto para esse estado.
+
+    <Frame>
+      <img src="https://mintcdn.com/replit/YElKpLz4AJkoRVnw/images/replitai/stripe-rollback-6-checkpoint.png?fit=max&auto=format&n=YElKpLz4AJkoRVnw&q=85&s=a48d19624a6740286ff9f004c302547d" alt="Checkpoint com o botão Rollback here" width="904" height="202" data-path="images/replitai/stripe-rollback-6-checkpoint.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Notas e limitações
+
+* A atividade no sandbox não afeta saldos ou clientes reais.
+* Alguns recursos do Stripe não podem ser testados em sandboxes (por exemplo, precificação IC+
+  e determinados fluxos do Connect). Veja
+  [as limitações do sandbox do Stripe](https://docs.stripe.com/sandboxes).

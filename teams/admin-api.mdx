@@ -1,0 +1,84 @@
+---
+title: "Admin API"
+description: "Use the Replit Enterprise Admin API to access account usage, workspaces, members, and projects programmatically."
+sidebarTitle: "Admin API"
+icon: "key"
+---
+
+<Note>
+  The Admin API is in **beta**. Available endpoints and behavior may change.
+</Note>
+
+The Admin API gives Enterprise account admins scope-based, programmatic access to account analytics and administration features. Use the API to build internal reporting, operational workflows, and integrations for your Enterprise account.
+
+## Who can access the Admin API
+
+The Admin API is available only to **account admins** on Enterprise accounts. Account admins can create and manage API keys. Workspace admins and other account members cannot access the Admin API or create its keys.
+
+To learn more about Enterprise admin roles, see [Account and Workspace Admins](/teams/identity-and-access-management/account-and-workspace-admins).
+
+## Create an API key
+
+<Steps>
+  <Step title="Open Developer settings">
+    Open **Settings**. Under **Account**, select **Developer**.
+  </Step>
+
+  <Step title="Create an API key">
+    Select **Create API key** and choose read-only or read and write access.
+  </Step>
+
+  <Step title="Store your key securely">
+    Copy the key, which begins with `rpl_`, and store it in a secure secret manager. Treat it like a password and never share it.
+  </Step>
+
+  <Step title="Authenticate your integration">
+    Send the key as a Bearer token with your API requests.
+  </Step>
+</Steps>
+
+## What you can do
+
+The Admin API uses scopes to control what each key can do. Its read scopes provide account data for reporting, while specific write scopes support actions such as updating budgets.
+
+* **Usage:** Read account usage and gross ledger cost, filtered or grouped by Workspace, member, project, or time period.
+* **Workspaces:** Read Workspace lists and details, including member and project counts, admins, and creation time.
+* **Members:** Read account and Workspace membership, filtered by role or searched by name, username, or email.
+* **Projects:** Read projects across Team Workspaces, filtered by visibility or deployment status, or searched by title, slug, or description.
+* **Budgets:** Read account budgets, and use the `write:budgets` scope to update them.
+
+API responses support cursor pagination and include rate-limit headers and an `X-Request-Id` for request tracking.
+
+## Build reports and workflows
+
+Use Admin API data wherever you already track operations, such as an internal dashboard, a Slack alert, or a monthly finance report. For example, group usage by Workspace to report spend for each Workspace.
+
+## Building with Replit Agent
+
+You can ask Replit Agent to build a custom dashboard with the Admin API. Describe the account data you want to track, such as usage by Workspace or costs by project, and Agent can build the dashboard and its API integration.
+
+<Steps>
+  <Step title="Open the skill picker">
+    In a Replit project, click the **+** button next to the chat input and select **Use a skill**.
+  </Step>
+
+  <Step title="Select the Admin API skill">
+    Under **Replit skills**, select **Admin API** to give Agent the API context and integration guidance.
+  </Step>
+
+  <Step title="Describe the dashboard">
+    Tell Agent what you want to track and how you want to view it. For example, ask Agent to build a dashboard that shows usage by Workspace and cost by project.
+  </Step>
+
+  <Step title="Add your API key securely">
+    When Agent needs to make API requests, add your Admin API key to your project's Secrets. Do not paste the key into chat or commit it to your project.
+  </Step>
+</Steps>
+
+## API reference
+
+For endpoint details, request parameters, and integration examples, see the [Admin API developer documentation](https://api.replit.com/docs).
+
+## Related documentation
+
+* [Workspace Settings](/features/collaboration/workspace-settings): Set Enterprise policy for the Agent models and model providers each Workspace can use.

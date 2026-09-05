@@ -1,0 +1,162 @@
+---
+title: "Créer une boutique en ligne"
+description: "Importez votre catalogue dans Shopify et concevez la vitrine dans Replit."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Donnez à l'Agent vos produits depuis une source que vous avez déjà : une feuille
+Google Sheets (nom, prix, description, code produit, stock) et des photos dans
+Google Drive. L'Agent configure la boutique Shopify, importe les produits, les
+prix, les descriptions et les images, et connecte le paiement et le checkout.
+Le design de la vitrine et le frontend vivent dans Replit, pas dans un thème
+Shopify. Les paiements passent par le checkout Shopify, vous n'avez donc pas
+besoin d'un connecteur Stripe séparé.
+
+## Idéal pour
+
+* Les fondateurs qui ont besoin d'une boutique à partir d'un catalogue déjà tenu dans Sheets et Drive.
+* Les designers produit qui ont besoin d'une vitrine Replit personnalisée avec Shopify comme backend commerce.
+
+## Connecteurs
+
+<Connectors
+  items={[
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "Liste de produits : noms, prix, descriptions, codes produit, stock",
+},
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "Photos de produits et ressources de marque",
+},
+{
+  id: "shopify",
+  name: "Shopify",
+  why: "Configuration de la boutique, import du catalogue, checkout et paiements",
+},
+]}
+/>
+
+## Avant de commencer
+
+Ayez une feuille avec une ligne par produit (nom, prix, description, code
+produit, stock) et un dossier Drive de photos nommées pour que l'Agent puisse
+les associer aux lignes. Connectez Sheets, Drive et Shopify. L'Agent peut
+provisionner Shopify depuis le chat si vous n'avez pas encore de boutique.
+Passez une commande test avant de partager la boutique.
+
+## Invite à l'Agent
+
+<AiPrompt>
+  À partir de cette source de produits \[feuille Google Sheets et dossier
+  Drive], configure une boutique Shopify complète : importe chaque produit
+  avec son nom, son prix, sa description et ses photos. Conçois et construis
+  le frontend de la vitrine dans cette application Replit (accueil,
+  collection, produit, panier). Utilise Shopify pour le catalogue, le panier,
+  le checkout et les paiements. N'utilise pas de thème Shopify pour les pages
+  destinées aux clients.
+</AiPrompt>
+
+## À quoi s'attendre
+
+L'Agent importe le catalogue dans Shopify, puis construit une vitrine Replit qui lit
+les produits depuis Shopify et envoie les clients vers le checkout Shopify.
+Vérifiez quelques produits par rapport à la feuille (prix, texte, image) et
+passez une commande test. Utilisez les paiements de test Shopify, confirmez
+que le total du panier correspond à la feuille, et vérifiez que le checkout
+reste sur Shopify.
+
+## Adaptez-le à vos besoins
+
+<AiPrompt>
+  Associe les photos Drive aux lignes de la feuille par nom de fichier
+  correspondant au code produit (CODE.jpg). Ignore toute ligne sans photo.
+</AiPrompt>
+
+<AiPrompt>
+  Ajoute des pages de collection à partir de la colonne catégorie de la
+  feuille, et une barre de recherche sur la vitrine Replit.
+</AiPrompt>
+
+## Dépannage
+
+* **Les photos ne correspondent pas aux produits :** nommez les fichiers Drive par code produit (`CODE.jpg`) et demandez à l'Agent d'ignorer toute ligne sans photo.
+* **Les prix ou le texte ne correspondent pas à la feuille :** confirmez une ligne par produit (nom, prix, description, code produit, stock) et vérifiez quelques articles après l'import.
+* **Le checkout n'est pas Shopify, ou la vitrine est un thème :** les pages destinées aux clients doivent vivre dans Replit. Les paiements passent par le checkout Shopify. Passez une commande test avant de partager la boutique.
+
+## Voir aussi
+
+<CardGroup cols={2}>
+  <Card title="Concevoir une page de destination" href="/fr/use-cases/design-landing-page">
+    Pour les fondateurs et designers produit qui ont d'abord besoin d'une page de liste d'attente.
+  </Card>
+
+  <Card title="Passer de Figma à une application en direct" href="/fr/use-cases/import-figma-design">
+    Pour les designers produit qui ont déjà la vitrine dans Figma.
+  </Card>
+</CardGroup>

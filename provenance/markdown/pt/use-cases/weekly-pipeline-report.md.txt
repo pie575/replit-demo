@@ -1,0 +1,147 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Gerar um relatório semanal de vendas
+
+> Mostre as mudanças e tendências do pipeline de vendas do HubSpot toda semana.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Puxe o pipeline de vendas desta semana do HubSpot, compare com a semana passada e escreva um
+relatório curto: novos negócios, movimentação de estágio, negócios atrasados e previsão.
+Coloque a tabela no Google Sheets e publique os destaques no Slack, para que o standup seja
+sobre mudança, não uma fotografia estática.
+
+## Ideal para
+
+* Gerentes de vendas que precisam de standups de segunda-feira com movimentação, não uma fotografia estática.
+* Líderes de operações de receita que precisam da variação semanal do pipeline em um só lugar.
+
+## Conectores
+
+<Connectors
+  items={[
+{ id: "hubspot", name: "HubSpot", why: "Negócios, estágios e valores" },
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "Tabela de tendências que você pode auditar",
+},
+{ id: "slack", name: "Slack", why: "Entregar o relatório" },
+]}
+/>
+
+<Note>Também funciona com Salesforce, Attio, Pipedrive ou outro CRM.</Note>
+
+## Antes de começar
+
+Conecte o HubSpot, o Sheets e o Slack. Diga qual pipeline ou equipe incluir.
+
+## Dê o prompt ao agente
+
+<AiPrompt>
+  Crie uma rotina que rode toda segunda-feira às 9h. Puxe o pipeline desta
+  semana do HubSpot. Escreva um relatório semanal mostrando as mudanças e
+  tendências do pipeline: novos negócios, movimentação de estágio, negócios
+  atrasados e previsão vs. semana passada. Coloque a tabela no Google Sheets e
+  publique os destaques no Slack.
+</AiPrompt>
+
+## O que esperar
+
+O Agent compara esta semana com a passada e escreve uma narrativa curta mais uma planilha.
+Confira alguns valores de negócios em relação ao HubSpot. Use os destaques do Slack no
+standup; guarde a planilha para a trilha de auditoria. Escolha um negócio novo e um
+atrasado, abra-os no HubSpot e confirme que estágio, valor e data de fechamento batem com a
+planilha.
+
+## Adapte ao seu caso
+
+<AiPrompt>
+  Destaque negócios acima de \$\[valor] que não se movem há 14 dias.
+</AiPrompt>
+
+<AiPrompt>
+  Adicione uma seção "em risco" usando data de fechamento e última atividade.
+</AiPrompt>
+
+## Solução de problemas
+
+* **Os valores de negócios não batem com o HubSpot:** diga qual pipeline ou equipe incluir, e qual campo de valor usar (valor vs. previsão ponderada). Confira alguns negócios em relação ao HubSpot antes de confiar na planilha.
+* **Os negócios atrasados parecem errados:** confirme as datas de fechamento e os estágios no HubSpot. Peça ao Agent para tratar um negócio como atrasado apenas quando a data de fechamento for adiada ou o estágio retroceder.
+* **O Slack publica no lugar errado:** informe o canal e se você quer apenas os destaques ou um link para a planilha completa.
+
+## Relacionados
+
+<CardGroup cols={2}>
+  <Card title="Monitorar concorrentes" href="/pt/use-cases/monitor-competitors">
+    Mesmos alertas no Slack para vendas antes que uma mudança de preço afete um negócio.
+  </Card>
+
+  <Card title="Criar um pitch deck para investidores" href="/pt/use-cases/pitch-deck-from-website">
+    Mesma fonte no Google Sheets para fundadores montando o slide financeiro dos investidores.
+  </Card>
+</CardGroup>

@@ -1,0 +1,394 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# SDK JavaScript pour App Storage
+
+> Découvrez comment utiliser le SDK JavaScript officiel pour gérer des fichiers dans Replit App Storage.
+
+Ce guide de référence explique la classe `Client` de la bibliothèque `object-storage` et fournit des exemples de code pour ses méthodes.
+
+## Client
+
+La classe `Client` gère les interactions avec Replit App Storage. Cette classe propose des méthodes pour effectuer des opérations sur des fichiers dans un bucket.
+
+Pour importer la classe depuis la bibliothèque, ajoutez la ligne suivante à votre code JavaScript :
+
+```javascript theme={null}
+import { Client } from "@replit/object-storage";
+```
+
+Utilisez le code suivant pour créer une instance `Client` qui interagit avec Replit Object Storage :
+
+```javascript theme={null}
+const client = new Client();
+```
+
+## Constructeurs
+
+**constructor**
+
+* **new Client**(`options?`): `Client`
+
+Crée une nouvelle instance de Client pour interagir avec Replit App Storage.
+
+**Paramètres**
+
+| Nom        | Type            | Description                                          |
+| :--------- | :-------------- | :--------------------------------------------------- |
+| `options?` | `ClientOptions` | Options de configuration pour initialiser le client. |
+
+**Retourne**
+
+`Client`
+
+## Méthodes
+
+### copy
+
+* **copy**(`objectName`, `destObjectName`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+Copie un objet dans le même bucket.
+Cette méthode écrase tout objet existant au chemin de destination.
+
+**Paramètres**
+
+| Nom              | Type     | Description                                   |
+| :--------------- | :------- | :-------------------------------------------- |
+| `objectName`     | `string` | Le chemin complet de l'objet à copier.        |
+| `destObjectName` | `string` | Le chemin complet vers lequel copier l'objet. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+***
+
+### delete
+
+* **delete**(`objectName`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+Supprime un objet du bucket.
+
+**Paramètres**
+
+| Nom          | Type            | Description                                     |
+| :----------- | :-------------- | :---------------------------------------------- |
+| `objectName` | `string`        | Le chemin complet de l'objet à supprimer.       |
+| `options?`   | `DeleteOptions` | Configurations pour l'opération de suppression. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+***
+
+### downloadAsBytes
+
+* **downloadAsBytes**(`objectName`, `options?`): `Promise`\<`Result`\<`Buffer`, `RequestError`>>
+
+Télécharge un objet et retourne son contenu brut sous forme de buffer.
+
+**Paramètres**
+
+| Nom          | Type              | Description                                        |
+| :----------- | :---------------- | :------------------------------------------------- |
+| `objectName` | `string`          | Le chemin complet de l'objet à télécharger.        |
+| `options?`   | `DownloadOptions` | Configurations pour l'opération de téléchargement. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`Buffer`, `RequestError`>>
+
+***
+
+### downloadAsStream
+
+* **downloadAsStream**(`objectName`, `options?`): `Readable`
+
+Crée un flux lisible du contenu de l'objet.
+Le flux émet toutes les erreurs rencontrées pendant le téléchargement.
+
+**Paramètres**
+
+| Nom          | Type              | Description                                        |
+| :----------- | :---------------- | :------------------------------------------------- |
+| `objectName` | `string`          | Le chemin complet de l'objet à télécharger.        |
+| `options?`   | `DownloadOptions` | Configurations pour l'opération de téléchargement. |
+
+**Retourne**
+
+`Readable`
+
+### downloadAsText
+
+* **downloadAsText**(`objectName`, `options?`): `Promise`\<`Result`\<`string`, `RequestError`>>
+
+Télécharge un objet et retourne son contenu sous forme de chaîne de caractères.
+
+**Paramètres**
+
+| Nom          | Type              | Description                                        |
+| :----------- | :---------------- | :------------------------------------------------- |
+| `objectName` | `string`          | Le chemin complet de l'objet à télécharger.        |
+| `options?`   | `DownloadOptions` | Configurations pour l'opération de téléchargement. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`string`, `RequestError`>>
+
+### downloadToFilename
+
+* **downloadToFilename**(`objectName`, `destFilename`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+Télécharge un objet et l'enregistre à l'emplacement spécifié sur le système de fichiers local.
+
+**Paramètres**
+
+| Nom            | Type              | Description                                                              |
+| :------------- | :---------------- | :----------------------------------------------------------------------- |
+| `objectName`   | `string`          | Le chemin complet de l'objet à télécharger.                              |
+| `destFilename` | `string`          | Le chemin sur le système de fichiers local où écrire l'objet téléchargé. |
+| `options?`     | `DownloadOptions` | Configurations pour l'opération de téléchargement.                       |
+
+**Retourne**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### exists
+
+* **exists**(`objectName`): `Promise`\<`Result`\<`boolean`, `RequestError`>>
+
+Vérifie si un objet existe dans le bucket.
+
+**Paramètres**
+
+| Nom          | Type     | Description                              |
+| :----------- | :------- | :--------------------------------------- |
+| `objectName` | `string` | Le chemin complet de l'objet à vérifier. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`boolean`, `RequestError`>>
+
+### getBucket
+
+* **getBucket**(): `Promise`\<`Bucket`>
+
+**Retourne**
+
+`Promise`\<`Bucket`>
+
+### init
+
+* **init**(`bucketId?`): `Promise`\<`Bucket`>
+
+**Paramètres**
+
+| Nom         | Type     |
+| :---------- | :------- |
+| `bucketId?` | `string` |
+
+**Retourne**
+
+`Promise`\<`Bucket`>
+
+### list
+
+* **list**(`options?`): `Promise`\<`Result`\<`StorageObject`\[], `RequestError`>>
+
+Retourne une liste de tous les objets dans le bucket.
+
+**Paramètres**
+
+| Nom        | Type          | Description                                 |
+| :--------- | :------------ | :------------------------------------------ |
+| `options?` | `ListOptions` | Configurations pour l'opération de listage. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`StorageObject`\[], `RequestError`>>
+
+### mapUploadOptions
+
+* **mapUploadOptions**(`options?`): `undefined` | `UploadOptions`
+
+**Paramètres**
+
+| Nom        | Type            |
+| :--------- | :-------------- |
+| `options?` | `UploadOptions` |
+
+**Retourne**
+
+`undefined` | `UploadOptions`
+
+### uploadFromBytes
+
+* **uploadFromBytes**(`objectName`, `contents`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+Téléverse un objet en utilisant sa représentation en octets en mémoire.
+Cette méthode écrase tout objet existant portant le même nom.
+
+**Paramètres**
+
+| Nom          | Type            | Description                                       |
+| :----------- | :-------------- | :------------------------------------------------ |
+| `objectName` | `string`        | Le chemin de destination complet de l'objet.      |
+| `contents`   | `Buffer`        | Le contenu brut de l'objet sous forme d'octets.   |
+| `options?`   | `UploadOptions` | Configurations pour l'opération de téléversement. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### uploadFromFilename
+
+* **uploadFromFilename**(`objectName`, `srcFilename`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+Téléverse un fichier depuis le système de fichiers local vers le bucket.
+Cette méthode écrase tout objet existant portant le même nom.
+
+**Paramètres**
+
+| Nom           | Type            | Description                                                         |
+| :------------ | :-------------- | :------------------------------------------------------------------ |
+| `objectName`  | `string`        | Le chemin de destination complet de l'objet.                        |
+| `srcFilename` | `string`        | Le chemin du fichier sur le système de fichiers local à téléverser. |
+| `options?`    | `UploadOptions` | Configurations pour l'opération de téléversement.                   |
+
+**Retourne**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+### uploadFromStream
+
+* **uploadFromStream**(`objectName`, `stream`, `options?`): `Promise`\<`void`>
+
+Téléverse un objet en lisant son contenu depuis le flux fourni.
+Le flux émet toutes les erreurs rencontrées pendant le téléversement. Cette méthode écrase tout objet existant portant le même nom.
+
+**Paramètres**
+
+| Nom          | Type            | Description                                               |
+| :----------- | :-------------- | :-------------------------------------------------------- |
+| `objectName` | `string`        | Le chemin de destination complet de l'objet.              |
+| `stream`     | `Readable`      | Un flux lisible depuis lequel lire le contenu de l'objet. |
+| `options?`   | `UploadOptions` | Configurations pour l'opération de téléversement.         |
+
+**Retourne**
+
+`Promise`\<`void`>
+
+### uploadFromText
+
+* **uploadFromText**(`objectName`, `contents`, `options?`): `Promise`\<`Result`\<`null`, `RequestError`>>
+
+Téléverse un objet en utilisant sa représentation textuelle en mémoire.
+Cette méthode écrase tout objet existant portant le même nom.
+
+**Paramètres**
+
+| Nom          | Type            | Description                                       |
+| :----------- | :-------------- | :------------------------------------------------ |
+| `objectName` | `string`        | Le chemin de destination complet de l'objet.      |
+| `contents`   | `string`        | Le contenu de l'objet sous forme de texte.        |
+| `options?`   | `UploadOptions` | Configurations pour l'opération de téléversement. |
+
+**Retourne**
+
+`Promise`\<`Result`\<`null`, `RequestError`>>
+
+## Exemples de méthodes
+
+Les sections suivantes fournissent des exemples de code pour gérer vos fichiers en utilisant le SDK Replit Object Storage.
+
+### Récupérer un objet en texte
+
+```javascript theme={null}
+const { ok, value: textValue, error } = await client.downloadAsText('file.json');
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Récupérer un objet sous sa représentation en octets bruts
+
+```javascript theme={null}
+const { ok, value: bytesValue, error } = await client.downloadAsBytes('file.png');
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Récupérer un objet depuis un flux
+
+```javascript theme={null}
+const { ok, value: stream, error } = await client.downloadAsStream('file.json');
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Télécharger un objet vers le système de fichiers
+
+```javascript theme={null}
+const { ok, error } = await client.downloadToFilename('file.json', destFilename);
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Lister les objets dans le bucket
+
+```javascript theme={null}
+const { ok, value, error } = await client.list();
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Téléverser un objet depuis du texte
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromText('file.json', data);
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Téléverser un objet en octets
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromBytes('file.png', data);
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Téléverser un objet depuis le système de fichiers
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromFilename('file.json', srcFilename);
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Téléverser un objet depuis un flux
+
+```javascript theme={null}
+const { ok, error } = await client.uploadFromStream('file.json', stream);
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```
+
+### Supprimer un objet du bucket
+
+```javascript theme={null}
+const { ok, error } = await client.delete('file.json');
+if (!ok) {
+    // ... gérer l'erreur ...
+}
+```

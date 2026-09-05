@@ -1,0 +1,70 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Configurer Google OAuth
+
+> Configurez Google comme fournisseur de connexion sociale pour l'authentification de votre application
+
+Ce guide vous explique comment créer une application OAuth Google dans la Google Cloud Console. Vous collecterez un **Client ID** et un **Client Secret**, et configurerez les origines JavaScript et les URI de redirection requis par Clerk.
+
+<Note>
+  Cette page couvre uniquement la configuration côté fournisseur dans la Google Cloud Console. Pour le flux Clerk Auth complet — y compris l'activation de Google et la saisie des identifiants dans le **volet Auth** — consultez [Configuring OAuth credentials for an SSO provider](/fr/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) dans la documentation Clerk Auth.
+</Note>
+
+## Prérequis
+
+* Accès à la [Google Cloud Console](https://console.cloud.google.com/)
+* Une [application Replit publiée](/fr/category/replit-deployments) — les identifiants OAuth personnalisés ne sont disponibles que dans l'environnement **Production**
+* Le panneau de modification du fournisseur **Google** ouvert dans : **volet Auth** → onglet **Configure** → section **SSO providers** → sélectionnez l'environnement **Production** → sélectionnez **Edit** à côté de **Google**
+
+## Étape 1 : Créer une application OAuth Google
+
+Accédez à la [Google Cloud Console](https://console.cloud.google.com/) :
+
+### Créer ou sélectionner un projet
+
+1. Sélectionnez un projet existant ou créez-en un nouveau depuis le sélecteur de projets
+2. Vous serez redirigé vers le tableau de bord de votre projet
+
+### Configurer l'écran de consentement OAuth
+
+1. Dans la barre latérale gauche, sélectionnez l'icône de menu (≡) puis **APIs & Services**
+2. Sélectionnez **OAuth consent screen**
+3. Configurez l'écran de consentement de votre application avec les informations requises
+4. Sauvegardez vos modifications
+
+### Créer les identifiants OAuth
+
+1. Depuis **APIs & Services**, sélectionnez **Credentials**
+2. Sélectionnez **Create Credentials** en haut, puis **OAuth client ID**
+3. Choisissez **Web application** comme type d'application
+4. Définissez **Authorized JavaScript origins** et **Authorized redirect URIs** sur les valeurs exactes affichées sous **Provider setup** dans le **volet Auth**. Ajoutez chaque valeur listée — votre domaine publié et tout domaine personnalisé sont tous deux inclus. Consultez [Configuring OAuth credentials for an SSO provider](/fr/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider) pour savoir comment les trouver.
+5. Sélectionnez **Create**
+6. Sauvegardez votre **Client ID** et votre **Client Secret**
+
+<Warning>
+  Conservez votre Client Secret en lieu sûr et ne le committez jamais dans un système de contrôle de version.
+</Warning>
+
+<Warning>
+  La connexion Google ne fonctionne pas dans les navigateurs intégrés ou les webviews in-app. Les utilisateurs doivent utiliser un navigateur web standard.
+</Warning>
+
+## Dépannage
+
+### Incompatibilité d'URI de redirection
+
+* Vérifiez que l'URI de redirection dans la Google Cloud Console correspond exactement à la valeur affichée sous **Provider setup** dans le **volet Auth**
+* Assurez-vous de l'absence de barres obliques finales ou de fautes de frappe
+* Attendez quelques minutes pour la propagation de la configuration de Google
+
+### Client invalide
+
+* Vérifiez que le Client ID et le Client Secret sont copiés correctement
+* Assurez-vous de l'absence d'espaces supplémentaires
+* Vérifiez que l'écran de consentement OAuth est configuré
+
+### Ne fonctionne pas sur un domaine personnalisé
+
+* Ajoutez les entrées de domaine personnalisé affichées sous **Provider setup** dans le **volet Auth** à la fois aux Authorized JavaScript origins et aux Authorized redirect URIs

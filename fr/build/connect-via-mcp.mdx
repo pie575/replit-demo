@@ -1,0 +1,155 @@
+---
+title: "Connecter via MCP"
+description: "Connectez Replit Agent à des outils externes, des sources de données et des API via le Model Context Protocol (MCP) — connectez-vous à un serveur pré-listé ou ajoutez un serveur personnalisé."
+---
+
+export const McpLinkGenerator = () => {
+  const getLink = () => {
+    if (typeof document === 'undefined') return 'https://replit.com/integrations?mcp=';
+    const displayName = document.getElementById('mcp-display-name')?.value || 'My MCP Server';
+    const baseUrl = document.getElementById('mcp-base-url')?.value || 'https://example.com/mcp';
+    const payload = {
+      displayName,
+      baseUrl
+    };
+    const jsonString = JSON.stringify(payload);
+    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+    return `https://replit.com/integrations?mcp=${encoded}`;
+  };
+  const updateOutputs = () => {
+    if (typeof document === 'undefined') return;
+    const link = getLink();
+    const badgeUrl = 'https://replit.com/badge?caption=Add%20to%20Replit';
+    const badgeMarkdown = `[![Add to Replit](${badgeUrl})](${link})`;
+    const linkEl = document.getElementById('mcp-link-output');
+    const badgeMarkdownEl = document.getElementById('mcp-badge-markdown');
+    if (linkEl) linkEl.textContent = link;
+    if (badgeMarkdownEl) badgeMarkdownEl.textContent = badgeMarkdown;
+  };
+  const handleBadgeClick = e => {
+    e.preventDefault();
+    window.open(getLink(), '_blank');
+  };
+  return <div className="space-y-4">
+      <div>
+        <label htmlFor="mcp-display-name" className="block text-sm font-medium mb-1">Display name</label>
+        <input type="text" id="mcp-display-name" placeholder="My MCP Server" onInput={updateOutputs} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+      </div>
+      <div>
+        <label htmlFor="mcp-base-url" className="block text-sm font-medium mb-1">Base URL</label>
+        <input type="text" id="mcp-base-url" placeholder="https://example.com/mcp" onInput={updateOutputs} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Install link</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="mcp-link-output">https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6Ik15IE1DUCBTZXJ2ZXIiLCJiYXNlVXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9tY3AifQ==</code>
+        </pre>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Badge preview</label>
+        <Frame>
+          <a href="#" onClick={handleBadgeClick} style={{
+    cursor: 'pointer'
+  }}>
+            <img src="https://replit.com/badge?caption=Add%20to%20Replit" alt="Add to Replit badge" noZoom />
+          </a>
+        </Frame>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Badge markdown</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="mcp-badge-markdown">[![Add to Replit](https://replit.com/badge?caption=Add%20to%20Replit)](https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6Ik15IE1DUCBTZXJ2ZXIiLCJiYXNlVXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9tY3AifQ==)</code>
+        </pre>
+      </div>
+    </div>;
+};
+
+Replit Agent peut se connecter à des centaines d'outils externes et de sources de données via le [Model Context Protocol (MCP)](https://modelcontextprotocol.io) — un standard ouvert pour les intégrations d'outils IA. Connectez-vous à un serveur pré-listé ou ajoutez n'importe quel serveur MCP personnalisé en lequel vous avez confiance.
+
+## Connecter un serveur MCP pré-listé
+
+Replit propose une liste organisée de serveurs MCP pour les services populaires comme Stripe, Linear, Notion, Sentry, et plus encore. La connexion se fait en un seul clic de connexion.
+
+<Frame>
+  <img src="/assets/mirror/mcp-servers-pane-8e1f431ca33c.png" alt="Volet des paramètres des Serveurs MCP pour Replit Agent listant les serveurs pré-listés incluant Stripe, Linear, Notion, Sentry, Atlassian, Miro, PostHog, Amplitude, Mixpanel, Granola et Razorpay — chacun avec un bouton Se connecter" width="3452" height="1988" data-path="images/replitai/mcp-servers-pane.png" />
+</Frame>
+
+<Steps>
+  <Step title="Ouvrir le volet Intégrations">
+    Allez sur [replit.com/integrations](https://replit.com/integrations) et faites défiler jusqu'aux **Serveurs MCP pour Replit Agent**.
+  </Step>
+
+  <Step title="Choisir un serveur">
+    Trouvez le service que vous souhaitez connecter — Stripe, Linear, Notion, Sentry, Atlassian, Miro, PostHog, Amplitude, Mixpanel, Granola, Razorpay, et d'autres.
+  </Step>
+
+  <Step title="Se connecter">
+    Cliquez sur **Se connecter** à côté du serveur. Vous serez guidé à travers le flux OAuth avec ce service. Une fois connecté, le statut de connexion du serveur se met à jour et Agent peut utiliser ses outils.
+  </Step>
+</Steps>
+
+Pour le catalogue complet, consultez la [référence des Serveurs MCP](/fr/features/mcp/overview).
+
+## Ajouter un serveur MCP personnalisé
+
+Si le serveur que vous souhaitez n'est pas dans le catalogue pré-listé, ajoutez-le par URL.
+
+<Frame>
+  <img src="/assets/mirror/mcp-connect-dialog-5b8f9b0d828e.png" alt="Boîte de dialogue Connecter un serveur MCP affichant le champ Nom d'affichage, le champ URL du serveur MCP, et une section Paramètres avancés extensible" width="3452" height="1988" data-path="images/replitai/mcp-connect-dialog.png" />
+</Frame>
+
+<Steps>
+  <Step title="Ouvrir la boîte de dialogue d'ajout de serveur">
+    Dans le volet des paramètres des Serveurs MCP, cliquez sur **+ Ajouter un serveur MCP**.
+  </Step>
+
+  <Step title="Définir un nom d'affichage">
+    Fournissez un nom reconnaissable — Agent l'utilise pour référencer le serveur dans les journaux de chat.
+  </Step>
+
+  <Step title="Entrer l'URL du serveur">
+    Collez le point de terminaison HTTPS du serveur MCP. Ouvrez les **Paramètres avancés** pour ajouter des en-têtes personnalisés (par ex. `X-API-Key`) si le serveur nécessite une authentification.
+  </Step>
+
+  <Step title="Tester et enregistrer">
+    Cliquez sur **Tester et enregistrer**. Replit tente de se connecter et vous guide à travers tout flux OAuth requis par le serveur. Une fois enregistrée, la connexion apparaît sous Serveurs MCP avec son statut.
+  </Step>
+</Steps>
+
+<Warning>
+  Connectez-vous uniquement aux serveurs MCP en lesquels vous avez confiance. Un serveur connecté peut fournir des outils et des données à Agent — examinez la source avant d'ajouter un point de terminaison inconnu.
+</Warning>
+
+## Utiliser les outils MCP dans Agent
+
+Après la connexion d'un serveur, Agent récupère automatiquement sa liste d'outils et rend les capacités disponibles dans tous vos projets. Pour utiliser un serveur, mentionnez-le simplement dans le chat :
+
+> Utilise le serveur MCP Notion pour trouver les notes de réunion les plus récentes.
+
+<Frame>
+  <img src="/assets/mirror/tool-call-7a53f51a11ae.png" alt="Agent appelant les outils d'un serveur MCP personnalisé dans le chat" width="571" height="817" data-path="images/replitai/custom-mcp/tool-call.png" />
+</Frame>
+
+Agent choisit les bons outils du serveur en fonction de votre demande. Si un outil nécessite une confirmation, vous verrez une invite avant qu'il s'exécute.
+
+## Partager un lien d'installation
+
+Les liens d'installation permettent à n'importe qui d'ajouter votre serveur MCP à Replit en un seul clic — utile pour la documentation, les READMEs, ou partout où vous souhaitez promouvoir votre intégration.
+
+Utilisez le formulaire ci-dessous pour générer un lien d'installation et un badge cliquable pour votre serveur :
+
+<McpLinkGenerator />
+
+Pour le format du lien, consultez la [référence du lien d'installation](/fr/features/mcp/overview#share-your-own-install-link).
+
+## Prochaines étapes
+
+<CardGroup cols={2}>
+  <Card title="Model Context Protocol" icon="server" href="/fr/learn/model-context-protocol">
+    Comprenez ce qu'est MCP, comment il fonctionne et les capacités qu'il offre pour l'IA.
+  </Card>
+
+  <Card title="Liste MCP" icon="folder-tree" href="/fr/features/mcp/overview">
+    Parcourez la liste organisée de serveurs MCP avec des boutons d'installation en un clic.
+  </Card>
+</CardGroup>

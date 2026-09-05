@@ -1,0 +1,177 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Agent skills
+
+> Understand when and how to use Agent Skills — proactive vs reactive patterns, being selective, security, and how skills differ from MCP servers.
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Skills teach Agent new capabilities. They let you share your expertise, preferred patterns, and specialized knowledge with Agent so it produces better, more consistent results.
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="Master Agent Skills: The game-changing framework for AI-assisted development" />
+
+## Why skills matter
+
+Every time you build with Agent, you create useful context: solutions to problems, design decisions, framework preferences. But that context disappears when the chat ends. Skills preserve it.
+
+A GSAP animation skill teaches Agent how to use a specific library correctly. A design system skill ensures it applies your exact colors and spacing rules. A bug fix skill captures a solution so Agent doesn't repeat the same mistake. Tasks that were previously inconsistent become reliable.
+
+Skills are also an [open standard](https://agentskills.io/specification). They work with any agent, including Replit Agent, so you can carry them between tools.
+
+## Proactive vs. reactive skills
+
+A framework for thinking about when and how to create skills. Understanding both patterns makes you more effective.
+
+### Proactive skills
+
+Proactive skills are ones you add *before* you start building. Research the libraries or patterns you want to use, find or create skills for them, then start prompting.
+
+**Example:** Before building a portfolio site with handwritten SVG animations, research animation libraries and find GSAP. Install a GSAP React skill, then prompt Agent to build the animations. Agent has the specialized knowledge it needs from the start — it understands the library's API, best practices, and common patterns. Without the skill, it might produce something generic or incorrect.
+
+This pattern works well when:
+
+* You're using a library that's popular but has nuanced patterns Agent may not nail on its own
+* You want consistent design choices across the project (typography, spacing, animation style)
+* You're starting a project and already know the technical direction
+
+### Reactive skills
+
+Reactive skills are ones you create *after* solving a problem. You encounter an issue, debug it with Agent, fix it, and then capture the solution so it doesn't happen again.
+
+**Example:** While building a canvas for a mobile app, you notice jagged edges on images that get worse when zooming in. Debugging with Agent reveals this is minification aliasing — a rendering issue where images look worse as they shrink, counterintuitively. After implementing a fix, ask Agent to create a skill:
+
+<AiPrompt>
+  Create a skill that captures what we just learned about fixing minification aliasing. Include the root cause, the solution, and when this issue typically occurs so you can prevent it in the future.
+</AiPrompt>
+
+Agent uses the conversation history to write a project-specific skill. Next time the issue comes up, you can point Agent to the skill instead of debugging from scratch.
+
+This pattern works well when:
+
+* You've fixed a non-obvious bug and want to prevent it from recurring
+* You've learned something about your app's architecture during a debugging session
+* You want to encode a solution that took significant effort to discover
+
+## Being selective with skills
+
+Think of skills like directions you'd give a friend to find your apartment. A targeted list of instructions works. A binder full of documentation doesn't — nobody has time to read that, and the important details get lost.
+
+The same applies to Agent. If you add too many skills, Agent can get confused. Be deliberate about which skills you enable for a given project, and remove ones you no longer need.
+
+<Note>
+  Skills work best when they capture specific, repeatable patterns rather than general guidance. Focus on concrete workflows, established conventions, and proven solutions.
+</Note>
+
+## Authoring skills well
+
+Skills can be complex and intricate. A few principles keep them effective:
+
+* **Describe the happy path.** Tell Agent how to do the thing right. If you catch yourself listing what *not* to do, that is usually a sign you should reframe the whole approach.
+* **Use scripts wherever you can.** A deterministic script takes the thinking off Agent's plate and is more reliable than asking it to reason through the same steps every time.
+* **Link out.** Structure a skill so it points to other Markdown files, and Agent pulls in only the ones it needs for the task in front of it.
+* **Benchmark regularly.** That is how you confirm a skill actually works, instead of assuming it does.
+* **Write them yourself.** The goal is concise, deliberate context, and you get there by hand-writing skills rather than generating them wholesale. Agent can help you draft one, but refine it yourself so every line earns its place.
+* **Keep them bespoke.** Do not build generic skills for code cleanliness or security — those already ship with Agent. Your skills should capture the things specific to you or your organization.
+
+Most skills fail in diagnosable ways:
+
+* **A skill fires when it should not.** The description is too broad. Narrow it, and say when *not* to use it — "not for blog posts or help docs" is often more useful than any positive instruction.
+* **A skill fires but the output is off.** The instructions are too generic. Replace vague guidance like "make it professional" with specific rules: exact names, concrete requirements, explicit things to avoid.
+* **Two skills conflict.** Fix the descriptions so both do not fire on the same task. Conflicts are almost always a scoping problem, not an instructions problem.
+
+Skills go stale, so treat them like documentation you actually maintain.
+
+## Taking skills workspace-wide
+
+Everything so far applies to skills in a single project. On a team, you can also customize Agent for your entire workspace, so everyone starts from the same conventions without re-explaining them in every project. Workspace customization has two parts:
+
+* **Custom instructions** — always-on rules injected into Agent's context on every project and every message, before anyone types a prompt. Reserve these for the few rules that are truly universal, such as "never store credentials in plain text." Because they load on every turn, every word spends part of Agent's context budget — keep them short.
+* **Workspace skills** — the same skills described above, made available to everyone in the workspace and managed centrally. They stay nearly free until a relevant task invokes them, so you can offer many without degrading output.
+
+A simple way to decide what goes where: if a rule should hold no matter what anyone is building, it is a custom instruction; if it only matters for a certain kind of task, it is a skill.
+
+For how to set up custom instructions and workspace skills, and who can manage them, see [Agent Customization](/features/agent/agent-customization).
+
+## Security considerations
+
+Skills from the Replit Skills pane are audited for safety. But skills can be installed from anywhere — they come from an [open source repository](https://github.com/vercel-labs/skills) where anyone can contribute.
+
+Since skills are instructions that Agent follows, a malicious skill could tell Agent to exfiltrate sensitive data from your project. Before installing any skill from an external source:
+
+1. **Open the file.** Skills are just markdown. Read the contents in `/.agents/skills/` before using them.
+2. **Check the source.** Verify the skill comes from a trusted repository or author.
+3. **Review what it instructs.** Make sure the skill doesn't reference suspicious external URLs or request sensitive information.
+
+<Warning>
+  Always review skills from external sources before installing them. Skills in the Replit Skills pane have been audited, but skills installed via CLI or copied from the internet have not.
+</Warning>
+
+## Skills vs. MCP servers
+
+Skills and MCP servers are the two main ways to extend agents, and they serve different purposes.
+
+**Skills** are context-efficient. Only a brief description loads until the skill is invoked. Use skills for:
+
+* Workflows and conventions ("how to publish," "code review checklist")
+* Reference materials (API patterns, style guides, design systems)
+* Reusable prompts and specialized knowledge (animation libraries, framework patterns)
+
+**MCP servers** are context-heavy. All tool descriptions load upfront, which can degrade output quality if you add too many. Use MCP servers for:
+
+* Connecting to external services (Notion, Linear, Figma)
+* Actions that need API access
+* Tools that *do* things, not just instruct
+
+The key distinction: skills define *how* your agent should work. MCP servers define *what* your agent can access. Both work for coding agents like Replit Agent and for agents you build yourself.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Agent Customization" icon="sliders" href="/features/agent/agent-customization">
+    Set up workspace-wide custom instructions and skills for your whole team.
+  </Card>
+
+  <Card title="Use a skill" icon="puzzle-piece" href="/build/use-agent-skills">
+    Attach a skill to a message, install one in your project, or start a new project from one.
+  </Card>
+
+  <Card title="Agent Skills reference" icon="book" href="/features/agent/skills">
+    Technical details on skill structure and how skills work under the hood.
+  </Card>
+
+  <Card title="MCP servers on Replit" icon="server" href="/features/mcp/overview">
+    Connect Agent to external services and tools via the Model Context Protocol.
+  </Card>
+
+  <Card title="Effective prompting" icon="wand-magic-sparkles" href="/learn/effective-prompting">
+    Write clearer instructions so Agent gets you closer on the first try.
+  </Card>
+</CardGroup>

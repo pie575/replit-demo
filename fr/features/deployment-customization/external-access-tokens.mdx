@@ -1,0 +1,219 @@
+---
+title: "Jetons d'accès externes"
+description: "Permettez aux pipelines CI, aux webhooks et aux autres services automatisés d'accéder à votre application Replit privée sans se connecter."
+---
+
+Les jetons d'accès externes sont des jetons porteurs que vous créez pour une Application Replit spécifique.
+Ils permettent aux services automatisés — pipelines CI, webhooks, vérificateurs d'état, bots Slack, scripts internes — d'accéder à l'application même lorsque son URL est verrouillée par
+[une URL de développement privée](/fr/features/publishing/private-deployments)
+ou par un [Déploiement privé](/fr/features/publishing/private-deployments).
+
+Traitez chaque jeton comme un mot de passe : toute personne qui le possède peut accéder à votre application jusqu'à l'expiration ou la révocation du jeton.
+
+<Note>
+  Les jetons d'accès externes sont disponibles lorsque vous sélectionnez l'accès privé pour un
+  déploiement. Aucune activation par l'espace de travail n'est nécessaire. Dans un espace de
+  travail Enterprise, seuls les administrateurs de l'espace de travail peuvent gérer les jetons.
+</Note>
+
+## Quand utiliser un jeton
+
+Utilisez un jeton d'accès externe lorsqu'un service *extérieur* à votre navigateur doit appeler votre Application Replit privée. Cas courants :
+
+* Un workflow GitHub Actions qui exécute un test de fumée sur votre URL de développement à chaque commit.
+* Un moniteur de disponibilité (Better Stack, Pingdom, UptimeRobot) qui interroge un endpoint de santé sur votre application publiée.
+* Un récepteur de webhook — Stripe, Slack, GitHub — effectuant une requête POST vers un déploiement privé.
+* Un appel `curl` ou `fetch` depuis la machine d'un coéquipier lors du débogage.
+
+Les jetons d'accès externes sont conçus pour le **trafic API**, pas pour ouvrir des pages d'interface utilisateur dans un navigateur. Les applications monopage (Vite, Next.js, etc.) chargent des bundles JavaScript dans des requêtes ultérieures qui ne transmettront pas votre jeton, donc ces requêtes échoueront. Pour la navigation interactive, connectez-vous normalement.
+
+## Environnements des jetons
+
+Chaque jeton est lié à un environnement :
+
+| Environnement | Où il fonctionne                                                                  | Utilisation                                                   |
+| :------------ | :-------------------------------------------------------------------------------- | :------------------------------------------------------------ |
+| `Development` | L'URL de développement de l'espace de travail de l'application (`*.replit.dev`)   | Accès à un Repl en cours d'exécution pendant le développement |
+| `Production`  | Le déploiement publié de l'application (`*.replit.app` et domaines personnalisés) | Accès à un déploiement privé depuis des services externes     |
+
+Un jeton `Production` survit à une republication, y compris la publication d'une nouvelle
+version. Replit le révoque lorsque vous :
+
+* Dépubliez le déploiement.
+* Supprimez le déploiement.
+* Changez l'accès de l'application de privé à public.
+
+Un jeton cesse également de fonctionner lorsqu'il expire ou que vous le révoquez.
+
+## Créer un jeton d'accès externe
+
+<Steps>
+  <Step>
+    Ouvrez l'application que vous souhaitez exposer, puis ouvrez l'outil **Publication**.
+  </Step>
+
+  <Step>
+    Sélectionnez **Ajuster les paramètres** pour développer les options de redéploiement.
+  </Step>
+
+  <Step>
+    Dans la section **Sécurité**, trouvez **Jetons d'accès externes**.
+  </Step>
+
+  <Step>
+    Sélectionnez **Créer un jeton d'accès** et remplissez :
+
+    * **Libellé** (optionnel) : un nom court pour reconnaître le jeton ultérieurement,
+      tel que `CI` ou `webhook Stripe`. Maximum 120 caractères.
+    * **Environnement** : choisissez `Development` ou `Production` selon l'endroit où
+      le service appelant doit accéder à l'application.
+    * **Expire après** : choisissez une durée de vie — `1 heure`, `24 heures`, `7 jours`,
+      `30 jours`, `3 mois`, `1 an` ou `5 ans`. Choisissez la durée la plus courte
+      adaptée à l'usage. Il n'y a pas d'option « n'expire jamais ».
+  </Step>
+
+  <Step>
+    Sélectionnez **Créer**.
+  </Step>
+</Steps>
+
+Replit affiche le jeton **une seule fois**. Copiez-le maintenant — une fois la boîte de dialogue fermée,
+il n'est plus possible de voir le jeton. Si vous le perdez, révoquez ce jeton et créez-en un nouveau.
+
+L'écran de révélation propose deux actions de copie :
+
+* **Copier le paramètre de requête** — copie `?project-protection-bypass=<jeton>` pour
+  l'ajouter à une URL. Pratique pour des vérifications rapides avec `curl`.
+* **Copier le jeton uniquement** — copie le jeton brut, adapté à l'envoi dans un
+  en-tête `Authorization: Bearer`.
+
+<Info>
+  La création de votre premier jeton active automatiquement l'accès externe pour l'application, si
+  ce n'était pas déjà le cas. Sans protection, le jeton n'a rien à contourner.
+</Info>
+
+## Utiliser un jeton
+
+Présentez le jeton de l'une des deux façons suivantes :
+
+### En-tête Authorization (recommandé)
+
+```bash theme={null}
+curl -H "Authorization: Bearer <jeton>" https://your-app.replit.app/health
+```
+
+C'est le bon choix pour presque tout — webhooks, scripts CI,
+appels backend à backend. Le jeton n'apparaît jamais dans les journaux capturant les URL
+et n'atterrit jamais dans l'historique de votre navigateur.
+
+### Paramètre de requête
+
+```bash theme={null}
+curl "https://your-app.replit.app/health?project-protection-bypass=<jeton>"
+```
+
+Utilisez la forme de paramètre de requête uniquement lorsque vous ne pouvez pas définir des en-têtes — par exemple, un
+service qui ne prend qu'une URL. Les URL avec jetons se retrouvent souvent dans les journaux proxy,
+l'historique du shell et les captures d'écran, préférez donc la forme d'en-tête autant que possible.
+
+## Gérer les jetons existants
+
+La section **Jetons d'accès externes** liste tous les jetons que vous avez créés pour
+l'application — du plus récent au plus ancien — avec leur libellé, environnement, date de création,
+expiration et statut de révocation. Les derniers caractères du jeton sont affichés
+sur chaque ligne pour vous aider à distinguer les jetons, car la valeur complète n'est affichée qu'à la création.
+
+Vous ne voyez que les jetons *que vous avez* créés. Les jetons des autres collaborateurs leur sont privés,
+même si vous êtes propriétaire de l'application.
+
+## Révoquer un jeton
+
+Révoquez un jeton dès qu'il n'est plus nécessaire, ou dès que vous suspectez qu'il
+a pu être compromis. Pour révoquer :
+
+<Steps>
+  <Step>
+    Ouvrez la section **Jetons d'accès externes** dans les paramètres de publication de l'application.
+  </Step>
+
+  <Step>
+    Trouvez le jeton dans la liste et sélectionnez l'icône de corbeille.
+  </Step>
+
+  <Step>
+    Confirmez la révocation.
+  </Step>
+</Steps>
+
+La révocation est **immédiate et irréversible**. Tout trafic utilisant encore le
+jeton commence à être rejeté en quelques secondes. Si vous avez besoin d'un accès à nouveau, créez un nouveau jeton.
+
+Vous ne pouvez révoquer que les jetons que vous avez créés vous-même. La suppression d'un collaborateur de
+l'espace de travail révoque automatiquement les jetons qu'il a créés pour cette application.
+
+## Protéger vos jetons
+
+Les jetons d'accès externes sont des identifiants. Traitez-les avec le même soin que vous
+donneriez à une clé API ou à un mot de passe.
+
+### À faire
+
+* **Stockez les jetons dans un gestionnaire de secrets** — les secrets GitHub Actions, le coffre de votre
+  fournisseur CI, le stockage secret de votre fournisseur cloud, ou un gestionnaire de mots de passe.
+  Ne les committez jamais dans un dépôt.
+* **Utilisez des durées de vie courtes** lorsque vous le pouvez. Un jeton de 7 jours pour une
+  intégration ponctuelle est plus sûr qu'un jeton de 5 ans laissé traîner.
+* **Étiquetez chaque jeton** afin que vous sachiez à quoi il sert et s'il est
+  toujours utilisé. Les jetons sans libellé sont les premiers à fuiter et les derniers à être révoqués.
+* **Créez un jeton séparé par consommateur.** Un jeton par tâche CI, un par
+  source de webhook, un par vérification de disponibilité. Lorsqu'un est compromis — ou
+  qu'un fournisseur n'est plus nécessaire — vous révoquez uniquement celui-là.
+* **Préférez l'en-tête `Authorization`** aux paramètres de requête afin que le jeton
+  ne fuie pas dans les journaux d'URL, l'historique du navigateur ou les en-têtes referrer.
+* **Révoquez immédiatement** si un jeton a pu être exposé — un journal divulgué, un
+  commit dans un dépôt public, un partage d'écran, l'ordinateur portable d'un ancien employé.
+  La révocation prend effet immédiatement ; créez un remplacement ensuite.
+
+### À ne pas faire
+
+* **Ne partagez pas un jeton entre coéquipiers ou services.** Si deux systèmes partagent
+  un jeton, vous ne pouvez pas en révoquer un sans casser l'autre.
+* **Ne collez pas de jetons dans les chats, e-mails, captures d'écran ou suivi des problèmes.**
+  Ces canaux sont archivés, indexés et partagés de façons que vous ne pouvez pas prévoir.
+* **N'intégrez pas de jetons dans du code côté client** — applications web, applications mobiles,
+  binaires de bureau. Tout ce qui est livré sur l'appareil d'un utilisateur doit être considéré comme public.
+* **Ne comptez pas sur les jetons pour les sessions de navigateur.** Les jetons fonctionnent pour les appels API,
+  pas pour charger des SPA dans un onglet de navigateur. Utilisez une connexion Replit normale pour cela.
+* **Ne choisissez pas une expiration de 5 ans par défaut.** Adaptez la durée de vie à la durée pendant laquelle
+  le consommateur a réellement besoin d'accès.
+
+## Dépannage
+
+<Accordion title="Mon jeton de production a soudainement cessé de fonctionner">
+  Les jetons de production restent valides lors des republications normales. Vérifiez si le
+  jeton a expiré ou si vous l'avez révoqué. Vérifiez également si vous avez dépublié ou
+  supprimé le déploiement, ou changé l'application de privé à public. Si l'application n'a
+  plus de déploiement privé, publiez-la en privé. Créez ensuite un nouveau jeton. Vous ne
+  pouvez pas réactiver un jeton expiré ou révoqué.
+</Accordion>
+
+<Accordion title="Mon jeton fonctionne pour `curl` mais mon navigateur affiche toujours la page de connexion">
+  Les jetons d'accès externes sont destinés au trafic API, pas aux sessions de navigateur.
+  Lorsqu'une application monopage se charge dans un navigateur, la requête HTML initiale
+  peut transmettre le jeton via le paramètre de requête, mais les requêtes ultérieures pour
+  les bundles JavaScript, CSS et les appels API ne l'incluront pas et seront
+  rejetées. Pour naviguer dans l'application de façon interactive, connectez-vous à Replit normalement.
+</Accordion>
+
+<Accordion title="J'ai perdu le jeton — puis-je le voir à nouveau ?">
+  Non. Replit n'affiche le jeton qu'une seule fois, au moment de la création. La vue liste affiche
+  les métadonnées (libellé, environnement, expiration, derniers caractères) mais jamais la
+  valeur complète du jeton. Si vous l'avez perdu, révoquez ce jeton et créez-en un nouveau.
+</Accordion>
+
+## Étapes suivantes
+
+* [Déploiements privés](/fr/features/publishing/private-deployments) :
+  la fonctionnalité de contrôle d'accès sous-jacente que ces jetons contournent.
+* [Gestion des accès aux Applications Replit](/fr/teams/identity-and-access-management/repl-access-management) :
+  gérez quels utilisateurs Replit peuvent se connecter à vos applications privées.

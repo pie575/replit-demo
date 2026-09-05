@@ -1,0 +1,59 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Custom domains and DNS
+
+> Answers to common custom domain questions—connecting a domain, troubleshooting SSL and verification, and configuring Clerk authentication.
+
+These answers cover connecting and troubleshooting custom domains. For full reference, see [Add a custom domain](/build/add-custom-domain) and [Custom domains](/features/publishing/custom-domains).
+
+<AccordionGroup>
+  <Accordion title="How do I connect a custom domain to my Replit app?">
+    If you bought your domain through Replit, the DNS records are managed for you—open **Publishing → Domains** and follow the in-product setup. See [Domain purchasing](/build/domain-purchasing).
+
+    To connect a domain from an external registrar:
+
+    1. Open your project and go to **Publishing → Domains**.
+    2. Select **Connect your own domain**, enter your domain, and continue.
+    3. Replit shows an A record and a TXT record—copy both.
+    4. Add both records at your DNS provider.
+    5. Return to Replit and start verification.
+
+    A few important notes:
+
+    * Both an A record and a TXT record are required for SSL. Apex (root) CNAMEs aren't supported—use an A record for your root domain.
+    * Wildcard certificates (`*.example.com`) aren't supported; connect each subdomain individually.
+    * On Cloudflare, set your A record to **DNS only** (the grey cloud) so proxy mode doesn't block SSL setup.
+    * DNS changes can take up to 48 hours to propagate.
+
+    See [Custom domains](/features/publishing/custom-domains) for the full reference.
+  </Accordion>
+
+  <Accordion title="My domain isn't verifying or SSL isn't provisioning—how do I troubleshoot?">
+    Work through these checks in order—most issues come from one of them:
+
+    1. **Wait for DNS to propagate.** Changes can take up to 48 hours. Confirm your records are visible globally with a DNS lookup tool.
+    2. **Remove AAAA records.** IPv6 (AAAA) records on the same hostname as your A record can block SSL.
+    3. **Remove old or conflicting A records.** Keep only one A record at your root domain pointing to Replit.
+    4. **Set Cloudflare to DNS only.** The orange cloud (proxy mode) interferes with SSL provisioning.
+    5. **Disconnect and reconnect the domain** in **Publishing → Domains → Manage** to force a fresh certificate, then wait a few minutes and reload.
+    6. **Check CAA records.** If you have CAA records, at least one must allow Let's Encrypt as an issuer, since Replit issues certificates through it.
+
+    These checks apply to externally registered domains. If you bought your domain through Replit, [contact Replit Support](https://replit.com/support). See [Custom domains](/features/publishing/custom-domains).
+  </Accordion>
+
+  <Accordion title="How do I set up Clerk authentication on a custom domain?">
+    A few issues commonly come up when using [Clerk authentication](/features/auth-and-identity/clerk-auth) on a custom domain:
+
+    * **"Clerk CNAME records required" warning.** This is a Clerk integration requirement and doesn't block your domain's verification or SSL. Open **Publishing → Domains**, select **Manage**, find the authentication DNS setup section, and add each listed CNAME record exactly at your DNS provider. If the section doesn't appear, disconnect and reconnect the domain.
+    * **Domain stuck on Verifying after prior Clerk use.** If the domain was attached to a different Clerk application, remove it there in your [Clerk dashboard](https://dashboard.clerk.com), then disconnect and reconnect the domain in Replit.
+    * **Migrating to your own Clerk instance.** Switching from Replit-managed Clerk to your own instance requires a manual step—[contact Replit Support](https://replit.com/support). See [Can I bring my own Clerk app?](/features/auth-and-identity/clerk-auth#can-i-bring-my-own-clerk-app-instead-of-using-the-replit-managed-one)
+
+    If you're still stuck, [contact Replit Support](https://replit.com/support) with your domain name, your project name, and what you've already tried.
+  </Accordion>
+</AccordionGroup>
+
+## Still need help?
+
+If your domain question isn't answered here, [contact Replit Support](https://replit.com/support).

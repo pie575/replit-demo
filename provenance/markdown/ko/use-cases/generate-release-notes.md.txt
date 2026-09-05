@@ -1,0 +1,142 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 릴리스 노트 생성하기
+
+> 매주 GitHub와 Linear의 변경 사항을 사람들이 실제로 읽을 수 있는 릴리스 노트로 바꾸세요.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+매주 GitHub와 Linear에서 변경 사항을 가져와 New, Improved, Fixed로 그룹화한
+고객용 릴리스 노트를 생성하고 Notion에 게시하세요. 내부용 작업은 건너뛰고 브레이킹
+체인지로 보이는 항목은 표시해서, 프로덕트, 지원, 고객이 정기적인 주기로 하나의
+이야기를 공유하도록 하세요.
+
+## 적합한 대상
+
+* 버전 태그를 기다리지 않고 주간 체인지로그가 필요한 프로덕트 매니저
+* 고객과 동일한 내용을 알아야 하는 프로덕트 마케팅 및 지원팀
+
+## 커넥터
+
+<Connectors
+  items={[
+{ id: "github", name: "GitHub", why: "병합된 풀 리퀘스트와 태그" },
+{ id: "linear", name: "Linear", why: "이슈와 고객용 제목" },
+{ id: "notion", name: "Notion", why: "게시된 노트" },
+]}
+/>
+
+## 시작하기 전에
+
+Agent에게 저장소와 Linear 팀을 알려주세요. 게시된 페이지를 위해 Notion을 연결하세요.
+주간 실행이 어느 요일에 이루어져야 하는지 말해주세요.
+
+## Agent에게 요청하기
+
+<AiPrompt>
+  매주 월요일 9시에 실행되는 루틴을 만들어 주세요. GitHub와 Linear에서 지난주
+  변경 사항을 가져와 New, Improved, Fixed로 그룹화한 고객용 릴리스 노트를
+  생성하고 Notion에 게시해 주세요. 내부용 작업은 건너뛰어 주세요. 브레이킹
+  체인지로 보이는 항목은 표시해 주세요.
+</AiPrompt>
+
+## 예상되는 결과
+
+Agent는 풀 리퀘스트와 이슈를 바탕으로 지난주 노트 초안을 작성한 다음 Notion 페이지를
+작성합니다. 고객에게 보내기 전에 톤을 수정하세요. 내부용 작업으로 보이는 항목은
+건너뛰고, 브레이킹 체인지는 맨 위에 배치하세요. 게시하기 전에 지난주 병합된 풀
+리퀘스트와 페이지를 비교하세요.
+
+## 나에게 맞게 조정하기
+
+<AiPrompt>
+  두 가지 버전을 작성해 주세요: 하나는 고객용, 하나는 내부 체인지로그용입니다.
+  같은 Notion 페이지에 유지해 주세요.
+</AiPrompt>
+
+<AiPrompt>
+  Notion 페이지 링크와 3가지 하이라이트를 담은 Slack 게시물을 #ship에 추가해
+  주세요.
+</AiPrompt>
+
+## 문제 해결
+
+* **릴리스 노트에 내부용 작업이 나타남:** Agent에게 올바른 저장소와 Linear 팀을 알려주고, 고객에게 배포되지 않는 작업은 건너뛰도록 다시 요청하세요.
+* **브레이킹 체인지가 묻힘:** 무엇이 "브레이킹"인지(로그인, 결제, 필수 마이그레이션 등) Agent에게 알려주고, 해당 항목을 표시해서 맨 위에 배치하도록 요청하세요.
+* **Notion 페이지가 잘못됨:** 정확한 페이지 또는 데이터베이스 링크를 제공하고, 지난주 노트를 덮어쓸지 매번 새 페이지를 만들지 알려주세요.
+
+## 관련 문서
+
+<CardGroup cols={2}>
+  <Card title="후보자 소싱하기" href="/ko/use-cases/source-candidates">
+    출시가 아니라 채용을 위한 동일한 GitHub 커넥터입니다.
+  </Card>
+
+  <Card title="고객 피드백 분석하기" href="/ko/use-cases/analyze-customer-feedback">
+    Notion에서 티켓도 함께 검토하는 프로덕트 매니저를 위한 문서입니다.
+  </Card>
+</CardGroup>

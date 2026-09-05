@@ -1,0 +1,127 @@
+---
+title: "Add login"
+description: "Let each Velocity customer sign in to see their own bookings and saved cars."
+sidebarTitle: "Add login"
+icon: "user-lock"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+By the end, each Velocity customer will sign in and see only their own bookings and saved cars.
+
+<Frame>
+  <img src="/assets/mirror/home-signed-in-f795a14fee54.png" alt="Velocity home screen after sign-in showing the customer name in the top-right header, the My bookings section with one upcoming reservation, and the saved-cars row underneath" width="100%" data-path="images/velocity/add-login/home-signed-in.png" />
+</Frame>
+
+You saw Velocity on [Welcome to Replit](/welcome) — a premium supercar rental app. Right now anyone visiting the public URL can see every reservation. No one books a Lamborghini anonymously. Add sign-in and each customer gets their own bookings and saved cars.
+
+## Tell Agent to add sign-in
+
+For Velocity, use Clerk. Replit's Clerk integration gives your app its own branded sign-in screen, customer accounts that exist inside Velocity (not Replit accounts), and full control over the look and feel — fitting for a premium rental brand. Agent provisions everything automatically, so there is no Clerk dashboard signup and no keys to paste.
+
+<AiPrompt>
+  Add sign-in to Velocity so each customer has their own bookings and saved
+  cars.
+
+  <br />
+
+  Use Clerk Auth.
+
+  <br />
+
+  Keep the car-browsing pages public so visitors can still explore the fleet
+  without an account.
+
+  <br />
+
+  Require sign-in before someone can reserve a car or save one to their
+  favorites.
+
+  <br />
+
+  After sign-in, show the customer's name in the header and a "My bookings"
+  section with only their reservations.
+
+  <br />
+
+  Add a sign-out button.
+
+  <br />
+
+  Give me a test checklist using two different customers.
+</AiPrompt>
+
+Agent will provision a Clerk tenant for Velocity, add the sign-in components, gate the booking flow behind it, attach each reservation to the signed-in customer, and add sign-out. Watch the build in the Agent chat.
+
+<Frame>
+  <img src="/assets/mirror/auth-modal-65f82eb6fafb.png" width="100%" data-path="images/velocity/add-login/auth-modal.png" />
+</Frame>
+
+## Test it with two customers
+
+One account isn't enough — you need two so you can prove bookings stay separate.
+
+1. Open Velocity in Preview and browse cars without signing in. The fleet should still be visible.
+2. Click Reserve on a car. You should land on the Clerk sign-in screen.
+3. Sign up with your own email and complete a reservation (e.g. a weekend booking on a 911).
+4. Sign out. The "My bookings" section should disappear and the booking flow should ask for sign-in again.
+5. Open Preview in an incognito window and sign up with a different email. Reserve a different car.
+6. Switch back to your first window, sign in, and confirm you still see your own reservation — not the second customer's.
+
+If both customers see the same reservations, the bookings aren't yet attached to the signed-in person. Tell Agent the exact symptom:
+
+<AiPrompt>
+  Both customers can see each other's reservations in Velocity.
+
+  <br />
+
+  Attach each booking and each saved car to the signed-in customer so each
+  person only sees their own.
+
+  <br />
+
+  Show me how to verify it with two test accounts.
+</AiPrompt>
+
+## Publish and sign in on the public URL
+
+Publish Velocity again from the Agent chat or the Publishing tile, then open the public URL in a new tab and sign in. Clerk is provisioned with separate Development and Production environments — Agent wires the Production credentials into the published app automatically, so sign-in works on the public URL out of the box.
+
+Velocity now has real customers. Each one signs in to a personal garage of bookings — nobody else sees them.
+
+## Improve it next
+
+<CardGroup cols={2}>
+  <Card title="Add a database" icon="database" href="/build/add-database">
+    Make cars, availability, and reservations persist between sessions.
+  </Card>
+
+  <Card title="Add payments" icon="credit-card" href="/build/add-payments">
+    Take a refundable deposit when a customer reserves a car.
+  </Card>
+</CardGroup>
+
+## Need further help?
+
+* **The whole app is hidden:** ask Agent to keep car browsing public and protect only the booking and account pages.
+* **Customers see each other's reservations:** ask Agent to attach each booking and saved car to the signed-in customer.
+* **Sign-in works in Preview but not after publishing:** open the public URL in a new tab and tell Agent the exact error you see. Make sure Agent provisioned the Production Clerk environment.
+* **You want a faster zero-config sign-in for prototypes:** Replit Auth uses your customers' Replit accounts with no Clerk tenant to manage — see [Replit Auth](/features/auth-and-identity/authentication).
+
+## Related
+
+* [Clerk Auth](/features/auth-and-identity/clerk-auth)
+* [Replit Auth](/features/auth-and-identity/authentication)

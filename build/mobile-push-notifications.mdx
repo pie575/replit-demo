@@ -1,0 +1,89 @@
+---
+title: "Send push notifications"
+description: "Notify players about new games and friend activity in PixelGames."
+sidebarTitle: "Send notifications"
+icon: "bell"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pushNotificationPrompt = "Notify a player when a friend beats their high score in PixelGames.";
+
+<AiPrompt>
+  {pushNotificationPrompt}
+</AiPrompt>
+
+<Frame caption="A PixelGames notification arriving on the lock screen.">
+  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="A PixelGames push notification appearing on the phone's lock screen" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
+</Frame>
+
+Android can test this right away in Expo Go. iOS needs the app
+[uploaded and installed from TestFlight](/build/mobile-testflight)
+first, Apple requires the app to be registered with them before it can receive any
+notification, even for testing.
+
+<Steps>
+  <Step title="Ask permission">
+    iOS and Android both prompt once before the first notification. Decline means silence
+    until the player re-enables it from Settings.
+  </Step>
+
+  <Step title="Register the device">
+    Agent registers a push token for the signed-in player, so PixelGames knows which device to
+    notify.
+  </Step>
+
+  <Step title="Send it">
+    A notification fires when a friend beats that player's high score.
+  </Step>
+</Steps>
+
+## Test it
+
+1. Grant notification permission when prompted, PixelGames can't send anything until this is
+   accepted, and the prompt only appears once.
+2. Trigger the real condition, like beating a friend's high score from a second account,
+   rather than only asking Agent for a one-off test notification. This confirms the whole
+   path works: the score save, the check for who to notify, and the send, not just that
+   permission was granted.
+3. Confirm it arrives on the lock screen, then tap it and confirm it opens PixelGames. Tapping
+   checks that the notification actually routes back into the app, not just that it displays.
+
+Do this on a real phone, notifications never reach a simulator. See
+[test with Expo Go](/build/mobile-preview-testing) for setup.
+
+## Troubleshooting
+
+* **Notification never arrives on iOS:** confirm you're testing from
+  [TestFlight](/build/mobile-testflight), Expo Go can't receive pushes on iOS.
+* **Player granted permission but gets nothing:** check the token was actually saved against
+  their account, a common gap when sign-in and notification setup happen separately.
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Add haptics" icon="wave-square" href="/build/mobile-haptics">
+    Pair a notification with a haptic tap.
+  </Card>
+
+  <Card title="Store images in your mobile app" icon="image" href="/build/mobile-store-images">
+    Save profile photos to App Storage.
+  </Card>
+</CardGroup>
+
+## Related
+
+* [Submit to the App Store](/build/mobile-publish-ios)

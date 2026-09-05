@@ -1,0 +1,149 @@
+---
+title: "Replit MCP Server"
+description: "Use Replit from ChatGPT, Claude, Slack, or any MCP client to create, update, and publish Replit Apps."
+sidebarTitle: "Replit MCP server"
+icon: "server"
+---
+
+Replit MCP uses the [Model Context Protocol](https://modelcontextprotocol.io/) to let you create, find, inspect, update, and publish Replit Apps from AI tools you already use.
+
+## Use Replit in ChatGPT, Claude, or Slack
+
+Replit connects natively to ChatGPT, Claude, and Slack. Pick your platform to connect Replit and start building. For prerequisites, plan availability, and troubleshooting, see [Replit in ChatGPT](/features/platforms/chatgpt) and [Replit in Claude](/features/platforms/claude).
+
+<CardGroup cols={3}>
+  <Card title="ChatGPT" icon="/assets/mirror/openai-7cbe4c2eddf6.svg" href="https://chatgpt.com/plugins/plugin_asdk_app_6934801c799081918131791660f02890" width="24" height="24" data-path="images/icons/openai.svg">
+    Open Replit in ChatGPT, connect your account, and start building from a conversation.
+  </Card>
+
+  <Card title="Claude" icon="/assets/mirror/claude-c9811f468bc4.svg" href="https://claude.com/connectors/replit" width="24" height="24" data-path="images/icons/claude.svg">
+    Open the Replit connector in Claude, connect your account, and start building.
+  </Card>
+
+  <Card title="Slack" icon="/assets/mirror/slack-aa5f43de3890.svg" href="/features/platforms/slack" width="24" height="24" data-path="images/icons/slack.svg">
+    Add Replit to your workspace, then ask Slackbot to build a working prototype from your idea.
+  </Card>
+</CardGroup>
+
+## Connect an MCP client directly
+
+Use the direct connection when your MCP client does not have a Replit native integration.
+
+| Property           | Value                                    |
+| ------------------ | ---------------------------------------- |
+| **URL**            | `https://replit-mcp.com/server/mcp`      |
+| **Transport**      | Streamable HTTP                          |
+| **Authentication** | OAuth using protected-resource discovery |
+
+Add the server URL to an MCP client that supports Streamable HTTP and OAuth authorization. The client reads Replit's protected-resource metadata. Then it prompts you to sign in to Replit.
+
+Do not create a custom OAuth server. The Replit MCP Server provides the OAuth metadata that your client needs.
+
+You can create apps or work with apps that you can edit, including apps shared with you.
+
+### Set up Replit MCP
+
+Codex and Claude Code are examples. You can add Replit MCP to any compatible MCP client.
+
+<Tabs>
+  <Tab title="Codex">
+    <Steps>
+      <Step title="Open the MCP list">
+        In Codex, open **Settings** → **Plugins** → **MCPs**.
+      </Step>
+
+      <Step title="Add Replit">
+        Add a custom MCP. Use a descriptive name such as `Replit`. Select **Streamable HTTP**. Enter `https://replit-mcp.com/server/mcp` and save. Do not add a bearer token or custom headers.
+
+        <Frame>
+          <img src="/assets/mirror/codex-add-replit-mcp-51365d598c24.png" alt="Codex custom MCP form with Replit, Streamable HTTP, the Replit endpoint, and empty bearer token and header fields" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Authenticate Replit">
+        In the MCP list, enable **Replit** and select **Authenticate**. Choose the Replit workspace to connect. Then select **Allow**.
+
+        <Frame>
+          <img src="/assets/mirror/codex-authenticate-replit-mcp-38e837424d0f.png" alt="Codex MCP list with Replit enabled and an Authenticate button" width="2000" height="1293" data-path="images/replitai/custom-mcp/codex-authenticate-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="/assets/mirror/codex-authorize-replit-workspace-b41e707504ae.png" alt="Replit authorization dialog with generic account and workspace placeholders, including workspace choices and an Allow button" width="1588" height="991" data-path="images/replitai/custom-mcp/codex-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Use Replit in Codex">
+        Ask Codex to create, inspect, or update a Replit project. For example, ask: "List my recently updated Replit projects."
+
+        <Frame>
+          <img src="/assets/mirror/codex-list-replit-projects-bebae6a1dbab.png" alt="Codex response listing three recently updated Replit projects" width="2000" height="951" data-path="images/replitai/custom-mcp/codex-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Claude Code">
+    <Steps>
+      <Step title="Add Replit">
+        In a terminal, add the server with HTTP transport.
+
+        ```bash theme={null}
+        claude mcp add replit https://replit-mcp.com/server/mcp --transport http
+        ```
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-add-replit-mcp-12b99cb7ce30.png" alt="Claude Code terminal after adding Replit MCP with the HTTP server command and a generic local configuration path" width="2000" height="1097" data-path="images/replitai/custom-mcp/claude-code-add-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Select Replit">
+        Start or restart Claude Code. Run `/mcp`, then select `replit`.
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-select-local-replit-mcp-dd30b45c949b.png" alt="Claude Code MCP list with the local replit server selected and marked needs authentication" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-select-local-replit-mcp.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Authenticate Replit">
+        For the local `replit` server, select **Authenticate**. Complete Replit sign-in, choose the workspace to connect, and select **Allow**.
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-authenticate-local-replit-mcp-b67f7c27231f.png" alt="Claude Code local replit server details with the direct Replit endpoint and Authenticate selected" width="2000" height="596" data-path="images/replitai/custom-mcp/claude-code-authenticate-local-replit-mcp.png" />
+        </Frame>
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-authorize-replit-workspace-dd7b3dca962c.png" alt="Claude authorization dialog with generic account and workspace placeholders, including workspace choices and an Allow button" width="1588" height="991" data-path="images/replitai/custom-mcp/claude-code-authorize-replit-workspace.png" />
+        </Frame>
+      </Step>
+
+      <Step title="Use Replit in Claude Code">
+        Ask Claude Code to create, inspect, or update a Replit project. For example, ask: "List my recently updated Replit projects."
+
+        <Frame>
+          <img src="/assets/mirror/claude-code-list-replit-projects-c775a3601cb9.png" alt="Claude Code response listing generic Replit projects and placeholder URLs" width="2000" height="850" data-path="images/replitai/custom-mcp/claude-code-list-replit-projects.png" />
+        </Frame>
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Tools
+
+| Tool                      | Required input                | Optional input                                                            | Use                                                                                                                                                                                                                                                                            |
+| ------------------------- | ----------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `create_app_from_prompt`  | `appDescription`, `app_stack` | `userSpecifiedAppName`, `userQuotes`, `attachmentSummary`, `sourceReplId` | Start a new app. `app_stack` is one of `react_website`, `mobile_app`, `design`, `slides`, `animation`, `data_visualization`, `3d_game`, `document`, or `spreadsheet`. Set `sourceReplId` to start the new app as a private copy of an existing app instead of a blank project. |
+| `search_apps`             | None                          | `query`, `url`, `updatedAfter`, `updatedBefore`, `limit`                  | Find apps by title keywords, URL, or last-updated time. `limit` is 1 through 50.                                                                                                                                                                                               |
+| `resolve_app_by_name`     | `name`                        | None                                                                      | Find one app by its exact title.                                                                                                                                                                                                                                               |
+| `list_apps`               | None                          | `query`, `limit`                                                          | List apps you can edit, ordered by recent activity. The default limit is 25 and the maximum is 50.                                                                                                                                                                             |
+| `ask_question`            | `replId`, `question`          | None                                                                      | Ask Agent about an app without changing it.                                                                                                                                                                                                                                    |
+| `update_app_using_prompt` | `replId`, `changeDescription` | `userQuotes`, `attachmentSummary`                                         | Start an Agent update for an existing app.                                                                                                                                                                                                                                     |
+| `publish_app`             | `replId`                      | None                                                                      | Publish an app or republish its latest changes.                                                                                                                                                                                                                                |
+| `get_publish_status`      | `replId`                      | None                                                                      | Check whether an app has been published, its current publish status, and its public URL.                                                                                                                                                                                       |
+
+## Troubleshooting
+
+| Problem                                               | What to do                                                                                           |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Replit asks you to authenticate                       | Complete the OAuth sign-in flow again from your MCP client.                                          |
+| An app is not found                                   | Check that you can edit the app. Then search by URL or use `list_apps` to choose from matching apps. |
+| A create, update, or publish request is still running | Wait before retrying. For publishing, use `get_publish_status` to check the current result.          |

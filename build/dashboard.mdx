@@ -1,0 +1,203 @@
+---
+title: "Create a dashboard from data"
+description: "Turn a public CSV, spreadsheet, database, warehouse connector, or API into a dashboard that answers a clear question."
+sidebarTitle: "Create a dashboard"
+icon: "chart-simple"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+A dashboard helps someone make a decision from data.
+
+You will build a **Global Progress Explorer** from a public CSV: country-level data with year, population, continent, life expectancy, and GDP per capita.
+
+## What you'll achieve
+
+By the end of this guide, you will have:
+
+* A Global Progress Explorer dashboard built from a realistic public CSV.
+* Summary metrics for countries, population, life expectancy, and GDP per capita.
+* Charts and filters that show how progress changed over time.
+* A way to verify that the dashboard numbers match the source data.
+* A shareable or publishable dashboard for stakeholders.
+
+## What you'll learn
+
+You will learn how to:
+
+* Start with a decision, not a chart type.
+* Ask Agent to build a dashboard from a public CSV.
+* Check calculations against the underlying data.
+* Add filters and an insights summary.
+* Decide when a dashboard needs login, refresh, exports, or connected data.
+
+## Who this is for
+
+Use this guide if you have customer, sales, product, operations, research, or public data and need a dashboard people can understand.
+
+This is useful for analysts, operators, founders, PMs, educators, and teams who need to turn raw data into decisions.
+
+## Define the decision
+
+Before building, write down the decision the dashboard should support.
+
+For the global progress dataset:
+
+* **Question**: Where did life expectancy and GDP per capita improve over time?
+* **Audience**: education, research, strategy, or nonprofit teams.
+* **Useful metrics**: country count, year range, latest median life expectancy, total population represented, and median GDP per capita.
+* **Useful filters**: continent, country, and year range.
+
+If you cannot state the decision, the dashboard will become a collection of charts instead of a useful tool.
+
+## Build from a public CSV
+
+Use a positive public dataset with meaningful fields and enough rows to explore.
+
+Dataset: [Gapminder global progress CSV](https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv)
+
+Ask Agent to build the dashboard from that CSV:
+
+<AiPrompt>
+  Build a Global Progress Explorer dashboard from this public CSV:<br />
+  [https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv](https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv)<br />
+  The dashboard should help an education or research team understand how life expectancy, population, and GDP per capita changed across countries and continents from 1952 to 2007.<br />
+  Include summary cards for total countries, year range, latest median life expectancy, total population represented, and latest median GDP per capita.<br />
+  Add a line chart for life expectancy over time by continent.<br />
+  Add a bubble chart where GDP per capita is on the x-axis, life expectancy is on the y-axis, bubble size represents population, and color represents continent.<br />
+  Add a bar chart showing the countries with the largest life expectancy gains between their first and latest year in the dataset.<br />
+  Add filters for continent, country, and year range.<br />
+  Include a short insights summary that explains the biggest patterns and which regions or countries improved most.<br />
+  Show how key metrics are calculated so I can verify the numbers.<br />
+  Make the dashboard polished, responsive, and easy to read on desktop and mobile.
+</AiPrompt>
+
+## Check your work
+
+Open Preview and verify the dashboard before sharing it.
+
+Check that:
+
+* Total countries matches the number of unique countries in the CSV.
+* The year range shows 1952 to 2007.
+* Latest median life expectancy uses the latest year in the dataset.
+* Population totals use the filtered countries and years.
+* Filters update the summary cards and charts.
+* The bubble chart uses GDP per capita, life expectancy, population, and continent correctly.
+* The insights summary matches what the charts show.
+* The dashboard works on a phone-sized screen.
+
+If a number looks different than expected, ask Agent to show the calculation.
+
+<AiPrompt>
+  The latest median life expectancy looks different than I expected.<br />
+  Show me how you calculated it from the CSV.<br />
+  Check that you used only rows from the latest year in the filtered data.<br />
+  Update the calculation if needed and tell me how to verify it.
+</AiPrompt>
+
+## Add filters and exports
+
+After the first dashboard works, ask Agent for the interaction that helps the audience explore the data.
+
+<AiPrompt>
+  Add an exploration panel for the global progress dashboard.<br />
+  Let me filter by continent, country, and year range.<br />
+  Add a button to export the filtered chart data to CSV.<br />
+  Keep the summary cards and insights summary in sync with the filters.
+</AiPrompt>
+
+Dashboards can also support PDF export, chart CSV export, refresh, auto-refresh, light/dark mode, and analysis summaries. See [Data Visualization](/features/artifact-types/data-apps) for the concept overview.
+
+## Use connected data when needed
+
+Use a public CSV when you are learning or prototyping. Use a connected data source when the dashboard should stay up to date.
+
+You can connect dashboards to:
+
+* A Replit app database.
+* A warehouse connector like BigQuery, Databricks, or Snowflake.
+* Analytics tools like Segment, Amplitude, or Hex.
+* External APIs.
+
+For warehouse data, ask Agent to explain the fields and queries it uses.
+
+<AiPrompt>
+  Create a growth dashboard using our warehouse connector.<br />
+  Identify the customer, product usage, billing, and retention fields needed.<br />
+  Build charts for active customers over time, account growth by segment, and expansion revenue by plan.<br />
+  Explain the fields and calculations you used so I can verify the dashboard.
+</AiPrompt>
+
+For setup and availability details, see [Data Connectors](/connectors/warehouses/overview).
+
+## Share the dashboard
+
+Share the dashboard when the numbers are trustworthy.
+
+If the dashboard uses private customer or business data, add access control before sharing widely. For public or sample data, you can publish and share the URL directly.
+
+Ask reviewers:
+
+> Review the global progress dashboard and tell me which region or country story you would highlight first, and why.
+
+## You're done when
+
+* The dashboard loads the public CSV.
+* Summary cards and charts answer the progress question.
+* You verified at least one key metric manually.
+* Filters update the dashboard correctly.
+* The insights summary matches the data.
+* You know whether the dashboard should stay public, require login, or connect to live data.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Add login" icon="lock" href="/build/add-login">
+    Put the dashboard behind authentication so only the right people see it.
+  </Card>
+
+  <Card title="Add a database" icon="database" href="/build/add-database">
+    Save data so it persists and refreshes between sessions.
+  </Card>
+
+  <Card title="Add integrations" icon="plug" href="/build/add-integrations">
+    Pull in another data source or push insights to existing tools.
+  </Card>
+
+  <Card title="Data Connectors" icon="network-wired" href="/connectors/warehouses/overview">
+    Connect a live warehouse so the dashboard reflects up-to-date data.
+  </Card>
+
+  <Card title="Turn insights into a deck" icon="presentation-screen">
+    Ask Agent to create a stakeholder presentation from the dashboard's findings.
+  </Card>
+</CardGroup>
+
+## Need further help?
+
+* **Numbers look different than expected:** ask Agent to show the query, formula, or transformation.
+* **The CSV is unavailable:** check the URL, network access, and CSV headers.
+* **Filters do not update charts:** ask Agent to connect filters to both summary cards and chart data.
+* **The dashboard is slow:** ask Agent to summarize data, add filters, or reduce rows loaded on startup.
+* **The dashboard uses private data:** add login before sharing broadly.
+
+## Related
+
+* [Data Visualization](/features/artifact-types/data-apps)
+* [Data Connectors](/connectors/warehouses/overview)
+* [Add login](/build/add-login)
+* [Add integrations](/build/add-integrations)

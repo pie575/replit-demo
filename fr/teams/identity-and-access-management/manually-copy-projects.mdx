@@ -1,0 +1,267 @@
+---
+title: "Copier manuellement un projet vers un autre espace de travail"
+description: "Copiez une application en ligne vers un autre espace de travail ou compte à la main : copiez le code, configurez la nouvelle application, redirigez vos utilisateurs vers elle avec un minimum d'interruption, et sachez comment annuler l'opération"
+sidebarTitle: "Copie manuelle de projet"
+icon: "copy"
+---
+
+Ce guide vous explique comment copier une application vers un autre espace de travail ou compte à la main. Vous copiez le code, configurez la nouvelle application, copiez vos données, puis redirigez vos utilisateurs vers la nouvelle application.
+
+Rien n'est déplacé ni supprimé. L'ancien projet reste exactement où il est, et les deux copies ne restent pas synchronisées. Une fois terminé, vous choisissez de conserver ou de supprimer l'ancien.
+
+<Note>
+  Vous cherchez le transfert intégré en un clic ? Consultez [Transférer une application vers Teams](/fr/teams/identity-and-access-management/transfer-app-to-teams). Utilisez ce guide lorsque cette option n'est pas disponible ou lorsque vous devez copier entre différents comptes.
+</Note>
+
+## Avant de commencer
+
+Vous avez besoin de :
+
+* Un accès à l'ancien projet et au nouvel espace de travail ou compte.
+* Environ une heure de temps concentré pour le basculement final. Les étapes précédentes peuvent s'étaler sur plusieurs jours.
+* Si votre application a une adresse web personnalisée, un accès à l'endroit où vous gérez ce domaine.
+
+Deux éléments ne sont pas copiés automatiquement et prennent le plus de temps : votre **base de données** et votre **adresse web**. Ce guide couvre les deux.
+
+<Note>
+  Si l'administrateur de votre espace de travail a activé [l'interdiction d'exportation du code source](/fr/teams/enterprise-privacy-settings#ban-source-code-export), vous ne pouvez pas télécharger le projet en zip. Consultez votre administrateur d'espace de travail avant de commencer—il peut confirmer si une copie manuelle est autorisée et comment déplacer le code et la base de données.
+</Note>
+
+## Prévoir l'interruption de service
+
+Pensez-y comme ouvrir une seconde boutique puis fermer la première. Il y a une courte période où l'ancienne boutique est fermée et la nouvelle n'est pas encore ouverte. Pendant ce temps, personne ne peut utiliser votre application.
+
+**Combien de temps l'application est-elle hors ligne ?** Généralement de 15 à 60 minutes. Cela dépend du volume de données de votre base de données et de la rapidité de mise à jour de votre adresse web.
+
+**Vais-je perdre des données ?** Seulement si quelqu'un ajoute des données à l'ancienne application après que vous avez copié la base de données. Pour éviter cela, vous mettez l'ancienne application hors ligne *avant* de faire la copie finale. Ce guide est ordonné pour que cela se produise ainsi.
+
+**Puis-je annuler ?** Oui. L'ancien projet n'est pas supprimé. Si quelque chose ne va pas, republiez l'ancienne application et elle fonctionnera exactement comme avant.
+
+**Quand dois-je le faire ?** Choisissez un moment où peu de personnes utilisent votre application. Prévenez vos utilisateurs à l'avance si possible.
+
+## Étape 1 : copier le code vers un nouveau projet
+
+Choisissez une méthode. L'ancienne application reste en ligne pendant cette étape. Les deux méthodes transportent votre code. GitHub conserve toujours votre historique de commits, tandis qu'un zip ne conserve l'historique que s'il inclut le dossier `.git` :
+
+|                              | Via GitHub                                                | Via fichier zip                                                                                                                         |
+| ---------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fichiers de code**         | Seulement les fichiers que vous committez et poussez      | Tout ce qui est sur le disque, y compris les modifications non validées                                                                 |
+| **Historique des commits**   | Historique complet sur le dépôt distant                   | Historique complet si le zip inclut le dossier `.git`. Pas d'historique si vous excluez `.git` pour rester sous la limite d'importation |
+| **Dossiers de dépendances**  | Suit votre `.gitignore`                                   | Exclus (`node_modules`, `.venv`, `build`, et similaires) ; réinstallés à l'importation                                                  |
+| **Prérequis**                | Un compte GitHub connecté aux deux comptes Replit         | Aucun                                                                                                                                   |
+| **Synchronisation continue** | Les deux copies peuvent pousser et tirer le même dépôt    | Aucune—instantané ponctuel                                                                                                              |
+| **Idéal pour**               | Projets que vous voulez sauvegarder dans Git à long terme | Copies ponctuelles rapides                                                                                                              |
+
+### Via GitHub
+
+<Steps>
+  <Step title="Poussez l'ancien projet vers GitHub">
+    Dans l'ancien projet, ouvrez le [panneau Git](/fr/features/workspace-tools/git-interface), connectez un dépôt GitHub, puis committez et poussez. Utilisez un dépôt privé sauf si vous voulez que le code soit public.
+  </Step>
+
+  <Step title="Accordez l'accès au nouveau compte">
+    Si le nouvel espace de travail appartient à un compte Replit différent, son compte GitHub doit avoir accès au dépôt. Pour un dépôt privé, ajoutez ce compte GitHub comme collaborateur ou utilisez une organisation GitHub partagée.
+  </Step>
+
+  <Step title="Importez dans le nouvel espace de travail">
+    Connectez-vous au nouveau compte, ouvrez [replit.com/import](https://replit.com/import), sélectionnez **GitHub**, connectez le compte GitHub et choisissez le dépôt. Consultez [Importer depuis un fournisseur](/fr/build/import-from-providers) pour le dépannage.
+  </Step>
+
+  <Step title="Vérifiez la copie">
+    Ouvrez le nouveau projet et confirmez que les fichiers et l'historique des commits sont présents. Replit installe les dépendances et configure les commandes d'exécution pendant l'importation.
+  </Step>
+</Steps>
+
+<Warning>
+  GitHub ne reçoit que ce que vous committez et poussez. Les fichiers correspondant à `.gitignore` et les modifications non validées restent en arrière. Ne committez jamais de valeurs de secrets ou de dumps de base de données dans le dépôt.
+</Warning>
+
+### Via fichier zip
+
+<Steps>
+  <Step title="Téléchargez l'ancien projet">
+    Dans l'ancien projet, sélectionnez le menu à trois points en haut de l'arborescence de fichiers et choisissez **Télécharger en zip**.
+
+    Si le téléchargement fonctionne et que le fichier fait moins de 200 Mo, passez à l'étape suivante.
+
+    Un fichier zip de plus de 200 Mo peut se télécharger avec succès. Cependant, [l'importation ZIP](/fr/build/import-from-providers#limitations) rejette les fichiers de plus de 200 Mo, donc Replit ne peut pas l'utiliser pour créer le nouveau projet. Si le téléchargement échoue ou si le zip dépasse 200 Mo, créez-en un plus petit :
+
+    1. Dans l'ancien projet, ouvrez l'outil **Shell**.
+
+    2. Collez cette commande et appuyez sur Entrée. Elle crée un fichier nommé `project.zip` et exclut les dossiers que Replit peut reconstruire lui-même :
+
+       ```bash theme={null}
+       zip -r project.zip . -x ".cache/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+    3. Vérifiez la taille. Collez cette commande et appuyez sur Entrée. Elle affiche la taille en Mo, comme `150M` pour 150 Mo :
+
+       ```bash theme={null}
+       du -h project.zip
+       ```
+
+    4. Si la taille dépasse 200 Mo, réduisez le fichier en excluant votre historique de modifications. Collez les deux lignes et appuyez sur Entrée :
+
+       ```bash theme={null}
+       rm project.zip
+       zip -r project.zip . -x ".cache/*" ".local/*" ".git/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+       N'excluez `.local` et `.git` que lorsque vous devez réduire le zip sous 200 Mo. Ces exclusions ne suppriment aucun des deux dossiers de l'ancien projet. Cependant, un zip sans `.git` n'inclut pas l'historique des commits du projet. Utilisez la méthode GitHub si vous devez préserver l'historique.
+
+    5. Trouvez `project.zip` dans l'arborescence de fichiers, sélectionnez le menu à trois points à côté, puis sélectionnez **Télécharger**.
+
+    Le dossier `.cache` contient l'état interne de Replit, y compris les valeurs de secrets mises en cache. Excluez-le toujours des fichiers zip que vous créez manuellement. Si votre projet a d'autres dossiers générés volumineux, ajoutez-les à la liste d'exclusion.
+  </Step>
+
+  <Step title="Importez dans le nouvel espace de travail">
+    Connectez-vous au nouveau compte, ouvrez [replit.com/import](https://replit.com/import), sélectionnez **ZIP**, et téléchargez le fichier.
+  </Step>
+
+  <Step title="Vérifiez la copie">
+    Ouvrez le nouveau projet et confirmez que vos fichiers sont présents. Si le zip inclut le dossier `.git`, votre historique de commits est venu avec. Si vous avez utilisé la commande d'archive réduite, le nouveau projet démarre sans historique de commits. Replit réinstalle les dépendances exclues pendant l'importation.
+  </Step>
+</Steps>
+
+## Étape 2 : configurer la nouvelle application
+
+L'ancienne application est toujours en ligne. Dans cette étape, vous faites fonctionner entièrement la nouvelle application avec une *copie de test* de vos données, afin que le basculement final soit rapide.
+
+<Steps>
+  <Step title="Ajoutez vos Secrets">
+    Les valeurs des secrets (clés API, mots de passe) ne quittent jamais l'ancien projet. Ouvrez l'outil [Secrets](/fr/core-concepts/project-editor/app-setup/secrets) dans les deux projets et copiez chacun manuellement. Incluez tous les secrets de déploiement.
+  </Step>
+
+  <Step title="Reconnectez les Connecteurs et autres services">
+    Reconnectez chaque intégration depuis **Outils → Connecteurs** dans le nouveau projet. Consultez [Recréer ce qui n'est pas copié](#recreer-ce-qui-nest-pas-copie) pour l'App Storage, les collaborateurs et tout le reste.
+  </Step>
+
+  <Step title="Publiez la nouvelle application">
+    [Publiez](/fr/features/publishing/overview) le nouveau projet. Il obtient sa propre adresse web `replit.app` et sa propre base de données de production vide. Ne connectez pas encore votre domaine personnalisé.
+  </Step>
+
+  <Step>
+    Suivez [Copier la base de données](#copier-la-base-de-donnees) ci-dessous, en utilisant la base de données de **production** du nouveau projet comme cible. Cela vous donne des données réelles pour tester. L'étape 3 remplacera cette copie par vos données les plus récentes.
+  </Step>
+
+  <Step>
+    Ouvrez la nouvelle application à son adresse `replit.app` et utilisez-la comme le feraient vos utilisateurs. Corrigez tout ce qui est cassé avant de continuer. Vos utilisateurs n'ont pas encore été affectés.
+  </Step>
+</Steps>
+
+## Étape 3 : basculer vos utilisateurs vers la nouvelle application
+
+C'est la partie avec interruption de service. Faites-le en une seule session.
+
+<Steps>
+  <Step title="Mettez l'ancienne application hors ligne">
+    Dans l'ancien projet, ouvrez l'outil **Publishing** et sélectionnez **Unpublish**. Votre application est maintenant hors ligne. Personne ne peut ajouter de nouvelles données à partir de ce moment, donc la copie que vous faites ensuite est complète.
+  </Step>
+
+  <Step title="Copiez la base de données une dernière fois">
+    Suivez [Copier la base de données](#copier-la-base-de-donnees) ci-dessous, en utilisant la base de données de **production** du nouveau projet comme cible. Cette copie contient toutes vos données les plus récentes.
+  </Step>
+
+  <Step title="Pointez votre adresse web vers la nouvelle application">
+    Si votre application utilise un domaine personnalisé : dans l'ancien projet, ouvrez **Publishing → Domains** et déconnectez le domaine. Dans le nouveau projet, ouvrez **Publishing → Domains** et [connectez-le](/fr/features/publishing/custom-domains#connect-a-domain-you-already-own). Mettez à jour les enregistrements chez votre fournisseur de domaine (par exemple GoDaddy ou Namecheap) si Replit vous le demande.
+
+    La nouvelle adresse peut prendre de quelques minutes à quelques heures pour fonctionner pour tout le monde. En attendant, certains visiteurs peuvent voir une erreur.
+
+    Si votre application utilise uniquement une adresse `replit.app`, partagez plutôt la nouvelle adresse avec vos utilisateurs.
+  </Step>
+
+  <Step title="Confirmez que la nouvelle application est en ligne">
+    Ouvrez votre adresse web et confirmez que la nouvelle application se charge avec vos données. Votre application est de nouveau en ligne.
+  </Step>
+</Steps>
+
+## Copier la base de données
+
+La copie du code ne touche pas votre base de données. Copiez les données avec les outils `pg_dump` et `pg_restore` de PostgreSQL, disponibles dans le Shell des deux projets. Les étapes 2 et 3 renvoient toutes deux ici. Les commandes sont les mêmes chaque fois. Seule la *cible* change.
+
+<Warning>
+  Les données écrites après l'exécution de `pg_dump` ne se retrouvent pas dans la copie. Pour la copie finale de l'étape 3, mettez d'abord l'ancienne application hors ligne.
+</Warning>
+
+<Steps>
+  <Step title="Exportez les données depuis l'ancien projet">
+    Ouvrez l'outil **Shell** dans l'ancien projet. Collez cette commande et appuyez sur Entrée. Elle crée un fichier nommé `backup.dump` dans votre arborescence de fichiers :
+
+    ```bash theme={null}
+    pg_dump -Fc "$DATABASE_URL" --no-owner --no-privileges -f backup.dump
+    ```
+
+    Cela exporte la base de données de **développement**. Vos données en ligne se trouvent généralement plutôt dans la base de données de **production**. Pour exporter celle-ci :
+
+    1. Ouvrez l'outil **Database**, sélectionnez la base de données de production, et ouvrez **Settings**.
+    2. Copiez la chaîne de connexion.
+    3. Dans la commande ci-dessus, remplacez `"$DATABASE_URL"` par la chaîne de connexion, en conservant les guillemets.
+
+    Consultez [Détails de connexion](/fr/features/data-and-storage/connection-details) si vous ne la trouvez pas.
+  </Step>
+
+  <Step title="Déplacez le fichier dump vers le nouveau projet">
+    Dans l'arborescence de fichiers de l'ancien projet, sélectionnez le menu à trois points à côté de `backup.dump` et téléchargez-le. Puis téléversez-le dans le nouveau projet avec l'option **Upload files** de l'arborescence de fichiers.
+
+    Si vous avez copié le code via GitHub, ne committez pas le dump. Déplacez-le séparément afin que vos données n'atterrissent jamais dans le dépôt.
+  </Step>
+
+  <Step title="Importez les données dans le nouveau projet">
+    Ouvrez l'outil **Shell** dans le nouveau projet. Collez cette commande et appuyez sur Entrée :
+
+    ```bash theme={null}
+    pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+    ```
+
+    Telle qu'écrite, cette commande importe dans la base de données de **développement** du nouveau projet. C'est ce que vous voulez à l'étape 2.
+
+    Pour la copie finale de l'étape 3, vous voulez plutôt la base de données de **production**. Dans le nouveau projet, ouvrez l'outil **Database**, sélectionnez la base de données de production, ouvrez **Settings**, copiez la chaîne de connexion, et utilisez-la à la place de `"$DATABASE_URL"`.
+
+    Cela supprime tous les objets correspondants dans la base de données cible, puis charge les données. Quand elle se termine sans sortie, cela a fonctionné.
+  </Step>
+</Steps>
+
+<Note>
+  Si `pg_restore` échoue avec des erreurs de rôle ou de politique, votre base de données utilise des rôles PostgreSQL personnalisés qui n'existent pas encore dans le nouveau projet. [Contactez le support](https://replit.com/support) pour obtenir de l'aide.
+</Note>
+
+<Note>
+  Si le nouveau projet utilise une [base de données de développement Neon héritée](/fr/features/data-and-storage/development-and-production#legacy-development-database), le flux de publication propose **Configurer votre base de données de production avec vos données de développement actuelles**. Cela copie ce qui se trouve dans la base de données de développement au moment où vous publiez. C'est correct pour les tests, mais pour le basculement final, utilisez les étapes ci-dessus afin d'obtenir les données les plus récentes.
+</Note>
+
+## Recréer ce qui n'est pas copié
+
+Le reste de la configuration du projet se trouve en dehors du système de fichiers. Recréez chaque élément dans le nouveau projet :
+
+| Élément                    | Que faire                                                                                                                                                                                                                                                                           |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Secrets**                | Les valeurs des secrets ne quittent jamais l'ancien projet. Ajoutez-les à nouveau dans l'outil [Secrets](/fr/core-concepts/project-editor/app-setup/secrets) du nouveau projet, y compris les secrets de déploiement.                                                               |
+| **Secrets de compte**      | [Liez-les](/fr/core-concepts/project-editor/app-setup/secrets#manage-account-secrets) dans le nouveau projet. Si le nouveau projet appartient à un compte différent, ajoutez-les d'abord à ce compte.                                                                               |
+| **App Storage**            | Les buckets ne se déplacent pas. Au sein du même compte, [ajoutez le bucket existant](/fr/features/data-and-storage/object-storage#bucket-access-management) au nouveau projet. Entre comptes différents, téléchargez les objets et téléversez-les dans un nouveau bucket.          |
+| **Connecteurs**            | Reconnectez chaque intégration depuis **Outils → Connecteurs** dans le nouveau projet. Consultez la [présentation des intégrations](/fr/features/integrations/overview).                                                                                                            |
+| **Déploiements**           | La copie n'est pas publiée. [Publiez-la](/fr/features/publishing/overview) depuis le nouvel espace de travail, comme à l'[étape 2](#etape-2-configurer-la-nouvelle-application).                                                                                                    |
+| **Domaines personnalisés** | Retirez le domaine de l'ancien déploiement, liez-le au nouveau, et mettez à jour vos enregistrements DNS. Couvert à l'[étape 3](#etape-3-basculer-vos-utilisateurs-vers-la-nouvelle-application).                                                                                   |
+| **Collaborateurs**         | Invitez à nouveau les collaborateurs et configurez l'[accès](/fr/teams/identity-and-access-management/groups-and-permissions) dans le nouvel espace de travail.                                                                                                                     |
+| **Historique Agent**       | Les conversations Agent et les restaurations de [points de contrôle](/fr/features/version-control/checkpoints-and-rollbacks) restent avec l'ancien projet. Les commits de points de contrôle voyagent avec votre historique Git, mais vous ne pouvez pas y revenir depuis la copie. |
+
+## En cas de problème
+
+L'ancien projet est toujours là. Pour revenir en arrière :
+
+1. Dans l'ancien projet, ouvrez l'outil **Publishing** et sélectionnez **Publish**.
+2. Si vous avez déplacé un domaine personnalisé, déplacez-le à nouveau de la même façon.
+
+Votre application est de nouveau en ligne avec les données qu'elle avait lorsque vous l'avez mise hors ligne. Rien n'a été perdu.
+
+## Nettoyage
+
+Attendez une semaine environ pour vous assurer que la nouvelle application fonctionne. Puis :
+
+* Supprimez `backup.dump` des deux projets et de votre appareil. Chaque copie contient un export complet de vos données.
+* Optionnellement, supprimez l'ancien projet.
+
+## Ressources associées
+
+* [Transférer une application vers Teams](/fr/teams/identity-and-access-management/transfer-app-to-teams) : Le transfert intégré pour déplacer un projet vers ou entre des espaces de travail d'équipe
+* [Importer depuis un fournisseur](/fr/build/import-from-providers) : Toutes les sources d'importation prises en charge
+* [Corriger une application publiée utilisant une base de données partagée](/fr/features/data-and-storage/shared-database-migration) : Plus de dépannage `pg_dump` et `pg_restore`

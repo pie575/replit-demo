@@ -1,0 +1,92 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 데이터 복구
+
+> 개발 데이터베이스를 체크포인트로 복원하거나 프로덕션 데이터베이스를 특정 시점으로 되돌리세요.
+
+실수는 일어날 수 있습니다: 잘못된 스키마 변경, 삭제된 행, 또는 엉뚱한 방향으로 진행된 Agent 세션 등. Replit은 각 데이터베이스에 대한 복구 방법을 제공합니다.
+
+| 데이터베이스 | 복구 방법             | 제공 범위                                               |
+| ------ | ----------------- | --------------------------------------------------- |
+| 개발     | 체크포인트 롤백          | 모든 플랜                                               |
+| 프로덕션   | 특정 시점 복원 및 예약된 백업 | Core: 최대 7일간의 기록. Pro 및 Enterprise: 최대 28일(기본값 7일). |
+
+## 개발 데이터베이스 복원
+
+[롤백 기능](/ko/features/version-control/checkpoints-and-rollbacks/)을 사용해 앱과 개발 데이터베이스를 이전 상태로 되돌릴 수 있습니다. 이 기능을 사용하면 데이터베이스를 Agent가 생성한 모든 체크포인트로 복원할 수 있습니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/0UCOQvZyQpUEM03B/images/replitai/checkpoint-rollback.png?fit=max&auto=format&n=0UCOQvZyQpUEM03B&q=85&s=f9594eb28458309b2759e8698b8535ce" alt="롤백 옵션을 보여주는 체크포인트 롤백 인터페이스" width="3154" height="2366" data-path="images/replitai/checkpoint-rollback.png" />
+</Frame>
+
+<Info>
+  체크포인트 상태로 복원할 때는 "추가 롤백 옵션" 아래에서 "Database"를 선택해야 합니다. 그러면 데이터베이스가 체크포인트 생성 시점의 상태로 복원됩니다.
+</Info>
+
+## 프로덕션 데이터베이스 복원
+
+프로덕션 데이터베이스의 경우, 특정 시점 복원 기능을 사용하여 데이터베이스를 특정 시점으로 복원할 수 있습니다.
+
+<Frame>
+  <img src="https://mintcdn.com/replit/tlGd6oyGOaUUeRxr/images/databases/database-rollbacks.jpg?fit=max&auto=format&n=tlGd6oyGOaUUeRxr&q=85&s=bef4a8570506fea11823cba941ad89a4" alt="롤백 옵션을 보여주는 데이터베이스 롤백 인터페이스" width="1082" height="708" data-path="images/databases/database-rollbacks.jpg" />
+</Frame>
+
+복원 가능한 기간은 플랜에 따라 다릅니다. Core 플랜은 최대 7일의 기록을 보관하고, Pro와 Enterprise 플랜은 최대 28일을 보관합니다. 모든 플랜은 7일부터 시작하며, 프로덕션 데이터베이스 설정에서 보관 기간을 변경할 수 있습니다. 보관 기간이 길어질수록 더 많은 스토리지를 사용하므로 보관 기간을 늘리면 사용 비용이 증가합니다. Pro에서 Core로 다운그레이드하면 보관 기간이 7일로 줄어듭니다.
+
+<Warning>
+  데이터베이스를 복원해도 앱의 코드는 복원되지 않으며, 앱을 롤백해도 데이터베이스는 복원되지 않습니다. 둘 다 같은 시점으로 되돌리려면 데이터베이스를 복원한 다음 [일치하는 체크포인트로 롤백](/ko/features/version-control/checkpoints-and-rollbacks/)하고 앱을 다시 게시하세요.
+</Warning>
+
+## 프로덕션 데이터베이스 백업 예약
+
+예약된 백업은 매일 하나의 전체 복원 지점을 생성합니다. 예약을 활성화하거나 업데이트하면 Replit은 브라우저의 현재 시간대 기준 자정 무렵에 백업을 예약합니다.
+
+1. **Database** 도구를 열고 프로덕션 데이터베이스를 선택하세요.
+2. **Settings**를 연 다음 **Advanced** 아래에서 **Scheduled backups**를 펼치세요.
+3. 예약된 백업을 활성화하려면 **Keep backups for**에서 보관 기간을 선택하세요.
+
+사용 가능한 보관 기간은 플랜에 따라 다릅니다. Core는 최대 7일을 지원합니다. Pro와 Enterprise는 최대 28일을 지원합니다.
+
+### 스토리지 비용
+
+Replit은 프로덕션 데이터베이스의 각 스토리지 범주를 개별적으로 계량합니다:
+
+| 스토리지 범주             | GiB당 월 요금 |
+| ------------------- | --------: |
+| 논리 데이터베이스 스토리지      |    \$0.35 |
+| 특정 시점 복원(PITR) 스토리지 |    \$0.20 |
+| 예약된 백업 스토리지         |    \$0.09 |
+
+<Note>데이터베이스 스토리지 비용은 현재 100% 할인되고 있습니다.</Note>
+
+\$0.35의 논리 스토리지 요금은 PITR, 예약된 백업, 또는 둘 다 사용하는 경우 모두 적용됩니다. 예약된 백업 스토리지는 GiB당 비용이 PITR 스토리지보다 저렴합니다. 매일의 복원 지점으로 충분하다면, PITR 기간을 더 짧게 설정하고 예약된 백업을 사용하면 복구 스토리지 비용을 줄일 수 있습니다. 총 백업 비용은 저장된 백업 용량과 보관 기간에 따라 달라집니다.
+
+PITR은 해당 기간 내에서 더 많은 복원 지점을 제공합니다. 예약된 백업은 하루에 하나의 복원 지점을 제공하므로, 필요에 맞는 복구 방법을 선택하세요.
+
+<Note>
+  이 예약은 현재 UTC 오프셋을 기준으로 합니다. 일광 절약 시간제 변경으로 인해 예약을 업데이트하기 전까지 백업 시간이 한 시간 이동할 수 있습니다. 오프셋이 분 단위인 시간대는 가장 가까운 시간을 사용합니다.
+</Note>
+
+### 예약된 백업 복원
+
+1. 프로덕션 데이터베이스 설정에서 **Scheduled backups**를 여세요.
+2. **View all backups**를 선택하세요.
+3. 원하는 복원 지점에 대해 **Restore**를 선택하세요.
+4. `restore`를 입력한 다음 **Continue**를 선택하세요.
+
+복원하면 데이터베이스가 선택한 백업 데이터로 전환됩니다. 현재 데이터는 삭제되지 않지만, 연결된 서비스가 잠시 재연결될 수 있습니다.
+
+## 게시 실패 문제 해결
+
+데이터베이스 문제로 게시가 실패하는 경우:
+
+1. 데이터베이스 연결 또는 스키마 충돌에 대한 구체적인 오류 메시지를 확인하려면 **게시 로그를 확인**하세요
+2. 기존 애플리케이션 코드와의 잠재적 충돌에 대해 **최근 스키마 변경 사항을 검토**하세요
+3. 다시 게시하기 전에 **배포 프리뷰에서 변경 사항을 테스트**하세요
+
+## 다음 단계
+
+* [개발 및 프로덕션](/ko/features/data-and-storage/development-and-production): 두 데이터베이스가 어떻게 함께 작동하는지 알아보세요.
+* [체크포인트 및 롤백](/ko/features/version-control/checkpoints-and-rollbacks/): 앱 전체를 롤백합니다.

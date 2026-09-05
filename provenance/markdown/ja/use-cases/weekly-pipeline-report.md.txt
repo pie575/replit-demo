@@ -1,0 +1,141 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# 週次の営業レポートを生成する
+
+> 毎週、HubSpotから営業パイプラインの変化とトレンドを表示します。
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+HubSpotから今週の営業パイプラインを取得し、先週と比較して、短いレポートを作成します:新規案件、ステージの移動、遅延した案件、予測。表をGoogle Sheetsに配置し、要点をSlackに投稿することで、スタンドアップが静的なスナップショットではなく変化についての話になるようにします。
+
+## こんな人におすすめ
+
+* 静的なスナップショットではなく、動きのある月曜スタンドアップが必要な営業マネージャー。
+* 週ごとのパイプラインの変化を一箇所で把握したいレベニューオペレーション担当者。
+
+## コネクタ
+
+<Connectors
+  items={[
+{ id: "hubspot", name: "HubSpot", why: "案件、ステージ、金額" },
+{
+  id: "google-sheets",
+  name: "Google Sheets",
+  why: "監査可能なトレンド表",
+},
+{ id: "slack", name: "Slack", why: "レポートを届ける" },
+]}
+/>
+
+<Note>Salesforce、Attio、Pipedrive、その他のCRMでも動作します。</Note>
+
+## 始める前に
+
+HubSpot、Sheets、Slackを接続してください。どのパイプラインまたはチームを含めるかを伝えてください。
+
+## Agentへのプロンプト
+
+<AiPrompt>
+  毎週月曜9時に実行されるルーティンを作成してください。HubSpotから今週の
+  パイプラインを取得してください。パイプラインの変化とトレンドを示す週次
+  レポートを作成してください:新規案件、ステージの移動、遅延した案件、先
+  週との比較予測。表をGoogle Sheetsに配置し、要点をSlackに投稿してくださ
+  い。
+</AiPrompt>
+
+## 期待できること
+
+Agentは今週と先週を比較し、短いナラティブとシートを作成します。いくつかの案件金額をHubSpotと照らし合わせて確認してください。Slackの要点はスタンドアップで使い、シートは監査証跡として保管してください。新規案件と遅延案件を1つずつ選び、HubSpotで開いて、ステージ、金額、成約予定日がシートと一致することを確認してください。
+
+## 自分向けにカスタマイズする
+
+<AiPrompt>
+  14日間動きのない\[金額]を超える案件を強調表示してください。
+</AiPrompt>
+
+<AiPrompt>
+  成約予定日と直近の活動をもとに「リスクあり」セクションを追加してくださ
+  い。
+</AiPrompt>
+
+## トラブルシューティング
+
+* **案件金額がHubSpotと一致しない:** どのパイプラインまたはチームを含めるか、どの金額フィールド(金額か加重予測か)を使うかを伝えてください。シートを信頼する前に、いくつかの案件をHubSpotと照らし合わせて確認してください。
+* **遅延案件がおかしく見える:** HubSpotで成約予定日とステージを確認してください。成約予定日が後ろにずれた場合、またはステージが後退した場合にのみ、その案件を遅延として扱うようAgentに依頼してください。
+* **Slackが違う場所に投稿される:** チャンネル名を指定し、要点だけを表示するか、完全なシートへのリンクを含めるかを伝えてください。
+
+## 関連項目
+
+<CardGroup cols={2}>
+  <Card title="競合を監視する" href="/ja/use-cases/monitor-competitors">
+    価格変更が案件に影響する前に、営業向けに同じSlackアラートを使います。
+  </Card>
+
+  <Card title="投資家向けピッチデックを作成する" href="/ja/use-cases/pitch-deck-from-website">
+    投資家向け財務スライドを作る創業者向けに同じGoogle Sheetsのデータソースを使います。
+  </Card>
+</CardGroup>

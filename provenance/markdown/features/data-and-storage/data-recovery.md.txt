@@ -1,0 +1,114 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Data recovery
+
+> Restore your development database to a checkpoint or roll your production database back to a point in time.
+
+Mistakes happen: a bad schema change, deleted rows, or an Agent session that went sideways. Replit gives you a recovery path for each database.
+
+| Database    | Recovery method                             | Availability                                                                          |
+| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Development | Checkpoint rollback                         | All plans                                                                             |
+| Production  | Point-in-time restore and scheduled backups | Core: up to 7 days of history. Pro and Enterprise: up to 28 days (7 days by default). |
+
+## Restore your development database
+
+You can revert your app and development database to a previous state using the [rollback feature](/features/version-control/checkpoints-and-rollbacks/). This restores your database to any checkpoint created by Agent.
+
+<Frame>
+  <img
+    src="https://mintcdn.com/replit/0UCOQvZyQpUEM03B/images/replitai/checkpoint-rollback.png?fit=max&auto=format&n=0UCOQvZyQpUEM03B&q=85&s=f9594eb28458309b2759e8698b8535ce"
+    alt="Checkpoint rollback interface showing rollback
+options"
+    width="3154"
+    height="2366"
+    data-path="images/replitai/checkpoint-rollback.png"
+  />
+</Frame>
+
+<Info>
+  Make sure to select "Database" under "Additional rollback options" when
+  restoring to the state of a checkpoint. This restores your database to the
+  state it was at the time of the checkpoint.
+</Info>
+
+## Restore your production database
+
+For production databases, you can restore to a specific moment using point-in-time restore.
+
+<Frame>
+  <img
+    src="https://mintcdn.com/replit/tlGd6oyGOaUUeRxr/images/databases/database-rollbacks.jpg?fit=max&auto=format&n=tlGd6oyGOaUUeRxr&q=85&s=bef4a8570506fea11823cba941ad89a4"
+    alt="Database rollbacks interface showing rollback
+options"
+    width="1082"
+    height="708"
+    data-path="images/databases/database-rollbacks.jpg"
+  />
+</Frame>
+
+How far back you can restore depends on your plan and your retention setting. Core retains up to 7 days of history, while Pro and Enterprise retain up to 28 days. Every plan starts at 7 days, and you can change the window in your production database's settings. Longer windows use more storage, so extending retention increases your usage costs. If you downgrade from Pro to Core, your retention window is reduced to 7 days.
+
+<Warning>
+  Restoring your database doesn't restore your app's code, and rolling back your
+  app doesn't restore your database. To bring both back to the same moment:
+  restore the database, then [roll back to the matching
+  checkpoint](/features/version-control/checkpoints-and-rollbacks/) and publish
+  your app again.
+</Warning>
+
+## Schedule production database backups
+
+Scheduled backups create one full restore point each day. Replit schedules the backup near midnight in your browser's current time zone when you enable or update the schedule.
+
+1. Open the **Database** tool and select the production database.
+2. Open **Settings**, then expand **Scheduled backups** under **Advanced**.
+3. To enable scheduled backups, select a retention period under **Keep backups for**.
+
+The available retention periods depend on your plan. Core supports up to 7 days. Pro and Enterprise support up to 28 days.
+
+### Storage costs
+
+Replit meters each production database storage category separately:
+
+| Storage category                     | Price per GiB per month |
+| ------------------------------------ | ----------------------: |
+| Logical database storage             |                  \$0.35 |
+| Point-in-time restore (PITR) storage |                  \$0.20 |
+| Scheduled backup storage             |                  \$0.09 |
+
+<Note>Database storage costs are currently discounted by 100%.</Note>
+
+The \$0.35 logical storage charge applies whether you use PITR, scheduled backups, or both. Scheduled backup storage costs less per GiB than PITR storage. If daily restore points meet your needs, scheduled backups with a shorter PITR window can reduce recovery storage costs. Your total backup cost depends on the stored backup volume and retention period.
+
+PITR provides more restore points within its window. Scheduled backups provide one restore point per day, so select the recovery method that matches your needs.
+
+<Note>
+  The schedule uses your current UTC offset. A daylight-saving change can move
+  the backup time by one hour until you update the schedule. Time zones with
+  fractional offsets use the nearest hour.
+</Note>
+
+### Restore a scheduled backup
+
+1. Open **Scheduled backups** in the production database settings.
+2. Select **View all backups**.
+3. Select **Restore** for the restore point that you want.
+4. Enter `restore`, then select **Continue**.
+
+The restore switches your database to the selected backup data. It does not delete the current data, but connected services can briefly reconnect.
+
+## Troubleshooting publishing failures
+
+If publishing fails due to database issues:
+
+1. **Check the publishing logs** for specific error messages about database connectivity or schema conflicts
+2. **Review recent schema changes** for potential conflicts with existing application code
+3. **Test your changes in a deployment preview** before attempting to republish
+
+## Next steps
+
+* [Development and production](/features/data-and-storage/development-and-production): How your two databases work together.
+* [Checkpoints and rollbacks](/features/version-control/checkpoints-and-rollbacks/): Roll your whole app back.

@@ -1,0 +1,98 @@
+---
+title: "Connection details"
+description: "Find your database's connection string, understand how credentials stay secure, and connect external tools."
+sidebarTitle: "Connection details"
+icon: "plug"
+---
+
+Your app connects to its database through credentials that Replit manages for you. Find them in the **Database** tool: select a database, then open the **Settings** tab. It shows the connection string, storage usage, and advanced connection details.
+
+<Frame>
+  <img src="/assets/mirror/connection-details-settings-4fc18c5dc574.png" alt="Database Settings tab showing the DATABASE_URL connection string, storage usage, and advanced connection details" width="1440" height="900" data-path="images/databases/connection-details-settings.png" />
+</Frame>
+
+## Environment variables
+
+The following environment variable is available for connecting to your development database:
+
+* `DATABASE_URL`: how to connect and authenticate to the database
+
+Your app uses it automatically. Because `DATABASE_URL` is scoped to your app, your development database cannot be accessed by other apps, even ones you own, or by external database viewers. Even if leaked, it cannot be used by anyone else to access and modify your database.
+
+<Info>
+  If your development database is still on the [legacy Neon infrastructure](/features/data-and-storage/development-and-production#legacy-development-database), the additional variables `PGHOST`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, and `PGPORT` are also available. These are **not** provided for databases hosted on Replit's current infrastructure; use `DATABASE_URL` instead.
+</Info>
+
+<Warning>
+  If you are still on the legacy Neon development database, do not share your `DATABASE_URL`. It contains your database credentials, which could be used by anyone to access and modify your database. Never paste it in public places or support tickets.
+</Warning>
+
+## Connect an external tool
+
+You can connect to your **production** database from any PostgreSQL-compatible SQL client using the connection string from the production database's **Settings** tab.
+
+## Security
+
+When you add a database integration using Agent, it adds an Object-Relational Mapper (ORM) that handles all database communications with built-in security:
+
+* **Schema validation**: Verifies data conforms to expected formats
+* **Data sanitization**: Automatically cleans up builder input to prevent SQL injection attacks
+
+## Regenerate production database credentials
+
+If a production connection string was exposed, regenerate its credentials in the Database tool. This action creates a new password for the Neon production database. Existing production connection strings stop working immediately.
+
+You can regenerate credentials when all of these conditions are true:
+
+* Your app has a Neon production database.
+* You are the app owner or an administrator of the owning workspace.
+* You use Replit in a web browser.
+* No deployment is in progress.
+* If your app has a live deployment, its latest build completed successfully and uses [Autoscale or a Reserved VM](/features/publishing/deployment-types).
+
+<Warning>
+  This action cannot be undone. Existing connection strings stop working
+  immediately. If your app has a live deployment, it can be unavailable briefly
+  during the redeploy.
+</Warning>
+
+### Regenerate the credentials
+
+1. In the Tools pane, select **Database**.
+
+2. Select **Production Database**, then select the **Settings** tab.
+
+   <Frame>
+     <img src="/assets/mirror/database-regenerate-credentials-settings-827c7718a25f.webp" alt="The production database Settings tab showing the connection string, storage usage, and the Advanced section with the Regenerate credentials row." width="2314" height="1608" data-path="images/databases/database-regenerate-credentials-settings.webp" />
+   </Frame>
+
+3. Under **Advanced**, expand the **Regenerate credentials** row.
+
+4. Select the **Regenerate credentials** button.
+
+   <Frame>
+     <img src="/assets/mirror/database-regenerate-credentials-button-ab9631f21b85.webp" alt="The Regenerate credentials row expanded in the Advanced section, showing the Regenerate credentials button." width="2206" height="1876" data-path="images/databases/database-regenerate-credentials-button.webp" />
+   </Frame>
+
+5. In the confirmation dialog, select **Regenerate credentials** to confirm.
+
+   <Frame>
+     <img src="/assets/mirror/database-regenerate-credentials-dialog-2477fc96f82b.webp" alt="The Regenerate credentials confirmation dialog warning that the action cannot be undone and existing connection strings stop working immediately." width="1364" height="638" data-path="images/databases/database-regenerate-credentials-dialog.webp" />
+   </Frame>
+
+6. Select **Refresh** to load the new connection string.
+
+7. If your app has a live deployment, open **Publishing** and monitor the redeploy.
+
+8. Replace any connection strings that you copied to external tools or custom integrations.
+
+### What changes
+
+Regenerating credentials creates a new password for the production database. Only the password part of the connection string changes. The host, database name, and role stay the same.
+
+For a supported live deployment, Replit redeploys the latest successful build with the updated connection string.
+
+## Next steps
+
+* [Work with your data](/features/data-and-storage/work-with-your-data): Browse and query without leaving Replit.
+* [Development and production](/features/data-and-storage/development-and-production): How your two databases differ.

@@ -1,0 +1,179 @@
+---
+title: "Plaidの接続"
+description: "Plaidコネクタを設定して、ビルダーがAgentを使って残高、取引、投資データのためにPlaid Linkで金融口座に接続するアプリを構築できるようにします。"
+---
+
+export const WistiaEmbed = ({videoId, title = "Wistia video", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+  if (!videoId) {
+    return null;
+  }
+  const url = "https://fast.wistia.net/embed/iframe/" + videoId + "?seo=false&playerColor=" + playerColor + "&controlsVisibleOnLoad=" + controlsVisibleOnLoad;
+  return <Frame>
+      <iframe src={url} title={title} allow="autoplay; fullscreen" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Info>
+  Plaidコネクタは有料のReplitプランで利用可能で、[チームワークスペース](/ja/features/collaboration/team-workspaces#create-a-team-workspace)が必要です。
+</Info>
+
+<WistiaEmbed videoId="fcqtulftwk" title="ReplitとPlaidで構築された様子をご覧ください" />
+
+Plaidはアプリを金融機関に接続します。Plaidコネクタを使用すると、ビルダーは接続された機関でサポートされている口座残高、取引、投資データを使用するアプリを作成できます。
+
+セットアップは2つのパートで構成されます。ワークスペース管理者がReplitでPlaidの認証情報を一度設定し、その後アプリを使用する各ユーザーがPlaid Linkを通じて自分の金融口座を接続します。Plaidアクセストークンはユーザーごとにスコープされ安全に保存されるため、アプリはPlaidシークレットを直接扱うことなく金融データを使用できます。
+
+## 構築できるもの
+
+Plaidコネクタを使用して次のようなアプリを構築します：
+
+* 個人財務ダッシュボード
+* 予算管理と費用分類ツール
+* 取引検索と分析アプリ
+* サポートされている投資口座のポートフォリオトラッカー
+* 支出パターンを要約するファイナンシャルコーチ
+
+## 前提条件
+
+ReplitでPlaidを設定する前に、以下が必要です：
+
+* [チームワークスペース](/ja/features/collaboration/team-workspaces#create-a-team-workspace) — PlaidはチームレベルでBuildされます
+* [Plaidアカウント](https://dashboard.plaid.com/signup)
+* [Plaidダッシュボード](https://dashboard.plaid.com/developers/keys)からのPlaid **クライアントID**
+* 使用する環境のPlaid **シークレット**
+* Plaid `sandbox`または`production`のどちらを使用するかの決定
+
+Plaidのサンプル機関と認証情報でテストする際は`sandbox`を使用します。実際の金融口座に接続する準備ができたら`production`を使用します。
+
+## ReplitでPlaidコネクタを設定する
+
+ワークスペース管理者がReplitにPlaidの認証情報を追加します。コネクタが設定されると、ビルダーはAgentを使用してPlaidデータを利用できます。
+
+<Steps>
+  <Step title="インテグレーションを開く">
+    Replitでワークスペースまたはアプリの設定を開き、**インテグレーション**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/integrations-panel-9c9a11a93f25.png" alt="Replit管理インテグレーションとコネクタセクションを表示するAvengerチームのワークスペースインテグレーションパネル（右上に新しいコネクタを追加ボタンがハイライト表示）" width="1440" height="900" data-path="images/replitai/plaid-connector/integrations-panel.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Plaidコネクタを追加する">
+    **新しいコネクタを追加**を選択し、**Plaid**を選択します。
+
+    <Frame>
+      <img src="/assets/mirror/plaid-connector-search-1283aace7d36.png" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-search.png" />
+    </Frame>
+  </Step>
+
+  <Step title="環境を選択する">
+    `sandbox`または`production`を選択します。使用するPlaidシークレットと一致する必要があります。
+  </Step>
+
+  <Step title="Plaidの認証情報を入力する">
+    PlaidダッシュボードからPlaidの**クライアントID**と**シークレット**を貼り付けます。
+  </Step>
+
+  <Step title="クライアント名を設定する">
+    Plaid Linkに表示されるアプリ名を入力します。フィールドには`My Plaid App`が事前入力されています。ユーザーが見る名前に置き換えます。Plaidが正しく表示できるよう30文字以内に収めます。
+  </Step>
+
+  <Step title="コネクタを保存する">
+    **設定**を選択してコネクタを保存します。Replitは認証情報を安全に保存し、ビルダーがPlaidアカウントを接続する際に使用します。
+
+    <Frame>
+      <img src="/assets/mirror/plaid-config-dialog-6f2537e3be30.png" alt="環境、クライアントID、クライアントシークレット、クライアント名のフィールドと保存のための設定ボタンを含むPlaid設定ダイアログ" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-config-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+後で設定を変更するには、インテグレーションパネルから**コネクタを管理**を開き、Plaidの横にある**管理**を選択します。
+
+<Frame>
+  <img src="/assets/mirror/plaid-connector-manage-89e796daff17.png" alt="保存された環境、クライアントID、クライアントシークレット、クライアント名と変更を保存する更新ボタンを含むPlaidコネクタ管理パネル" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-manage.png" />
+</Frame>
+
+組織全体のコネクタ管理については、[コネクタの管理](/ja/replitai/managing-connectors)を参照してください。
+
+## Plaid Linkでサインインする
+
+Plaidは標準のOAuthリダイレクトの代わりに[Plaid Link](https://plaid.com/docs/link/)を使用します。フローを開始するには、コネクタテーブルでPlaidを見つけ、**サインイン**を選択します。Replitは接続を確認する簡単な同意画面を表示し、その後Plaid Linkを開きます。
+
+<Frame>
+  <img src="/assets/mirror/connect-plaid-consent-ea05ebe1a916.png" alt="ReplitとPlaidのロゴ、Plaidへの接続、データ使用、取り消し可能な権限に関する3つの安心できる箇条書きと「Plaidに続ける」ボタンを含むPlaid接続同意ダイアログ" width="1440" height="900" data-path="images/replitai/plaid-connector/connect-plaid-consent.png" />
+</Frame>
+
+Plaid Linkは、各ユーザーが金融機関を選択してその機関で認証する埋め込みフローを開きます。
+
+<Frame>
+  <img src="/assets/mirror/plaid-link-picker-2e241c8e1271.png" alt="「機関を選択」というタイトルのPlaid Link機関ピッカー。検索入力フィールドとChase、Bank of America、Wells Fargo、Citibank、US Bank、Capital One、PNC、USAA、American Express、TD、Regions、Navy Federalなどの主要な米国銀行のロゴが表示され、下部にサンドボックスモードのバナーがある" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-link-picker.png" />
+</Frame>
+
+各ユーザーが自分の口座をリンクします。Replitはそのユーザーの接続に対する結果のPlaidアクセストークンを保存し、AgentやアプリがPlaidデータをリクエストする際に使用します。
+
+## Plaidデータで構築を開始する
+
+Plaidが接続されたら、接続された金融データを使って構築するようAgentに依頼します。例えば：
+
+<AiPrompt>
+  Build a personal finance dashboard where people connect bank accounts with Plaid Link. Show account balances, monthly spending by category, and the five largest recent transactions.
+</AiPrompt>
+
+<AiPrompt>
+  Create a budgeting app where each person connects accounts through Plaid Link. Import transactions, group them by merchant and category, and show whether they are over budget this month.
+</AiPrompt>
+
+<AiPrompt>
+  Build a portfolio tracker where people connect supported investment accounts through Plaid Link. Show holdings, account balances, and changes over time where data is available.
+</AiPrompt>
+
+Plaidデータの可用性は、接続された機関とPlaidアカウントで有効になっているPlaid製品によって異なります。
+
+## トラブルシューティング
+
+<AccordionGroup>
+  <Accordion title="PlaidがインテグレーションにBuildされない">
+    Plaidには有料のReplitプランが必要です。有料プランを利用していてもPlaidが表示されない場合は、ページを更新して正しいワークスペースにいることを確認します。
+
+    セットアップに**この機能にはエンタープライズプランが必要です**と表示される場合は、ページを更新して正しいワークスペースを使用していることを確認します。
+
+    それでもPlaidが表示されない場合は、Replitサポートに連絡してチームがワークスペースの設定を確認できるようにします。
+  </Accordion>
+
+  <Accordion title="Plaid Linkにアプリ名ではなく「このアプリケーション」と表示される">
+    設定されたクライアント名が見つからないか長すぎる場合、Plaidは**このアプリケーション**と表示することがあります。Plaidコネクタの設定を編集し、30文字以内のアプリ名を使用します。
+  </Accordion>
+
+  <Accordion title="接続が切断済みとして表示される">
+    Plaid接続は、金融機関がアカウント保有者に再度サインインを要求する場合、認証情報が変更された場合、または権限が取り消された場合に切断されることがあります。
+
+    インテグレーションまたはコネクタパネルからPlaidを再接続してPlaid Linkを開き、アクセスを復元します。
+  </Accordion>
+
+  <Accordion title="SandboxとProductionのデータが一致しない">
+    Plaidのsandboxとproductionでは異なる認証情報とトークンを使用します。コネクタの環境が入力したPlaidシークレットとテストしている金融口座のタイプと一致していることを確認します。
+  </Accordion>
+</AccordionGroup>
+
+## 関連ドキュメント
+
+* [Agentインテグレーション](/ja/features/integrations/overview) — Replit管理インテグレーション、コネクタ、外部インテグレーション、Agentサービスの概要
+* [コネクタの管理](/ja/replitai/managing-connectors) — ワークスペースのコネクタを設定・管理する
+* [Plaidドキュメント](https://plaid.com/docs/) — Plaid API、Link、製品ドキュメント
+* [Plaidダッシュボード](https://dashboard.plaid.com/developers/keys) — PlaidのクライアントIDとシークレットを見つける
+* [Replit x Plaid](https://replit.com/partners/plaid) — デモとセットアップリソースが含まれるパートナーページ

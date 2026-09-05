@@ -1,0 +1,162 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.replit.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Sourcer des candidats
+
+> À partir d'une offre d'emploi, trouvez des ingénieurs correspondants sur GitHub, ignorez ceux déjà dans Ashby, et rédigez une prise de contact.
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ashby filtre déjà les candidatures entrantes. Ce workflow est sortant : lisez l'offre
+d'emploi dans Drive, trouvez des ingénieurs qui correspondent sur GitHub, ignorez ceux déjà
+dans Ashby, et rédigez une prise de contact que vous validez avant l'envoi. L'Agent enregistre
+les nouvelles personnes comme sourcées avec une courte explication de pourquoi elles
+correspondent et un brouillon sur la fiche candidat. Vous relisez et envoyez. N'utilisez pas
+ceci comme seule décision d'embauche.
+
+## Idéal pour
+
+* Les recruteurs techniques qui ont besoin d'une liste sourcée quand le volume entrant est trop faible.
+* Les responsables du recrutement qui ont besoin d'ingénieurs identifiés sur GitHub sans passer leur journée en recherche.
+
+## Connecteurs
+
+<Connectors
+  items={[
+{
+  id: "google-drive",
+  name: "Google Drive",
+  why: "Offre d'emploi et critères indispensables",
+},
+{
+  id: "github",
+  name: "GitHub",
+  why: "Dépôts publics, contributions et profils",
+},
+{
+  id: "ashby",
+  name: "Ashby",
+  why: "Ignorer les candidats existants et enregistrer les personnes sourcées",
+},
+]}
+/>
+
+## Avant de commencer
+
+Ayez une offre d'emploi avec les indispensables et les atouts. Connectez Drive, GitHub et
+Ashby. Précisez le lieu, le niveau d'expérience, et combien de noms vous voulez. N'utilisez
+pas ceci comme seule décision d'embauche.
+
+## Invite à l'Agent
+
+<AiPrompt>
+  Crée une routine qui s'exécute chaque lundi à 9h00. À partir de cette offre
+  d'emploi \[lien Drive ou collé], trouve 30 ingénieurs sur GitHub qui
+  correspondent aux indispensables. Ignore ceux déjà dans Ashby. Pour chaque
+  personne, écris une explication de 3 lignes sur pourquoi elle correspond et
+  un court brouillon de prise de contact. N'envoie rien. Ajoute les nouvelles
+  personnes à Ashby comme sourcées, avec la note et le brouillon sur la fiche
+  candidat.
+</AiPrompt>
+
+## À quoi s'attendre
+
+L'Agent lit l'offre d'emploi, effectue une recherche sur GitHub, ignore ceux déjà dans Ashby,
+et renvoie une liste courte avec des brouillons. Vous relisez et envoyez. Le premier passage
+sera bruyant. Affinez les indispensables après l'avoir vu. Ouvrez trois profils GitHub de la
+liste, vérifiez qu'ils correspondent aux indispensables, et confirmez que ces personnes ne
+sont pas déjà dans Ashby avant d'envoyer quoi que ce soit.
+
+## Adaptez-le à vos besoins
+
+<AiPrompt>
+  N'inclus que les personnes avec des commits récents en \[langage / type de
+  dépôt] et \[n]+ ans d'expérience pertinente. Retire toute personne qui
+  semble être un client actuel ou un employé concurrent.
+</AiPrompt>
+
+<AiPrompt>
+  Réécris la prise de contact dans mon style à partir de ces exemples
+  \[collés]. Reste sous 80 mots. Ne mentionne pas qu'un agent l'a écrite.
+</AiPrompt>
+
+## Dépannage
+
+* **La liste courte est bruyante :** affinez les indispensables par rapport aux atouts après le premier passage. Demandez des commits récents dans un langage ou type de dépôt spécifique, et retirez les personnes qui ressemblent à des clients actuels ou des employés concurrents.
+* **Des personnes déjà dans Ashby apparaissent encore :** vérifiez qu'Ashby est connecté au bon espace de travail et que l'Agent fait correspondre par e-mail ou nom d'utilisateur GitHub, pas seulement par nom affiché.
+* **Une prise de contact est partie :** ce workflow ne devrait que rédiger des brouillons. Si quelque chose a été envoyé, arrêtez la routine et demandez à l'Agent de ne jamais envoyer d'e-mail ou de message aux candidats.
+
+## Voir aussi
+
+<CardGroup cols={2}>
+  <Card title="Générer des notes de version" href="/fr/use-cases/generate-release-notes">
+    Le même connecteur GitHub pour ce que l'équipe a déjà livré.
+  </Card>
+
+  <Card title="Créer un pitch deck pour investisseurs" href="/fr/use-cases/pitch-deck-from-website">
+    Le même connecteur Google Drive pour les responsables du recrutement qui présentent aussi l'entreprise.
+  </Card>
+</CardGroup>

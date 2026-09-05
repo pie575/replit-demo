@@ -1,0 +1,156 @@
+---
+title: "Monitor brand mentions"
+description: "Catch important conversations about your brand and send them where the team already works."
+sidebarTitle: "Monitor brand mentions"
+icon: "hashtag"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Monitor mentions of a brand on X, detect important conversations, summarize sentiment and
+context, send relevant mentions to Slack, and archive them in Notion. Agent ignores noise
+and flags only what needs a reply, so you catch a spike before it becomes a support or public-relations
+issue.
+
+## Best for
+
+* Brand and community managers who need spikes in sentiment before they become a support or public-relations issue.
+* Social and support leads who need only the mentions that require a reply, not every mention.
+
+## Connectors
+
+<Connectors
+  items={[
+{
+  id: "x",
+  name: "X",
+  why: "Source of public mentions and conversations",
+  auth: "api-key",
+},
+{
+  id: "slack",
+  name: "Slack",
+  why: "Alert the team when a mention needs a response",
+},
+{ id: "notion", name: "Notion", why: "Archive summaries for later review" },
+]}
+/>
+
+## Before you start
+
+Have the brand name or handles you care about, a Slack channel for alerts, and a Notion
+database for the archive.
+
+Agent will ask for your **X Bearer Token**. Create an account at
+[console.x.com](https://console.x.com) and generate a Bearer Token there.
+
+Add credits on your X developer account. Without credits, mention search on X
+will fail.
+
+## Prompt the agent
+
+<AiPrompt>
+  Create a routine that runs every morning at 8:00. Monitor mentions of \[brand]
+  on X. Detect important conversations, summarize sentiment and context, send
+  relevant mentions to Slack, and archive them in Notion. Ignore noise. Flag
+  anything that needs a reply.
+</AiPrompt>
+
+## What to expect
+
+Agent watches for mentions, scores which ones matter, posts a short summary to Slack, and
+saves the thread in Notion. Review the first batch and tighten what counts as "important."
+If mentions never come in, check that the Bearer Token is set and the X developer account
+has credits. After the first morning run, open a Slack alert, click through to X, and
+confirm the Notion row has the same link.
+
+## Make it work for you
+
+<AiPrompt>
+  Only alert Slack for mentions with negative sentiment or more than \[n] likes.
+  Archive everything else in Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Add a daily digest in Slack with the top 5 mentions and overall sentiment.
+</AiPrompt>
+
+## Troubleshooting
+
+* **Mentions never come in:** confirm the X Bearer Token is set and the X developer account has credits. Without credits, mention search fails even with a valid token.
+* **Slack is silent but Notion fills up:** Agent may be treating everything as noise. Tighten what counts as "important," or ask it to post a daily digest even when nothing needs a reply.
+* **The archive is messy:** point Agent at a Notion database with columns you already use (date, link, sentiment, needs reply). Ask it to map to those fields instead of creating a new page each time.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Analyze customer feedback" href="/use-cases/analyze-customer-feedback">
+    Same Slack and Notion setup for support tickets.
+  </Card>
+
+  <Card title="Monitor competitors" href="/use-cases/monitor-competitors">
+    Same Slack alerts and Notion archive for competitor sites.
+  </Card>
+</CardGroup>

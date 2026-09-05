@@ -1,0 +1,128 @@
+---
+title: "Workflows"
+description: "Apprenez à configurer des Workflows — des boutons d'exécution configurables qui exécutent les commandes de votre choix."
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Un workflow est une séquence d'étapes réutilisable et personnalisable qui peut être exécutée dans votre application Replit. Elle peut être aussi simple que d'exécuter `python main.py` ou aussi complexe qu'une procédure en plusieurs étapes.
+
+<Frame>
+  <img src="/assets/mirror/workflows-pane-e7d5e4251006.png" alt="image" width="525" height="622" data-path="images/workflows/workflows-pane.png" />
+</Frame>
+
+Exemples d'utilisation :
+
+* Exécuter plusieurs services en parallèle (par ex. frontend + backend)
+* Exécuter des fichiers ou des commandes séquentiellement (par ex. exécuter le linter → exécuter les tests, compiler → exécuter le code)
+
+Pour commencer à [créer des workflows](#creating-workflows), accédez au panneau Workflows via le menu de la barre latérale des outils, ou recherchez le panneau Workflows avec `Command + K`.
+
+<YouTubeEmbed videoId="I5wePXNdPwg" title="Workflows sur Replit" />
+
+## Types de tâches disponibles
+
+Il existe actuellement 3 types de tâches disponibles : `Exécuter une commande shell`, `Installer des paquets` et `Exécuter un workflow`.
+
+### Exécuter une commande shell
+
+`Exécuter une commande shell` stocke une commande shell et l'exécute en utilisant le même environnement que le panneau Shell. Ce type de tâche offre un large éventail d'utilisations, de l'exécution de fichiers individuels :
+
+```text theme={null}
+python main.py
+```
+
+à l'exécution de commandes de requêtes de base de données complexes :
+
+```text theme={null}
+psql -h 0.0.0.0 -U your_username -d your_database -c "SELECT * FROM your_table;"
+```
+
+Exemple d'utilisation :
+
+<Frame>
+  <img src="/assets/mirror/shellExec-task-example-44b117f3fc2d.gif" alt="image" width="908" height="602" data-path="images/workflows/shellExec-task-example.gif" />
+</Frame>
+
+### Installer des paquets
+
+`Installer des paquets` utilise le système de gestion des dépendances intégré de Replit, détectant automatiquement les dépendances de votre projet et installant les paquets nécessaires. Voir [Gestion des dépendances](/fr/core-concepts/project-editor/app-setup/dependency-management#the-universal-package-manager) pour plus de détails sur la façon dont UPM devine les paquets à installer pour votre projet.
+
+Exemple d'utilisation :
+
+<Frame>
+  <img src="/assets/mirror/packager-task-example-0ed4437abfc1.webp" alt="image" width="720" height="429" data-path="images/workflows/packager-task-example.webp" />
+</Frame>
+
+### Exécuter un workflow
+
+`Exécuter un workflow` vous permet d'exécuter un autre workflow depuis le workflow actuel. Cela permet de réutiliser des workflows et de les combiner pour créer des workflows plus complexes.
+
+Exemple d'utilisation :
+
+<Frame>
+  <img src="/assets/mirror/example-run-workflow-62f93cd1bf00.webp" alt="image" width="720" height="678" data-path="images/workflows/example-run-workflow.webp" />
+</Frame>
+
+En utilisant ce type de tâche pour créer des dépendances entre workflows, vous pouvez modifier un workflow et que les autres workflows qui y font référence utilisent automatiquement les dernières modifications. Notez qu'une limite de profondeur est placée sur les appels de workflows profondément imbriqués.
+
+## Mode d'exécution des workflows
+
+Les workflows offrent deux modes d'exécution différents : séquentiel et parallèle.
+
+### Séquentiel
+
+L'exécution séquentielle exécutera chaque tâche dans l'ordre défini, attendant que chaque tâche se termine avant de passer à l'étape suivante, et arrêtant l'exécution de la séquence si une tâche dans le workflow échoue.
+
+Un exemple d'utilisation de ce mode est pour définir des commandes logiquement connectées, telles que des commandes git pour récupérer les dernières modifications de votre branche principale, puis rebaser votre branche actuelle sur la branche principale :
+
+<Frame>
+  <img src="/assets/mirror/example-sequential-workflow-62ae8a64038f.png" alt="image" width="721" height="654" data-path="images/workflows/example-sequential-workflow.png" />
+</Frame>
+
+### Parallèle
+
+L'exécution parallèle exécutera chaque tâche en parallèle, de sorte que chaque tâche soit démarrée et s'exécute indépendamment des autres tâches dans le workflow. L'échec d'une tâche n'arrête pas l'exécution des autres tâches.
+
+Un exemple d'utilisation de ce mode est l'exécution d'un projet fullstack qui doit démarrer à la fois le serveur frontend et le serveur backend :
+
+<Frame>
+  <img src="/assets/mirror/example-parallel-workflow-ebda6681ce61.png" alt="image" width="721" height="654" data-path="images/workflows/example-parallel-workflow.png" />
+</Frame>
+
+## Création de workflows
+
+Les workflows peuvent être créés via le panneau workflows en cliquant sur le bouton `+ Nouveau workflow`. Commencez par donner un nom descriptif à votre workflow, choisissez un mode d'exécution approprié et commencez à ajouter des tâches. Les tâches peuvent être réordonnées par glisser-déposer dans l'ordre souhaité.
+
+<Frame>
+  <img src="/assets/mirror/example-workflow-setup-c9ffc4fca282.webp" alt="image" width="720" height="414" data-path="images/workflows/example-workflow-setup.webp" />
+</Frame>
+
+## Assigner un workflow au bouton Run
+
+Un workflow peut également être assigné au bouton Run pour remplacer le comportement par défaut du bouton Run (voir [Configurer une application Replit](/fr/core-concepts/project-editor/app-setup/configuration)). Pour conserver la commande d'exécution par défaut configurée dans `.replit`, sélectionnez l'option par défaut « Exécuter l'application Replit » dans la liste déroulante.
+
+Le workflow sélectionné dans le menu déroulant à côté du bouton Run sera exécuté lorsque le bouton Run est cliqué. Cliquez sur le workflow souhaité dans le menu déroulant pour changer quel workflow doit être exécuté par le bouton Run.
+
+<Frame>
+  <img src="/assets/mirror/configure-run-button-workflow-92b0243e955c.gif" alt="image" width="588" height="254" data-path="images/workflows/configure-run-button-workflow.gif" />
+</Frame>
+
+## Visualisation des sorties de workflow
+
+Les sorties de workflow seront affichées dans le panneau `Console`. Vous pouvez basculer l'affichage pour n'afficher que les dernières sorties et effacer entièrement la console.
+
+<Frame>
+  <img src="/assets/mirror/workflow-output-view-550fb8b764ff.gif" alt="image" width="706" height="434" data-path="images/workflows/workflow-output-view.gif" />
+</Frame>

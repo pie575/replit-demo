@@ -1,0 +1,139 @@
+---
+title: "公開"
+description: "数クリックでReplitアプリを世界に公開しましょう。"
+sidebarTitle: "公開"
+icon: "cloud-arrow-up"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+公開（Publishing）を使用すると、シンプルなプロセスでReplitアプリを世界と共有できます。
+
+<Note>
+  アプリをライブにする操作を「公開（Publishing）」と呼びます。このページでは、利用可能なデプロイメントの種類について説明します。
+</Note>
+
+## 公開とは？
+
+公開は、Replitアプリの**スナップショット**をクラウドに保存し、誰でもインタラクトできるようにする機能です。スナップショットはReplitアプリのファイルの現在の状態をキャプチャします。
+
+Replitアプリを公開すると、**公開済みアプリ**が作成されます。公開済みアプリは、Replitのクラウドインフラストラクチャで実行されているアプリのインスタンスです。これにより、アプリはProject Editorのバージョンとは別に、インターネット上で確実に利用可能になります。
+
+<Info>
+  ReplitのインフラストラクチャはGoogle Cloud Platform（GCP）によって支えられています。すべての
+  公開済みアプリはアメリカ合衆国でホストされています。エンタープライズのお客様は
+  公開済みアプリをEU域内にホストするよう、セールスにお問い合わせください。
+
+  個人、組織、エンタープライズのすべてのお客様に、公開済みアプリ用の専用シングルテナントGCPプロジェクトが提供されます。つまり、公開済みアプリのコンピュートリソース、シークレット、ストレージは完全に分離されており、他のお客様のアプリと共有されることはありません。
+</Info>
+
+公開済みアプリのステータスを監視し、ウェブ分析を表示するためのツールが含まれています。
+
+Replitは以下のデプロイメントタイプを提供しています：
+
+<CardGroup>
+  <Card title="オートスケールデプロイメント" href="/ja/features/publishing/deployment-types#autoscale" icon="layer-group">
+    アプリの使用状況に基づいてリソースを自動調整します。
+  </Card>
+
+  <Card title="静的デプロイメント" href="/ja/features/publishing/deployment-types#static" icon="files">
+    ユーザー入力によって変化しないウェブサイトをホストするための手頃な方法を提供します。
+  </Card>
+
+  <Card title="予約VMデプロイメント" href="/ja/features/publishing/deployment-types#reserved-vm" icon="server">
+    アプリが継続的に実行するための一定量のコンピュートリソースを提供します。
+  </Card>
+
+  <Card title="スケジュールデプロイメント" href="/ja/features/publishing/deployment-types#scheduled" icon="clock">
+    指定したスケジュール時刻にアプリを実行します。
+  </Card>
+</CardGroup>
+
+## はじめに
+
+以下の手順でReplitアプリを公開します：
+
+1. Project Editorから、上部の <img class="icon-svg" src="/assets/mirror/deploy-icon-7dec74bde1ff.svg" alt="公開アイコン" width="16" height="16" data-path="images/icons/deploy-icon.svg" /> **公開**を選択します。
+2. **公開**タブで、公開オプションを選択します。
+3. **お支払い方法を追加**が表示された場合は、プロンプトに従ってお支払い方法を追加します。
+
+Replitはプロジェクトのタイプとニーズに基づいて、アプリに最適な公開オプションを自動的に選択します。
+
+ただし、別のデプロイメントタイプを選択するには、以下の情報を考慮してください。
+
+## 適切な公開オプションの選択
+
+以下の動画では、アプリに適した公開オプションの選び方を説明しています：
+
+<YouTubeEmbed videoId="OqSbgBMoTm0" title="Replit Deployments マスタークラス" />
+
+動画で紹介されている以下のデシジョンツリーを参考にしてください：
+
+<Frame>
+  <img src="/assets/mirror/decision-tree-3660e9115ca3.png" width="5344" height="6250" data-path="images/deployments/decision-tree.png" />
+</Frame>
+
+## 主な機能
+
+公開には以下の便利な機能があります：
+
+* **複数の公開オプション**：数クリックでニーズに合ったデプロイメントタイプを選択または更新。
+* **カスタムドメイン**：自分のウェブドメインからアプリを提供。
+* **分析**：公開済みアプリの訪問者データやその他のメトリクスを追跡。
+* **監視ツール**：公開済みアプリのステータスと設定を表示。
+* **アクセスコントロール**：ワンクリックでアプリを閲覧できる人を制御。**Pro** および **Enterprise** メンバーのみ利用可能。
+* **バッジ設定**：コアユーザーは公開設定で「Made with Replit」バッジを管理できます。Starterプランでバッジ付きアプリを公開した場合、アップグレード後にバッジが削除されるまで数分かかる場合があります。
+* **フィードバック収集**：公開済みアプリでフィードバックを有効にして、ユーザーからのインサイトを収集します。
+
+## 仕組み
+
+Replitアプリを公開すると、ReplitはアプリのファイルとDependenciesのスナップショットを作成します。
+このスナップショットはReplitのクラウドインフラストラクチャに送信され、アプリの別のインスタンスとして実行されます。最新の変更で公開済みアプリを更新するには、再度公開して新しいスナップショットを作成します。
+
+<Warning>
+  公開済みアプリのファイルシステムに書き込まれたデータの保存と依存は避けてください。
+  データを保存するには、ReplitのStorageやDatabase（[ストレージとデータベース](/ja/learn/projects-and-artifacts/storage-and-databases)）などのストレージやデータベースオプションを使用してください。
+</Warning>
+
+## ユースケース
+
+以下の例は、さまざまな種類の公開済みアプリを示しています。
+
+### オートスケールデプロイメント：タイピング速度測定アプリ
+
+ユーザーがタイピングテストを受けるときはクラウドがリソースをスケールアップし、使用していないときは縮小します。
+
+### 静的デプロイメント：太陽系シミュレーション
+
+ウェブ上の太陽系可視化アプリで惑星について学びます。
+この可視化はブラウザでレンダリングされ、ユーザー入力をサーバーに転送しません。
+
+### 予約VMデプロイメント：Discordボット
+
+メンバーのモデレーションとオンボーディングを支援するDiscordボットを実行します。
+予測可能な料金とパフォーマンスで、常にオンラインでユーザーとチャットし、コマンドに応答します。
+
+### スケジュールデプロイメント：ホームオートメーショントリガー
+
+特定の時刻と曜日にスマートホームデバイスを起動・停止するAPIコールをスケジュールします。
+
+## 次のステップ
+
+Replitの公開についてさらに学ぶには、以下のリソースを参照してください：
+
+* [オートスケールデプロイメント](/ja/features/publishing/deployment-types#autoscale)：トラフィックに応じてスケールするアプリケーションのセットアップ方法を学ぶ
+* [静的デプロイメント](/ja/features/publishing/deployment-types#static)：静的ウェブサイトを迅速かつ効率的に公開する方法を学ぶ
+* [予約VMデプロイメント](/ja/features/publishing/deployment-types#reserved-vm)：特殊なユースケースのための専用VMオプションを探る
+* [スケジュールデプロイメント](/ja/features/publishing/deployment-types#scheduled)：シンプルなスケジューリングで繰り返しタスクを設定する
+* [カスタムドメイン](/ja/features/publishing/custom-domains)：公開済みアプリをカスタムドメインに接続する

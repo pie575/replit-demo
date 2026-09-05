@@ -1,0 +1,136 @@
+---
+title: "Dependency Management"
+description: "Learn how to install and manage packages and dependencies for your Replit App across different languages."
+sidebarTitle: "Dependencies"
+icon: "boxes-packing"
+---
+
+Replit provides several ways to install and manage packages for your Replit App. You can install packages using the [Shell](/features/workspace-tools/shell), ask [Agent](/features/agent/overview/) to handle it for you, or let Replit automatically detect and install missing dependencies when you run your Replit App.
+
+## Install packages using the Shell
+
+Open the **Shell** tool in the Project Editor and run the appropriate command for your language's package manager:
+
+<CodeGroup>
+  ```bash Node.js (npm) theme={null}
+  npm install <package-name>
+  ```
+
+  ```bash Node.js (pnpm) theme={null}
+  pnpm add <package-name>
+  ```
+
+  ```bash Python (poetry) theme={null}
+  poetry add <package-name>
+  ```
+
+  ```bash Python (pip) theme={null}
+  pip install <package-name>
+  ```
+
+  ```bash Ruby theme={null}
+  bundle add <gem-name>
+  ```
+</CodeGroup>
+
+You can also use Replit's [Universal Package Manager (UPM)](https://github.com/replit/upm/) to install packages across supported languages:
+
+```bash theme={null}
+upm add <package-name>
+```
+
+To install a specific version:
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+For all supported languages and package managers, see [UPM: Supported Languages](https://github.com/replit/upm/#supported-languages).
+
+## Install packages using Agent
+
+You can ask [Agent](/features/agent/overview/) to install packages for you directly in chat. For example:
+
+* "Install the axios package"
+* "Add Flask and SQLAlchemy to my project"
+* "Set up TailwindCSS"
+
+Agent installs the package using the appropriate package manager for your project and updates the relevant configuration files.
+
+## Automatic import detection
+
+Replit automatically analyzes your code for missing dependencies each time you select **Run**. If your code imports a package that is not yet installed, Replit detects it and installs the latest version automatically.
+
+For example, if you add `import flask` to `main.py`, the next time you select **Run**, the **Console** displays a message indicating that **Flask** is being installed.
+
+<Note>
+  You can configure automatic import detection in the [.replit](/features/project-setup/configuration#replit-file) file using the `packager.features.guessImports` setting.
+</Note>
+
+### Override automatic detection
+
+If the wrong package was detected, or you need a specific version, run the correct install command in the Shell. For example:
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+You can also exclude specific packages or paths from automatic detection in your [.replit](/features/project-setup/configuration#replit-file) file:
+
+## Python package managers
+
+When you create a Python Replit App, your package manager is **poetry** by default. This means `pip install` does not manage your dependencies. Instead, use `poetry add <package>` or `upm add <package>` in the Shell.
+
+### Switch from poetry to pip
+
+If you prefer using `pip`, follow these steps:
+
+<Steps>
+  <Step>
+    Open the Shell and run:
+
+    Remove the lock file so that the packaging infrastructure switches to pip:
+
+    ```bash theme={null}
+    rm poetry.lock
+    ```
+  </Step>
+
+  <Step title="Move your dependencies">
+    Transfer your dependencies from the `[tool.poetry.dependencies]` section in `pyproject.toml` to `requirements.txt`. For example, `flask = "^3.0.2"` becomes `flask>=3.0.2,<4`.
+  </Step>
+
+  <Step title="Clean up pyproject.toml">
+    Delete the `[tool.poetry...]` sections from `pyproject.toml`.
+  </Step>
+</Steps>
+
+After these changes, the packaging infrastructure uses `pip` for all future operations, and automatic import detection continues to work as expected.
+
+## System dependencies with Nix
+
+Replit supports all programming languages through integration with [Nix](https://nixos.org/). If you need system-level dependencies beyond standard language packages, you can add them to your [replit.nix](/features/project-setup/configuration#replit-nix-file) file.
+
+### Nix packages
+
+Add system-level dependencies by editing `replit.nix` directly. You can search for available packages at [search.nixos.org](https://search.nixos.org/packages).
+
+### Modules
+
+Modules combine support for programming languages, formatters, and packagers. They provide the foundation for your Replit App. If you create a Replit App from a template or GitHub repository, Replit automatically installs the required modules.
+
+You can customize modules and other Nix settings using the [.replit](/features/project-setup/configuration#replit-file) file.
+
+## Packager configuration
+
+You can fine-tune package management behavior in your [.replit](/features/project-setup/configuration#replit-file) file:
+
+| Setting                               | Description                                              | Default                |
+| ------------------------------------- | -------------------------------------------------------- | ---------------------- |
+| `packager.language`                   | Language used for package operations                     | Detected automatically |
+| `packager.features.guessImports`      | Automatically detect and install missing packages on Run | `true`                 |
+| `packager.features.packageSearch`     | Enable package search support                            | `true`                 |
+| `packager.features.enabledForHosting` | Require package installation when hosting                | `false`                |
+| `packager.afterInstall`               | Command to run after a package is installed              | —                      |
+| `packager.ignoredPaths`               | Paths to ignore during import detection                  | `[]`                   |
+| `packager.ignoredPackages`            | Packages to exclude from automatic detection             | `[]`                   |

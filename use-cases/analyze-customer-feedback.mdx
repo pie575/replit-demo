@@ -1,0 +1,141 @@
+---
+title: "Analyze customer feedback"
+description: "Turn support tickets into themes, trends, and a dashboard the team can act on."
+sidebarTitle: "Analyze customer feedback"
+icon: "comments"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Not a native connector. Agent will ask for your API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Pull support tickets from Zendesk, categorize issues, identify trends, and
+update a Notion dashboard with top themes, volume vs last week, and suggested follow-ups.
+Ping Slack if a new theme appears or volume jumps, so the team can act before it hits the
+roadmap.
+
+## Best for
+
+* Product managers who need weekly reviews from Zendesk.
+* Support and product leads who need to catch a new issue before it hits the roadmap.
+
+## Connectors
+
+<Connectors
+  items={[
+{ id: "zendesk", name: "Zendesk", why: "Tickets and conversation text" },
+{ id: "slack", name: "Slack", why: "Alert on a spike or a new theme" },
+{ id: "notion", name: "Notion", why: "Theme log and dashboard" },
+]}
+/>
+
+<Note>Also works with Intercom, Front, and Zoho Desk.</Note>
+
+## Before you start
+
+Connect Zendesk, Slack, and Notion. Tell Agent which products or tags to include.
+
+## Prompt the agent
+
+<AiPrompt>
+  Create a routine that runs every Monday at 9:00. Pull last week's tickets from
+  Zendesk. Categorize issues, identify trends, and update a Notion dashboard
+  with top themes, volume vs last week, and suggested follow-ups. Ping Slack if
+  a new theme appears or volume jumps.
+</AiPrompt>
+
+## What to expect
+
+Agent clusters tickets into themes, counts volume, and writes a short "what to do." Sample a
+few tickets per theme to check the labels. After the first week, raise or lower what counts
+as a spike so Slack stays useful. Open two tickets per top theme in Zendesk and confirm
+the label fits. If Slack fired, check that volume really jumped vs last week.
+
+## Make it work for you
+
+<AiPrompt>
+  Separate bugs, billing, and feature requests. Rank feature requests by
+  frequency.
+</AiPrompt>
+
+<AiPrompt>
+  Draft a customer reply template for the top theme this week.
+</AiPrompt>
+
+## Troubleshooting
+
+* **Themes are too vague or mix unrelated tickets:** tell Agent which products or tags to include, and ask it to separate bugs, billing, and feature requests. Sample a few tickets per theme to check the labels.
+* **Slack pings on every small change:** raise the bar: only alert when a new theme appears or volume jumps by a percentage you name.
+* **Tickets come from the wrong workspace:** connect Zendesk to the right workspace and say which products or tags to include.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Monitor brand mentions" href="/use-cases/monitor-brand-mentions">
+    Same Slack and Notion setup for public sentiment, not just tickets.
+  </Card>
+
+  <Card title="Generate release notes" href="/use-cases/generate-release-notes">
+    For product managers who also ship a weekly changelog in Notion.
+  </Card>
+</CardGroup>

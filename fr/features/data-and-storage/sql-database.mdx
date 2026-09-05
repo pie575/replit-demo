@@ -1,0 +1,105 @@
+---
+title: "Base de données"
+description: "Apprenez à utiliser la base de données SQL intégrée de Replit pour stocker et récupérer des données pour votre application."
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube video", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Replit Database utilise une base de données SQL entièrement gérée qui vous permet d'ajouter un stockage de données persistant à votre application Replit depuis l'éditeur de projet.
+
+<Note>
+  La façon la plus rapide de commencer est de demander à **Agent** d'ajouter une base de données à votre application. Agent configurera l'intégration, créera le schéma de la base de données et mettra à jour votre application pour stocker et récupérer des données.
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/database-editor-cbaa1fe049f8.jpg" alt="capture d'écran de l'éditeur de base de données" width="1389" height="871" data-path="images/databases/database-editor.jpg" />
+</Frame>
+
+## Fonctionnalités
+
+L'outil Replit Database fournit les fonctionnalités suivantes :
+
+* **Outils de base de données** : Exécutez des requêtes, gérez le schéma de la base de données et visualisez les données avec les outils SQL intégrés
+* **Voyage dans le temps** : Restaurez votre base de données à n'importe quel point de contrôle **Agent**. Consultez [Récupération de données](/fr/features/data-and-storage/data-recovery)
+* **Stockage gratuit** : Inclut 20 Go de stockage gratuit pour chaque application Replit.
+* **Variables d'environnement** : Utilisez des variables d'environnement dans votre application Replit pour accéder de façon sécurisée à la base de données
+
+<Info>
+  Avant le 4 décembre 2025, la base de données de développement était hébergée sur Neon et présente quelques différences importantes.
+  Consultez [Développement et production](/fr/features/data-and-storage/development-and-production#base-de-données-de-développement-legacy) pour plus de détails.
+</Info>
+
+## Utilisation
+
+<YouTubeEmbed videoId="zbyRuoPNIc8" title="Comment utiliser les bases de données sur Replit" />
+
+Vous pouvez accéder à l'outil Replit Database directement dans l'éditeur de projet.
+Les sections suivantes vous guident dans la configuration et la gestion de votre base de données.
+
+<Accordion title="Comment accéder à l'outil Database">
+  1. Ouvrez le panneau **Tools** et sélectionnez **Database** sous **Replit Cloud**.
+  2. La vue d'accueil liste vos bases de données. Sélectionnez-en une, comme **Development Database**, pour l'ouvrir.
+</Accordion>
+
+L'outil Database est organisé autour de votre liste de bases de données. La vue d'accueil affiche chaque base de données avec son utilisation de stockage, ainsi que votre **Billing Period** et vos **Hours of Compute Used** actuels. Ouvrir une base de données affiche trois onglets :
+
+* **Overview** : Les tables de votre base de données.
+* **My Data** : Parcourez et modifiez les lignes, ou exécutez des requêtes SQL.
+* **Settings** : La chaîne de connexion, l'utilisation du stockage et les détails de connexion.
+
+### Ajouter une base de données
+
+Toutes les applications Replit sont livrées avec une base de données par défaut. Vous pouvez y accéder en sélectionnant l'outil <img class="icon-svg" src="/assets/mirror/postgres-c4cb2a1e2de3.svg" alt="Icône base de données PostgreSQL" width="24" height="24" data-path="images/icons/postgres.svg" /> **Database** dans l'éditeur de projet.
+
+Vous pouvez intégrer la base de données à votre application Replit en demandant à **Agent** d'ajouter une base de données PostgreSQL à votre application Replit,
+en précisant les données que votre application Replit doit stocker. Agent créera le schéma de la base de données
+et mettra à jour votre application pour communiquer avec la base de données.
+
+### Fonctionnalités de sécurité
+
+Lorsque vous ajoutez une intégration de base de données avec **Agent**, il ajoute un Object-Relational Mapper (ORM)
+qui gère toutes les communications avec la base de données avec une sécurité intégrée.
+
+Cette couche ORM, combinée à l'implémentation des meilleures pratiques de sécurité par Agent, protège votre application contre les exploits grâce aux fonctionnalités suivantes :
+
+* **Validation du schéma** : Vérifie que les données sont conformes aux formats attendus
+* **Assainissement des données** : Nettoie automatiquement les entrées des créateurs pour prévenir les attaques par injection SQL
+
+## Prochaines étapes
+
+Avant le 4 décembre 2025, la base de données de développement était hébergée sur <a href="https://neon.com/" target="_blank">Neon</a>.
+Cette base de données est maintenant dépréciée et toutes les nouvelles bases de données de développement sont hébergées sur l'infrastructure de base de données propre de Replit.
+
+Vous pouvez voir si votre base de données de développement est hébergée sur Neon en vérifiant la [variable d'environnement](#afficher-les-identifiants-de-connexion-et-lutilisation) `DATABASE_URL`.
+
+<Info>
+  Si `DATABASE_URL` contient `neon.tech/neondb`, alors votre base de données de développement est encore hébergée sur Neon.
+  Sinon, si elle contient `helium/heliumdb`, alors votre base de données de développement est maintenant hébergée sur Replit.
+</Info>
+
+Voici les différences clés entre la base de données de développement Neon legacy et la nouvelle base de données de développement Replit :
+
+| **Fonctionnalité**                 | **Replit (actuel)**                                                                                                                                                                               | **Neon (legacy)**                                                                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hébergement**                    | Hébergé sur l'infrastructure propre de Replit                                                                                                                                                     | Hébergé sur Neon (fournisseur tiers)                                                                                                                                                   |
+| **Facturation**                    | Inclus gratuitement avec chaque application Replit                                                                                                                                                | Facturation basée sur l'utilisation. Voir [Facturation des publications et des bases de données](/fr/billing/about-usage-based-billing#databases) pour plus de détails.                |
+| **Capacité de restauration**       | Restaurez votre base de données à n'importe quel point de contrôle grâce à la [fonctionnalité de rollback](/fr/features/version-control/checkpoints-and-rollbacks/)                               | Restauration à un point dans le temps (PITR) — récupérez à n'importe quel point dans la fenêtre de rétention des sauvegardes.                                                          |
+| **Sécurité de connexion**          | Accessible uniquement depuis votre application ; jamais exposé publiquement.                                                                                                                      | Utilisait une chaîne de connexion complète — si divulguée, n'importe qui pourrait accéder à et modifier votre base de données.                                                         |
+| **Comportement de remix**          | Le [remix](/fr/features/projects-and-artifacts/remix-an-app) crée une nouvelle base de données de développement avec des données copiées pour l'isolation et la sécurité.                         | Le remix réutilisait la même base de données pour toutes les copies, donc les modifications dans les remixes pouvaient affecter l'application d'origine.                               |
+| **Création de la base de données** | Créée automatiquement pour chaque application Replit.                                                                                                                                             | Nécessitait une configuration explicite.                                                                                                                                               |
+| **Flux de publication**            | Le déploiement ou la publication nécessite la création d'une [base de données de production](/fr/features/data-and-storage/development-and-production) pour l'isolation entre les environnements. | Le développement et la production partageaient la même base de données, donc des modifications de développement non intentionnelles pouvaient affecter les applications en production. |
+
+<Warning>
+  Si votre application a été forkée ou remixée lors de l'utilisation de la base de données Neon legacy, votre application publiée peut encore référencer l'URL de la base de données de l'application d'origine. Après la [mise à niveau de la base de données](/fr/features/data-and-storage/development-and-production), cette connexion partagée cessera de fonctionner. Consultez [Corriger une application publiée utilisant une base de données partagée](/fr/features/data-and-storage/shared-database-migration) pour savoir comment mettre à jour votre application publiée.
+</Warning>

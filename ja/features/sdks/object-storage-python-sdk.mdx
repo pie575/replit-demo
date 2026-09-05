@@ -1,0 +1,274 @@
+---
+title: "App Storage Python SDK"
+description: "公式Python SDKを使用してReplit App Storageのファイルを管理する方法を学ぶ。"
+---
+
+このリファレンスガイドでは、`replit-object-storage-python` パッケージの `Client` クラスについて説明し、クラスメソッドのコード例を提供します。
+
+## Client
+
+`Client` クラスはReplit App Storageとのやり取りを管理します。このクラスはバケット内のオブジェクトを操作するメソッドを備えています。
+
+`replit.object_storage` パッケージからクラスをインポートするには、Pythonコードに次の行を追加します：
+
+```python theme={null}
+from replit.object_storage import Client
+```
+
+次のコードを使用して、Replit App Storageとやり取りする `Client` インスタンスを作成します：
+
+```python theme={null}
+client = Client()
+```
+
+<Tip>
+  アプリが複数のバケットを使用する場合、バケットごとに1つの `Client` インスタンスを作成してください。
+</Tip>
+
+### \_\_init\_\_
+
+`init` メソッドはClientクラスのインスタンスを初期化します。
+
+```python theme={null}
+def __init__(bucket_id: Optional[str] = None)
+```
+
+**引数**:
+
+* `bucket_id` (Optional\[str]): クライアントが管理するバケットのID。省略した場合、ClientはReplit AppまたはDeploymentに関連付けられたデフォルトのバケットを使用します。
+
+### copy
+
+`copy` メソッドは同じバケット内でオブジェクトをコピーします。同じ場所にオブジェクトが存在する場合は上書きします。
+
+```python theme={null}
+def copy(object_name: str, dest_object_name: str) -> None
+```
+
+**引数**:
+
+* `object_name` (str) - ソースオブジェクトのフルパス。
+* `dest_object_name` (str) - オブジェクトのコピー先フルパス。
+
+**例外**:
+
+* `ObjectNotFoundError` - 指定したパスにソースオブジェクトが存在しないことを示します。
+
+### delete
+
+`delete` メソッドはApp Storageからファイルを完全に削除します。
+
+```python theme={null}
+def delete(object_name: str, ignore_not_found: bool = False) -> None
+```
+
+**引数**:
+
+* `object_name` (str) - 削除するオブジェクトの名前。
+* `ignore_not_found` (bool) - `True` の場合、オブジェクトが存在しなくてもエラーを抑制します。
+
+**例外**:
+
+* `ObjectNotFoundError` - オブジェクトが存在しないことを示します。
+
+### download\_as\_bytes
+
+`download_as_bytes` メソッドはファイルの内容を `bytes` として取得します。
+
+```python theme={null}
+def download_as_bytes(object_name: str) -> bytes
+```
+
+**引数**:
+
+* `object_name` (str) - ダウンロードするオブジェクトの名前。
+
+**戻り値**:
+
+* `bytes` - オブジェクトの内容の生のバイト表現。
+
+**例外**:
+
+* `ObjectNotFoundError` - オブジェクトが存在しないことを示します。
+
+### download\_as\_text
+
+`download_as_text` メソッドはファイルの内容を `str` 型としてダウンロードします。
+
+```python theme={null}
+def download_as_text(object_name: str) -> str
+```
+
+**引数**:
+
+* `object_name` (str) - 取得するソースオブジェクト名。
+
+**戻り値**:
+
+* str: UTF-8エンコードされた文字列としてのオブジェクトの内容。
+
+**例外**:
+
+* `ObjectNotFoundError` - オブジェクトが存在しないことを示します。
+
+### download\_to\_filename
+
+ローカルディスク上のファイルにオブジェクトの内容をダウンロードします。
+
+```python theme={null}
+def download_to_filename(object_name: str, dest_filename: str) -> None
+```
+
+**引数**:
+
+* `object_name` (str) - App Storageから取得するソースオブジェクト名。
+* `dest_filename` (str) - ローカルディスク上の保存先ファイル名。
+
+**例外**:
+
+* `ObjectNotFoundError` - オブジェクトが存在しないことを示します。
+
+### exists
+
+`exists` メソッドはオブジェクトが存在するかどうかを確認します。
+
+```python theme={null}
+def exists(object_name: str) -> bool
+```
+
+**引数**:
+
+* `object_name` (str) - 存在を確認するオブジェクトの名前。
+
+**戻り値**:
+
+* `bool`: オブジェクトが存在する場合は `True`、そうでない場合は `False`。
+
+### list
+
+`list` メソッドはバケット内のオブジェクトを一覧表示します。
+
+```python theme={null}
+def list(end_offset: Optional[str] = None,
+         match_glob: Optional[str] = None,
+         max_results: Optional[int] = None,
+         prefix: Optional[str] = None,
+         start_offset: Optional[str] = None) -> List[Object]
+```
+
+**引数**:
+
+* `end_offset`(Optional\[str]) - `end_offset` より辞書順で前の名前を持つオブジェクトに結果をフィルタします。`start_offset` が定義されている場合、リストされるオブジェクトの名前は `start_offset`（含む）から `end_offset`（含まない）の間になります。
+* `match_glob` (Optional\[str]) - 結果をフィルタするためのglobパターン。例: "foo\*bar" は "footbar"、"foo baz bar"、"foobar" にマッチします。
+* `max_results` (Optional\[int]) - レスポンスで返す結果の最大数。
+* `prefix` (Optional\[str]) - 指定したプレフィックスを持つ名前のオブジェクトに結果をフィルタします。
+* `start_offset` (Optional\[str]) - `start_offset` と辞書順で等しいか後の名前のオブジェクトに結果をフィルタします。`end_offset` が設定されている場合、リストされるオブジェクトの名前は `start_offset`（含む）から `end_offset`（含まない）の間になります。
+
+**戻り値**:
+
+* `List`(Object): 指定したクエリパラメーターに一致するオブジェクトのリスト。
+
+### upload\_from\_filename
+
+`upload_from_filename()` を使用して、ローカルディスク上のソースファイルからApp Storageにオブジェクトをアップロードします。
+
+```python theme={null}
+def upload_from_filename(dest_object_name: str, src_filename: str) -> None
+```
+
+**引数**:
+
+* `dest_object_name`(str) - アップロードするファイルの名前。
+* `src_filename`(str) - アップロードするソースファイル。
+
+### upload\_from\_bytes
+
+`upload_from_bytes` メソッドは `bytes` データからオブジェクトをアップロードします。
+
+```python theme={null}
+def upload_from_bytes(dest_object_name: str, src_data: bytes) -> None
+```
+
+**引数**:
+
+* `dest_object_name`(str) - アップロードするオブジェクトの名前。
+* `src_data`(str) - アップロードする `bytes` データ。
+
+### upload\_from\_text
+
+`upload_from_text` メソッドは文字列からオブジェクトをアップロードします。
+
+```python theme={null}
+def upload_from_text(dest_object_name: str, src_data: Union[bytes, str]) -> None
+```
+
+**引数**:
+
+* `dest_object_name`(str) - アップロードするオブジェクトの名前。
+* `src_data`(str) - アップロードするテキストデータ。
+
+### 例外タイプ
+
+* `Client` を使用してReplit App Storageとやり取りする際、次のいずれかのエラーが返される可能性があります：
+
+  * `BucketNotFoundError`: 設定されたバケット名がApp Storageのどのバケットとも一致しないことを示します。
+
+  * `DefaultBucketError`: デフォルトのバケット設定が欠如していることを示します。
+
+  * `ForbiddenError`: バケットへのアクセス権限が不足していることを示します。
+
+  * `TooManyRequestsError`: 過剰なリクエストによりオペレーションがレート制限されていることを示します。
+
+  * `UnauthorizedError`: 認証によりオペレーションへのアクセスが制限されていることを示します。
+
+## クラスメソッドの例
+
+以下のセクションでは、Replit App Storage SDKを使用してオブジェクトを管理するコード例を提供します。
+
+### ファイルをテキストとして取得する
+
+```python theme={null}
+client.download_as_text("file.json")
+```
+
+### ファイルの生バイトを取得する
+
+```python theme={null}
+client.download_as_bytes("file.png")
+```
+
+### ファイルをローカルファイルシステムにダウンロードする
+
+```python theme={null}
+client.download_to_filename("file.json", dest_filename)
+```
+
+### バケット内のオブジェクトを一覧表示する
+
+```python theme={null}
+client.list()
+```
+
+### テキストからファイルをアップロードする
+
+```python theme={null}
+client.upload_from_text("file.json", data)
+```
+
+### バイトとしてファイルをアップロードする
+
+```python theme={null}
+client.upload_from_bytes("file.png", data)
+```
+
+### ファイルシステムからオブジェクトをアップロードする
+
+```python theme={null}
+client.upload_from_filename("file.json", src_filename)
+```
+
+### バケットからオブジェクトを削除する
+
+```python theme={null}
+client.delete("file.json")
+```
