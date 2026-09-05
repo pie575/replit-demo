@@ -1,0 +1,250 @@
+---
+title: "修复使用共享数据库的已发布应用"
+description: "更新仍在使用为其他应用创建的数据库的已发布应用的操作步骤。"
+---
+
+部分较早发布的应用可能仍连接着最初为其他应用创建的开发数据库。
+
+这种情况多见于在 Replit 上通过复刻 (fork) 或重混 (remix) 创建的旧应用。在旧版 Neon 配置下，复刻出的应用可以继续沿用原应用的数据库连接。随着 Replit 将开发数据库与生产数据库彻底分离，旧的共享开发数据库将在迁移过程中被删除，已发布的应用需要迁移到各自独立的生产数据库。
+
+如果已发布的应用出现数据库连接错误，或者 Secrets 面板中的 `DATABASE_URL` 仍然指向 `neon.tech`，请参考本指南。
+
+<Warning>
+  旧的共享数据库将于 **2026 年 6 月 8 日**关闭。请在此之前更新已发布的应用，以免出现停机或永久性数据丢失。
+</Warning>
+
+<div id="section">
+  ## 开始之前
+</div>
+
+已发布应用需要有自己的**生产数据库**。**数据库**面板中显示的开发数据库不应直接供已发布应用使用。
+
+<Frame>
+  <img src="/assets/mirror/dev-database-5c024a6c134e.png" alt="显示开发数据库的数据库面板" width="955" height="767" data-path="images/databases/shared-database-migration/dev-database.png" />
+</Frame>
+
+要解决这个问题，请先确认你属于哪种情况：
+
+* **情况 1：**所需数据已显示在应用的**数据库**面板中。
+* **情况 2：**已发布应用仍在使用旧的共享开发数据库，因此**数据库**面板中未显示所需数据。
+
+<div id="section-2">
+  ## 如何确认已发布应用是否使用了共享数据库
+</div>
+
+如果符合以下任一情况，说明你已发布应用受到了影响：
+
+* 数据库升级后，已发布应用出现数据库连接错误
+* 应用是在 **2026 年 1 月 9 日之前**从另一个带有数据库的应用重混 (Remix) 而来
+
+<div id="section-3">
+  ## 如何检查已发布应用是否使用源应用的共享数据库
+</div>
+
+<div id="1">
+  ### 步骤 1：打开源应用的数据库面板
+</div>
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-showing-secrets-763dd4c4845f.png" alt="显示 DATABASE_URL 的 Secrets 面板" width="792" height="418" data-path="images/databases/shared-database-migration/secret-pane-showing-secrets.png" />
+</Frame>
+
+获取 `NEON_DATABASE_URL` 的值；若不存在 `NEON_DATABASE_URL`，则改用 `DATABASE_URL`。
+
+<Info>
+  并非所有受影响的应用都有 `NEON_DATABASE_URL`。如果找不到它，且其值仍指向 `neon.tech`，请使用已发布应用 Secrets 中当前的 `DATABASE_URL`。
+</Info>
+
+<div id="2publish">
+  ### 步骤 2：打开已发布应用的 Publish 面板
+</div>
+
+<Frame>
+  <img src="/assets/mirror/production-app-secrets-e4da45c53e36.png" alt="显示 DATABASE_URL 的已发布应用 Secrets" width="1385" height="1225" data-path="images/databases/shared-database-migration/production-app-secrets.png" />
+</Frame>
+
+要查看已发布应用的数据库 URL，请执行以下操作：
+
+1. 在 Replit 中用 AI 打开该应用
+2. 打开**发布**面板
+3. 打开**调整设置**
+4. 打开 **Secrets**
+5. 找到 `DATABASE_URL`
+
+<div id="312url">
+  ### 步骤 3：比较步骤 1 中源应用与步骤 2 中重混应用的数据库 URL
+</div>
+
+如果两者相同，说明已发布应用使用的是源应用的共享 Neon 开发数据库。
+
+<div id="section-4">
+  ## 如何将数据从源应用复制到已发布应用
+</div>
+
+确认已发布应用使用的是源应用的共享开发数据库后，下一步是将所需数据传输到已发布应用。需要考虑以下两种情况：
+
+* 情况 1：已发布应用的**数据库**面板中已包含所需数据。
+* 情况 2：已发布应用的**数据库**面板中不包含所需数据。
+
+<div id="1-2">
+  ### 情况 1：数据库面板中已显示所需数据
+</div>
+
+如果应用的**数据库**面板中已经显示了所需数据，这是最简单的方法。
+
+<div id="1-3">
+  #### 步骤 1：确认数据存在
+</div>
+
+<Frame>
+  <img src="/assets/mirror/my-data-12834f2ebfd6.png" alt="显示数据行的数据库面板" width="865" height="454" data-path="images/databases/shared-database-migration/my-data.png" />
+</Frame>
+
+打开已发布应用的**数据库**面板，确认其中包含所需的表和数据。
+
+如果数据库面板未显示所需数据，请先暂停操作，并按照[情况 2](#case-2-the-database-panel-does-not-show-the-data-you-need)的步骤正确迁移数据。
+
+<div id="2">
+  #### 步骤 2：使用生产数据库发布或重新发布
+</div>
+
+1. 在项目编辑器中打开应用
+2. 选择**发布**或**重新发布**
+3. 开启**创建生产数据库**
+4. 开启**使用当前开发数据设置生产数据库**
+5. 完成发布流程
+
+发布后会创建已发布应用的新版本，并自动将 `DATABASE_URL` 指向新的生产数据库。在此流程中，你无需手动更新该 Secrets。
+
+<Frame>
+  <img src="/assets/mirror/production-database-settings-8855bf453da9.png" alt="显示生产数据库创建选项的发布设置" width="1406" height="1207" data-path="images/databases/shared-database-migration/production-database-settings.png" />
+</Frame>
+
+<Warning>
+  复制到生产环境会覆盖现有的生产数据。详情请参阅[生产数据库](/zh/ja/features/data-and-storage/development-and-production)。
+</Warning>
+
+<div id="3">
+  #### 步骤 3：验证已发布应用
+</div>
+
+打开已发布应用，确认能够访问数据且应用运行正常。
+
+<div id="2-2">
+  ### 情况 2：数据库面板中未显示所需数据
+</div>
+
+如果已发布应用的**数据库**面板中未显示所需数据，请按以下步骤导出数据。
+
+如果已发布应用仍连接着另一个应用的数据库，数据库面板会显示“检测到外部数据库”警告。
+
+<Frame>
+  <img src="/assets/mirror/external-database-detected-489d99632e74.png" alt="显示检测到外部数据库的数据库面板" width="1403" height="1208" data-path="images/databases/shared-database-migration/external-database-detected.png" />
+</Frame>
+
+<Warning>
+  如果用户仍在使用该应用保存新数据，请在导出数据前安排一个短暂的维护窗口。
+</Warning>
+
+<div id="1-4">
+  #### 步骤 1：从旧数据库导出数据
+</div>
+
+<Frame>
+  <img src="/assets/mirror/pg-dump-example-54c6c790ccb1.png" alt="pg_dump 示例" width="1252" height="450" data-path="images/databases/shared-database-migration/pg-dump-example.png" />
+</Frame>
+
+在项目编辑器中打开 **Shell**，然后运行以下命令：
+
+```bash theme={null}
+pg_dump -Fc "database_url" --no-owner --no-privileges -f backup.dump
+```
+
+`database_url` 即你在[步骤 1：在源应用中打开数据库面板](#step-1-open-the-database-panel-in-the-source-app)中获取的数据库 URL。
+
+<div id="2secretsdatabase_url">
+  ### 步骤 2：从应用的 Secrets 中删除旧的 `DATABASE_URL`
+</div>
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-eb253120f8a6.png" alt="Secrets 面板示例" width="1410" height="1184" data-path="images/databases/shared-database-migration/secret-pane.png" />
+</Frame>
+
+1. 在项目编辑器中打开 **Secrets** 工具
+2. 找到旧的 `DATABASE_URL`
+3. 将其删除
+4. 刷新页面或重新打开**数据库**面板
+
+完成后，应用将不再引用旧的共享数据库，而是重新使用当前的开发数据库。
+
+<div id="3-2">
+  ### 步骤 3：将数据导入当前的开发数据库
+</div>
+
+<Frame>
+  <img src="/assets/mirror/pg-restore-example-409ae4d7bf09.png" alt="pg_restore 示例" width="802" height="426" data-path="images/databases/shared-database-migration/pg-restore-example.png" />
+</Frame>
+
+删除旧的 `DATABASE_URL` Secrets后，应用当前的开发数据库会在项目编辑器中重新以 `$DATABASE_URL` 的形式提供。
+
+返回项目编辑器的 **Shell**，运行以下命令：
+
+```bash theme={null}
+pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+```
+
+这会将导出的数据加载到应用当前的开发数据库中。
+
+<div id="51">
+  ### 步骤 5：按照情况 1 使用生产数据库发布或重新发布
+</div>
+
+当**数据库**面板显示出所需的正确数据后，按照[情况 1](#case-1-the-database-panel-already-shows-the-data-you-need)**创建生产数据库**，将数据复制到生产环境，然后发布或重新发布。
+
+<div id="6">
+  ### 步骤 6：验证已发布应用
+</div>
+
+<Frame>
+  <img src="/assets/mirror/successful-export-bfb997304cc1.png" alt="导出成功" width="965" height="554" data-path="images/databases/shared-database-migration/successful-export.png" />
+</Frame>
+
+打开已发布应用，确认能够访问数据且应用运行正常。
+
+<div id="section-5">
+  ## 故障排除
+</div>
+
+<div id="section-6">
+  ### 表已存在导致导入失败
+</div>
+
+上述 `pg_restore --clean --if-exists` 命令会在恢复前，先删除转储文件中匹配的对象，然后重新创建它们。
+
+<div id="section-7">
+  ### 导入因角色或策略错误而失败
+</div>
+
+如果你的数据库使用了自定义 PostgreSQL 角色或基于角色的策略，由于这些角色在新数据库中尚不存在，导入可能会失败。
+
+Replit 的自动 Helium 迁移会在恢复前尝试重建角色存根，但上述手动流程不会执行这一步。如果在 `pg_restore` 过程中遇到与角色相关的错误，请[联系支持团队](https://replit.com/support)。
+
+<div id="section-8">
+  ### 如果你已经修复了应用
+</div>
+
+如果已发布应用已拥有自己的生产数据库且运行正常，则无需再做任何操作。
+
+<div id="section-9">
+  ## 需要更多帮助
+</div>
+
+如果您不确定自己的应用属于哪种情况，或在迁移过程中遇到问题，请[联系支持团队](https://replit.com/support)。
+
+<div id="section-10">
+  ## 相关文档
+</div>
+
+* [数据库升级](/zh/ja/features/data-and-storage/development-and-production#database-infrastructure-upgrade)
+* [生产数据库](/zh/ja/features/data-and-storage/development-and-production)
+* [数据库](/zh/ja/features/data-and-storage/sql-database)

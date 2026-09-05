@@ -1,0 +1,109 @@
+---
+title: "Устранение ошибки истечения срока действия подключения Salesforce"
+description: "Обновите политику токенов обновления, чтобы устранить ошибку «Connection Expired» в коннекторе Salesforce для Replit."
+---
+
+<div id="section">
+  ## Обзор
+</div>
+
+Если коннектор Salesforce перестаёт работать и отображается ошибка **«Connection Expired»**, обычно это происходит потому, что политика токенов обновления в вашей организации Salesforce настроена на отзыв токенов через определённый период. В этом случае Replit больше не может аутентифицироваться в Salesforce от вашего имени, и вам необходимо повторно пройти аутентификацию для подключения.
+
+В этом руководстве объясняется, как обновить настройки Connected App в Salesforce, чтобы токены обновления оставались действительными, пока не будут явно отозваны.
+
+<Warning>
+  Для выполнения этих шагов требуется **доступ администратора Salesforce**. Если у вас нет прав администратора, обратитесь к администратору Salesforce и поделитесь с ним этим руководством.
+</Warning>
+
+<div id="section-2">
+  ## Устранение неполадок
+</div>
+
+<div id="1-salesforceconnected-app">
+  ### Шаг 1. Откройте настройки Connected App в Salesforce
+</div>
+
+<Steps>
+  <Step title="Войдите в Salesforce">
+    Войдите в организацию Salesforce с правами администратора.
+  </Step>
+
+  <Step title="Перейдите в Connected Apps">
+    Перейдите в **Setup &gt; Apps &gt; Connected Apps &gt; Manage Connected Apps**.
+  </Step>
+
+  <Step title="Найдите App Replit">
+    В списке найдите и выберите Connected App **Replit**.
+  </Step>
+
+  <Step title="Измените политики">
+    Выберите **Edit Policies**, чтобы открыть страницу настроек политик.
+  </Step>
+</Steps>
+
+<div id="2">
+  ### Шаг 2: Обновите политику токенов обновления
+</div>
+
+Стандартная политика Salesforce для токенов обновления может аннулировать token через определённое количество дней или после периода бездействия. Чтобы подключение не истекало, измените политику так, чтобы token оставался действительным бессрочно.
+
+<Steps>
+  <Step title="Найдите настройку политики токенов обновления">
+    На странице Connected App Edit найдите раздел **политики токенов обновления** в разделе **OAuth Policies**.
+  </Step>
+
+  <Step title="Выберите «Refresh token is valid until revoked»">
+    Установите для политики значение **Refresh token is valid until revoked**. Это предотвратит автоматическое аннулирование token.
+
+    <Frame>
+      <img src="/assets/mirror/refresh-token-policy-e2f92339f33d.png" alt="Страница Salesforce Connected App Edit, где для политики токенов обновления установлено значение Refresh token is valid until revoked" width="886" height="449" data-path="images/replitai/debugging-salesforce-connectors/refresh-token-policy.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Сохраните изменения">
+    Выберите **Save**, чтобы применить обновлённую политику.
+  </Step>
+</Steps>
+
+<Tip>
+  Изменения политики могут вступить в силу через несколько минут. После сохранения подождите несколько минут, затем повторно подключите Salesforce в Replit.
+</Tip>
+
+<div id="3-replitsalesforce">
+  ### Шаг 3: переподключите Salesforce в Replit
+</div>
+
+После обновления политики токенов обновления переподключите коннектор Salesforce в Replit.
+
+<Steps>
+  <Step title="Откройте Project Editor">
+    Перейдите к приложению в Project Editor.
+  </Step>
+
+  <Step title="Перейдите в Connectors">
+    Откройте панель **Connectors** на боковой панели.
+  </Step>
+
+  <Step title="Переподключите Salesforce">
+    Для подключения Salesforce с истёкшим сроком действия выберите **Reconnect**. При появлении запроса завершите процесс аутентификации OAuth.
+  </Step>
+</Steps>
+
+<div id="section-3">
+  ## Если ошибка по-прежнему отображается
+</div>
+
+Если подключение становится недействительным даже после обновления политики токенов обновления:
+
+* **Проверьте другие параметры политики токенов**: убедитесь, что не выбраны альтернативные варианты истечения срока действия, например «Expire refresh token if not used for» или «Expire refresh token after».
+* **Проверьте настройки IP Relaxation**: если в вашей организации Salesforce применяются IP-ограничения, настройка IP Relaxation для Connected App может блокировать запросы с серверов Replit. Если это соответствует требованиям безопасности, рассмотрите вариант **Relax IP restrictions**.
+* **Проверьте историю входов**: в Salesforce откройте **Setup &gt; Login History** и проверьте, нет ли неудачных попыток аутентификации, связанных с Replit.
+* **Обратитесь в поддержку Replit**: если проблема не на стороне Salesforce, свяжитесь с [поддержкой Replit](https://replit.com/support).
+
+<div id="section-4">
+  ## Связанная документация
+</div>
+
+* [Обзор Connectors](/ru/ja/features/integrations/overview) — Узнайте обо всех типах интеграций, включая коннектор Salesforce
+* [Управление коннекторами](/ru/ja/replitai/managing-connectors) — Настройки администратора для коннекторов Workspace и Organization
+* [Справка Salesforce: управление Connected Apps](https://help.salesforce.com/s/articleView?id=sf.connected_app_manage.htm) — Официальное руководство Salesforce по управлению политиками Connected App

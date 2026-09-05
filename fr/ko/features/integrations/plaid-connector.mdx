@@ -1,0 +1,193 @@
+---
+title: "Connecter Plaid"
+description: "Configurez le connecteur Plaid pour permettre aux créateurs de s'appuyer sur Agent pour créer des applications qui connectent des comptes financiers via Plaid Link et exploitent les données de soldes, de transactions et d'investissements."
+---
+
+export const WistiaEmbed = ({videoId, title = "Vidéo Wistia", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+  if (!videoId) {
+    return null;
+  }
+  const url = "https://fast.wistia.net/embed/iframe/" + videoId + "?seo=false&playerColor=" + playerColor + "&controlsVisibleOnLoad=" + controlsVisibleOnLoad;
+  return <Frame>
+      <iframe src={url} title={title} allow="autoplay; fullscreen" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Info>
+  Le connecteur Plaid est disponible avec les plans Replit payants et nécessite un [espace de travail Teams](/fr/ko/features/collaboration/team-workspaces#create-a-team-workspace).
+</Info>
+
+<WistiaEmbed videoId="fcqtulftwk" title="Découvrez comment nous avons créé une application avec Replit et Plaid" />
+
+Plaid connecte votre application aux établissements financiers. Grâce au connecteur Plaid, les créateurs peuvent concevoir des applications qui exploitent les soldes de comptes, les transactions et les données d&#39;investissement pris en charge par les établissements financiers connectés.
+
+La configuration se déroule en deux temps. L&#39;administrateur de l&#39;espace de travail configure une seule fois les identifiants Plaid dans Replit, puis chaque utilisateur de l&#39;application connecte ses propres comptes financiers via Plaid Link. Les jetons d&#39;accès Plaid sont propres à chaque utilisateur et stockés de manière sécurisée : l&#39;application peut donc exploiter les données financières sans manipuler directement les secrets Plaid.
+
+<div id="section">
+  ## Ce que vous pouvez créer
+</div>
+
+Le connecteur Plaid vous permet de créer des applications telles que :
+
+* Des tableaux de bord de finances personnelles
+* Des outils de gestion budgétaire et de catégorisation des dépenses
+* Des applications de recherche et d&#39;analyse de transactions
+* Des outils de suivi de portefeuille pour les comptes d&#39;investissement pris en charge
+* Des coachs financiers qui résument vos habitudes de dépenses
+
+<div id="section-2">
+  ## Prérequis
+</div>
+
+Avant de configurer Plaid dans Replit, vous devez disposer des éléments suivants :
+
+* Un [espace de travail Teams](/fr/ko/features/collaboration/team-workspaces#create-a-team-workspace) — Plaid se configure au niveau de l&#39;équipe
+* Un [compte Plaid](https://dashboard.plaid.com/signup)
+* Le **Client ID** Plaid obtenu depuis le [tableau de bord Plaid](https://dashboard.plaid.com/developers/keys)
+* Le **Secret** Plaid correspondant à l&#39;environnement que vous souhaitez utiliser
+* Le choix entre `sandbox` et `production` pour Plaid
+
+Utilisez `sandbox` tant que vous effectuez vos tests avec les institutions et identifiants d&#39;exemple fournis par Plaid. Passez à `production` lorsque votre application est prête à se connecter à de véritables comptes financiers.
+
+<div id="replit-plaid">
+  ## Configurer le connecteur Plaid dans Replit
+</div>
+
+Un administrateur de l’espace de travail ajoute les identifiants Plaid à Replit. Une fois le connecteur configuré, les créateurs peuvent utiliser les données Plaid avec Agent.
+
+<Steps>
+  <Step title="Ouvrir Integrations">
+    Dans Replit, ouvrez les paramètres de l’espace de travail ou de l’application, puis sélectionnez **Integrations**.
+
+    <Frame>
+      <img src="/assets/mirror/integrations-panel-9c9a11a93f25.png" alt="Panneau Workspace Integrations de l’équipe Avenger affichant les intégrations gérées par Replit et la section Connectors, avec le bouton Add new connector mis en évidence en haut à droite" width="1440" height="900" data-path="images/replitai/plaid-connector/integrations-panel.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ajouter le connecteur Plaid">
+    Sélectionnez **Add new connector**, puis **Plaid**.
+
+    <Frame>
+      <img src="/assets/mirror/plaid-connector-search-1283aace7d36.png" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-search.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Sélectionner l’environnement">
+    Sélectionnez `sandbox` ou `production`. Ce choix doit correspondre au Secret Plaid que vous souhaitez utiliser.
+  </Step>
+
+  <Step title="Saisir les identifiants Plaid">
+    Collez le **Client ID** et le **Secret** Plaid depuis le tableau de bord Plaid.
+  </Step>
+
+  <Step title="Définir le nom du client">
+    Saisissez le nom de l’application à afficher dans Plaid Link. Le champ est prérempli avec `My Plaid App` ; remplacez-le par le nom que vous souhaitez afficher aux utilisateurs. Limitez-le à 30 caractères pour que Plaid puisse l’afficher correctement.
+  </Step>
+
+  <Step title="Enregistrer le connecteur">
+    Sélectionnez **Configure** pour enregistrer le connecteur. Replit stocke les identifiants de manière sécurisée et les utilise lorsque les créateurs connectent leur compte Plaid.
+
+    <Frame>
+      <img src="/assets/mirror/plaid-config-dialog-6f2537e3be30.png" alt="Boîte de dialogue de configuration Enable Plaid avec des champs pour Environment, Client Id, Client Secret et Client Name, ainsi qu’un bouton Configure pour enregistrer" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-config-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+Pour modifier la configuration ultérieurement, ouvrez **Manage connectors** dans le panneau Integrations, puis sélectionnez **Manage** à côté de Plaid.
+
+<Frame>
+  <img src="/assets/mirror/plaid-connector-manage-89e796daff17.png" alt="Panneau Manage du connecteur Plaid avec les valeurs enregistrées pour Environment, Client Id, Client Secret et Client Name, ainsi qu’un bouton Update pour enregistrer les modifications" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-manage.png" />
+</Frame>
+
+Pour en savoir plus sur la gestion des connecteurs à l’échelle de l’organisation, consultez [Gérer les connecteurs](/fr/ko/replitai/managing-connectors).
+
+<div id="plaid-link">
+  ## Se connecter avec Plaid Link
+</div>
+
+Plaid utilise [Plaid Link](https://plaid.com/docs/link/) plutôt qu&#39;une redirection OAuth classique. Pour lancer le processus, recherchez Plaid dans le tableau Connectors et sélectionnez **Sign in**. Replit affiche un écran de consentement simple confirmant la connexion, puis ouvre Plaid Link.
+
+<Frame>
+  <img src="/assets/mirror/connect-plaid-consent-ea05ebe1a916.png" alt="Boîte de dialogue de consentement Connect Plaid avec les logos Replit et Plaid, trois points rassurants sur la connexion à Plaid, l'utilisation des données et les autorisations révocables, ainsi qu'un bouton Continue to Plaid" width="1440" height="900" data-path="images/replitai/plaid-connector/connect-plaid-consent.png" />
+</Frame>
+
+Plaid Link ouvre ensuite un parcours intégré dans lequel chaque utilisateur choisit son établissement financier et s&#39;authentifie auprès de celui-ci.
+
+<Frame>
+  <img src="/assets/mirror/plaid-link-picker-2e241c8e1271.png" alt="Sélecteur d'établissement Plaid Link intitulé Select your institution, avec un champ de recherche et les logos des principales banques américaines dont Chase, Bank of America, Wells Fargo, Citibank, US Bank, Capital One, PNC, USAA, American Express, TD, Regions et Navy Federal, avec une bannière Sandbox mode en bas" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-link-picker.png" />
+</Frame>
+
+Chaque utilisateur connecte son propre compte. Replit stocke le jeton d&#39;accès Plaid ainsi obtenu pour la connexion de cet utilisateur et l&#39;utilise lorsque l&#39;Agent ou l&#39;app demande des données Plaid.
+
+<div id="plaid">
+  ## Commencer à créer avec les données Plaid
+</div>
+
+Une fois Plaid connecté, demandez à Agent de créer une application à partir de vos données financières connectées. Par exemple :
+
+<AiPrompt>
+  Crée un tableau de bord de finances personnelles où les utilisateurs connectent leur compte bancaire via Plaid Link. Affiche le solde des comptes, les dépenses mensuelles par catégorie et les 5 transactions récentes les plus importantes.
+</AiPrompt>
+
+<AiPrompt>
+  Crée une application de gestion de budget où chaque utilisateur connecte ses comptes via Plaid Link. Récupère les transactions, regroupe-les par commerçant et par catégorie, et indique si le budget du mois est dépassé.
+</AiPrompt>
+
+<AiPrompt>
+  Crée un outil de suivi de portefeuille où les utilisateurs connectent leurs comptes d&#39;investissement pris en charge via Plaid Link. Affiche les titres détenus, le solde des comptes et leur évolution dans le temps lorsque les données sont disponibles.
+</AiPrompt>
+
+La disponibilité des données Plaid dépend de l&#39;établissement connecté et des produits Plaid activés sur votre compte Plaid.
+
+<div id="section-3">
+  ## Dépannage
+</div>
+
+<AccordionGroup>
+  <Accordion title="Plaid n'apparaît pas dans Integrations">
+    Plaid nécessite un plan Replit payant. Si vous avez un plan payant mais que Plaid reste introuvable, actualisez la page et vérifiez que vous êtes dans le bon espace de travail.
+
+    Si le message **This feature requires an enterprise plan** s&#39;affiche dans les paramètres, actualisez la page et assurez-vous d&#39;utiliser le bon espace de travail.
+
+    Si Plaid n&#39;apparaît toujours pas, contactez le support Replit afin que l&#39;équipe puisse vérifier la configuration de votre espace de travail.
+  </Accordion>
+
+  <Accordion title="Plaid Link affiche This Application au lieu du nom de mon app">
+    Si aucun nom de client n&#39;est configuré ou s&#39;il est trop long, Plaid peut afficher **This Application**. Modifiez la configuration du connecteur Plaid et utilisez un nom d&#39;app de 30 caractères maximum.
+  </Accordion>
+
+  <Accordion title="La connexion s'affiche comme interrompue">
+    Une connexion Plaid peut être interrompue si l&#39;établissement financier demande au titulaire du compte de se reconnecter, si les identifiants changent ou si les autorisations sont révoquées.
+
+    Reconnectez Plaid depuis le panneau Integrations ou Connectors : Plaid Link s&#39;ouvre et l&#39;accès est rétabli.
+  </Accordion>
+
+  <Accordion title="Les données du bac à sable et de la production ne correspondent pas">
+    Le bac à sable et la production Plaid utilisent des identifiants et des jetons différents. Vérifiez que l&#39;environnement du connecteur correspond au Plaid Secret que vous avez saisi ainsi qu&#39;au type de compte financier que vous testez.
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-4">
+  ## Documentation associée
+</div>
+
+* [Intégrations Agent](/fr/ko/features/integrations/overview) — Présentation des intégrations gérées par Replit, des connecteurs, des intégrations externes et des services Agent
+* [Gérer les connecteurs](/fr/ko/replitai/managing-connectors) — Configuration et gestion des connecteurs de votre espace de travail
+* [Documentation Plaid](https://plaid.com/docs/) — Documentation de l&#39;API Plaid, de Link et des produits
+* [Tableau de bord Plaid](https://dashboard.plaid.com/developers/keys) — Retrouver vos Client ID et Secret Plaid
+* [Replit x Plaid](https://replit.com/partners/plaid) — Page partenaire proposant des démos et des ressources de configuration

@@ -1,95 +1,111 @@
 ---
-title: "Corriger les erreurs de connexion expirée Salesforce"
-description: "Corrigez les erreurs 'Connexion expirée' lors de l'utilisation du connecteur Salesforce dans Replit en mettant à jour votre politique de jeton d'actualisation."
+title: "Résoudre les erreurs « Connection Expired » de Salesforce"
+description: "Résolvez les erreurs « Connection Expired » liées au connecteur Salesforce dans Replit en mettant à jour votre politique de jeton d'actualisation."
+sidebarTitle: "Erreurs Salesforce"
+icon: "bug"
 ---
 
-## Aperçu
+<div id="overview">
+  ## Vue d&#39;ensemble
+</div>
 
-Si votre connecteur Salesforce cesse de fonctionner et que vous voyez une erreur **« Connexion expirée »**, cela signifie généralement que la politique de jeton d'actualisation de votre organisation Salesforce est configurée pour expirer les jetons après une période définie. Dans ce cas, Replit ne peut plus s'authentifier auprès de Salesforce en votre nom, et la connexion doit être ré-autorisée.
+Si votre connecteur Salesforce cesse de fonctionner et qu&#39;une erreur **« Connection Expired »** s&#39;affiche, cela signifie généralement que la politique de jetons d&#39;actualisation de votre organisation Salesforce est configurée pour faire expirer les jetons au bout d&#39;une durée définie. Dans ce cas, Replit ne peut plus s&#39;authentifier auprès de Salesforce en votre nom : la connexion doit alors être réautorisée.
 
-Ce guide vous explique comment mettre à jour les paramètres de votre application connectée Salesforce pour que le jeton d'actualisation reste valide jusqu'à ce qu'il soit explicitement révoqué.
+Ce guide vous explique comment modifier les paramètres de votre application connectée Salesforce afin que le jeton d&#39;actualisation reste valide jusqu&#39;à sa révocation explicite.
 
 <Warning>
-  Ces étapes nécessitent un **accès administrateur Salesforce**. Si vous n'avez pas les privilèges d'administrateur, contactez votre administrateur Salesforce et partagez ce guide avec lui.
+  Ces étapes nécessitent un **accès administrateur Salesforce**. Si vous ne disposez pas des privilèges d&#39;administrateur, contactez votre administrateur Salesforce et transmettez-lui ce guide.
 </Warning>
 
-## Étapes de dépannage
+<div id="troubleshooting-steps">
+  ## Étapes de dépannage
+</div>
 
-### Étape 1 : Ouvrez les paramètres de votre application connectée Salesforce
+<div id="step-1-open-your-salesforce-connected-app-settings">
+  ### Étape 1 : ouvrir les paramètres de votre application connectée Salesforce
+</div>
 
 <Steps>
   <Step title="Se connecter à Salesforce">
-    Connectez-vous à votre organisation Salesforce en tant qu'administrateur.
+    Connectez-vous à votre organisation Salesforce en tant qu&#39;administrateur.
   </Step>
 
   <Step title="Accéder aux applications connectées">
-    Allez dans **Configuration > Applications > Applications connectées > Gérer les applications connectées**.
+    Rendez-vous dans **Setup &gt; Apps &gt; Connected Apps &gt; Manage Connected Apps**.
   </Step>
 
   <Step title="Trouver l'application Replit">
-    Localisez l'application connectée **Replit** dans la liste et sélectionnez-la.
+    Repérez l&#39;application connectée **Replit** dans la liste et sélectionnez-la.
   </Step>
 
   <Step title="Modifier les politiques">
-    Sélectionnez **Modifier les politiques** pour ouvrir la page de configuration des politiques.
+    Sélectionnez **Edit Policies** pour ouvrir la page de configuration des politiques.
   </Step>
 </Steps>
 
-### Étape 2 : Mettez à jour la politique de jeton d'actualisation
+<div id="step-2-update-the-refresh-token-policy">
+  ### Étape 2 : Mettre à jour la politique des jetons d’actualisation
+</div>
 
-La politique de jeton d'actualisation Salesforce par défaut peut expirer les jetons après un nombre défini de jours ou après une période d'inactivité. Pour éviter l'expiration de la connexion, modifiez la politique pour maintenir les jetons valides indéfiniment.
+Par défaut, la politique Salesforce relative aux jetons d’actualisation peut faire expirer les jetons après un certain nombre de jours ou une période d’inactivité. Pour éviter que la connexion n’expire, modifiez cette politique afin que les jetons restent valides indéfiniment.
 
 <Steps>
-  <Step title="Trouver le paramètre Politique de jeton d'actualisation">
-    Sur la page de modification de l'application connectée, localisez la section **Politique de jeton d'actualisation** sous **Politiques OAuth**.
+  <Step title="Rechercher le paramètre Refresh Token Policy">
+    Sur la page de modification de l’application connectée, repérez la section **Refresh Token Policy** sous **OAuth Policies**.
   </Step>
 
-  <Step title="Sélectionner 'Le jeton d'actualisation est valide jusqu'à révocation'">
-    Modifiez la politique en **Le jeton d'actualisation est valide jusqu'à révocation**. Cela garantit que le jeton n'expire pas automatiquement.
+  <Step title="Sélectionner « Refresh token is valid until revoked »">
+    Définissez la politique sur **Refresh token is valid until revoked**. Ainsi, le jeton n’expirera pas automatiquement.
 
     <Frame>
-      <img src="/assets/mirror/refresh-token-policy-e2f92339f33d.png" alt="Page de modification de l'application connectée Salesforce affichant la politique de jeton d'actualisation définie sur 'Le jeton d'actualisation est valide jusqu'à révocation'" width="886" height="449" data-path="images/replitai/debugging-salesforce-connectors/refresh-token-policy.png" />
+      <img src="/assets/mirror/refresh-token-policy-e2f92339f33d.png" alt="Page de modification de l’application connectée Salesforce affichant la politique des jetons d’actualisation définie sur « Refresh token is valid until revoked »" width="886" height="449" data-path="images/replitai/debugging-salesforce-connectors/refresh-token-policy.png" />
     </Frame>
   </Step>
 
   <Step title="Enregistrer vos modifications">
-    Sélectionnez **Enregistrer** pour appliquer la politique mise à jour.
+    Sélectionnez **Save** pour appliquer la politique mise à jour.
   </Step>
 </Steps>
 
 <Tip>
-  Les modifications de politique peuvent prendre quelques minutes à prendre effet. Après l'enregistrement, attendez quelques minutes avant de reconnecter Salesforce dans Replit.
+  Les modifications de la politique peuvent prendre quelques minutes à prendre effet. Après l’enregistrement, attendez quelques minutes avant de reconnecter Salesforce dans Replit.
 </Tip>
 
-### Étape 3 : Reconnectez Salesforce dans Replit
+<div id="step-3-reconnect-salesforce-in-replit">
+  ### Étape 3 : reconnecter Salesforce dans Replit
+</div>
 
-Après avoir mis à jour la politique de jeton d'actualisation, reconnectez le connecteur Salesforce dans Replit.
+Après avoir mis à jour la politique de jeton d&#39;actualisation, reconnectez le connecteur Salesforce dans Replit.
 
 <Steps>
-  <Step title="Ouvrir l'éditeur de projet">
-    Accédez à votre application dans l'éditeur de projet.
+  <Step title="Ouvrir le Project Editor">
+    Accédez à votre app dans le Project Editor.
   </Step>
 
-  <Step title="Accéder aux connecteurs">
-    Ouvrez le panneau **Connecteurs** dans la barre latérale.
+  <Step title="Accéder à Connectors">
+    Ouvrez le panneau **Connectors** dans la barre latérale.
   </Step>
 
   <Step title="Reconnecter Salesforce">
-    Sélectionnez **Reconnecter** sur la connexion Salesforce expirée. Complétez le flux d'autorisation OAuth lorsque vous y êtes invité.
+    Sélectionnez **Reconnect** sur la connexion Salesforce expirée, puis suivez le flux d&#39;autorisation OAuth jusqu&#39;à son terme lorsque vous y êtes invité.
   </Step>
 </Steps>
 
-## Vous voyez toujours des erreurs ?
+<div id="still-seeing-errors">
+  ## Toujours des erreurs ?
+</div>
 
-Si vous avez mis à jour la politique de jeton d'actualisation et que la connexion expire encore :
+Si vous avez mis à jour la politique de jeton d&#39;actualisation et que la connexion expire malgré tout :
 
-* **Vérifiez les autres options de politique de jeton** : Assurez-vous qu'aucune des autres options d'expiration (comme « Faire expirer le jeton d'actualisation s'il n'est pas utilisé pendant » ou « Faire expirer le jeton d'actualisation après ») n'est sélectionnée.
-* **Vérifiez les paramètres de relaxation IP** : Si votre organisation Salesforce applique des restrictions IP, le paramètre **Relaxation IP** sur l'application connectée peut bloquer les requêtes depuis les serveurs de Replit. Envisagez de le définir sur **Relâcher les restrictions IP** si cela est approprié pour vos exigences de sécurité.
-* **Consultez l'historique de connexion** : Dans Salesforce, vérifiez **Configuration > Historique de connexion** pour les tentatives d'authentification échouées liées à Replit.
-* **Contactez le support Replit** : Si le problème ne vient pas de Salesforce, contactez le [support Replit](https://replit.com/support) pour obtenir de l'aide.
+* **Vérifiez les autres options de politique de jeton** : assurez-vous qu&#39;aucune des autres options d&#39;expiration (telles que « Expire refresh token if not used for » ou « Expire refresh token after ») n&#39;est sélectionnée.
+* **Vérifiez les paramètres d&#39;assouplissement des restrictions IP** : si votre organisation Salesforce impose des restrictions IP, le paramètre **IP Relaxation** de l&#39;application connectée peut bloquer les requêtes provenant des serveurs de Replit. Envisagez de le définir sur **Relax IP restrictions** si cela est compatible avec vos exigences de sécurité.
+* **Consultez l&#39;historique de connexion** : dans Salesforce, ouvrez **Setup &gt; Login History** pour repérer d&#39;éventuelles tentatives d&#39;authentification ayant échoué liées à Replit.
+* **Contactez l&#39;assistance Replit** : si le problème ne vient pas de Salesforce, adressez-vous à l&#39;[assistance Replit](https://replit.com/support) pour obtenir de l&#39;aide.
 
-## Documentation associée
+<div id="related-documentation">
+  ## Documentation associée
+</div>
 
-* [Aperçu des connecteurs](/fr/features/integrations/overview) -- En savoir plus sur tous les types d'intégration, y compris les connecteurs Salesforce
-* [Gérer vos connecteurs](/fr/replitai/managing-connectors) -- Configuration administrateur pour les connecteurs d'espace de travail et d'organisation
-* [Aide Salesforce : Gérer les applications connectées](https://help.salesforce.com/s/articleView?id=sf.connected_app_manage.htm) -- Guide officiel Salesforce pour gérer les politiques des applications connectées
+* [Présentation des Connectors](/fr/features/integrations/overview) -- Découvrez tous les types d&#39;intégration, y compris les connecteurs Salesforce
+* [Gérer vos connectors](/fr/replitai/managing-connectors) -- Configuration administrateur des connectors de Workspace et d&#39;organisation
+* [Aide Salesforce : gérer les applications connectées](https://help.salesforce.com/s/articleView?id=sf.connected_app_manage.htm) -- Le guide officiel de Salesforce sur la gestion des stratégies des applications connectées

@@ -1,0 +1,239 @@
+---
+title: "App 存储"
+description: "了解如何使用 App 存储托管和管理用户上传的图片、视频、文档等文件。"
+---
+
+import { AiPrompt } from "/snippets/zh/shared-components.mdx";
+
+App 存储是 Replit 内置的对象存储服务，可让应用轻松托管和保存图片、视频、文档等上传文件。
+存储桶是用于存储文件等对象的容器，包含访问策略，可限制用户或应用程序对内容执行的操作。
+
+<Info>
+  <strong>对象存储</strong>已更名为<strong>App 存储</strong>。功能保持不变，现有存储桶、权限和编程访问方式将继续正常运行。
+</Info>
+
+你可以使用 App 存储构建以下类型的应用：
+
+* **照片分享平台**：让用户上传、保存和查看图片
+* **视频流媒体服务**：处理视频上传并向观众提供内容
+* **文档管理系统**：安全地存储和整理用户文件
+* **作品集网站**：通过可靠加载的媒体文件展示作品
+* **文件备份服务**：为用户提供重要文件的云存储
+
+<Frame>
+  <img src="/assets/mirror/object-storage-overview-c955d7e5bdb5.jpg" alt="App 存储工具的屏幕截图" width="1920" height="1080" data-path="images/cloud-services/object-storage-overview.jpg" />
+</Frame>
+
+<Note>
+  请让 **Agent** 将 App 存储添加到你的应用中，并指定应用需要处理的文件类型。Agent 会配置集成、创建所需的存储桶，并更新应用，使其能够借助认证和访问控制等高级功能上传、保存和获取文件。
+</Note>
+
+使用 App 存储工具，你可以在开发环境与生产环境之间，或与其他 Replit App 之间无缝共享数据。
+
+<div id="section">
+  ## 功能
+</div>
+
+<Info>
+  App Storage 使用 Google Cloud Storage (GCS) 。
+  因此，您可以享受行业领先的正常运行时间、可用性和安全性。
+</Info>
+
+App Storage 为 Replit App 提供以下功能：
+
+* **持久化云存储**：存储已发布应用和用户可持续访问的文件
+* **可扩展的文件处理**：轻松满足不断增长的数据需求，无需担心存储限制
+* **跨应用数据共享**：在多个 Replit App 之间共享存储桶，支持分布式架构
+* **程序化访问**：使用直观的 API 上传、下载和管理文件
+* **增强的 Agent 集成**：让 Agent 配置 App Storage 的高级设置、检查现有配置，并生成包含身份验证和访问控制功能的完整前后端代码
+
+在 Replit App 中使用 App Storage 的示例：
+
+* 存储构建者的个人资料图片和上传的媒体文件
+* 为电商网站提供商品图片
+* 处理表单提交中的文档上传
+* 创建文件共享和协作功能
+* 构建带媒体库的内容管理系统
+
+<Tip>
+  **增强的 Agent 集成**：您可以让 [Replit Agent](/zh/ja/features/agent/overview) 自动为您的应用添加 App Storage！Agent 可以配置对象存储、检查现有配置，并生成包含身份验证和访问控制等高级功能的完整前后端代码。只需在提示词中提及“App Storage”或“文件存储”。
+
+  <AiPrompt>将 App Storage 添加到我的应用中以存储文件</AiPrompt>
+  <AiPrompt>创建一个使用 App Storage 存储图片的照片画廊应用</AiPrompt>
+  <AiPrompt>为用户文件上传配置带身份验证的 App Storage</AiPrompt>
+
+  查看 [Agent 集成](/zh/ja/features/integrations/overview#data-storage--management) 的更多信息，以及所有可用的 App Storage 提示词。
+</Tip>
+
+<div id="section-2">
+  ## 使用方法
+</div>
+
+<Note>
+  Replit App 必须通过 Google Cloud Storage 进行认证，才能访问存储桶及其中的对象。
+  如需自动进行认证，请使用官方 Replit App Storage 客户端库。
+</Note>
+
+你可以直接从项目编辑器访问 App Storage 工具。
+
+<Accordion title="如何访问 App Storage 工具">
+  在左侧的**工具栏**中：
+
+  1. <img class="icon-svg" src="/assets/mirror/workspace-all-tools-button-7e378364e0b4.svg" alt="所有工具图标" width="16" height="16" data-path="images/icons/workspace-all-tools-button.svg" /> 选择**所有工具**，显示项目编辑器中的工具列表。
+  2. <img class="icon-svg" src="/assets/mirror/object-storage-monoochrome-icon-aaba8f517280.svg" alt="App Storage 图标" width="16" height="16" data-path="images/icons/object-storage-monoochrome-icon.svg" /> 选择 **App Storage**。
+
+  使用**搜索栏**：
+
+  1. 选择顶部的<img class="icon-svg" src="/assets/mirror/workspace-search-icon-d20ee3e562fb.svg" alt="放大镜图标" width="16" height="16" data-path="images/icons/workspace-search-icon.svg" />放大镜图标，打开搜索工具。
+  2. 输入“App Storage”找到该工具，然后在搜索结果中选择它。
+</Accordion>
+
+要将新的存储桶关联到 Replit App，请创建一个存储桶。
+
+<Accordion title="如何创建存储桶">
+  在 **App Storage** 工具中：
+
+  1. 点击**创建新存储桶**。
+  2. 在**名称**字段中输入存储桶名称，然后选择**创建存储桶**。
+
+  App Storage 标签页将如下方截图所示：
+
+  <Frame>
+    <img src="/assets/mirror/object-storage-empty-bucket-3462e2efb1bc.png" alt="App Storage 工具截图" width="2790" height="1218" data-path="images/databases/object-storage-empty-bucket.png" />
+  </Frame>
+
+  要创建更多存储桶，请打开 **App Storage** 标签页左上角的存储桶下拉菜单，然后选择**创建新存储桶**。
+</Accordion>
+
+以下部分介绍 App Storage 工具中管理存储桶和对象的选项。
+
+<div id="section-3">
+  ### 选择存储桶
+</div>
+
+要切换存储桶，请点击 **App 存储**标签页左上角的下拉菜单。
+
+当前选中的存储桶名称旁会显示一个勾选标记，如下图所示：
+
+<Frame>
+  <img src="/assets/mirror/select-bucket-97eb8b71353a.png" alt="存储桶选择菜单截图" width="1852" height="704" data-path="images/databases/select-bucket.png" />
+</Frame>
+
+<div id="id">
+  ### 获取存储桶 ID
+</div>
+
+在 **App 存储**标签页顶部的下拉菜单中选择**设置**视图，即可查看**存储桶 ID**。
+存储桶 ID 用于唯一标识存储桶，代码执行操作时需要引用该 ID。
+
+如果有多个存储桶，请在左上角的下拉菜单中选择正确的存储桶。
+
+下方截图展示了“FileVault Bucket One”存储桶的存储桶 ID：
+
+<Frame>
+  <img src="/assets/mirror/bucket-id-42a44cef1025.png" alt="App 存储工具的截图" width="1596" height="428" data-path="images/databases/bucket-id.png" />
+</Frame>
+
+<div id="section-4">
+  ### 上传和下载对象
+</div>
+
+要将对象上传到所选存储桶：
+
+1. 前往**App 存储**选项卡中的**对象**视图。
+2. 选择<img class="icon-svg" src="/assets/mirror/upload-file-5894be4232ce.svg" alt="文件上传图标" width="16" height="16" data-path="images/icons/upload-file.svg" /> **上传文件**；如需上传文件夹中的所有文件，请选择<img class="icon-svg" src="/assets/mirror/upload-folder-fc87519bedf9.svg" alt="文件夹上传图标" width="16" height="16" data-path="images/icons/upload-folder.svg" /> **上传文件夹**。
+   然后，在文件对话框中选择一个或多个文件。
+   也可以将文件或文件夹拖放到显示存储桶内容的区域。
+
+要从所选存储桶下载对象：
+
+1. 前往**App 存储**选项卡中的**对象**视图。
+2. 选择要下载的文件右侧的<img class="icon-svg" src="/assets/mirror/download-icon-c7b527953d65.svg" alt="下载图标" width="16" height="16" data-path="images/icons/download-icon.svg" />下载图标。
+
+<div id="section-5">
+  ### 使用文件夹整理对象
+</div>
+
+要在所选存储桶中创建文件夹：
+
+1. 前往**App 存储**标签页中的**对象**视图。
+2. 在**对象**视图中，选择<img class="icon-svg" src="/assets/mirror/create-folder-c9acf112a042.svg" alt="创建文件夹图标" width="16" height="16" data-path="images/icons/create-folder.svg" /> **创建文件夹**。
+3. 输入文件夹名称。
+
+要将对象添加到**对象**视图中的文件夹，只需将对象拖到目标文件夹中。
+
+要将对象移至父文件夹，请将其拖到对象列表上方显示的文件夹名称上。
+
+以下动画演示了如何将“product&#95;demo.mov”文件从“videos”文件夹移动到父级“Objects”文件夹：
+
+<Frame>
+  <img src="/assets/mirror/object-move-0cdcf479505a.webp" alt="将文件移动到父文件夹的动画" width="800" height="440" data-path="images/databases/object-move.webp" />
+</Frame>
+
+<div id="section-6">
+  ### 删除对象或存储桶
+</div>
+
+<Warning>
+  删除操作无法撤销。继续操作前请备份重要数据。
+</Warning>
+
+要永久删除对象：
+
+1. 前往 **App 存储**选项卡的**对象**视图。
+2. 点击待删除对象旁边的 <img class="icon-svg" src="/assets/mirror/trash-icon-4674cd09b8db.svg" alt="垃圾桶图标" width="16" height="16" data-path="images/icons/trash-icon.svg" /> 垃圾桶图标。
+3. 在确认对话框中确认删除。
+
+要删除存储桶及其中的所有对象：
+
+1. 前往 **App 存储**选项卡的**设置**视图。
+2. 在左上角的存储桶下拉菜单中选择要删除的存储桶。
+3. 点击 <img class="icon-svg" src="/assets/mirror/trash-icon-4674cd09b8db.svg" alt="垃圾桶图标" width="16" height="16" data-path="images/icons/trash-icon.svg" /> **删除存储桶**。
+4. 在确认对话框中确认删除。
+
+<div id="section-7">
+  ### 存储桶访问管理
+</div>
+
+Replit 会将您创建的所有存储桶关联到您的账户，并使所有 Replit App 都可使用这些存储桶。创建存储桶的 Replit App 会自动获得访问权限。
+
+通过控制哪些 Replit App 可以访问特定存储桶，您可以高效、安全地共享数据。
+
+要允许您账户中的其他 App 访问 Replit App 中的存储桶：
+
+1. 在 App 存储标签页左上角的存储桶菜单中，选择<img class="icon-svg" src="/assets/mirror/workspace-search-icon-d20ee3e562fb.svg" alt="放大镜图标" width="16" height="16" data-path="images/icons/workspace-search-icon.svg" />
+   **添加现有存储桶**。
+2. 在**选择存储桶**对话框中，选择要添加的存储桶，然后选择**将存储桶添加到 Repl**。
+
+<Frame>
+  <img src="/assets/mirror/choose-bucket-dialog-b709aa247a85.png" alt="选择存储桶对话框的屏幕截图" width="1115" height="457" data-path="images/databases/choose-bucket-dialog.png" />
+</Frame>
+
+要撤销 Replit App 对存储桶的访问权限：
+
+1. 前往**App 存储**标签页的**设置**视图。
+2. 在标签页左上角的存储桶下拉菜单中选择存储桶名称。
+3. 选择**从 Repl 移除存储桶**，然后在确认对话框中确认移除。
+
+<div id="app">
+  ### 以编程方式访问 App 存储
+</div>
+
+要从 Replit App 访问 App 存储，请使用以下任一库：
+
+* Replit App 存储 SDK (提供 JavaScript 和 Python 版本)
+* <a href="https://cloud.google.com/storage/docs/reference/libraries" target="_blank">Google Cloud Storage 客户端库</a>
+
+有关客户端库的使用方法，请参阅以下资源：
+
+* [JavaScript App 存储 SDK](/zh/ja/features/sdks/object-storage-javascript-sdk/)：JavaScript SDK 客户端参考文档
+* [Python App 存储 SDK](/zh/ja/features/sdks/object-storage-python-sdk/)：Python SDK 客户端参考文档
+* [Google Cloud Python SDK 示例应用](https://replit.com/@matt/GCS-Python-Uploads?v=1)：重混 (Remix) 此应用，即可使用 Google Cloud Python SDK 管理对象
+
+<div id="section-8">
+  ## 账单和资源使用量
+</div>
+
+要监控 App 存储空间的使用量，请前往<a href="https://replit.com/usage/" target="_blank">使用量</a>页面。
+
+有关 App 存储空间费用的详细信息，请参阅 [App 存储空间账单](/zh/ja/billing/object-storage-billing)。

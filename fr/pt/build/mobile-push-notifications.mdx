@@ -1,0 +1,97 @@
+---
+title: "Envoyer des notifications push"
+description: "Informez les joueurs des nouveaux jeux et de l'activité de leurs amis sur PixelGames."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pushNotificationPrompt = "Informez un joueur lorsqu’un ami bat son record dans PixelGames.";
+
+<AiPrompt>
+  {pushNotificationPrompt}
+</AiPrompt>
+
+<Frame caption="Une notification de PixelGames qui arrive sur l'écran de verrouillage.">
+  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="Une notification push de PixelGames qui apparaît sur l'écran de verrouillage du téléphone" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
+</Frame>
+
+Sur Android, vous pouvez tester cela immédiatement dans Expo Go. Sur iOS, l&#39;app doit d&#39;abord être
+[envoyée et installée depuis TestFlight](/fr/build/mobile-testflight) : Apple exige
+que l&#39;app soit enregistrée auprès d&#39;elle avant de pouvoir recevoir la moindre notification, même à
+des fins de test.
+
+<Steps>
+  <Step title="Demandez l'autorisation">
+    iOS et Android affichent une demande une seule fois, avant la première notification. En cas de refus, plus aucune notification
+    jusqu&#39;à ce que le joueur réactive l&#39;option dans les Réglages.
+  </Step>
+
+  <Step title="Enregistrez l'appareil">
+    L&#39;Agent enregistre un jeton push pour le joueur connecté, afin que PixelGames sache quel
+    appareil notifier.
+  </Step>
+
+  <Step title="Envoyez">
+    Une notification est déclenchée lorsqu&#39;un ami bat le record de ce joueur.
+  </Step>
+</Steps>
+
+<div id="teste">
+  ## Test
+</div>
+
+1. Accordez l&#39;autorisation de notification lorsqu&#39;elle vous est demandée : PixelGames ne peut rien
+   envoyer tant qu&#39;elle n&#39;est pas accordée, et la demande n&#39;apparaît qu&#39;une seule fois.
+2. Déclenchez la condition réelle, par exemple battre le record d&#39;un ami depuis un second compte,
+   plutôt que de demander simplement à Agent une notification de test isolée. Cela confirme que
+   toute la chaîne fonctionne : l&#39;enregistrement du record, la vérification des personnes à
+   notifier et l&#39;envoi, et pas seulement que l&#39;autorisation a été accordée.
+3. Vérifiez qu&#39;elle arrive bien sur l&#39;écran de verrouillage, puis appuyez dessus et vérifiez
+   qu&#39;elle ouvre PixelGames. Cette étape permet de confirmer que la notification renvoie
+   réellement vers l&#39;app, et pas seulement qu&#39;elle s&#39;affiche.
+
+Faites-le sur un téléphone réel : les notifications n&#39;arrivent jamais sur un simulateur. Consultez
+[les tests avec Expo Go](/fr/build/mobile-preview-testing) pour la configuration.
+
+<div id="soluo-de-problemas">
+  ## Dépannage
+</div>
+
+* **La notification n&#39;arrive jamais sur iOS :** vérifiez que vous testez bien depuis
+  [TestFlight](/fr/build/mobile-testflight), car Expo Go ne peut pas recevoir de notifications push sur iOS.
+* **Le joueur a accordé l&#39;autorisation mais ne reçoit rien :** vérifiez que le jeton push a bien été
+  enregistré sur son compte : c&#39;est un oubli fréquent lorsque la connexion et la configuration des
+  notifications sont gérées séparément.
+
+<div id="o-que-vem-a-seguir">
+  ## Et ensuite
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter un retour haptique" icon="wave-square" href="/fr/pt/build/mobile-haptics">
+    Associez une notification à une vibration haptique.
+  </Card>
+
+  <Card title="Stocker des images dans votre app mobile" icon="image" href="/fr/pt/build/mobile-store-images">
+    Enregistrez les photos de profil dans App Storage.
+  </Card>
+</CardGroup>
+
+<div id="relacionado">
+  ## Ressources associées
+</div>
+
+* [Publier sur l&#39;App Store](/fr/build/mobile-publish-ios)

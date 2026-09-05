@@ -1,0 +1,173 @@
+---
+title: "监测效果最佳的广告"
+description: "集中查看广告效果，了解哪些创意素材真正值得投入。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                不是原生 connector。Agent 会要求您提供 API key。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+从 TikTok Ads、Snapchat Ads、Meta Ads 和 Google Ads 获取上周的广告数据。
+集中查看广告表现，并根据广告支出、点击率、
+获客成本和广告投资回报率找出最佳广告。将表现优异和不佳的广告分类，
+以确定哪些广告素材应跨平台扩大投放或暂停。
+
+<div id="ideal-para">
+  ## 适用对象
+</div>
+
+* 需要每周审核 Meta、Google、TikTok 和 Snapchat 广告创意的效果营销从业者。
+* 需要判断哪些广告应扩大投放、哪些应暂停投放的增长负责人。
+
+<div id="conectores">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "tiktok-ads",
+name: "TikTok Ads",
+why: "短视频创意效果",
+},
+{
+id: "snapchat",
+name: "Snapchat Ads",
+why: "Snap 广告和快拍效果",
+},
+{
+id: "google-ads",
+name: "Google Ads",
+why: "搜索广告和展示广告效果",
+auth: "api-key",
+},
+{
+id: "facebook",
+name: "Meta Ads",
+why: "广告支出、点击率、获客成本、广告投资回报率",
+auth: "api-key",
+},
+]}
+/>
+
+<div id="antes-de-comear">
+  ## 开始之前
+</div>
+
+在 Replit 中连接 TikTok Ads 和 Snapchat Ads。对于 Google Ads 和 Meta Ads，请准备好您的
+API 密钥。Agent 需要获取数据时会向您索取。选择一个时间范围，并说明哪些指标最重要 (广告
+投资回报率还是获客成本) 。
+
+<div id="d-o-prompt-ao-agente">
+  ## 向 Agent 提供 prompt
+</div>
+
+<AiPrompt>
+  创建一个每周一上午 9 点运行的例程。从 TikTok Ads、Snapchat Ads、Meta Ads 和 Google Ads
+  获取上周的广告数据。汇总广告表现，并根据广告支出、点击率、获客成本和广告投资回报率
+  找出表现最佳的广告。区分表现优异和表现不佳的广告，并告诉我哪些创意素材应该扩大投放
+  或暂停投放。
+</AiPrompt>
+
+<div id="o-que-esperar">
+  ## 预期结果
+</div>
+
+Agent 会生成一份跨平台创意素材排名表。在调整预算前，请在各广告管理平台中
+抽查总数。由于统计周期和时区通常不一致，请先在各广告管理平台中统一时间范围。
+选择表现最好和最差的广告，在广告管理平台中打开它们，并在调整预算前确认
+广告支出无误。
+
+<div id="adapte-ao-seu-caso">
+  ## 根据你的需求调整
+</div>
+
+<AiPrompt>
+  按创意主题而非仅按广告系列名称分组。显示哪些主题在哪些平台上表现最佳。
+</AiPrompt>
+
+<AiPrompt>
+  在 Slack 发布周一摘要：表现最佳的 3 个广告、表现最差的 3 个广告，以及建议的预算调整。
+</AiPrompt>
+
+<div id="soluo-de-problemas">
+  ## 故障排除
+</div>
+
+* **Google Ads 或 Meta Ads 无法拉取数据：**这两者并非原生连接器。Agent 会要求您提供 API 密钥。请提前准备好，并确认该密钥有权读取您跟踪的广告账户。
+* **汇总数据与广告管理平台不一致：**时间范围和时区通常不一致。请让 Agent 使用与各平台相同的时间范围 (通常为上周一至周日) ，并在调整预算前抽查广告支出。
+* **表格中缺少某个平台：**请先在 Replit 中连接 TikTok Ads 和 Snapchat Ads。如果原生连接已过期，请重新连接并再次运行该例程。
+
+<div id="relacionados">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="创建社交媒体图标和横幅" href="/zh/pt/use-cases/create-social-kit">
+    适合需要为各社交平台制作头像和封面图的营销人员。
+  </Card>
+
+  <Card title="分析客户反馈" href="/zh/pt/use-cases/analyze-customer-feedback">
+    查看广告是否与客户的真实反馈相符。
+  </Card>
+</CardGroup>

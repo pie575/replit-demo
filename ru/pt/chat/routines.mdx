@@ -1,0 +1,297 @@
+---
+title: "Routines"
+description: "Запланируйте повторяющиеся задачи в чате и получайте результаты в той же ветке."
+sidebarTitle: "Выполнение регулярных задач"
+tag: "New"
+icon: "arrows-rotate"
+canonical: "https://docs.replit.com/chat/routines"
+---
+
+import { CardScene, Panel, DotGrid } from "/snippets/ru/shared-components.mdx";
+
+export const AgentModesCardVisual = () => <CardScene>
+    <Panel style={{
+  width: 118,
+  height: 82,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+}}>
+      <DotGrid />
+    </Panel>
+  </CardScene>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const CoffeeShopScreenshotFrame = ({src, alt}) => <div style={{
+  margin: "28px 0",
+  overflow: "hidden",
+  borderRadius: "24px",
+  background: "radial-gradient(circle at 50% -18%, rgba(255,255,255,.82), transparent 42%), radial-gradient(circle at 4% 96%, rgba(255,184,146,.48), transparent 38%), linear-gradient(140deg, #ff764d, #ff3c00 60%, #c92d00)",
+  boxShadow: "0 16px 32px rgba(112,36,13,.18)"
+}}>
+    <div style={{
+  padding: "clamp(10px, 2vw, 18px)",
+  background: "linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 48%, rgba(111,24,0,.2))"
+}}>
+      <a href={src} target="_blank" rel="noreferrer" aria-label={`Открыть ${alt} в полном размере`} style={{
+  display: "block",
+  overflow: "hidden",
+  border: "1px solid rgba(255,255,255,.62)",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,.96)",
+  boxShadow: "0 12px 28px rgba(55,27,18,.2)",
+  cursor: "zoom-in"
+}}>
+        <img src={src} alt={alt} style={{
+  display: "block",
+  width: "100%",
+  height: "auto"
+}} />
+      </a>
+    </div>
+  </div>;
+
+export const RoutinePlanAvailability = () => <>
+    Routines доступны на тарифах{" "}
+    <a href="/billing/plans/replit-core">Core</a> и{" "}
+    <a href="/billing/plans/replit-pro">Pro</a>. В тарифе Starter они недоступны.
+  </>;
+
+<div className="chat-mkt" role="img" aria-label="Облачко Conversation со стрелками часов, установленными на 4:00, обозначающее запланированную Routine" style={{ margin: "28px 0 42px", borderTop: 0, paddingTop: 0 }}>
+  <div className="chat-use-case-visual" style={{ aspectRatio: "auto", minHeight: "clamp(220px, 34vw, 320px)" }}>
+    <div
+      aria-hidden="true"
+      style={{
+position: "relative",
+zIndex: 1,
+display: "flex",
+alignItems: "center",
+justifyContent: "center",
+gap: "clamp(18px, 4vw, 28px)",
+color: "#fff",
+filter: "drop-shadow(0 8px 18px rgba(73,18,0,.42))",
+}}
+    >
+      <svg width="96" height="96" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 6.25a.75.75 0 0 1 .75.75v4.932l3.666 2.443a.75.75 0 0 1-.833 1.248l-4-2.666a.75.75 0 0 1-.333-.624V7a.75.75 0 0 1 .75-.75" />
+
+        <path fillRule="evenodd" d="M5.751 3.253a10.75 10.75 0 1 1 9.043 19.128 10.75 10.75 0 0 1-7.302-.623 1.25 1.25 0 0 0-.658-.056l-3.367.985-.018.005a1.753 1.753 0 0 1-2.118-1.165 1.75 1.75 0 0 1-.045-.88 1 1 0 0 1 .022-.08l1.049-3.242a1.25 1.25 0 0 0-.06-.702A10.75 10.75 0 0 1 5.75 3.253m6.984-.473a9.25 9.25 0 0 0-9.046 13.286c.202.51.248 1.069.13 1.604l-.02.07-1.046 3.229a.25.25 0 0 0 .075.213.25.25 0 0 0 .233.06l3.398-.993.065-.015c.442-.088.899-.066 1.329.064l.182.062.051.021A9.252 9.252 0 0 0 18.501 5.42a9.25 9.25 0 0 0-5.766-2.64" clipRule="evenodd" />
+      </svg>
+
+      <span
+        style={{
+  fontSize: "clamp(34px, 7vw, 58px)",
+  fontWeight: 600,
+  letterSpacing: "-0.03em",
+  lineHeight: 1,
+}}
+      >
+        Routines
+      </span>
+    </div>
+  </div>
+</div>
+
+**Routine** позволяет настроить в Replit повторное выполнение задачи из [Conversation](/ru/chat/conversations). Результаты будут возвращаться в ту же Conversation, где вы сможете их просмотреть и продолжить работу.
+
+<div id="whats-a-routine">
+  ## Что такое Routine?
+</div>
+
+Routine — это запланированная задача, связанная с Conversation. Она может использовать подключённые инструменты, создавать проекты или задачи в подключённых сервисах и отправлять сообщения.
+
+Например, вы можете попросить Replit каждое утро просматривать ваш Slack и сообщать ваши приоритеты на день.
+
+<Note>
+  В одной Conversation можно создать несколько Routine. Они остаются частью
+  этой Conversation, и их нельзя создавать внутри Project.
+</Note>
+
+<div id="what-you-can-do">
+  ## Что вы можете делать
+</div>
+
+Используйте Routine для регулярных задач, которые Replit может выполнять в Conversation. Например, вы можете:
+
+* Собирать информацию из [подключённых инструментов](/ru/features/integrations/overview) и суммировать изменения.
+* Создавать проекты или задачи в подключённых сервисах.
+* Отправлять сообщения через подключённый инструмент.
+
+<div id="permissions-and-results">
+  ## Разрешения и результаты
+</div>
+
+Routine доступна только вам. Она наследует разрешения Conversation и доступ к подключённым инструментам.
+
+Результаты каждого запуска возвращаются в Conversation. Если Replit потребуется ваша помощь или запуск завершится ошибкой, он сообщит об этом там.
+
+Если к моменту запуска Routine уже выполняется другая работа, Routine ждёт. Replit не добавляет ещё один ожидающий запуск той же Routine.
+
+<div id="availability-and-limits">
+  ## Доступность и ограничения
+</div>
+
+<RoutinePlanAvailability />
+
+* Routines могут запускаться с интервалом не менее одного часа.
+* В тарифе Core доступно до пяти активных Routines на пользователя, а в тарифе Pro — до 10.
+* Routines выполняются в режимах Power или Max Mode. В Free Mode они не работают.
+
+Для каждого запуска Routine требуется бюджет. Replit проверяет бюджет после каждого шага. Если выполнение шага уже началось, например выполняется вызов API, Replit завершит его перед остановкой. Поэтому запуск может немного превысить выделенный бюджет.
+
+Routines могут планировать работу, которую Replit может выполнить в Conversation. Они не могут планировать публикацию.
+
+<div id="create-a-routine">
+  ## Создание Routine
+</div>
+
+Перед началом убедитесь, что в поле под полем ввода промпта выбран режим **Power** или
+**Max**. В Free Mode нельзя создавать или запускать Routine.
+
+<Frame caption="Перед созданием Routine выберите Power или Max.">
+  <img src="/assets/mirror/routine-power-mode-57f68b753e60.png" alt="Переключатель режимов Replit: выбран Power, также доступны Free и Max" width="1132" height="840" data-path="images/chat/routine-power-mode.png" />
+</Frame>
+
+<Steps>
+  <Step title="Сформулируйте регулярный запрос">
+    Попросите Replit отслеживать важную для вас информацию. Например:
+
+    <AiPrompt>
+      Каждый понедельник проверяй местные события, ближайшие кофейни и изменения,
+      которые могут повлиять на открытие моего кафе в районе. Кратко опиши изменения, объясни,
+      почему они важны, и порекомендуй, как обновить мой план открытия в этой
+      Conversation.
+    </AiPrompt>
+  </Step>
+
+  <Step title="Уточните расписание и область мониторинга">
+    Ответьте на уточняющие вопросы Replit о том, когда должна запускаться Routine и
+    что она должна отслеживать. Например, выберите утро понедельника и попросите её
+    отслеживать выбранный район, похожие кафе и местные события.
+  </Step>
+
+  <Step title="Проверьте и создайте Routine">
+    Проверьте предложенные инструкции, расписание и бюджет на запуск. При необходимости внесите изменения,
+    затем выберите **Создать routine**.
+
+    Для каждого запуска Routine нужен отдельный бюджет. Replit проверяет бюджет после
+    каждого шага. Если шаг уже выполняется, например выполняется вызов API, Replit
+    завершит его перед остановкой. Поэтому запуск может немного превысить
+    выделенный бюджет.
+
+    <CoffeeShopScreenshotFrame src="/assets/mirror/review-routine-5496b632774b.png" alt="Экран подтверждения Routine в Replit с названием, инструкциями, расписанием на понедельник, бюджетом на запуск и кнопкой «Создать routine»" />
+  </Step>
+
+  <Step title="Проверьте результат и скорректируйте план">
+    Replit подтверждает название Routine, расписание, бюджет и область мониторинга.
+    Каждый последующий результат появляется в этой Conversation, где вы можете решить,
+    что изменить дальше.
+
+    <CoffeeShopScreenshotFrame src="/assets/mirror/routine-created-87a7629dfc0d.png" alt="Созданная Routine с названием Lausanne café launch watch, с расписанием на понедельник, бюджетом на запуск и отслеживаемыми местными изменениями" />
+  </Step>
+</Steps>
+
+<div id="find-and-manage-routines">
+  ## Поиск Routines и управление ими
+</div>
+
+Полный пример интеграции календаря со Slack см. в разделе [Запланировать Routine](/ru/schedule-a-routine).
+
+<Steps>
+  <Step title="Откройте Routines">
+    Выберите **Routines** на боковой панели Replit.
+
+    <Frame>
+      <img src="/assets/mirror/open-routines-sidebar-ee93c4f81f44.png" alt="Боковая панель Replit с выбранным разделом Routines" width="464" height="646" data-path="images/chat/open-routines-sidebar.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Просмотрите свои Routines">
+    Просмотрите запланированные Routines, их расписания, статусы активности и историю
+    запусков.
+
+    <Frame>
+      <img src="/assets/mirror/routines-management-page-c8d8f51156d4.png" alt="Страница Routines с активной ежедневной сводкой календаря в Slack и её расписанием" width="2738" height="782" data-path="images/chat/routines-management-page.png" />
+    </Frame>
+
+    Изменить бюджет Routine для каждого запуска можно двумя способами: попросить Replit в
+    Conversation или напрямую отредактировать поле **Budget** на боковой панели
+    Routines для этой Routine.
+  </Step>
+
+  <Step title="Управляйте Routine">
+    Откройте меню действий Routine, чтобы запустить её сейчас или удалить.
+
+    <Frame>
+      <img src="/assets/mirror/routine-action-menu-7331793cd0de.png" alt="Меню действий Routine с вариантами Run now и Delete" width="500" height="348" data-path="images/chat/routine-action-menu.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="prximos-passos">
+  ## Следующие шаги
+</div>
+
+<section className="chat-mkt chat-workflow-grid has-visuals">
+  <a className="chat-example has-visual" href="/ru/pt/schedule-a-routine">
+    <div className="chat-use-case-visual palette-orange">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="calendar-clock" size={24} color="#ffffff" />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="calendar-clock" size={19} />
+    </span>
+
+    <div className="chat-card-title">Запланировать Routine</div>
+    <p>Воспользуйтесь кратким руководством, чтобы создать и запланировать регулярно выполняемую задачу.</p>
+    <div className="chat-card-link">Открыть краткое руководство →</div>
+  </a>
+
+  <a className="chat-example has-visual" href="/ru/pt/chat/agent-modes">
+    <AgentModesCardVisual />
+
+    <span>
+      <Icon icon="bolt" size={19} />
+    </span>
+
+    <div className="chat-card-title">Как выполняются Routines</div>
+
+    <p>
+      Запланированные Routines выполняются в режиме Power или Max Mode, но не в Free Mode.
+    </p>
+
+    <div className="chat-card-link">Подробнее о режимах Agent →</div>
+  </a>
+</section>
+
+Определив, что нужно выполнять, сравните [режимы Agent](/ru/pt/chat/agent-modes), чтобы выбрать, как Replit будет решать задачу.

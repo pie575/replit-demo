@@ -1,6 +1,8 @@
 ---
 title: "Créer une application mobile"
-description: "Créez une application en priorité sur téléphone avec Agent, testez-la dans un simulateur et sur votre téléphone, et partagez-la pour obtenir des retours."
+description: "Créez une application pensée pour le mobile avec Agent, testez-la dans un simulateur et sur votre téléphone, puis partagez-la pour recueillir des retours."
+sidebarTitle: "Créer une application mobile"
+icon: "mobile-screen"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -731,249 +733,302 @@ export const AgentInput = ({defaultPrompt = "", highlightPlan = false, highlight
 
 ⏰ *Durée estimée : 15 minutes*
 
-Une application mobile doit se sentir naturelle sur un téléphone : rapide à ouvrir, facile à appuyer et confortable à utiliser d'une seule main.
+Une application mobile doit paraître naturelle sur un téléphone : rapide à ouvrir, facile à utiliser au doigt et agréable à manipuler d&#39;une seule main.
 
-Vous allez créer **Pace Mobile**, un suivi de course en priorité sur téléphone inspiré de l'exemple de suivi de course de [Qu'est-ce que Replit ?](/fr/welcome). L'objectif est de tester un flux mobile ciblé avant de s'engager dans le chemin complet de l'App Store.
+Vous allez créer **Pace Mobile**, une application de suivi de course pensée avant tout pour le mobile, inspirée de l&#39;exemple de suivi de course présenté dans [Qu&#39;est-ce que Replit ?](/fr/welcome). L&#39;objectif est de tester un parcours mobile ciblé avant de se lancer dans la démarche complète de publication sur l&#39;App Store.
 
 <Frame>
-  <img src="/assets/mirror/mobile-app-4203ff45ecd5.png" alt="Un exemple d'application mobile soignée avec des écrans de suivi fitness conçus pour les téléphones" width="1440" height="850" data-path="images/build-examples/mobile-app.png" />
+  <img src="/assets/mirror/mobile-app-4203ff45ecd5.png" alt="Un exemple d'application mobile soignée avec des écrans de suivi de forme physique conçus pour une utilisation sur téléphone" width="1440" height="850" data-path="images/build-examples/mobile-app.png" />
 </Frame>
 
-## Ce que vous allez accomplir
+<div id="what-youll-achieve">
+  ## Ce que vous allez accomplir
+</div>
 
 À la fin de ce guide, vous aurez :
 
-* Un projet d'application mobile créé avec Agent.
-* Une première version délimitée autour d'un flux adapté aux téléphones.
-* L'application fonctionnant dans un simulateur ou émulateur.
-* L'application fonctionnant sur votre téléphone avec Expo Go.
-* Une version partageable que vous pouvez envoyer à quelqu'un pour obtenir des retours.
+* Un projet d&#39;app mobile créé avec Agent.
+* Une première version centrée sur un seul parcours adapté au mobile.
+* L&#39;app exécutée dans un simulateur ou un émulateur.
+* L&#39;app exécutée sur votre téléphone avec Expo Go.
+* Une version partageable que vous pouvez envoyer à quelqu&#39;un pour recueillir des retours.
 
-## Ce que vous allez apprendre
+<div id="what-youll-learn">
+  ## Ce que vous allez apprendre
+</div>
 
-Vous apprendrez à :
+Vous allez apprendre à :
 
-* Démarrer une application mobile depuis un prompt.
-* Délimiter la première version autour des contraintes du téléphone.
-* Tester l'application dans un simulateur ou émulateur.
-* Tester l'application sur un vrai appareil avec Expo Go.
-* Décider quand continuer à itérer avant le travail sur App Store ou TestFlight.
+* Créer une application mobile à partir d&#39;un prompt.
+* Délimiter la première version en fonction des contraintes du téléphone.
+* Tester l&#39;application dans un simulateur ou un émulateur.
+* Tester l&#39;application sur un appareil réel avec Expo Go.
+* Déterminer jusqu&#39;à quand itérer avant de passer à l&#39;App Store ou à TestFlight.
 
-## À qui s'adresse ce guide
+<div id="who-this-is-for">
+  ## À qui s&#39;adresse ce guide
+</div>
 
-Utilisez ce guide quand votre idée doit être utilisée sur un téléphone.
+Utilisez ce guide lorsque votre idée est destinée à être utilisée sur un téléphone.
 
-C'est utile pour les applications de suivi, les flux de réservation, les outils de terrain, les applications d'événements, les outils d'apprentissage, les applications d'habitudes et tout ce que les gens devraient utiliser loin d'un bureau.
+C&#39;est utile pour les outils de suivi, les parcours de réservation, les outils de terrain, les apps événementielles, les outils d&#39;apprentissage, les apps de suivi d&#39;habitudes et tout ce qui doit s&#39;utiliser loin d&#39;un ordinateur de bureau.
 
 <Note>
-  La publication sur TestFlight et l'App Store est distincte de ce guide. Quand vous êtes prêt pour ce chemin, consultez [Créer et lancer une application mobile](/fr/build/mobile-app).
+  TestFlight et la publication sur l&#39;App Store ne sont pas traités dans ce guide. Lorsque vous
+  serez prêt à emprunter cette voie, consultez [Créer et lancer une app mobile](/fr/build/mobile-app).
 </Note>
 
-## Avant de commencer
+<div id="before-you-start">
+  ## Avant de commencer
+</div>
 
-Vous avez besoin de :
+Vous aurez besoin de :
 
 * Un [compte Replit](https://replit.com).
-* Un téléphone avec [Expo Go](https://expo.dev/go) installé.
+* Un téléphone équipé de [Expo Go](https://expo.dev/go).
 * Un flux mobile que vous pouvez tester en quelques minutes.
 
-Pour les détails exacts sur les simulateurs, émulateurs et l'aperçu sur appareil, consultez [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps).
+Pour en savoir plus sur les simulateurs, les émulateurs et les aperçus sur appareil, consultez [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps).
 
-## Définir le flux mobile
+<div id="define-the-mobile-flow">
+  ## Définir le parcours mobile
+</div>
 
-Avant de construire, décidez ce que quelqu'un devrait faire sur son téléphone.
+Avant de vous lancer dans le développement, déterminez ce que l&#39;utilisateur doit pouvoir faire depuis son téléphone.
 
 Pour Pace Mobile :
 
-* **Audience** : les coureurs qui veulent enregistrer une course rapidement.
-* **Flux principal** : choisir le type de course → entrer la distance et la durée → enregistrer la course → voir le résumé du jour.
-* **Contrainte mobile** : l'action principale doit être facile à atteindre avec un pouce.
-* **Première version** : pas de comptes, pas de fil social, pas d'analyses avancées.
+* **Public** : les coureurs qui souhaitent enregistrer une course rapidement.
+* **Parcours principal** : choisir le type de course → saisir la distance et la durée → enregistrer la course → consulter le résumé du jour.
+* **Contrainte mobile** : l&#39;action principale doit être accessible avec un seul pouce.
+* **Première version** : pas de comptes, pas de fil social, pas d&#39;analyses avancées.
 
-Cela maintient le premier segment mobile suffisamment petit pour être testé.
+La première version mobile reste ainsi suffisamment restreinte pour être testée.
 
-## Construire la première version
+<div id="build-the-first-version">
+  ## Créer la première version
+</div>
 
-Ouvrez Replit et démarrez une nouvelle application. Décrivez ce que vous souhaitez construire, puis sélectionnez **Application mobile** comme type d'application.
+Ouvrez Replit et créez une nouvelle app. Décrivez ce que vous voulez créer, puis sélectionnez **Application mobile** comme type d’app.
 
 <Frame>
-  <img src="/assets/mirror/prompt-5cb144699b45.png" alt="L'écran d'accueil Replit avec Application mobile sélectionné comme type d'application" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
+  <img src="/assets/mirror/prompt-5cb144699b45.png" alt="L’invite de l’écran d’accueil de Replit avec Application mobile sélectionnée comme type d’app" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
 </Frame>
 
-Utilisez ce prompt :
+Utilisez ce prompt :
 
 <AiPrompt>
-  Crée Pace Mobile, un suivi de course conçu en priorité pour le téléphone.<br />
-  Un coureur doit pouvoir choisir un type de course, entrer la distance et la durée, enregistrer la course et voir le résumé du jour.<br />
-  Conçois-la pour une utilisation à une main, avec de grandes zones tactiles, une navigation simple et un rendu soigné digne d'une application de fitness.<br />
-  Garde la première version suffisamment simple pour la tester aujourd'hui dans un simulateur et sur un vrai téléphone.
+  Crée Pace Mobile, une application de suivi de course à pied conçue pour les téléphones.
+
+  <br />
+
+  Un coureur doit pouvoir choisir un type de course, saisir la distance et la durée, enregistrer
+  sa course et consulter le récapitulatif du jour.
+
+  <br />
+
+  Conçois l’application pour une utilisation à une main, avec de grandes zones tactiles, une navigation simple et une
+  interface soignée digne d’une application de fitness.
+
+  <br />
+
+  Garde la première version suffisamment simple pour pouvoir la tester dès aujourd’hui dans un simulateur et sur un vrai
+  téléphone.
 </AiPrompt>
 
-Si vous souhaitez que Agent réfléchisse avant de construire, utilisez le [mode Plan](/fr/features/agent/plan-mode). Demandez à Agent de vérifier les écrans, la navigation, les zones tactiles et les contraintes spécifiques aux téléphones avant de commencer à construire.
+Si vous souhaitez qu’Agent réfléchisse avant de créer l’application, utilisez le [mode Plan](/fr/features/agent/plan-mode). Demandez à Agent de vérifier les écrans, la navigation, les zones tactiles et les contraintes propres aux téléphones avant de commencer à créer l’application.
 
 <Frame>
-  <img src="/assets/mirror/agent-plan-mode-prompt-059fe8d2c277.png" alt="Le compositeur de prompt Replit avec le mode Plan sélectionné avant qu'Agent délimite la construction d'une application mobile" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
+  <img src="/assets/mirror/agent-plan-mode-prompt-059fe8d2c277.png" alt="Le composeur de prompts de Replit avec le mode Plan sélectionné avant qu’Agent ne définisse le périmètre de création d’une application mobile" width="1440" height="900" data-path="images/fitstart/work-with-agent/agent-plan-mode-prompt.png" />
 </Frame>
 
-## Tester dans un simulateur ou émulateur
+<div id="test-in-a-simulator-or-emulator">
+  ## Tester dans un simulateur ou un émulateur
+</div>
 
-Quand Agent a terminé la première construction, ouvrez [Preview](/fr/features/editor/preview). Dans le sélecteur d'appareils, choisissez **Simulateur iOS** ou **Émulateur Android**.
+Une fois le premier build généré par Agent, ouvrez [Preview](/fr/features/editor/preview). Dans le sélecteur d’appareil, choisissez **iOS Simulator** ou **Android Emulator**.
 
-Naviguez dans l'application comme quelqu'un l'utilisant sur un téléphone.
+Parcourez l’application comme si vous l’utilisiez sur un téléphone.
 
 <Frame>
-  <img src="/assets/mirror/workspace-dda0f81e6b83.png" alt="L'éditeur de projet Replit affichant un aperçu d'application mobile et l'option de prévisualisation sur un appareil mobile" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
+  <img src="/assets/mirror/workspace-dda0f81e6b83.png" alt="Le Project Editor de Replit affichant l’aperçu d’une application mobile et l’option permettant de la prévisualiser sur un appareil mobile" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
 </Frame>
 
-Vérifiez que vous pouvez :
+Vérifiez que vous pouvez :
 
-* Démarrer l'application sans erreurs.
+* Démarrer l’application sans erreur.
 * Choisir un type de course.
-* Entrer la distance et la durée.
+* Saisir la distance et la durée.
 * Enregistrer la course.
-* Voir le résumé du jour se mettre à jour.
-* Naviguer sans blocage.
+* Voir le récapitulatif du jour se mettre à jour.
+* Naviguer sans vous retrouver bloqué.
 * Lire le texte sans zoomer.
 
-## Tester sur votre téléphone
+<div id="test-on-your-phone">
+  ## Testez sur votre téléphone
+</div>
 
-Les tests dans le simulateur sont utiles, mais un téléphone vous dit si l'application se sent bien.
+Les tests sur simulateur sont utiles, mais seul un téléphone permet de vérifier si l&#39;application est agréable à utiliser.
 
-Ouvrez le panneau d'aperçu sur appareil mobile et scannez le code QR avec votre téléphone. Cela ouvre l'application dans Expo Go.
+Ouvrez le panneau d&#39;aperçu sur appareil mobile et scannez le code QR avec votre téléphone. L&#39;application s&#39;ouvrira dans Expo Go.
 
 <Frame>
-  <img src="/assets/mirror/mobile-screen-e5685fc26793.png" alt="Une application mobile fonctionnant dans l'aperçu de l'éditeur de projet Replit avec le panneau Preview sur appareil et le code QR pour Expo Go" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
+  <img src="/assets/mirror/mobile-screen-e5685fc26793.png" alt="Une application mobile s'exécutant dans l'aperçu du Replit Project Editor, avec le panneau Preview on device et le code QR pour Expo Go" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
 </Frame>
 
-Sur votre téléphone, vérifiez :
+Sur votre téléphone, vérifiez :
 
-* Pouvez-vous terminer le flux principal d'une seule main ?
-* Les boutons et les champs de saisie sont-ils suffisamment grands pour appuyer dessus ?
-* L'action principale est-elle facile à atteindre ?
-* Le clavier couvre-t-il des champs importants ?
-* L'application a-t-elle encore du sens sur un petit écran ?
+* Pouvez-vous effectuer le parcours principal d&#39;une seule main ?
+* Les boutons et les champs de saisie sont-ils suffisamment grands pour être touchés ?
+* L&#39;action principale est-elle facile à atteindre ?
+* Le clavier masque-t-il des champs importants ?
+* L&#39;application reste-t-elle utilisable sur un petit écran ?
 
-Si quelque chose semble maladroit, demandez à Agent de corriger cette partie spécifique plutôt que de reconcevoir toute l'application.
+Si un élément semble peu pratique, demandez à Agent de corriger cette partie précise plutôt que de repenser toute l&#39;application.
 
 <AiPrompt>
-  Améliore Pace Mobile pour une utilisation à une main sur téléphone.<br />
-  Rends le bouton Enregistrer la course plus facile à atteindre, augmente les zones tactiles là où c'est nécessaire, et garde le formulaire de course simple.<br />
-  N'ajoute pas de nouvelles fonctionnalités.<br />
-  Après la modification, vérifie qu'enregistrer une course met toujours à jour le résumé du jour.
+  Améliorez Pace Mobile pour une utilisation à une main sur téléphone.
+
+  <br />
+
+  Facilitez l&#39;accès au bouton Save Run, augmentez les zones tactiles si nécessaire,
+  et gardez le formulaire de course simple.
+
+  <br />
+
+  N&#39;ajoutez pas de nouvelles fonctionnalités.
+
+  <br />
+
+  Après la modification, vérifiez que l&#39;enregistrement d&#39;une course met toujours à jour le récapitulatif du jour.
 </AiPrompt>
 
-## Partager pour obtenir des retours
+<div id="share-for-feedback">
+  ## Partager pour obtenir des retours
+</div>
 
-Quand le flux sur téléphone fonctionne, publiez l'application pour créer une version Expo Go partageable pour les premiers retours.
+Lorsque le parcours sur téléphone fonctionne, publiez l&#39;app pour créer une version Expo Go partageable et recueillir de premiers retours.
 
-Partagez avec une tâche ciblée :
+Partagez-la en confiant une seule tâche précise :
 
-> Ouvrez Pace Mobile sur votre téléphone, enregistrez une course et dites-moi tout ce qui vous a semblé maladroit à appuyer, lire ou comprendre.
+> Ouvre Pace Mobile sur ton téléphone, enregistre une course et dis-moi tout ce qui t&#39;a semblé peu pratique à toucher, à lire ou à comprendre.
 
-Les retours ciblés sont plus faciles à utiliser que les opinions générales. Si les retours pointent vers un problème clair, demandez à Agent le correctif le plus petit possible et testez à nouveau l'application sur votre téléphone.
+Des retours ciblés sont plus faciles à exploiter que des avis généraux. Si les retours mettent en évidence un problème précis, demandez à Agent la correction la plus simple possible, puis testez à nouveau l&#39;app sur votre téléphone.
 
-## Publier sur l'App Store
+<div id="publish-to-the-app-store">
+  ## Publier sur l’App Store
+</div>
 
-Après avoir testé Pace Mobile dans le simulateur et sur votre téléphone avec Expo Go, vous pouvez promouvoir la même application vers TestFlight et l'App Store. Ce flux nécessite une adhésion au **Programme développeur Apple** avec l'authentification à deux facteurs. Pour des informations sur l'inscription, les comptes individuels vs. organisations, les tests TestFlight vs. l'examen de l'App Store et les tests externes, consultez [Créer et lancer une application mobile](/fr/build/mobile-app).
+Après avoir testé Pace Mobile dans le simulateur et sur votre téléphone avec Expo Go, vous pouvez soumettre cette même app à TestFlight et à l’App Store. Ce processus nécessite une adhésion à l’**Apple Developer Program** avec authentification à deux facteurs. Pour en savoir plus sur l’inscription, les comptes individuels ou d’organisation, la validation par TestFlight ou l’App Store, et les tests externes, consultez [Créer et lancer une app mobile](/fr/build/mobile-app).
 
 <Steps>
-  <Step title="Ouvrir l'onglet Publication et démarrer la publication sur l'App Store">
-    Après que votre aperçu Expo Go est en ligne, ouvrez l'onglet **Publication**. Sous **Production**, vous verrez une carte **Prêt à publier Pace sur l'App Store ?**. Sélectionnez **Commencer la publication sur l'App Store**.
+  <Step title="Ouvrir l'onglet Publishing et lancer la publication sur l'App Store">
+    Une fois votre Preview Expo Go en ligne, ouvrez l&#39;onglet **Publishing**. Sous **Production**, une carte **Ready to publish Pace to the App Store ?** s&#39;affiche. Sélectionnez **Start publishing to the App Store**.
 
     <Frame>
-      <img src="/assets/mirror/app-store-02-start-publishing-190eb7841bcf.png" alt="L'onglet Publication dans l'éditeur de projet affichant le statut de production et une carte 'Prêt à publier Pace sur l'App Store ?' avec un bouton Commencer la publication sur l'App Store" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-02-start-publishing.png" />
+      <img src="/assets/mirror/app-store-02-start-publishing-190eb7841bcf.png" alt="L'onglet Publishing dans le Project Editor affichant l'état Production et une carte Ready to publish Pace to the App Store ? avec un bouton Start publishing to the App Store" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-02-start-publishing.png" />
     </Frame>
   </Step>
 
   <Step title="Choisir votre projet Expo">
-    Replit ouvre **Launch** — un flux Expo intégré dans Replit. Entrez ou confirmez le nom et le slug de votre projet Expo, puis sélectionnez **Continuer**. Si vous avez déjà un projet Expo, sélectionnez plutôt **Utiliser l'existant**.
+    Replit ouvre **Launch** — un flux Expo intégré à Replit. Saisissez ou confirmez le nom et le slug de votre projet Expo, puis sélectionnez **Continue**. Si vous disposez déjà d&#39;un projet Expo, sélectionnez plutôt **Use existing**.
 
     <Frame>
-      <img src="/assets/mirror/app-store-03-choose-expo-project-4707fafffafe.png" alt="La boîte de dialogue Launch avec l'étape Choisir un projet Expo active — champs pour le nom du projet et le slug préremplis avec Pace, un bouton Continuer et une option Utiliser l'existant" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-03-choose-expo-project.png" />
+      <img src="/assets/mirror/app-store-03-choose-expo-project-4707fafffafe.png" alt="La boîte de dialogue Launch à l'étape Choose Expo project — les champs Project name et Project slug pré-remplis avec Pace, un bouton Continue et une option Use existing" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-03-choose-expo-project.png" />
     </Frame>
   </Step>
 
   <Step title="Se connecter avec Apple">
-    Connectez le compte développeur Apple qui sera propriétaire de la liste App Store. Le compte doit être inscrit au Programme développeur Apple, et Apple impose l'authentification à deux facteurs — soyez prêt à approuver un code de vérification sur un appareil de confiance.
+    Connectez le compte Apple Developer qui détiendra la fiche App Store. Ce compte doit être inscrit au Apple Developer Program, et Apple impose l&#39;authentification à deux facteurs — préparez-vous à valider un code de vérification sur un appareil de confiance.
 
     <Frame>
-      <img src="/assets/mirror/app-store-04-sign-in-apple-459dfc9b84ba.png" alt="La boîte de dialogue Launch à l'étape Se connecter avec Apple — champs pour l'e-mail ou le numéro de téléphone du développeur Apple et le mot de passe, avec une note indiquant que le mot de passe ne quitte jamais l'appareil et que le compte doit être inscrit au Programme développeur Apple" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-04-sign-in-apple.png" />
+      <img src="/assets/mirror/app-store-04-sign-in-apple-459dfc9b84ba.png" alt="La boîte de dialogue Launch à l'étape Sign in with Apple — les champs adresse e-mail ou numéro de téléphone Apple Developer et mot de passe, avec une note indiquant que le mot de passe ne quitte jamais l'appareil et que le compte doit être inscrit au Apple Developer Program" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-04-sign-in-apple.png" />
     </Frame>
   </Step>
 
-  <Step title="Choisir ou créer votre application Apple">
-    Entrez le **Nom de l'application** et l'**identifiant de bundle** (par exemple `app.replit.pace`) qui apparaîtront sur l'App Store. L'identifiant de bundle ne peut pas être modifié après le premier build, donc choisissez-le soigneusement.
+  <Step title="Choisir ou créer votre app Apple">
+    Saisissez le **App name** et le **Bundle ID** (par exemple `app.replit.pace`) qui apparaîtront sur l&#39;App Store. L&#39;identifiant de bundle ne peut plus être modifié après le premier build : choisissez-le avec soin.
 
     <Frame>
-      <img src="/assets/mirror/app-store-05-choose-apple-app-3971aea62f14.png" alt="La boîte de dialogue Launch à l'étape Choisir une application Apple — nom de l'application défini sur Pace, identifiant de bundle app.replit.pace, avec une note indiquant que l'identifiant de bundle ne peut pas être modifié ultérieurement, et un bouton Création de l'application…" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-05-choose-apple-app.png" />
+      <img src="/assets/mirror/app-store-05-choose-apple-app-3971aea62f14.png" alt="La boîte de dialogue Launch à l'étape Choose Apple app — App name défini sur Pace, Bundle ID app.replit.pace, avec une note indiquant que l'identifiant de bundle ne pourra pas être modifié par la suite, et un bouton Creating app…" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-05-choose-apple-app.png" />
     </Frame>
   </Step>
 
-  <Step title="Lancer vers l'App Store">
-    Replit configure les certificats Apple en votre nom. Quand l'étape **Prêt pour le lancement** s'allume, sélectionnez **Lancer vers l'App Store**. Replit construit votre application native dans le cloud et soumet le build à App Store Connect pour l'examen bêta TestFlight.
+  <Step title="Lancer sur l'App Store">
+    Replit configure les certificats Apple à votre place. Lorsque l&#39;étape **Ready for launch** s&#39;active, sélectionnez **Launch to App Store**. Replit compile votre app native dans le cloud et soumet le build à App Store Connect pour la revue bêta TestFlight.
 
     <Frame>
-      <img src="/assets/mirror/app-store-06-ready-for-launch-ab02659ee0bb.png" alt="La boîte de dialogue Launch à l'étape Prêt pour le lancement avec Choisir une application Apple et Configurer les certificats Apple marqués comme terminés, et un bouton Lancer vers l'App Store avec des paramètres de lancement optionnels" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-06-ready-for-launch.png" />
+      <img src="/assets/mirror/app-store-06-ready-for-launch-ab02659ee0bb.png" alt="La boîte de dialogue Launch à l'étape Ready for launch, avec Choose Apple app et Configure Apple certificates marquées comme terminées, un bouton Launch to App Store et des Optional launch parameters" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-06-ready-for-launch.png" />
     </Frame>
 
-    Quand Launch est terminé, vous verrez une confirmation que l'application cible l'App Store, puis la boîte de dialogue se ferme et vous ramène à l'éditeur de projet.
+    Une fois Launch terminé, une confirmation indique que l&#39;app cible bien l&#39;App Store, puis la boîte de dialogue se ferme et vous ramène au Project Editor.
 
     <Frame>
-      <img src="/assets/mirror/app-store-targeting-f8797071c9e0.png" alt="La boîte de dialogue Launch avec Ciblage de l'App Store marqué comme terminé et un message Redirection vers Replit — l'état de confirmation après que Lancer vers l'App Store est sélectionné" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-targeting.png" />
+      <img src="/assets/mirror/app-store-targeting-f8797071c9e0.png" alt="La boîte de dialogue Launch avec Targeting App Store marqué comme terminé et un message Redirecting back to Replit — l'état de confirmation après avoir sélectionné Launch to App Store" width="3452" height="1988" data-path="images/native-mobile-apps/app-store-targeting.png" />
     </Frame>
   </Step>
 </Steps>
 
 <Note>
-  Le premier build d'une version nécessite généralement un examen bêta TestFlight avant que les testeurs puissent l'installer. Après approbation, les builds supplémentaires parviennent généralement aux testeurs plus rapidement. Pour partager avec des testeurs externes ou soumettre pour la sortie App Store, terminez la liste dans **App Store Connect** — consultez [Créer et lancer une application mobile](/fr/build/mobile-app) pour la liste de contrôle complète d'App Store Connect.
+  La première build d’une version nécessite généralement une validation bêta TestFlight avant que les testeurs puissent l’installer. Une fois approuvées, les builds suivantes sont généralement disponibles plus rapidement pour les testeurs. Pour la partager avec des testeurs externes ou la soumettre à la publication sur l’App Store, complétez la fiche dans **App Store Connect** — consultez [Créer et lancer une app mobile](/fr/build/mobile-app) pour accéder à la checklist complète d’App Store Connect.
 </Note>
 
-## Vous avez terminé quand
+<div id="youre-done-when">
+  ## Vous avez terminé lorsque
+</div>
 
-* L'application s'ouvre dans le simulateur iOS ou l'émulateur Android.
-* L'application s'ouvre sur votre téléphone avec Expo Go.
-* Vous pouvez terminer le flux mobile principal.
-* Le texte, les boutons et la navigation se sentent confortables sur un téléphone.
+* L&#39;app s&#39;ouvre dans le simulateur iOS ou l&#39;émulateur Android.
+* L&#39;app s&#39;ouvre sur votre téléphone avec Expo Go.
+* Vous pouvez suivre le parcours mobile principal jusqu&#39;au bout.
+* Le texte, les boutons et la navigation sont agréables à utiliser sur un téléphone.
 * Vous avez publié ou partagé une version mobile testable.
-* Au moins une personne peut l'essayer et donner des retours.
-* (Optionnel) Vous avez soumis l'application à TestFlight via le flux App Store.
+* Au moins une personne peut l&#39;essayer et vous faire un retour.
+* (Facultatif) Vous avez soumis l&#39;app à TestFlight via le processus App Store.
 
-## Améliorer ensuite
+<div id="improve-it-next">
+  ## Améliorez-la ensuite
+</div>
 
 <CardGroup cols={2}>
   <Card title="Ajouter une connexion" icon="user-lock" href="/fr/build/add-login">
-    Permettez à chaque personne de voir sa propre progression.
+    Permettez à chacun de suivre sa propre progression.
   </Card>
 
   <Card title="Ajouter une base de données" icon="database" href="/fr/build/add-database">
-    Sauvegardez l'historique des courses au-delà de la première session de test.
+    Conservez l&#39;historique des courses au-delà de la première session de test.
   </Card>
 
   <Card title="Ajouter des intégrations" icon="plug" href="/fr/build/add-integrations">
-    Connectez l'application aux notifications, aux données de santé ou aux services externes.
+    Reliez l&#39;app à des notifications, des données de santé ou des services externes.
   </Card>
 
-  <Card title="Créer et lancer une application mobile" icon="mobile-screen" href="/fr/build/mobile-app">
-    Faites progresser une application mobile fonctionnelle vers TestFlight et l'App Store.
+  <Card title="Créer et lancer une app mobile" icon="mobile-screen" href="/fr/build/mobile-app">
+    Faites passer une app mobile fonctionnelle sur TestFlight et l&#39;App Store.
   </Card>
 </CardGroup>
 
-## Besoin d'aide supplémentaire ?
+<div id="need-further-help">
+  ## Besoin d&#39;aide supplémentaire ?
+</div>
 
-* **Agent construit une application web à la place :** recommencez et sélectionnez **Application mobile** comme type d'application avant de construire.
-* **L'aperçu Expo Go semble périmé :** secouez votre téléphone, ouvrez le menu développeur et sélectionnez **Rafraîchir**.
-* **Les zones tactiles semblent trop petites :** demandez à Agent d'augmenter les cibles tactiles et de garder les actions principales à portée du pouce.
-* **La navigation semble encombrée :** demandez à Agent de réduire l'application au minimum d'écrans nécessaires pour le flux principal.
-* **Le simulateur fonctionne mais le téléphone ne fonctionne pas :** testez le comportement spécifique au matériel sur un vrai appareil et consultez [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps).
+* **Agent crée une application web à la place :** recommencez et sélectionnez **Mobile app** comme type d&#39;application avant de lancer la création.
+* **L&#39;aperçu Expo Go n&#39;est pas à jour :** secouez votre téléphone, ouvrez le menu développeur et sélectionnez **Refresh**.
+* **Les zones tactiles paraissent trop petites :** demandez à Agent d&#39;agrandir les zones tactiles et de placer les actions principales à portée de pouce.
+* **La navigation paraît surchargée :** demandez à Agent de réduire l&#39;application au strict minimum d&#39;écrans nécessaires au parcours principal.
+* **Le simulateur fonctionne, mais pas le téléphone :** testez les comportements propres au matériel sur un appareil réel et consultez [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps).
 * **La publication échoue :** consultez [Dépannage des applications mobiles](/fr/features/troubleshooting/mobile-app).
 
-## Essayez maintenant
+<div id="try-it-now">
+  ## Essayez dès maintenant
+</div>
 
-<AgentInput highlightStart defaultPrompt="Build Pace Mobile, a phone-first running tracker. A runner should be able to choose a run type, enter distance and time, save the run, and see today's summary. Design it for one-handed use with large tap targets, simple navigation, and a polished fitness-app feel. Keep the first version small enough to test today in a simulator and on a real phone." showTypewriter={false} />
+<AgentInput highlightStart defaultPrompt="Crée Pace Mobile, une application de suivi de course à pied pensée avant tout pour le mobile. Un coureur doit pouvoir choisir un type de course, saisir la distance et la durée, enregistrer la course et consulter le récapitulatif du jour. Conçois-la pour une utilisation à une main, avec de grandes zones tactiles, une navigation simple et le rendu soigné d'une appli de fitness. Garde la première version assez légère pour pouvoir la tester dès aujourd'hui dans un simulateur et sur un vrai téléphone." showTypewriter={false} />
 
-## En relation
+<div id="related">
+  ## Ressources associées
+</div>
 
-* [Applications mobiles natives](/fr/features/artifact-types/building-mobile-apps)
-* [Créer et lancer une application mobile](/fr/build/mobile-app)
+* [Application mobile native](/fr/features/artifact-types/building-mobile-apps)
+* [Créer et lancer une app mobile](/fr/build/mobile-app)
 * [Vibe coding 101](/fr/learn/foundations/vibe-coding-101)
-* [Dépannage des applications mobiles](/fr/features/troubleshooting/mobile-app)
+* [Dépannage d&#39;application mobile](/fr/features/troubleshooting/mobile-app)

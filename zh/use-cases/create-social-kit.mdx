@@ -1,0 +1,159 @@
+---
+title: "创建社交媒体头像和横幅"
+description: "利用你的网站和 Drive 中的素材，为各个社交平台生成尺寸合适的头像和封面横幅。"
+sidebarTitle: "创建社交媒体头像和横幅"
+icon: "images"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+根据你的网站和 Google Drive 中的品牌文件，为 X、LinkedIn、Instagram、Facebook、TikTok 以及你指定的其他平台生成头像图标和封面横幅。Agent 会按各平台当前的尺寸规范和安全区域来处理，确保人脸、徽标和文字在实际主页上不会被裁掉。保持统一的视觉体系，并导出为 PNG 格式。如果某个平台需要不同的裁切比例，请单独新建一个专用画板，不要拉伸图像。
+
+<div id="best-for">
+  ## 适用场景
+</div>
+
+* 需要一次性为各个社交平台准备头像和封面素材的品牌设计师。
+* 希望基于现有 徽标 和网站生成可直接导出的图标与横幅的营销人员。
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "徽标、配色和现有品牌素材",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 开始之前
+</div>
+
+准备好网站 URL，并在 Drive 中放好 徽标 (或品牌素材文件夹) 。说明你需要哪些社交平台。如果
+徽标 是文字标，请说明图标应为图形标、字母标，还是两者兼具。
+
+<div id="prompt-the-agent">
+  ## 向 Agent 发出提示
+</div>
+
+<AiPrompt>
+  根据此网站 [URL] 和 Google Drive 中的品牌文件，在 Replit Design 中创建一套社交媒体素材：
+  为 X、LinkedIn、Instagram、Facebook 和 TikTok 制作头像和封面横幅。使用各平台当前官方规定的尺寸和安全区域，
+  确保人脸、徽标和文字不会被裁切。保持统一的视觉风格。导出为 PNG。
+  如果某个平台需要不同的裁切方式，请创建专用画板，不要拉伸。
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 预期效果
+</div>
+
+Agent 会读取网站和 Drive 中的 素材，然后为每个 素材 生成一块尺寸正确的画板。常见的一套包括：
+
+* **X：** 400×400 头像，1500×500 头图
+* **LinkedIn：** 400×400 头像，1584×396 横幅
+* **Instagram：** 320×320 头像 (如需帖子和快拍封面，另加 1080×1080 和 1080×1920)
+* **Facebook：** 320×320 头像，820×312 封面 (或 2× 的 1640×624)
+* **TikTok：** 200×200 头像，1080×1920 封面
+
+上传前，请分别在圆形头像和宽幅横幅上检查裁切效果。导出一个图标和一个横幅，放到圆形头像和宽幅头图上试试，并确认小尺寸下的留白是否合适。
+
+<div id="make-it-work-for-you">
+  ## 按你的需求定制
+</div>
+
+<AiPrompt>
+  添加 YouTube (800×800 头像，2560×1440 横幅，安全区域 1546×423)
+  和 Pinterest (165×165 头像，1000×1500 图钉) 。
+</AiPrompt>
+
+<AiPrompt>
+  为每个图标制作浅色和深色两个版本。横幅统一使用网站的主色调。
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+* **徽标或人脸被裁切：**在圆形头像和宽幅横幅中检查每项素材。让 Agent 注意安全区域，并针对不同的裁切比例制作专用画板。请勿拉伸。
+* **尺寸不符合平台要求：**说明你需要的平台，并让 Agent 使用各平台当前的官方尺寸。上传前再次核对；平台的尺寸要求可能会变更。
+
+<div id="related">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计落地页" href="/zh/use-cases/design-landing-page">
+    用同一批 Google Drive 品牌文件制作等候名单页或发布页。
+  </Card>
+
+  <Card title="制作投资人路演材料" href="/zh/use-cases/pitch-deck-from-website">
+    用同一批 Google Drive 品牌文件制作幻灯片。
+  </Card>
+</CardGroup>

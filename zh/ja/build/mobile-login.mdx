@@ -1,0 +1,101 @@
+---
+title: "添加登录功能"
+description: "让玩家能够通过 Clerk 登录 PixelGames。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const loginPrompt = "使用 Clerk 为 PixelGames 添加登录功能。即使没有账户，任何人仍可游玩；登录仅适用于想要创建账户的玩家。";
+export const appleSignInPrompt = "为 PixelGames 添加“通过 Apple 登录”，但仅在 iOS 上显示。Android 版本仅保留邮箱和 Google 登录。";
+
+即使暂时没有需要保存的内容，也可以现在就为 PixelGames 添加登录功能。玩家有了账户后，之后就能将最高分、已解锁的游戏等内容关联到自己的账户。
+
+登录功能使用 Replit 的内置集成 [Clerk Auth](/zh/features/auth-and-identity/clerk-auth)。Agent 会自动完成配置，并为 PixelGames 提供专属品牌的登录页面。
+
+<AiPrompt>
+  {loginPrompt}
+</AiPrompt>
+
+<Frame caption="PixelGames 的 Clerk 登录页面。可通过电子邮件或 Google 登录。">
+  <img src="/assets/mirror/mobile-signin-2b3700144e02.png" alt="包含“使用电子邮件继续”和“使用 Google 继续”的 PixelGames 登录模态框" data-path="images/pixelgames/mobile/mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/mobile-signin.png" />
+</Frame>
+
+<div id="sign-in-with-apple">
+  ## 添加 Sign in with Apple
+</div>
+
+Apple 的 App Store 审核要求：如果你提供 Google 等其他社交登录方式，就必须在 iOS 上提供同等的
+**Sign in with Apple**。Android 没有这一要求。
+
+<AiPrompt>
+  {appleSignInPrompt}
+</AiPrompt>
+
+<Frame caption="仅限 iOS 的界面，除电子邮件和 Google 外，还添加了 Sign in with Apple。">
+  <img src="/assets/mirror/apple-mobile-signin-2eee321f670f.png" alt="PixelGames 登录模态框中，Continue with Google 上方添加了 Continue with Apple" data-path="images/pixelgames/mobile/apple-mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/apple-mobile-signin.png" />
+</Frame>
+
+<div id="section">
+  ## 启用身份提供方
+</div>
+
+仅在代码中添加身份提供方还不够；还需要在应用的认证设置中逐一启用。
+打开 **Users &amp; Auth → Configure → SSO providers → Production**，确认 **Google** 和 **Apple** 均显示为
+Enabled。
+
+<Frame caption="Production 环境的 SSO providers 中已启用 Google 和 Apple。">
+  <img src="/assets/mirror/sso-provider-0547c43ad601.png" alt="Replit 的 Users and Auth 窗格，显示 SSO providers 中已启用 Google 和 Apple" data-path="images/pixelgames/mobile/sso-provider.png" width="1266" height="502" data-path="images/pixelgames/mobile/sso-provider.png" />
+</Frame>
+
+<Note>
+  **Development** 和 **Production** 分别有独立的身份提供方列表。启用其中一方不会
+  自动启用另一方。发布前请检查 Production。
+</Note>
+
+<div id="section-2">
+  ## 测试
+</div>
+
+仅有一个账户还不够；要证明 PixelGames 能正确区分玩家，需要两个账户。
+
+1. 不登录，先玩一局。PixelGames 应该仍能正常运行。
+2. 登录自己的账户。
+3. 登出后使用另一个账户登录，确认你进入的是另一个会话，而非第一个账户的会话。
+4. 再次登录第一个账户，确认你已回到该账户。
+5. 在 iOS 上，确认 **Continue with Apple** 显示在 Google 上方。在 Android 上，
+   确认其完全不显示。
+
+<div id="section-3">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="在移动应用中保存图片" icon="image" href="/zh/ja/build/mobile-store-images">
+    玩家登录后，保存其个人资料照片。
+  </Card>
+
+  <Card title="添加原生设备功能" icon="camera" href="/zh/ja/build/mobile-camera">
+    为 PixelGames 添加更多功能。
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ## 相关内容
+</div>
+
+* [在移动应用中保存图片](/zh/ja/build/mobile-store-images)
+* [添加应用内支付](/zh/ja/build/mobile-payments)
+* [配置登录身份提供方](/zh/features/auth-and-identity/sign-in-providers)

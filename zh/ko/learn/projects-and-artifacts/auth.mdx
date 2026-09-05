@@ -1,0 +1,86 @@
+---
+title: "Auth"
+description: "了解 Replit 中的 Auth：应用如何借助用户账户保存偏好设置、限制功能访问、打造个性化体验，以及如何在 Replit Auth 与 Clerk Auth 之间做出选择。"
+sidebarTitle: "Auth"
+icon: "user-lock"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+<YouTubeEmbed videoId="cfpC1rzxspo" title="为 Replit 应用添加 Auth" />
+
+Auth——**认证 (authentication) **的缩写——为应用引入了“用户”这一概念。没有 Auth，所有访问者都是匿名的，应用无法区分不同的人。有了 Auth，每位访问者都可以登录，应用能识别其身份，并保存专属于他们的数据：预约、已保存的车辆、偏好设置、进度。
+
+接入 Auth 后，你可以：
+
+* 存储用户专属数据——预约、设置、内容、记录。
+* 将功能限制在登录之后 (支付、个人资料页面、管理面板) 。
+* 根据姓名、角色、套餐或过往行为提供个性化体验。
+* 按个人而非会话追踪活动与使用量。
+
+<div id="replit-auth">
+  ## Auth 在 Replit 应用中的工作方式
+</div>
+
+Replit 提供两种内置 Auth 选项，两者均由 Agent 自动预配——无需另行注册控制台账户，也不用复制粘贴 OAuth 密钥。
+
+* **[Replit Auth](/zh/ko/features/auth-and-identity/authentication)** —— 用户使用现有的 **Replit 账户**登录，登录页面采用 Replit 品牌样式。除了让 Agent 帮你添加之外，无需任何设置。
+* **[Clerk Auth](/zh/ko/features/auth-and-identity/clerk-auth)** —— 你的应用将拥有专属的 **Clerk 租户**。用户在*你的*应用内创建账户，而非在 Replit 上创建。品牌形象、登录方式以及登录界面的外观与体验都由你掌控。
+
+这两种选项都会替你搞定繁琐的部分——登录页面、会话、密码的安全处理、社交登录——你的应用代码只需要问一句“当前登录的用户是谁？”。
+
+<div id="replit-auth-vs-clerk-auth">
+  ## Replit Auth 与 Clerk Auth 对比
+</div>
+
+|            | Replit Auth                  | Clerk Auth                 |
+| ---------- | ---------------------------- | -------------------------- |
+| **用户账户**   | 用户使用 Replit 账户登录             | 用户在应用内创建账户 (无需 Replit 账户)  |
+| **品牌形象**   | Replit 品牌的登录页面               | 完全可自定义 —— 应用的名称、图标和配色      |
+| **SSO 凭据** | 使用 Replit 共享的 OAuth 应用       | 各提供商使用自有的 OAuth 凭据         |
+| **环境**     | 单一环境                         | 开发与生产环境相互独立                |
+| **最适合**    | 快速上手、原型开发、可接受 Replit 品牌标识的应用 | 品牌化应用、专业及商业产品              |
+
+如果你要构建原型或内部工具，Replit Auth 是最快捷的方式。如果你要构建具有自有品牌形象的产品，尤其是面向客户或商用的产品，那么 Clerk Auth 更为合适。
+
+<div id="auth">
+  ## 为应用添加 Auth
+</div>
+
+无需提前决定——可以先用其中一种，之后再迁移。最快的方式是直接告诉 Agent 要使用哪一种：
+
+* *“给我的应用添加登录功能，使用 Replit Auth。”*
+* *“给我的应用添加登录功能，使用 Clerk Auth。”*
+
+<div id="section">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Replit Auth" icon="lock" href="/zh/ko/features/auth-and-identity/authentication">
+    零配置的 Replit 品牌登录 —— 用户使用自己的 Replit 账户登录。
+  </Card>
+
+  <Card title="Clerk Auth" icon="user-lock" href="/zh/ko/features/auth-and-identity/clerk-auth">
+    自有品牌的 Auth 租户 —— 登录界面完全可自定义，开发与生产环境相互独立。
+  </Card>
+
+  <Card title="添加登录功能" icon="user-plus" href="/zh/ko/build/add-login">
+    实战示例：为真实应用接入 Clerk Auth，并用两个客户账户进行测试。
+  </Card>
+
+  <Card title="从 Replit Auth 迁移到 Clerk" icon="right-left" href="/zh/ko/features/auth-and-identity/migrate-auth-to-clerk">
+    将现有应用从 Replit Auth 迁移到 Clerk 租户。
+  </Card>
+</CardGroup>

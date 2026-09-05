@@ -1,0 +1,356 @@
+---
+title: "自定义模板"
+description: "在 Replit Enterprise 中配置和管理自定义模板，统一组织使用 Agent 构建应用的方式。"
+sidebarTitle: "模板"
+icon: "rectangle-list"
+---
+
+<div id="primeiros-passos">
+  ## 入门
+</div>
+
+Replit 是一个云端开发环境，可用于编写和运行各种框架或技术栈。要创建自定义模板，推荐以下两种方式：
+
+1. **从 [Git 提供商](https://replit.com/import)导入** — 从 GitHub、GitLab 或 Bitbucket 导入现有的初始技术栈 (或符合您偏好的技术栈) 。
+2. **fork 空白模板** — fork[空白模板](https://replit.com/@replit/Nothing?v=1)，从零开始使用完全空白的开发环境。
+
+客户已成功创建适用于 Rust、Python、Java、C++ 及许多其他技术栈的模板——只要能运行，就可以在 Replit 上运行。
+
+<Tip>
+  我们建议您在创建首批模板时与 **Replit Field Engineering** 团队合作。他们在为各种技术栈配置自定义模板方面经验丰富，并随时可提供帮助。请联系您的客户经理进行对接。
+</Tip>
+
+自定义模板让 Enterprise 管理员能够创建预先配置好的起点，并直接显示在组织所有成员的 Agent 收件箱中。开发者选择自定义模板后，Agent 会 fork 该模板，并使用模板的配置、说明和 skills 来指导后续所有工作。无需额外配置。
+
+<Note>
+  自定义模板仅适用于 **Enterprise** 计划。只有组织管理员可以固定和管理模板。
+</Note>
+
+<div id="como-os-templates-personalizados-funcionam">
+  ## 自定义模板的工作原理
+</div>
+
+自定义模板是组织中的标准 Replit App，且已**固定到 Agent 收件箱**。开发者选择后：
+
+1. Agent 会通过 fork 模板创建一个新应用 (复制所有文件)
+2. Agent 会跳过规划阶段，直接进入构建模式
+3. 模板中的 `custom_instruction/instructions.md` 文件会被注入 Agent 的上下文
+4. Agent 会发现并提供 `.agents/skills/` 中的自定义 [skills](/zh/pt/features/agent/skills)
+5. [`replit.md`](/zh/pt/features/project-setup/replit-dot-md) 文件会持续提供项目上下文
+
+这意味着，从第一次交互开始，组织的标准、约定和工具就已融入其中。
+
+<div id="estrutura-de-arquivos-do-template">
+  ## 模板文件结构
+</div>
+
+以下是自定义模板的推荐目录结构：
+
+```
+meu-template/
+├── .replit                              # App 配置（运行命令、端口和模块）
+├── replit.md                            # Agent 记忆：项目概览和偏好设置
+├── custom_instruction/
+│   └── instructions.md                  # 注入到 Agent 提示词中的公司指令
+├── .agents/
+│   └── skills/
+│       └── minha-skill/
+│           └── SKILL.md                 # Agent 可按需调用的自定义 skills
+└── ...                                  # 仓库结构的其余部分
+```
+
+每个文件各有不同用途。以下各节将说明如何配置它们。
+
+<div id="configurar-um-template-personalizado">
+  ## 配置自定义模板
+</div>
+
+<div id="criar-o-app-base">
+  ### 创建基础 App
+</div>
+
+在你的组织中创建一个新的 Replit App。为项目配置开发者作为起点所需的全部文件、依赖项和设置。其中包括：
+
+* 源代码脚手架 (组件、实用工具、配置文件)
+* 预先安装的依赖项 (`package.json`、`requirements.txt` 等)
+* 在 [`.replit` 文件](/zh/replit-app/configuration)中配置环境
+
+<div id="configurar-secrets-compartilhados">
+  ### 配置共享 Secrets
+</div>
+
+如果你的 模板 依赖 API 密钥、令牌或其他凭据，请先将其添加到 模板 的 **Secrets** (位于工具面板) ，再将 模板 固定。开发者基于该 模板 创建新 App 时，所有 secrets 都会自动复制到新 App 中，无需再配置凭据即可开始工作。
+
+请在 `custom_instruction/instructions.md` (或专门的 skill) 中记录每个 secret，说明可用的 secret 及每个密钥的用途。
+
+<Warning>
+  secrets 会在 fork 时复制，不会动态同步。如果你轮换密钥或向 模板 添加新的 secret，之前 fork 的 App 不会自动更新。开发者需要在这些 App 中手动添加或更新 secrets。
+</Warning>
+
+<div id="escrever-instrues-personalizadas">
+  ### 编写自定义指令
+</div>
+
+在项目根目录创建 `custom_instruction/instructions.md` 文件。这是 模板 中最重要的文件——它告诉 Agent 您的组织如何构建软件。
+
+<Warning>
+  文件夹名称必须为 `custom_instruction` (单数) ，而非 `custom_instructions`。
+</Warning>
+
+Agent 会将此文件连同一个前言直接注入其系统 提示词，将其作为公司提供的指导。请使用 Markdown 编写，并包括：
+
+* **架构模式**：App 应如何组织
+* **代码规范**：命名约定、文件组织规则、linting 要求
+* **组件使用**：应使用哪些库和组件 (以及应避免哪些)
+* **API 模式**：如何调用 backend 服务、处理身份验证和管理错误
+* **测试要求**：需要哪些测试及如何运行
+* **deployment 指南**：特定环境配置和部署流程
+
+````markdown theme={null}
+# 公司工程规范
+
+## 架构
+所有 Web 应用均使用 React 和 TypeScript。仅使用函数组件
+和 Hooks。使用 Zustand 管理本地状态，
+使用 React Query 管理服务器状态。
+
+## 组件库
+使用我们的内部设计系统包 `@acme/ui`。不得使用原生 HTML
+元素来创建按钮、输入框、表单或模态框——始终使用
+`@acme/ui` 中相应的组件。
+
+按如下方式导入组件：
+```tsx
+import { Button, TextField, Modal } from '@acme/ui';
+```
+
+## API 集成
+所有 API 调用均通过 `@acme/api-client` 包进行。不得直接使用
+原生 fetch 或 axios。客户端会自动处理认证。
+
+## 测试
+每个组件都必须有对应的测试文件。使用 Vitest
+进行单元测试，使用 Playwright 进行集成测试。
+````
+
+**大小限制**：内容大小限制约为 25 KB。超出此限制的内容可能会被逐步截断。随着说明内容增多，请将详细的参考资料移至 `.agents/skills/` 中的 [skills](/zh/pt/features/agent/skills)，而非全部保留在 `instructions.md` 中。skills 会在相关时按需加载，因此不会计入说明的大小限制，并能让核心说明聚焦于高层规则。
+
+<div id="adicionar-skills-personalizadas">
+  ### 添加自定义 skills
+</div>
+
+在 `.agents/skills/` 目录中创建 skills，以定义 Agent 应遵循的专用工作流程。每个 skill 都是一个目录，其中包含一个带 YAML frontmatter 的 `SKILL.md` 文件。
+
+```
+.agents/skills/
+├── usar-sistema-de-design/
+│   └── SKILL.md
+├── integracao-de-api/
+│   └── SKILL.md
+└── executar-testes/
+    └── SKILL.md
+```
+
+每个 `SKILL.md` 都需要在 frontmatter 中包含 `name` 和 `description`：
+
+```markdown theme={null}
+---
+name: use-design-system
+description: Use when building UI components. Provides component patterns, theming rules, and accessibility requirements for the Acme design system.
+---
+
+# Sistema de Design Acme
+
+## Componentes disponíveis
+
+- `Button` — Variantes primária, secundária e ghost
+- `TextField` — Input de texto com suporte à validação
+- `Modal` — Overlay de diálogo com captura de foco
+...
+```
+
+| 字段            | 必填 | 详细信息                                 |
+| ------------- | -- | ------------------------------------ |
+| `name`        | 是  | 最多 64 个字符。仅限小写字母、数字和连字符。             |
+| `description` | 是  | 最多 1,024 个字符。描述 skill 的功能及其使用时机。     |
+| `enabled`     | 否  | 默认为 `true`。设为 `false` 可在不删除的情况下将其禁用。 |
+
+**skills 的加载方式**：Agent 在其 提示词 中只能看到 `name` 和 `description`。只有当 skill 与当前任务相关时，才会按需读取完整的 `SKILL.md` 内容。这意味着 `description` 至关重要——请确保其内容与 Agent 应使用该 skill 的场景相匹配。
+
+skills 还可以包含与 `SKILL.md` 一同使用的支持文件：
+
+```
+.agents/skills/usar-sistema-de-design/
+├── SKILL.md
+├── references/
+│   └── component-api.md
+└── assets/
+    └── theme-tokens.json
+```
+
+有关 skills 的更多信息，请参阅 [Agent Skills](/zh/pt/features/agent/skills) 和 [使用 skill](/zh/pt/build/use-agent-skills)。
+
+<div id="configurar-replitmd">
+  ### 配置 replit.md
+</div>
+
+在项目根目录下预先创建 `replit.md`，并填写 模板 的架构概览。该文件会始终加载到 Agent 的上下文中，作为项目的长期记忆。
+
+该文件应包含以下四个部分：
+
+```markdown theme={null}
+# 概述
+基于 React、TypeScript 和 Acme 设计系统构建的任务管理应用，使用 Express.js 后端和 PostgreSQL。
+
+# 用户偏好
+- 所有文件均使用 TypeScript
+- 优先使用带 Hooks 的函数组件
+- 遵循 Acme 代码规范
+
+# 系统架构
+- 前端：React + TypeScript + @acme/ui
+- 后端：Express.js + TypeScript
+- 数据库：PostgreSQL + Drizzle ORM
+- 身份验证：通过 @acme/auth 使用 Acme SSO
+
+# 外部依赖
+- @acme/ui：内部设计系统
+- @acme/api-client：API 集成层
+- @acme/auth：身份验证 SDK
+```
+
+Agent 会随着项目的演进更新 `replit.md`。如果该文件超过约 4,000 个令牌，Agent 会自动对其进行总结，使其保持重点明确且实用。
+
+更多详情，请参阅 [replit.md](/zh/pt/features/project-setup/replit-dot-md)。
+
+<div id="fixe-o-template-na-sua-organizao">
+  ### 将模板固定到组织
+</div>
+
+模板准备就绪后：
+
+1. 前往组织中的模板 App
+2. 打开 App 操作菜单 (三点菜单)
+3. 选择 **固定到 Agent 收件箱**
+
+<img src="/assets/mirror/custom-templates-pin-to-agent-b733d3eb9a80.png" alt="显示“固定到 Agent 收件箱”选项的 App 操作菜单" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  只有组织管理员 (拥有 `system_admins` 角色的成员) 可以固定或取消固定模板。
+</Note>
+
+将成员访问权限设置为 **只读**，这样成员便可查看和使用已固定的模板，但无法编辑。
+
+<img src="/assets/mirror/custom-templates-members-read-only-cf6aa160c8ef.png" alt="邀请对话框中成员访问权限设为“只读”" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+现在，该模板会以可选择的标签形式显示在 Agent 收件箱下方，供组织中的所有成员使用。若要移除它，请打开同一菜单并选择 **从 Agent 收件箱取消固定**。
+
+<div id="controlar-o-acesso-ao-template">
+  ### 控制模板的访问权限
+</div>
+
+置顶会使模板对组织中的所有成员可见。如需更有针对性地分发，请使用模板 App 中的 **邀请** 按钮，将其共享给特定的[群组或个人用户](/zh/pt/teams/identity-and-access-management/groups-and-permissions)。这样，您可以限制哪些团队或人员能够查看和 fork 该模板，同时不将其置顶到组织的全局收件箱中。
+
+<div id="o-que-acontece-quando-um-desenvolvedor-seleciona-um-template">
+  ## 开发者选择模板后会发生什么
+</div>
+
+<img src="/assets/mirror/custom-templates-input-box-553384ac7dd0.png" alt="模板以可选标签的形式显示在 Agent 收件箱中" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+当组织成员在 Agent 收件箱中选择已固定的模板时：
+
+1. **Fork**：系统会基于该模板创建一个新 App，其中包含模板的所有文件
+2. **跳过规划**：Agent 会跳过初始规划对话，直接进入构建模式
+3. **加载说明**：系统会读取 `custom_instruction/instructions.md`，并将其作为公司提供的指导注入 Agent 的系统提示词中
+4. **发现 skills**：系统会识别 `.agents/skills/` 中的 skills，并将其列在 Agent 的上下文中，以便按需加载
+5. **加载项目上下文**：系统会读取 `replit.md` 并将其注入 Agent 的上下文中 (如果不存在，则会自动生成)
+6. **继承配置**：`.replit` 文件、依赖项以及模板中的所有文件都会一并转移到新 App
+
+开发者可以立即开始向 Agent 输入具体需求，Agent 会按照模板设定的指导方针开展工作。
+
+<div id="como-os-arquivos-funcionam-juntos">
+  ## 文件如何协同工作
+</div>
+
+每个配置文件各有不同用途：
+
+| 文件                                   | 用途        | Agent 何时读取        | Agent 是否可修改             |
+| ------------------------------------ | --------- | ----------------- | ----------------------- |
+| `custom_instruction/instructions.md` | 组织规范和规则   | 始终 (注入系统 提示词)  | 否                       |
+| `.agents/skills/*/SKILL.md`          | 专项工作流和规范  | 按需 (相关时)          | 是 (Agent 也可以创建 skills)  |
+| `replit.md`                          | 项目概览和偏好设置 | 始终 (注入系统 提示词)  | 是 (Agent 会随时间更新)        |
+| `.replit`                            | 运行时配置     | 配置 App 时          | 是                       |
+
+**核心区别**：`custom_instruction/instructions.md` 是组织规范的静态权威来源。`replit.md` 是 Agent 随项目演进持续维护的动态文档。skills 是面向特定工作流的按需参考资料。
+
+<div id="melhores-prticas">
+  ## 最佳实践
+</div>
+
+<div id="mantenha-as-instrues-focadas">
+  ### 保持说明聚焦
+</div>
+
+将最重要的规范写入 `custom_instruction/instructions.md`。重点包括：
+
+* 难以更改的决策 (架构、数据模型)
+* 必须保持一致的模式 (组件使用、API 约定)
+* 开发者可能不了解的模式 (内部库、团队约定)
+
+避免包含变更日志、实现细节或频繁变动的信息。
+
+<div id="escreva-descries-de-skills-descobrveis">
+  ### 编写易于发现的 skill 描述
+</div>
+
+`SKILL.md` 前置元数据中的 `description` 字段供 Agent 判断何时加载 skill。请编写能准确说明 skill 适用任务的描述：
+
+```yaml theme={null}
+# 良好——说明适用场景
+description: Use when building forms or handling user input. Provides validation patterns, error display conventions, and accessible form layouts.
+
+# 较差——过于笼统
+description: Form utilities and helpers.
+```
+
+<div id="organize-skills-por-fluxo-de-trabalho">
+  ### 按工作流程组织 skills
+</div>
+
+按工作流程而非技术类别对 skills 进行分组：
+
+| 方法        | 示例                                           |
+| --------- | -------------------------------------------- |
+| **按工作流程** | `build-a-form`, `connect-to-api`, `add-auth` |
+| **按技术领域** | `react-utils`, `api-helpers`, `auth-config`  |
+
+按工作流程组织可帮助 Agent 在恰当的时机找到相应的 skills。
+
+<div id="itere-no-seu-template">
+  ### 迭代你的模板
+</div>
+
+模板会在使用过程中不断完善。当你的团队开始使用模板构建应用时：
+
+1. 留意 Agent 容易出错的模式，并将其添加到 `instructions.md`
+2. 当 Agent 很好地解决某个问题时，创建新的 skill，记录该解决方案
+3. 随着技术栈的发展，更新基础依赖项和配置
+4. 通过基于模板创建新的 App 来测试更改，验证使用体验
+
+<div id="atualizaes-de-templates-e-apps-existentes">
+  ### 更新现有模板和 App
+</div>
+
+对模板 App 所做的更改会体现在基于该模板创建的**新** App 中。此前从该模板 fork 的现有 App 是独立副本，不会收到更新。
+
+<div id="recursos-relacionados">
+  ## 相关资源
+</div>
+
+* [Agent Skills](/zh/pt/features/agent/skills) — 了解 skills 的工作方式及其创建方法
+* [使用 skill](/zh/pt/build/use-agent-skills) — 使用和创建 skills 的实用指南
+* [replit.md](/zh/pt/features/project-setup/replit-dot-md) — 使用项目级上下文自定义 Agent 的行为
+* [设计系统](/zh/pt/teams/custom-design-system) — 为 Agent 配置组织的设计系统
+* [App 配置](/zh/replit-app/configuration) — 配置你的 `.replit` 文件
+* [开发者框架](/zh/pt/features/project-setup/developer-frameworks) — 了解为何移除了语言和框架初始模板，以及如何开始创建项目
+* [Enterprise 概览](/zh/pt/category/teams) — 详细了解 Enterprise 功能

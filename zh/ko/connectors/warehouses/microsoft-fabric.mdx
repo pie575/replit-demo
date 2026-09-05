@@ -1,0 +1,155 @@
+---
+title: "在 Microsoft Fabric 中构建数据应用"
+description: "使用 Replit Agent 在 Microsoft Fabric 中构建并发布数据应用。"
+sidebarTitle: "Microsoft Fabric"
+icon: "chart-column"
+---
+
+<Frame>
+  <img src="/assets/mirror/fabric-template-selector-d3f975e2e1d0.png" alt="Replit 首页中已打开 Templates 下拉菜单，Org templates 下的 Microsoft Fabric App 处于高亮状态" width="872" height="406" data-path="images/connectors/microsoft-fabric/fabric-template-selector.png" />
+</Frame>
+
+在 Replit 中构建 AI 驱动的应用，并直接发布到具备企业级治理和安全保障的 Microsoft Fabric。Microsoft Fabric 集成可将受治理的企业数据转化为仪表板、工作流和 AI 应用等内部工具。团队可以更快地从提示词推进到生产环境，同时身份验证和访问策略仍保留在您信赖的 Fabric 环境中。
+
+<div id="fabric">
+  ## 什么是 Fabric 数据应用
+</div>
+
+Fabric 数据应用是静态 React 应用，通过对 [Power BI 语义模型](https://learn.microsoft.com/en-us/power-bi/connect-data/service-datasets-understand)执行 [Data Analysis Expressions(DAX)](https://learn.microsoft.com/en-us/dax/) 查询来呈现 Power BI 图表。其构建方式由以下几个特性决定：
+
+* **Power BI 语义模型是数据源。** 图表由针对已连接语义模型 (数据集) 的 DAX 查询驱动。
+* **设计上为只读。** 应用使用 DAX `EVALUATE` 读取数据，不会将数据写回 Power BI。如果需要可写状态，请在仪表板之外使用独立的应用数据库。
+* **通过 Fabric 门户呈现。** 数据层在 Microsoft Fabric 门户内运行，对语义模型执行查询并将结果返回给应用。数据始终保留在 Fabric 环境中。
+* **托管在 Microsoft 基础设施上。** 你可以将完成的数据应用发布到 Microsoft 托管服务中，使其与 Fabric 环境的其他部分一同运行。
+
+<Note>
+  Microsoft Fabric 数据应用需要访问包含 Power BI 语义模型的 Microsoft Fabric 租户；在预览期间，还需要加入获批准的测试人员计划。
+</Note>
+
+在内部，Agent 可通过 [Rayfin](https://github.com/microsoft/rayfin) (用于构建应用后端的开源 SDK 和 CLI) 在 Fabric 数据之上定义并发布生产就绪的应用。
+
+整个过程都在一个工作流程中完成：描述应用，由 Agent 搭建脚手架，连接受治理的 Fabric 数据，然后发布应用，使其在组织的 Fabric 租户中运行。
+
+本指南介绍构建者流程、应用如何连接到 Fabric 数据，以及团队和自动化选项。如需了解基于其他数据仓库的通用数据仪表板，请参阅[数据可视化](/zh/ko/features/artifact-types/data-apps)。
+
+<div id="section">
+  ## 使用场景
+</div>
+
+对于已经投入 Microsoft 数据生态系统的组织而言，这是快速构建内部软件的捷径。团队无需花数周时间连接身份验证、API、部署工具和治理策略，只需描述需求，让 Agent 完成构建。
+
+常见使用场景：
+
+* 部门生产力工具
+* 运营仪表板
+* 数据探索工具
+* 工作流自动化应用
+* 报表界面
+
+对于企业 IT 而言，治理、身份验证和安全性仍在组织已管理的 Fabric 环境中，因此快速创建应用不会以牺牲集中管控为代价。
+
+<div id="fabric-2">
+  ## 构建 Fabric 数据应用
+</div>
+
+构建流程以对话方式进行。您将在 Replit 中操作，并在出现提示时通过 Microsoft 完成身份验证和数据访问。
+
+<Steps>
+  <Step title="从 Fabric 模板开始">
+    在 Replit 主页上打开 **Templates** 下拉菜单，然后在 **Org templates** 下选择 **Microsoft Fabric App**。这会让 Agent 进入预加载 Fabric 工具的数据应用工作流。
+
+    <Frame caption="在 Replit 主页上选择 Microsoft Fabric App 组织模板（私有预览界面）。">
+      <img src="/assets/mirror/fabric-template-selector-d3f975e2e1d0.png" alt="Replit 主页打开了 Templates 下拉菜单，Org templates 下的 Microsoft Fabric App 已突出显示" width="872" height="406" data-path="images/connectors/microsoft-fabric/fabric-template-selector.png" />
+    </Frame>
+  </Step>
+
+  <Step title="描述您想要的仪表板">
+    输入提示词，描述您要构建的仪表板或报表工具。例如：“基于 Fabric 销售模型构建月度营收增长仪表板。”您无需编写 DAX，Agent 会生成查询。
+  </Step>
+
+  <Step title="使用 Microsoft 登录">
+    出现提示时，通过拥有 Fabric 数据的租户使用 Microsoft OAuth 登录。这将授权 Agent 读取您有权访问的语义模型。您用于登录的身份必须拥有目标 Fabric 工作区的访问权限。
+  </Step>
+
+  <Step title="添加数据源">
+    当 Agent 请求时，分享您要使用的 Power BI / Fabric 语义模型。您可以提供 Fabric 门户的完整数据集 URL (例如 `https://app.powerbi.com/groups/<workspaceId>/datasets/<datasetId>/...`) ，也可以提供工作区 ID 以及数据集/项目 ID。Agent 会据此识别要查询的工作区和语义模型。
+
+    模型必须**发布到 Power BI 服务**，本地 `.pbix` 文件无法使用。
+
+    <Frame caption="Agent 请求提供 Power BI / Fabric 语义模型链接（私有预览界面）。">
+      <img src="/assets/mirror/fabric-agent-semantic-model-prompt-732ce9c4a29d.png" alt="Agent 面板要求构建者通过 Fabric 门户完整 URL，或工作区 ID 和数据集或项目 ID，分享 Power BI 或 Fabric 语义模型，并提示模型必须发布到 Power BI 服务，本地 .pbix 文件无法使用" width="1316" height="650" data-path="images/connectors/microsoft-fabric/fabric-agent-semantic-model-prompt.png" />
+    </Frame>
+  </Step>
+
+  <Step title="让 Agent 构建并迭代">
+    Agent 会探索语义模型的架构、编写 DAX 查询，并用合适的图表组装仪表板。查看结果后，您可以用自然语言提出修改请求，例如添加筛选器、更改图表类型或添加其他指标。
+  </Step>
+
+  <Step title="发布（可选）">
+    仪表板准备就绪后，您可以将其发布到 Microsoft 的托管服务，使其在 Fabric 环境中运行。发布将在其他内容中介绍；本指南重点讲解数据连接和应用构建。
+  </Step>
+</Steps>
+
+<div id="fabric-3">
+  ## 连接到 Fabric 数据
+</div>
+
+要读取数据，您的应用需要已获授权连接到 Microsoft Fabric。Replit 会通过以下两种方式之一建立连接。
+
+<div id="fabric-4">
+  ### 应用级 Fabric 登录 (查看者)
+</div>
+
+已发布数据应用的查看者无需设置连接器。他们通过应用内置的 Microsoft Fabric 单点登录进行身份验证，应用则通过 Fabric 门户以该用户身份读取数据。访问权限由现有的 Fabric 权限管理。
+
+<div id="microsoft-fabric">
+  ### Microsoft Fabric 连接器 (为构建者提供的便捷方式)
+</div>
+
+对于构建者，**Microsoft Fabric 连接器**可便捷地在开发期间授权数据访问。这是可选功能，方便但并非必需。
+
+* 首次进行设置的构建者需完成与 Microsoft 的**一次性 OAuth**。
+* **同一项目中的其他协作者**会继承该连接。
+* **其他工作区**必须启用连接器，并完成各自的 OAuth。
+* 经 OAuth 授权的身份必须拥有目标 Fabric 工作区的访问权限。
+
+该连接器使用 Microsoft Entra OAuth，并限定在租户范围内。与其他 Replit 连接器一样，您可以在项目的[集成](/zh/ko/features/integrations/overview)页面中管理它。有关连接器的更多概念，请参阅[管理连接器](/zh/ko/replitai/managing-connectors)。
+
+<Note>
+  在私有预览期间，Microsoft Fabric 连接器不提供由 Replit 共享管理的凭据。构建者需针对自己的 Microsoft Entra 租户进行授权。
+</Note>
+
+<div id="section-2">
+  ## 团队与自动化
+</div>
+
+对于共享团队或非交互式环境 (例如 CI) ，交互式 OAuth 并不总是适用。在这种情况下，无需进行交互式登录，而是通过项目 [Secrets](/zh/ko/core-concepts/project-editor/app-setup/secrets) 提供**服务主体**令牌。App 使用服务主体的 ID 读取 Fabric 数据。
+
+这是最接近机器对机器配置的方式：在 Microsoft Entra 中预配并获得 Fabric 工作区访问权限的非人类身份，无需人工参与即可为 App 进行身份验证。请确保服务主体有权访问 App 查询的工作区和语义模型。
+
+<div id="section-3">
+  ## 故障排除
+</div>
+
+<AccordionGroup>
+  <Accordion title="应用预览无法加载数据">
+    Fabric 数据层通过 Microsoft Fabric 门户运行。如果图表为空或应用预览无法加载数据，请确认你已完成 Microsoft 登录，并且登录的账户有权访问已连接的工作区和语义模型。
+  </Accordion>
+
+  <Accordion title="Agent 找不到语义模型">
+    请确认你已在 Fabric 门户中粘贴 Power BI 数据集链接，并且该账户 (或服务主体) 至少拥有此工作区的读取权限。如果 Agent 提示无法验证工作区或模型，请重新分享数据集链接。
+  </Accordion>
+
+  <Accordion title="连接器中断或反复显示连接提示">
+    在项目的[集成](/zh/ko/features/integrations/overview)页面中，重新对 Microsoft Fabric 连接器进行身份验证。确认已通过 OAuth 授权的账户拥有 Fabric 工作区的访问权限。对于团队或 CI 使用，建议优先使用通过 Secrets 提供的服务主体令牌。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-4">
+  ## 相关文档
+</div>
+
+* [数据可视化](/zh/ko/features/artifact-types/data-apps)：使用 Agent 构建仪表板和报表工具。
+* [数据仓库连接器概览](/zh/ko/connectors/warehouses/overview)：查看所有受支持的数据仓库连接器。
+* [管理连接器](/zh/ko/replitai/managing-connectors)：管理和配置连接器。
+* [Microsoft Fabric 文档](https://learn.microsoft.com/en-us/fabric/)：Microsoft 提供的 Fabric 和 Power BI 文档。

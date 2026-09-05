@@ -1,0 +1,107 @@
+---
+title: "添加集成"
+description: "将所有 Velocity 预订同步至客户的 Google 日历。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+完成后，所有 Velocity 预订都会添加到客户的 Google 日历中，并预先填好取车和还车时间。
+
+借助集成，Velocity 可以与其他工具联动。您可以将每笔预订发送到客户的日历；在有人预订高价值租赁时向协调员发送电子邮件；或将天气信息引入行程规划页面。先从一个集成开始 — 选择 Google 日历即可为每位客户保留清晰、可核实的记录 (“租赁已添加到日历”) 。测试时，您也可以在自己的日历中进行确认。
+
+<div id="agentgoogle">
+  ## 让 Agent 添加 Google 日历集成
+</div>
+
+Replit 内置了包含 Google 日历的 **Google Workspace 连接器**。Agent 可让你一键登录 Google，无需创建 API 项目、复制 OAuth 凭据或粘贴 Secrets。
+
+<AiPrompt>
+  在 Velocity 客户确认预订后，将租赁信息添加到其 Google 日历。<br />
+  请使用 Replit 的 Google Workspace 连接器连接 Google 日历 — 不要向我索要任何 OAuth 凭据。<br />
+  事件标题应为“Velocity 租赁：[汽车品牌和型号]”。<br />
+  事件应从取车时间持续到还车时间，并在说明中包含取车地址和预订参考号。<br />
+  如果客户更改日期或取消预订，请自动更新日历事件。<br />
+  如果添加日历事件失败，请在 Velocity 中显示清晰的提示，但仍要确认预订。
+</AiPrompt>
+
+Agent 会预配 Google Workspace 连接器，并在工作区中打开一个连接对话框。使用拥有该日历的 Google 账号登录后，Velocity 将设置为在每次确认预订时添加日历事件。
+
+<Note>
+  连接器是 Core、Pro 或 Enterprise 套餐提供的功能。如果你使用免费套餐，请改为让 Agent 使用 Google OAuth 项目 — 你需要创建 Google Cloud 项目、启用 Calendar API，并将获得的凭据粘贴到应用的 Secrets 窗格中。
+</Note>
+
+<div id="section">
+  ## 端到端测试
+</div>
+
+1. 在新标签页中打开你的 Google 日历。
+2. 在 Preview 中登录 Velocity。
+3. 预订下周六至周日的车辆并确认预订。
+4. 切换到 Google 日历标签页。周六至周日应会显示一个名为“Velocity rental: [车名]”的新事件，说明中包含取车地址。
+5. 在 Velocity 中将预订改为周日至周一。日历事件应会自动更新。
+6. 取消预订。日历事件应会消失。
+7. 作为第二项测试，打开工作区的 **集成**，断开 Google Workspace 的连接，然后尝试预订。Velocity 应会确认预订，并显示类似“Couldn&#39;t add to your calendar — your reservation is confirmed.”的清晰提示。测试完成后，请重新连接该连接器。
+
+如果预订已确认但事件未显示，请将确切的错误信息粘贴给 Agent：
+
+<AiPrompt>
+  集成失败，并出现以下错误：[粘贴来自 Velocity 或 Replit 日志的错误]。<br />
+  告诉我可能的原因，并以最小改动修复问题。<br />
+  确保即使无法访问 Google 日历，仍可在 Velocity 中预订车辆。
+</AiPrompt>
+
+<div id="url">
+  ## 通过发布 URL 发布并测试
+</div>
+
+当日历集成在 Preview 中正常运行后：
+
+1. 在 Agent 聊天中再次发布 Velocity。
+2. 打开发布 URL，以真实客户的身份预订车辆。
+3. 确认预订账户的日历中显示了相应事件。
+4. 通过发布 URL 更新或取消预订，并确认日历事件也会相应更新。
+
+客户使用 Velocity 后，租赁信息会自动添加到日历中。预订不仅会发送确认邮件，还会作为不会被遗忘的日历事件保留下来。
+
+<div id="section-2">
+  ## 后续改进
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加自定义域名" icon="globe" href="/zh/ja/build/add-custom-domain">
+    将 Velocity 迁移到客户可分享的品牌网址。
+  </Card>
+
+  <Card title="添加支付功能" icon="credit-card" href="/zh/ja/build/add-payments">
+    在预约时收取可退款的押金。
+  </Card>
+</CardGroup>
+
+<div id="section-3">
+  ## 如需进一步帮助
+</div>
+
+* **Google 日历中未显示事件：** 打开工作区的**集成**，确认 Google Workspace 连接器显示为“Connected”，且已授予 Calendar 权限范围。
+* **连接器显示为 Connected，但未收到事件：** 请 Agent 将日历载荷输出到日志中，并修正字段映射。
+* **日期或地址字段填入了事件中的错误位置：** 请 Agent 将要发送的事件格式输出到日志中，并修正字段映射。
+* **想使用其他集成：** 将“Google 日历”替换为其他连接器，例如用于团队通知的 Slack、将客户记录为 CRM 联系人的 HubSpot，或通过共享数据库管理预约的 Airtable。Agent 可通过同一 集成 窗格支持这些连接器。
+
+<div id="section-4">
+  ## 相关信息
+</div>
+
+* [集成](/zh/ja/features/integrations/overview)
+* [Replit AI 集成](/zh/ja/features/integrations/replit-ai-integrations)

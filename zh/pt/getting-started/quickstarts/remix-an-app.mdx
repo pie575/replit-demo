@@ -1,0 +1,289 @@
+---
+title: "Remix 应用"
+description: "了解如何基于现有 Replit 项目创建应用。**Remix** 是基于你当前有权访问的应用创建的新 Replit 应用。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const RemixButton = ({replUrl = "https://replit.com/@sarahxli/Digital-Piano-Keys?v=1", label = "Remix this app", count = null}) => {
+  if (typeof document !== 'undefined' && !document.getElementById('remix-button-styles')) {
+    const style = document.createElement('style');
+    style.id = 'remix-button-styles';
+    style.textContent = `
+      /* Button container */
+      .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --btn-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --btn-text: var(--replit-docs-text, #1D1D1D);
+        --btn-border: var(--replit-docs-border, #DEDAD5);
+        --transition-duration: 120ms;
+        display: flex;
+        justify-content: center;
+      }
+
+      .dark .remix-btn-container,
+      html.dark .remix-btn-container,
+      [data-theme="dark"] .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-elevated, #222223);
+        --btn-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --btn-text: var(--replit-docs-text, #F5F5F5);
+        --btn-border: var(--replit-docs-border, #39393D);
+      }
+
+      /* Button base styles - matching template page exactly */
+      .remix-btn {
+        /* Layout */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        max-width: 400px;
+        min-width: 200px;
+        height: 36px;
+        padding: 0 16px;
+        gap: 8px;
+
+        /* Typography */
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5;
+        text-decoration: none;
+        white-space: nowrap;
+
+        /* Visual */
+        border-radius: 8px;
+        border: none;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        box-shadow: inset 0 0 0 1px var(--btn-border);
+
+        /* Interaction */
+        cursor: pointer;
+        user-select: none;
+        transition-property: background-color;
+        transition-duration: var(--transition-duration);
+        transition-timing-function: ease-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      /* Content (icon + label) - centered */
+      .remix-btn-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      /* Hover state */
+      @media (hover: hover) {
+        .remix-btn:hover {
+          background: var(--btn-bg-hover);
+        }
+      }
+
+      /* Active/pressed state */
+      .remix-btn:active {
+        background: var(--btn-bg-hover);
+        transform: scale(0.99);
+      }
+
+      /* Focus visible state */
+      .remix-btn:focus-visible {
+        outline: 2px solid #0079F2;
+        outline-offset: 2px;
+      }
+
+      /* Icon styles */
+      .remix-btn svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Label styles */
+      .remix-btn span {
+        font-weight: 600;
+      }
+
+      /* Animation */
+      @keyframes remix-btn-fade-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .remix-btn-container {
+        animation: remix-btn-fade-in 300ms ease-out;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleClick = e => {
+    e.preventDefault();
+    const url = replUrl.includes('replit.com') ? replUrl : `https://replit.com${replUrl}`;
+    window.open(url, '_blank');
+  };
+  const RemixIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMin">
+      <path d="M17.47 13.47a.75.75 0 0 1 1.06 0l4 4a.745.745 0 0 1 .118.16c.016.027.032.054.044.083.007.016.01.032.016.049a.744.744 0 0 1 .042.238.743.743 0 0 1-.037.223c-.007.02-.012.042-.02.062a.748.748 0 0 1-.163.245l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H15.95a4.753 4.753 0 0 1-3.886-2.09l-.351-.442a.75.75 0 0 1 1.172-.936l.36.45.04.055a3.251 3.251 0 0 0 2.68 1.463h4.224l-2.72-2.72a.75.75 0 0 1 0-1.06ZM17.47 1.47a.75.75 0 0 1 1.06 0l4 4a.756.756 0 0 1 .162.816.749.749 0 0 1-.162.244l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H16.02a3.25 3.25 0 0 0-2.674 1.372l-5.44 8.58a4.75 4.75 0 0 1-3.934 2.047L2 18.75a.75.75 0 0 1 0-1.5h1.979a3.25 3.25 0 0 0 2.673-1.373l5.442-8.578.02-.03a4.751 4.751 0 0 1 3.913-2.018l4.162-.001-2.72-2.72a.75.75 0 0 1 0-1.06ZM3.972 5.25a4.75 4.75 0 0 1 4.27 2.612.751.751 0 0 1-1.34.675 3.252 3.252 0 0 0-2.698-1.781l-.226-.006H2a.75.75 0 0 1 0-1.5h1.972Z" />
+    </svg>;
+  return <div className="remix-btn-container" style={{
+    margin: '16px 0'
+  }}>
+      <button onClick={handleClick} className="remix-btn" type="button" tabIndex={0}>
+        <RemixIcon />
+        <span>{label}</span>
+      </button>
+    </div>;
+};
+
+想换一种方式在 Replit 上开始创作？**Remix** 可让您以社区创建的现有应用为基础开始创作。它比从零开始构建更快，也是通过可运行的代码学习的绝佳方式。
+
+<Tip>
+  刚接触 Replit？试试[创建您的第一个应用](/zh/pt/getting-started/quickstarts/ask-ai)，了解 Agent 如何从零开始构建应用。
+</Tip>
+
+<div id="crie-seu-remix">
+  ## 创建你的 Remix
+</div>
+
+⏰ *预计用时：5 分钟*
+
+按照本指南的步骤，为交互式数字钢琴应用创建一个 Remix：
+
+<Frame>
+  <img src="/assets/mirror/quickstart_piano_complete-93e4e5a32279.png" alt="带琴键的交互式数字钢琴" width="1820" height="1024" data-path="images/getting-started/quickstart_piano_complete.png" />
+</Frame>
+
+<Tip>
+  在 [Digital Piano Keys](https://digital-piano-keys.replit.app) 试用已部署的应用。
+</Tip>
+
+<Steps>
+  <Step title="Remix 此应用">
+    选择下方的 **Remix 此应用** 按钮，开始创建你自己的数字钢琴应用版本。
+
+    <RemixButton replUrl="https://replit.com/@sarahxli/Digital-Piano-Keys?v=1" label="Remix 此应用" />
+  </Step>
+
+  <Step title="填写应用详情">
+    选择该按钮后，会显示 **Remix 应用** 对话框。选择 **Remix 应用** 继续。你可以稍后编辑这些信息。
+
+    <Frame>
+      <img src="/assets/mirror/quickstart_remix_dialog-39c49a3d7bb7.png" alt="Remix 应用对话框，显示应用名称、描述和隐私设置" width="1222" height="1202" data-path="images/getting-started/quickstart_remix_dialog.png" />
+    </Frame>
+  </Step>
+
+  <Step title="弹奏钢琴">
+    应用会自动启动。前往 **预览** 标签页查看钢琴界面。
+
+    <Frame>
+      <video autoPlay muted loop playsInline src="/assets/mirror/quickstart-piano-demo-4b7f4ee0053a.mp4" />
+    </Frame>
+
+    现在，你拥有了一个功能完整的 Remix，可以与之交互并持续迭代改进。
+
+    点击钢琴琴键即可弹奏音符并听到声音。尝试弹奏一段简单的旋律来测试应用。
+  </Step>
+</Steps>
+
+<div id="aprimore-seu-remix">
+  ## 完善你的 Remix
+</div>
+
+现在你已经有了一个可运行的应用，可以使用 Agent 对它进行修改和扩展。以下部分提供了一些完善 Remix 的实用示例。
+
+<div id="adicione-um-recurso-usando-o-agent">
+  ### 使用 Agent 添加功能
+</div>
+
+使用 Agent 为您的 Remix 添加复杂功能：
+
+<Steps>
+  <Step title="创建 prompt">
+    前往 **Agent** 标签页。
+
+    在文本区域中输入以下 prompt：
+
+    <AiPrompt>
+      添加一个教程模式，教用户弹奏简单的歌曲。教程模式启用后，高亮显示接下来需要弹奏的琴键，等待您按下正确的琴键后再继续，并在顶部显示歌曲名称。添加一个用于启动教程的按钮，并预加载至少两首简单歌曲，例如“Mary Had a Little Lamb”或“Twinkle Twinkle Little Star”。
+    </AiPrompt>
+
+    发送 prompt 后，Agent 可能会暂停并要求您提供更多说明或确认。请在文本区域中回复。
+  </Step>
+
+  <Step title="测试功能">
+    前往 **预览** 标签页，查看 Agent 对钢琴做出的更新。
+
+    尝试启动教程模式，并按照高亮显示的琴键进行弹奏。
+
+    <Frame>
+      <video autoPlay muted loop playsInline src="/assets/mirror/quickstart-remix-piano-play-3be628756ae7.mp4" />
+    </Frame>
+
+    由于初始 prompt 未包含视觉设计方面的具体细节，结果可能不会完全符合您的预期。
+  </Step>
+
+  <Step title="完善功能">
+    如果该功能与您的预期不符，请在 **Agent** 的文本区域中输入后续 prompt，继续对话。
+    例如：
+
+    <AiPrompt>
+      让高亮显示的琴键通过脉冲动画发光，并添加一个进度指示器，显示我已完成歌曲的多少进度。
+    </AiPrompt>
+
+    要撤销这些更改，请在 **Agent** 标签页中开始规划此次更改后立即创建的 checkpoint 中选择 **还原到此处**。
+
+    详细了解 [checkpoint 和回滚](/zh/pt/core-concepts/agent/checkpoints-and-rollbacks)。
+  </Step>
+</Steps>
+
+<div id="adicione-um-recurso-usando-o-modo-lite">
+  ### 使用 Lite 模式添加功能
+</div>
+
+按照以下步骤，使用 [Lite 模式](/zh/pt/core-concepts/agent/agent-modes) 快速改进您的 Remix：
+
+<Steps>
+  <Step title="创建 prompt">
+    切换到 [Lite 模式](/zh/pt/core-concepts/agent/agent-modes)，然后输入以下 prompt：
+
+    <AiPrompt>
+      添加录制和播放按钮，用于录制和重放钢琴演奏。
+    </AiPrompt>
+
+    发送 prompt 后，Agent 会说明计划进行的更改，并允许您在继续前查看代码变更。
+    选择 **查看代码变更**，即可对比当前代码与更新后的代码。
+  </Step>
+
+  <Step title="测试功能">
+    选择 **应用全部**，然后确认后续提示以继续。
+
+    前往 **预览** 选项卡查看结果。现在，您应该会看到录制和播放按钮，可用于录制和重放您的演奏。
+
+    要撤销这些更改，请使用 **Agent** 选项卡中的还原功能。
+  </Step>
+</Steps>
+
+<div id="continue-sua-jornada">
+  ## 继续您的旅程
+</div>
+
+现在您已完成本教程，以下是一些与 Remix 相关的后续步骤：
+
+* **探索更多 Remix**：浏览[社区](https://replit.com/community/all)，寻找可供 Remix 的应用并从中学习
+* **从零开始创建**：尝试使用 Agent [创建自己的应用](/zh/pt/getting-started/quickstarts/ask-ai)，体验不同的开发方式
+* **发布供 Remix 的版本**：分享您的改进版本，让其他人能在您的成果基础上继续创作。

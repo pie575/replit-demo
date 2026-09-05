@@ -1,6 +1,8 @@
 ---
 title: "Sourcer des candidats"
-description: "À partir d'une offre d'emploi, trouvez des ingénieurs correspondants sur GitHub, ignorez ceux déjà dans Ashby, et rédigez une prise de contact."
+description: "À partir d'une description de poste, identifiez les ingénieurs correspondants sur GitHub, écartez ceux déjà présents dans Ashby et rédigez un message de prospection."
+sidebarTitle: "Sourcer des candidats"
+icon: "user-check"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                Il ne s’agit pas d’un connector natif. Agent vous demandera votre clé API.
               </div> : null}
           </div>
         </div>)}
@@ -67,93 +69,108 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Ashby filtre déjà les candidatures entrantes. Ce workflow est sortant : lisez l'offre
-d'emploi dans Drive, trouvez des ingénieurs qui correspondent sur GitHub, ignorez ceux déjà
-dans Ashby, et rédigez une prise de contact que vous validez avant l'envoi. L'Agent enregistre
-les nouvelles personnes comme sourcées avec une courte explication de pourquoi elles
-correspondent et un brouillon sur la fiche candidat. Vous relisez et envoyez. N'utilisez pas
-ceci comme seule décision d'embauche.
+Ashby filtre déjà les candidatures entrantes. Ce flux de travail, lui, est sortant : lire la description
+du poste dans Drive, trouver des ingénieurs correspondant au profil sur GitHub, écarter les personnes
+déjà présentes dans Ashby et rédiger un message de prospection que vous n&#39;aurez plus qu&#39;à
+envoyer. Agent enregistre chaque nouvelle personne comme sourcée, avec une courte explication de
+son adéquation et un brouillon rattaché au candidat. Vous relisez et vous envoyez. N&#39;en faites
+pas votre unique critère de recrutement.
 
-## Idéal pour
+<div id="best-for">
+  ## Idéal pour
+</div>
 
-* Les recruteurs techniques qui ont besoin d'une liste sourcée quand le volume entrant est trop faible.
-* Les responsables du recrutement qui ont besoin d'ingénieurs identifiés sur GitHub sans passer leur journée en recherche.
+* Les recruteurs techniques qui ont besoin d&#39;une liste de candidats sourcés lorsque le volume de candidatures entrantes est trop faible.
+* Les responsables du recrutement qui recherchent des ingénieurs correspondant à leurs critères sur GitHub, sans y passer leurs journées.
 
-## Connecteurs
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 {
-  id: "google-drive",
-  name: "Google Drive",
-  why: "Offre d'emploi et critères indispensables",
+id: "google-drive",
+name: "Google Drive",
+why: "Description de poste et critères indispensables",
 },
 {
-  id: "github",
-  name: "GitHub",
-  why: "Dépôts publics, contributions et profils",
+id: "github",
+name: "GitHub",
+why: "Dépôts publics, contributions et profils",
 },
 {
-  id: "ashby",
-  name: "Ashby",
-  why: "Ignorer les candidats existants et enregistrer les personnes sourcées",
+id: "ashby",
+name: "Ashby",
+why: "Écarter les candidats existants et consigner les profils sourcés",
 },
 ]}
 />
 
-## Avant de commencer
+<div id="before-you-start">
+  ## Avant de commencer
+</div>
 
-Ayez une offre d'emploi avec les indispensables et les atouts. Connectez Drive, GitHub et
-Ashby. Précisez le lieu, le niveau d'expérience, et combien de noms vous voulez. N'utilisez
-pas ceci comme seule décision d'embauche.
+Préparez une description de poste distinguant les critères indispensables des critères souhaitables. Connectez Drive, GitHub et Ashby. Précisez le lieu,
+le niveau d&#39;expérience et le nombre de profils souhaités. Ne fondez pas votre décision d&#39;embauche uniquement sur cet outil.
 
-## Invite à l'Agent
-
-<AiPrompt>
-  Crée une routine qui s'exécute chaque lundi à 9h00. À partir de cette offre
-  d'emploi \[lien Drive ou collé], trouve 30 ingénieurs sur GitHub qui
-  correspondent aux indispensables. Ignore ceux déjà dans Ashby. Pour chaque
-  personne, écris une explication de 3 lignes sur pourquoi elle correspond et
-  un court brouillon de prise de contact. N'envoie rien. Ajoute les nouvelles
-  personnes à Ashby comme sourcées, avec la note et le brouillon sur la fiche
-  candidat.
-</AiPrompt>
-
-## À quoi s'attendre
-
-L'Agent lit l'offre d'emploi, effectue une recherche sur GitHub, ignore ceux déjà dans Ashby,
-et renvoie une liste courte avec des brouillons. Vous relisez et envoyez. Le premier passage
-sera bruyant. Affinez les indispensables après l'avoir vu. Ouvrez trois profils GitHub de la
-liste, vérifiez qu'ils correspondent aux indispensables, et confirmez que ces personnes ne
-sont pas déjà dans Ashby avant d'envoyer quoi que ce soit.
-
-## Adaptez-le à vos besoins
+<div id="prompt-the-agent">
+  ## Créez un prompt pour l&#39;agent
+</div>
 
 <AiPrompt>
-  N'inclus que les personnes avec des commits récents en \[langage / type de
-  dépôt] et \[n]+ ans d'expérience pertinente. Retire toute personne qui
-  semble être un client actuel ou un employé concurrent.
+  Crée une Routine qui s&#39;exécute chaque lundi à 9h00. À partir de cette fiche de
+  poste [lien Drive ou copier-coller], trouve 30 ingénieurs sur GitHub qui
+  correspondent aux critères indispensables. Ignore les personnes déjà présentes
+  dans Ashby. Pour chaque personne, rédige 3 lignes expliquant pourquoi son
+  profil convient, ainsi qu&#39;un court brouillon de message de prospection.
+  N&#39;envoie rien. Ajoute les nouvelles personnes dans Ashby avec le statut sourcé,
+  en joignant la note et le brouillon à la fiche du candidat.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## À quoi s&#39;attendre
+</div>
+
+Agent lit la description de poste, effectue des recherches sur GitHub, écarte les personnes déjà présentes dans Ashby et
+renvoie une liste restreinte accompagnée de brouillons. Vous relisez et vous envoyez. Le premier résultat manquera de précision.
+Affinez les critères indispensables après l&#39;avoir consulté. Ouvrez trois profils GitHub de la liste, vérifiez qu&#39;ils
+correspondent aux critères indispensables et assurez-vous que ces personnes ne figurent pas déjà dans Ashby avant d&#39;envoyer
+quoi que ce soit.
+
+<div id="make-it-work-for-you">
+  ## Adaptez-le à vos besoins
+</div>
+
+<AiPrompt>
+  N&#39;inclus que les personnes ayant des commits récents en [langage / type de dépôt] et
+  [n]+ années d&#39;expérience pertinente. Écarte toute personne qui semble être un client actuel ou
+  un employé d&#39;un concurrent.
 </AiPrompt>
 
 <AiPrompt>
-  Réécris la prise de contact dans mon style à partir de ces exemples
-  \[collés]. Reste sous 80 mots. Ne mentionne pas qu'un agent l'a écrite.
+  Réécris le message de prospection avec mon ton, en t&#39;inspirant de ces exemples [coller]. Reste
+  sous les 80 mots. Ne mentionne pas qu&#39;un agent l&#39;a rédigé.
 </AiPrompt>
 
-## Dépannage
+<div id="troubleshooting">
+  ## Dépannage
+</div>
 
-* **La liste courte est bruyante :** affinez les indispensables par rapport aux atouts après le premier passage. Demandez des commits récents dans un langage ou type de dépôt spécifique, et retirez les personnes qui ressemblent à des clients actuels ou des employés concurrents.
-* **Des personnes déjà dans Ashby apparaissent encore :** vérifiez qu'Ashby est connecté au bon espace de travail et que l'Agent fait correspondre par e-mail ou nom d'utilisateur GitHub, pas seulement par nom affiché.
-* **Une prise de contact est partie :** ce workflow ne devrait que rédiger des brouillons. Si quelque chose a été envoyé, arrêtez la routine et demandez à l'Agent de ne jamais envoyer d'e-mail ou de message aux candidats.
+* **La liste restreinte manque de précision :** resserrez la distinction entre critères indispensables et critères souhaitables après le premier passage. Demandez des commits récents dans un langage ou un type de dépôt précis, et écartez les personnes qui semblent être des clients actuels ou des employés de concurrents.
+* **Des personnes déjà présentes dans Ashby apparaissent encore :** vérifiez qu&#39;Ashby est bien connecté au bon workspace et qu&#39;Agent effectue la correspondance sur l&#39;adresse e-mail ou le nom d&#39;utilisateur GitHub, et pas uniquement sur le nom affiché.
+* **Des messages de prospection sont partis :** ce flux de travail doit uniquement rédiger des brouillons. Si quoi que ce soit a été envoyé, arrêtez la routine et indiquez à Agent de ne jamais envoyer d&#39;e-mail ni de message aux candidats.
 
-## Voir aussi
+<div id="related">
+  ## Ressources connexes
+</div>
 
 <CardGroup cols={2}>
   <Card title="Générer des notes de version" href="/fr/use-cases/generate-release-notes">
-    Le même connecteur GitHub pour ce que l'équipe a déjà livré.
+    Le même connector GitHub, appliqué à ce que l&#39;équipe a déjà livré.
   </Card>
 
   <Card title="Créer un pitch deck pour investisseurs" href="/fr/use-cases/pitch-deck-from-website">
-    Le même connecteur Google Drive pour les responsables du recrutement qui présentent aussi l'entreprise.
+    Le même connector Google Drive pour les responsables du recrutement qui présentent aussi l&#39;entreprise.
   </Card>
 </CardGroup>

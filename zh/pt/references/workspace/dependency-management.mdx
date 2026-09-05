@@ -1,0 +1,154 @@
+---
+title: "依赖管理"
+description: "了解如何在不同编程语言中为你的 Replit App 安装和管理包与依赖项。"
+---
+
+Replit 提供多种方式来为你的 Replit App 安装和管理包。你可以使用 [Shell](/zh/pt/references/editor/shell) 安装包，也可以让 [Agent](/zh/pt/features/agent/overview/) 代劳，或者在运行 Replit App 时让 Replit 自动检测并安装缺失的依赖项。
+
+<div id="instalar-pacotes-usando-o-shell">
+  ## 使用 Shell 安装包
+</div>
+
+在 Project Editor 中打开 **Shell** 工具，运行与你所用语言的软件包管理器对应的命令：
+
+<CodeGroup>
+  ```bash Node.js (npm) theme={null}
+  npm install <package-name>
+  ```
+
+  ```bash Node.js (pnpm) theme={null}
+  pnpm add <package-name>
+  ```
+
+  ```bash Python (poetry) theme={null}
+  poetry add <package-name>
+  ```
+
+  ```bash Python (pip) theme={null}
+  pip install <package-name>
+  ```
+
+  ```bash Ruby theme={null}
+  bundle add <gem-name>
+  ```
+</CodeGroup>
+
+你也可以使用 Replit 的 [Universal Package Manager (UPM)](https://github.com/replit/upm/) 为受支持的语言安装包：
+
+```bash theme={null}
+upm add <package-name>
+```
+
+如需安装特定版本：
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+如需查看所有受支持的语言和包管理器，请参阅 [UPM：支持的语言](https://github.com/replit/upm/#supported-languages)。
+
+<div id="instalar-pacotes-usando-o-agent">
+  ## 使用 Agent 安装包
+</div>
+
+你可以直接在 Chat 中让 [Agent](/zh/pt/features/agent/overview/) 为你安装包。例如：
+
+* “安装 axios 包”
+* “把 Flask 和 SQLAlchemy 添加到我的项目中”
+* “配置 TailwindCSS”
+
+Agent 会使用适合你项目的软件包管理器安装该包，并更新相关的配置文件。
+
+<div id="deteco-automtica-de-imports">
+  ## 自动导入检测
+</div>
+
+每次你选择 **Run** 时，Replit 都会自动扫描代码，查找缺失的依赖项。如果代码中导入了尚未安装的包，Replit 会自动检测并安装其最新版本。
+
+例如，如果你在 `main.py` 中添加 `import flask`，下次选择 **Run** 时，**控制台**会显示一条消息，提示正在安装 **Flask**。
+
+<Note>
+  你可以在 [.replit](/zh/pt/references/configuration/configuration#replit-file) 文件中使用 `packager.features.guessImports` 配置项来设置自动导入检测。
+</Note>
+
+<div id="substituir-a-deteco-automtica">
+  ### 覆盖自动检测
+</div>
+
+如果检测到的包有误，或者你需要安装特定版本，请在 Shell 中运行正确的安装命令。例如：
+
+```bash theme={null}
+upm add 'flask==2.3.3'
+```
+
+你还可以在 [.replit](/zh/pt/references/configuration/configuration#replit-file) 文件中将特定的包或路径排除在自动检测之外：
+
+<div id="gerenciadores-de-pacotes-python">
+  ## Python 软件包管理器
+</div>
+
+当你创建 Python 的 Replit App 时，默认的软件包管理器是 **poetry**。这意味着 `pip install` 不会管理你的依赖项。请改为在 Shell 中使用 `poetry add <package>` 或 `upm add <package>`。
+
+<div id="mudar-de-poetry-para-pip">
+  ### 从 poetry 切换到 pip
+</div>
+
+如果你更习惯使用 `pip`，请按以下步骤操作：
+
+<Steps>
+  <Step>
+    打开 Shell 并运行：
+
+    删除锁文件，让打包基础设施切换到 pip：
+
+    ```bash theme={null}
+    rm poetry.lock
+    ```
+  </Step>
+
+  <Step title="迁移依赖项">
+    将 `pyproject.toml` 中 `[tool.poetry.dependencies]` 部分的依赖项迁移到 `requirements.txt`。例如，`flask = "^3.0.2"` 改写为 `flask>=3.0.2,<4`。
+  </Step>
+
+  <Step title="清理 pyproject.toml">
+    删除 `pyproject.toml` 中的 `[tool.poetry...]` 部分。
+  </Step>
+</Steps>
+
+完成这些更改后，打包基础设施在后续所有操作中都会使用 `pip`，自动导入检测功能也会照常工作。
+
+<div id="dependncias-de-sistema-com-nix">
+  ## 使用 Nix 管理系统依赖
+</div>
+
+Replit 通过集成 [Nix](https://nixos.org/) 支持所有编程语言。如果你需要标准语言包之外的系统级依赖，可以将其添加到 [replit.nix](/zh/pt/references/configuration/configuration#replit-nix-file) 文件中。
+
+<div id="pacotes-nix">
+  ### Nix 包
+</div>
+
+直接编辑 `replit.nix` 即可添加系统级依赖。你可以在 [search.nixos.org](https://search.nixos.org/packages) 上搜索可用的包。
+
+<div id="mdulos">
+  ### 模块
+</div>
+
+模块集成了对编程语言、代码格式化工具和包管理器的支持，是 Replit App 的基础。通过模板或 GitHub 仓库创建 Replit App 时，Replit 会自动安装所需模块。
+
+你可以通过 [.replit](/zh/pt/references/configuration/configuration#replit-file) 文件自定义模块和其他 Nix 配置。
+
+<div id="configurao-do-gerenciador-de-pacotes">
+  ## 软件包管理器配置
+</div>
+
+你可以在 [.replit](/zh/pt/references/configuration/configuration#replit-file) 文件中调整包管理行为：
+
+| 配置项                                   | 说明             | 默认值     |
+| ------------------------------------- | -------------- | ------- |
+| `packager.language`                   | 包操作所使用的语言      | 自动检测    |
+| `packager.features.guessImports`      | 运行时自动检测并安装缺失的包 | `true`  |
+| `packager.features.packageSearch`     | 启用包搜索支持        | `true`  |
+| `packager.features.enabledForHosting` | 托管时要求执行包安装     | `false` |
+| `packager.afterInstall`               | 安装包后执行的命令      | —       |
+| `packager.ignoredPaths`               | 检测导入时要忽略的路径    | `[]`    |
+| `packager.ignoredPackages`            | 从自动检测中排除的包     | `[]`    |

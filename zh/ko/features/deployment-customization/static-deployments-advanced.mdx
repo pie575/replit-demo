@@ -1,0 +1,157 @@
+---
+title: "配置静态部署"
+description: "了解如何为静态部署配置 HTTP 标头、路由规则和 URL 重写。"
+---
+
+本指南介绍以下 Web 服务器级别的配置：
+
+* [添加响应标头](#add-response-headers)
+* [创建自定义 404 页面](#create-a-custom-404-page)
+* [定义 URL 路径重写规则](#define-url-path-rewrites)
+
+<div id="section">
+  ## 添加响应标头
+</div>
+
+自定义**响应标头**可以让你为匹配特定路径的请求添加 HTTP 标头指令。
+响应标头是由名称和值组成的键值对，用于告知浏览器如何处理所请求的内容。
+
+例如，你可以通过指定 `Access-Control-Allow-Origin` 标头，来指定哪些域名可以访问该页面。
+要创建此项，请在 Replit App 根目录下的 `.replit` 文件中添加以下内容。
+
+```
+[[deployment.responseHeaders]]
+path = "/*"
+name = "Access-Control-Allow-Origin"
+value = "origin"
+```
+
+该响应标头包含以下参数：
+
+* **path**：与请求资源匹配的 URL 路径模式
+* **name**：HTTP 标头名称
+* **value**：HTTP 标头的值
+
+您可以在 `.replit` 文件中添加多个 `deployment.responseHeaders` 条目。
+
+如需使配置更新生效，请重新发布您的 Replit App。
+
+<div id="section-2">
+  #### 保留标头
+</div>
+
+Replit 保留以下 HTTP 标头，不允许配置。
+
+```text [expandable] theme={null}
+Accept-Ranges
+Age
+Allow
+Alt-Svc
+Connection
+Content-Encoding
+Content-Length
+Content-Range
+Date
+Location
+Server
+Set-Cookie
+Trailer
+Transfer-Encoding
+Upgrade
+```
+
+<Tip>
+  如需深入了解 HTTP 标头，请参阅 MDN Web 文档中的
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers" target="_blank">
+    HTTP headers
+  </a>
+
+  条目。
+</Tip>
+
+<div id="404">
+  ## 创建自定义 404 页面
+</div>
+
+当用户请求的 URL 路径与已发布应用中的任何文件或规则都不匹配时，将显示自定义 404 页面。
+
+若要添加自定义 404 页面，请在 Replit App 的根目录中创建一个名为 `404.html` 的文件，并编写页面内容。
+
+当用户尝试访问不存在的 URL 路径时，浏览器将显示该自定义 404 页面渲染后的 HTML。
+
+<div id="url">
+  ## 定义 URL 路径重写
+</div>
+
+您可以定义 URL 重写规则，在 Replit App 处理请求之前修改请求的 URL 路径。
+浏览器中仍会显示原始 URL，但服务器加载的是重写规则中指定的资源。
+
+例如，您可以让所有以 `/app` 开头的请求都加载 `/app/index.html` 文件的内容。
+要创建此条目，请在 Replit App 根目录下的 `.replit` 文件中添加以下内容。
+
+```
+[[deployment.rewrites]]
+from = "/app/*"
+to = "/app/index.html"
+```
+
+* **from**：与请求的资源匹配的 URL 路径模式
+* **to**：指向静态部署中相应文件的重写路径
+
+您可以在 `.replit` 文件中添加多个 `deployment.rewrites` 条目。
+服务器会按列出的顺序解析这些条目，并忽略重复项。
+
+要使配置更新生效，必须重新发布 Replit App。
+
+以下部分将介绍 URL 重写规则的限制。
+
+<div id="section-3">
+  ### 路径匹配
+</div>
+
+重写规则的 `from` 和 `to` 参数受以下约束：
+
+* 不含 `*` 时，必须完全匹配
+* `*` 匹配路径的剩余部分
+* `*` 只能出现在路径末尾
+* 如果 `from` 参数中包含 `*`，也可以在 `to` 参数中使用 `*` 来表示路径中匹配到的部分
+
+例如，假设 `.replit` 文件中包含以下重写规则。
+
+```
+[[deployment.rewrites]]
+from = "/v1/*"
+to = "/v2/*"
+```
+
+当用户访问 `/v1/about-us.html` 路径时，重写规则会返回 `/v2/about-us.html` 处的文件。
+
+<div id="section-4">
+  ### 遮蔽
+</div>
+
+当重写规则匹配的 URL 路径恰好也对应静态部署中的某个文件时，就会发生遮蔽。
+此时，云服务器会忽略重写规则，直接提供该文件。
+
+例如，假设已发布的应用包含以下文件：
+
+* `index.html`
+* `about.html`
+
+而 `.replit` 文件中包含以下重写配置：
+
+```
+[[deployment.rewrites]]
+from = "/*"
+to = "/index.html"
+```
+
+当用户访问 `/register.html` 时，服务器会将请求重写为 `/index.html`，并返回该文件。
+但如果用户访问 `/about.html`，由于该文件在静态部署中确实存在，服务器会忽略重写规则，直接返回 `about.html` 文件。
+
+<div id="section-5">
+  ### 域名限制
+</div>
+
+重写仅对指向静态部署默认域名的请求生效，并且只能重定向到该静态部署内的文件。

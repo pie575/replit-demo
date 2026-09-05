@@ -1,0 +1,237 @@
+---
+title: "Создание лендинг-страницы"
+description: "Создайте и опубликуйте лендинг-страницу с одним чётким предложением, одним призывом к действию и рабочей формой для сбора откликов."
+---
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Скопировано!";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Скопировать промпт
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Создать в Replit ↗
+      </button>
+    </div>;
+};
+
+export const RACHEL_JONES_PROMPT = `Создай одностраничный сайт для онлайн-фитнес-тренера по имени Rachel Jones. Он должен выглядеть премиально, как реклама в журнале: тёмный, драматичный и роскошный, только в чёрном и тёплом золотом цветах. Крупные смелые заголовки, много свободного пространства и элегантные акценты шрифтом с засечками. Без ярких цветов и округлённой эстетики «техстартапа».
+
+Вот что должно быть на странице сверху вниз:
+
+Верхняя панель с небольшим золотым логотипом "RJ" слева, надписью "RACHEL JONES — ФИТНЕС-ТРЕНЕР" рядом с ним, несколькими ссылками меню по центру (Обо мне, Тренировки, Программы, Истории успеха, Ресурсы) и золотой кнопкой "Записаться на бесплатную консультацию" справа.
+
+Большой главный блок с эффектной фотографией крупным планом сильной, спортивной женщины, освещённой тёплым золотым светом на чёрном фоне. Слева, поверх тёмной области, размести огромный заголовок в три строки:
+"СИЛЬНОЕ ТЕЛО. УВЕРЕННЫЙ РАЗУМ. НЕОСТАНОВИМАЯ ВЫ." — последняя строка золотым цветом.
+Под ним: "Персонализированный подход. Проверенные стратегии. Реальные результаты надолго." Затем две кнопки: золотая "Тренироваться с Rachel" и контурная "Посмотреть историю Rachel" с иконкой воспроизведения. Ниже покажи 4 маленькие круглые фотографии клиенток и 5 золотых звёзд с текстом "Нам доверяют более 500 женщин по всему миру."
+Справа, поверх фотографии, напиши "Rachel Jones" изящным золотым рукописным шрифтом, под ним — "СЕРТИФИЦИРОВАННЫЙ ФИТНЕС-ТРЕНЕР", а также список квалификаций с маленькими золотыми иконками: Сертифицирована NASM, Precision Nutrition Level 1, Специалист по женскому фитнесу, Более 10 лет опыта.
+
+Полоса "Нас рекомендуют" — тонкий ряд с вымышленными логотипами журналов, написанными разными изящными шрифтами: Women's Health, Oxygen, Forbes, mindbodygreen, Fit Pregnancy, Shape.
+
+Раздел "Комплексный подход" — заголовок по центру "Комплексный подход. Реальные результаты." элегантным шрифтом с засечками. Ниже — четыре колонки рядом, каждая с небольшой золотой иконкой, заголовком и однострочным описанием: Индивидуальные тренировки, Рекомендации по питанию, Работа с мышлением, Поддержка и контроль.
+
+Раздел "Истории успеха" — слева заголовок "Сильнее снаружи. Сильнее внутри." с кнопкой "Больше историй успеха". Справа — три фотографии женщин до и после трансформации, под каждой крупный золотой результат ("−24 ФУНТА за 16 недель", "+18 ФУНТОВ мышц", "−20% жира в организме за 14 недель"), короткая цитата курсивом и имя клиентки.
+
+Финальная панель призыва к действию — широкая тёмная карточка, разделённая на три части. Слева: доброжелательный портрет Rachel. Посередине: заголовок "Вам не нужно больше мотивации. Вам нужен правильный план." с золотой кнопкой "Записаться на бесплатную консультацию". Справа: три небольших преимущества с иконками — "Стратегическая консультация 1:1", "Персональный план", "Начните свою трансформацию".
+
+Для фотографий сгенерируй изображения: нужна спортивная женщина с драматичным тёплым золотым освещением на чёрном фоне, очень кинематографично. Фотографии до и после должны быть в полный рост в том же тёмном студийном стиле.
+
+Пусть сайт выглядит как настоящий профессиональный бренд фитнес-тренера, а не шаблон. Не добавляй формы, регистрации или дополнительные страницы — только этот красивый лендинг.`;
+
+Лендинг-страница объединяет идею, кампанию, список ожидания, мероприятие или предложение в одном целенаправленном пространстве.
+
+<Frame>
+  <img src="/assets/mirror/rachel-jones-coach-cb889778361d.png" alt="Лендинг фитнес-тренера Rachel Jones, опубликованный по общедоступному URL: тёмный редакционный главный экран с заголовком «Сильное тело. Уверенный разум. Неудержимая вы.», кнопкой призыва к действию «Тренироваться с Rachel», сертификатами и блоком упоминаний в прессе" width="2880" height="1800" data-path="images/build-examples/rachel-jones-coach.png" />
+</Frame>
+
+<PromptActions prompt={RACHEL_JONES_PROMPT} />
+
+<div id="section">
+  ## Что вы узнаете
+</div>
+
+Вы узнаете:
+
+* Как превратить целевую аудиторию, предложение и призыв к действию в страницу.
+* Как попросить Agent создать текст страницы, макет и логику формы.
+* Как убедиться, что страница понятна, прежде чем ею делиться.
+* Как протестировать форму по опубликованному URL-адресу.
+* Как улучшать страницу на основе качества ответов.
+
+<div id="canvas">
+  ## Доработка в Canvas и поиск альтернатив
+</div>
+
+Когда Agent завершит первую сборку, откройте Canvas, чтобы дать визуальную обратную связь и попросить Agent предложить другие варианты — без необходимости переписывать промпт.
+
+<Steps>
+  <Step title="Создание лендинга">
+    Скопируйте запрос и вставьте его в [поле запроса на replit.com](https://replit.com) или нажмите **Build on Replit**, чтобы открыть Replit с уже введённым запросом.
+
+    <PromptActions prompt={RACHEL_JONES_PROMPT} />
+  </Step>
+
+  <Step title="Предпросмотр приложения, созданного Agent">
+    Когда Agent завершит работу, правая панель переключится на **Preview**, где вы сможете взаимодействовать с лендингом в реальном времени. Прокрутите главный экран, нажмите кнопки призыва к действию и убедитесь, что текст и изображения соответствуют вашему запросу, прежде чем приступать к доработке.
+
+    <Frame>
+      <img src="/assets/mirror/landing-preview-4855c4b25270.png" alt="Лендинг фитнес-тренера Rachel Jones, отображённый в окне Replit Preview рядом с чатом Agent: тёмный редакционный главный экран с заголовком «Более сильное тело. Уверенный разум. Неудержимая вы.» поверх золотистого портрета, кнопками «Заниматься с Rachel» и «Смотреть историю Rachel», сертификатами справа и полосой с пятью звёздами «Нам доверяют более 500 женщин по всему миру»" width="3452" height="1988" data-path="images/fitstart/launch-landing-page/landing-preview.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Откройте Canvas">
+    Выберите кнопку **Canvas** под вкладками Preview и Tools, чтобы переключить правую панель из Preview в Canvas.
+
+    <Frame>
+      <img src="/assets/mirror/landing-canvas-button-494c5b0076b1.png" alt="Рабочее пространство Replit с выделенной кнопкой Canvas под вкладками Preview и Tools" width="720" height="450" data-path="images/fitstart/launch-landing-page/landing-canvas-button.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Комментирование вне режима предпросмотра">
+    Используйте инструменты Canvas **Text** и **Draw**, чтобы добавлять заметки и стрелки в пустом пространстве вокруг макета, а затем указывать Agent на конкретные элементы, которые нужно изменить. За пределами области предпросмотра аннотации, размещённые на Canvas, остаются привязанными к обратной связи, чтобы Agent мог читать их вместе с дизайном.
+
+    Посвящайте каждую аннотацию одному изменению. Короткие и конкретные заметки (&quot;Сделай эту кнопку уже&quot;) эффективнее расплывчатой обратной связи.
+
+    <Frame>
+      <img src="/assets/mirror/landing-canvas-annotate-text-8135bfe1e8e2.png" alt="Аннотация Canvas «Сделай эту кнопку уже», размещённая на пустом поле Canvas справа от лендинга Rachel Jones, со стрелкой, указывающей на золотую кнопку 'Book a Free Consultation' в заголовке страницы" width="3452" height="1988" data-path="images/fitstart/launch-landing-page/landing-canvas-annotate-text.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите комментарии и предпросмотр и отправьте их в Agent">
+    Выделите рамкой комментарии вместе с фреймом предпросмотра, затем введите короткий промпт в **Chat about selected items** и отправьте его. Agent рассматривает комментарии и дизайн в едином контексте, поэтому понимает, к какому элементу относится каждая заметка.
+
+    Пишите сообщение в чате в общих чертах — например: &quot;Примени изменения из комментариев.&quot; Конкретные детали указывайте в комментариях.
+
+    <Frame>
+      <img src="/assets/mirror/landing-canvas-send-24b771bf29bf.png" alt="Лендинг Rachel Jones, выбранный в Canvas вместе с двумя комментариями: «Уменьши ширину этой кнопки», указывающим на кнопку Book a Free Consultation, и «Добавь анимацию появления для изображения Rachel», указывающим на главное изображение; в поле Chat about selected items введён промпт" width="1726" height="1988" data-path="images/fitstart/launch-landing-page/landing-canvas-send.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Поиск разных вариантов">
+    Нажмите Design на Canvas и выберите предложение рядом с ним, например **Explore different approaches**, чтобы попросить Agent предложить альтернативные визуальные решения.
+
+    <Frame>
+      <img src="/assets/mirror/landing-canvas-reimagine-9e60c24f342f.png" alt="Три альтернативных варианта лендинг-страницы, созданные в виде фреймов Design на Canvas рядом с исходным вариантом" width="1726" height="994" data-path="images/fitstart/launch-landing-page/landing-canvas-reimagine.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Рассматривайте альтернативы и дорабатывайте">
+    Дождитесь, пока Agent завершит генерацию. **Explore different approaches** обновляет тот же артефакт новым вариантом — переключайтесь между вариантами в выпадающем списке артефактов над макетом. **Explore different vibes** создает отдельные визуальные макеты, которые появляются на Canvas рядом с исходным.
+
+    Когда варианты появятся, выберите направление и продолжайте итерации. Добавьте еще один комментарий к выбранному кадру, выделите рамкой его вместе с дизайном и отправьте новый запрос — например: &quot;Примени изменения, запрошенные в комментариях.&quot; Agent использует контекст варианта и новые комментарии как единый промпт.
+
+    <Frame>
+      <img src="/assets/mirror/landing-canvas-zoomed-4d1585d33fe6.png" alt="Лендинг Rachel Jones в Canvas после того, как Agent создал три варианта настроения (Editorial Warmth, Quiet Clinical, Vibrant Pop) — исходный кадр выбран с двумя новыми комментариями («Уменьши ширину этой кнопки» и «Добавь анимацию появления изображения Rachel»), а в чате введено «Примени изменения, запрошенные в комментариях»" width="3452" height="1988" data-path="images/fitstart/launch-landing-page/landing-canvas-zoomed.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Опубликовать работу">
+    Когда страница будет готова в Preview, нажмите **Publish** (или **Republish** при последующих деплоях) в правом верхнем углу рабочего пространства, чтобы опубликовать последнюю версию по общедоступному URL. Перед тем как поделиться ссылкой, откройте опубликованный URL в новой вкладке и отправьте один тестовый ответ, чтобы убедиться, что опубликованная страница собирает данные.
+
+    <Frame>
+      <img src="/assets/mirror/landing-publish-e3b901a79440.png" alt="Правый верхний угол рабочего пространства Replit, увеличенный в 2 раза: серая кнопка Republish в заголовке выделена оранжевой рамкой, а под ней открыто всплывающее окно с надписью «Raouf published about 18 hours ago», настройкой публичного доступа Public, проверкой безопасности и кнопкой Republish" width="2142" height="1072" data-path="images/fitstart/launch-landing-page/landing-publish.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="section-2">
+  ## Следующие шаги
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Добавьте интеграции" icon="plug" href="/ru/ko/build/add-integrations">
+    Отправляйте последующие письма или синхронизируйте ответы с CRM.
+  </Card>
+
+  <Card title="Добавьте собственный домен" icon="globe" href="/ru/ko/build/add-custom-domain">
+    Перед публикацией добавьте на страницу URL брендовой кампании.
+  </Card>
+
+  <Card title="Добавьте базу данных" icon="database" href="/ru/ko/build/add-database">
+    Сохраняйте более структурированные ответы, чтобы их можно было сортировать и экспортировать.
+  </Card>
+
+  <Card title="Тестируйте изменения по одному" icon="flask">
+    Создайте второй вариант и сравните сообщения — в каждом раунде меняйте только один элемент, чтобы понимать, что влияет на результат.
+  </Card>
+</CardGroup>
+
+<div id="section-3">
+  ## Связанные материалы
+</div>
+
+* [Добавление интеграций](/ru/ko/build/add-integrations)
+* [Добавление собственного домена](/ru/ko/build/add-custom-domain)

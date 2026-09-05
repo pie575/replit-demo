@@ -1,0 +1,113 @@
+---
+title: "Добавление пользовательского домена"
+description: "Переносим Velocity с velocity.replit.app на velocityrentals.com."
+---
+
+import { YouTubeEmbed } from "/snippets/ru/shared-components.mdx";
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+После этого Velocity будет работать на `velocityrentals.com`, а не на `velocity.replit.app`.
+
+<YouTubeEmbed videoId="rGYdyb58wJY" />
+
+Вы добавили в Velocity вход в систему, базу данных, платежи и интеграцию с календарём. Теперь дайте приложению URL-адрес, достойный настоящего бренда по аренде. В этом руководстве мы переносим Velocity на `velocityrentals.com` — используйте вместо него собственный домен.
+
+<div id="replit-url-velocity">
+  ## Сначала убедитесь, что Velocity работает по URL-адресу Replit
+</div>
+
+Прежде чем менять DNS, убедитесь, что публичный URL `velocity.replit.app` работает стабильно. Откройте его в новой вкладке браузера и проверьте следующее:
+
+* Страница со списком автомобилей загружается.
+* Клиент может войти в систему и забронировать автомобиль, а после обновления страницы бронирование сохраняется.
+* Открывается страница оплаты депозита Stripe, и бронирование подтверждается тестовой картой.
+* Событие Google Calendar появляется в календаре клиента, оформившего бронирование.
+
+Если на каком-либо из этих шагов возникает ошибка, устраните её до изменения DNS. См. раздел [Устранение неполадок с деплоем](/ru/ko/build/troubleshooting).
+
+<div id="replit-velocityrentalscom">
+  ## Подключение velocityrentals.com в Replit
+</div>
+
+Откройте настройки Publishing для Velocity и добавьте `velocityrentals.com` как пользовательский домен. Replit покажет две DNS-записи — скопируйте их в точности так, как они отображаются.
+
+<Frame>
+  <img src="/assets/mirror/dns-records-d64f183fa655.png" alt="Диалоговое окно пользовательского домена Replit в настройках Publishing для Velocity: введён velocityrentals.com и готовы к копированию две DNS-записи (A-запись и TXT-запись для подтверждения)" width="1280" height="720" data-path="images/velocity/add-custom-domain/dns-records.png" />
+</Frame>
+
+Затем откройте панель управления вашего доменного регистратора (Namecheap, Cloudflare, Google Domains, GoDaddy и т. п.) и добавьте эти записи в точности так же. Если хотите, чтобы Agent провёл вас по шагам для конкретного регистратора:
+
+<AiPrompt>
+  Я переношу Velocity с velocity.replit.app на velocityrentals.com. Мой домен зарегистрирован в [название доменного регистратора].<br />
+  Подскажите точно, какие DNS-записи и в каком порядке нужно добавить.<br />
+  Используйте значения, показанные в Replit, и не придумывайте значения записей.<br />
+  Расскажите, как проверить, что домен подключён, ещё до того как он заработает.
+</AiPrompt>
+
+Изменения DNS могут вступать в силу от нескольких минут до нескольких часов. Когда Replit обнаружит записи, рядом с `velocityrentals.com` появится статус «Verified».
+
+<div id="velocityrentalscom-velocity">
+  ## Тестирование Velocity на velocityrentals.com
+</div>
+
+После того как Replit пометит домен как проверенный:
+
+1. Откройте `https://velocityrentals.com` в новой вкладке браузера. Должен появиться зелёный замок — HTTPS подключается автоматически.
+2. Войдите как клиент. Вход должен по-прежнему работать (Replit Auth обрабатывает новый домен автоматически).
+3. Забронируйте автомобиль, обновите страницу и убедитесь, что бронирование сохранилось.
+4. Откройте оформление залога в Stripe. Теперь на странице в качестве URL продавца должен отображаться `velocityrentals.com`.
+5. Подтвердите бронирование и убедитесь, что событие Google Calendar по-прежнему появляется в календаре клиента.
+
+Если вход, оформление оплаты или интеграция с календарём сбоят только на `velocityrentals.com`, опишите Agent точные симптомы.
+
+<AiPrompt>
+  Velocity работает на velocity.replit.app, но на velocityrentals.com возникает [описание ошибки].<br />
+  Подскажи, где нужно вносить исправление: в DNS, в настройках Replit или в настройках стороннего поставщика, например Stripe или Google.<br />
+  Предложи самую безопасную следующую проверку.
+</AiPrompt>
+
+Теперь Velocity работает по реальному URL вашего прокатного бренда. Делитесь с клиентами адресом `velocityrentals.com` — «replit.app» нигде больше не появляется.
+
+<div id="section">
+  ## Дальнейшие улучшения
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Устранение неполадок деплоя" icon="triangle-exclamation" href="/ru/ko/build/troubleshooting">
+    Устраните проблемы, если публичный URL не работает.
+  </Card>
+
+  <Card title="Покупка домена" icon="cart-shopping" href="/ru/ko/build/domain-purchasing">
+    Если вы ещё этого не сделали, купите домен velocityrentals.com через Replit.
+  </Card>
+</CardGroup>
+
+<div id="section-2">
+  ## Нужна дополнительная помощь?
+</div>
+
+* **`velocityrentals.com` не открывается сразу:** изменения DNS могут вступать в силу несколько часов. Подождите и проверьте ещё раз, прежде чем менять другие настройки.
+* **URL Replit работает, а пользовательский домен — нет:** убедитесь, что DNS-записи в точности совпадают с теми, что показаны в Replit. Частые ошибки — завершающая точка, лишний поддомен или устаревшие записи.
+* **В Stripe Checkout по-прежнему отображается `velocity.replit.app`:** попросите Agent обновить URL перенаправления Stripe, чтобы использовался `velocityrentals.com`.
+* **У вас ещё нет домена:** купите его через Replit — см. [Покупка домена](/ru/ko/build/domain-purchasing).
+
+<div id="section-3">
+  ## Связанные материалы
+</div>
+
+* [Пользовательские домены](/ru/ko/features/publishing/custom-domains)
+* [Покупка домена](/ru/ko/build/domain-purchasing)

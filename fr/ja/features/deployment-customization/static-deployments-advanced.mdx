@@ -1,0 +1,158 @@
+---
+title: "Configurer un déploiement statique"
+description: "Découvrez comment configurer les en-têtes HTTP, les règles de routage et les réécritures d'URL de vos déploiements statiques."
+---
+
+Ce guide présente les paramètres suivants, définis au niveau du serveur web :
+
+* [Ajouter des en-têtes de réponse](#add-response-headers)
+* [Créer une page 404 personnalisée](#create-a-custom-404-page)
+* [Définir des réécritures de chemins d&#39;URL](#define-url-path-rewrites)
+
+<div id="section">
+  ## Ajouter des en-têtes de réponse
+</div>
+
+Les **en-têtes de réponse** personnalisés vous permettent d&#39;ajouter des instructions HTTP aux requêtes correspondant à un chemin donné.
+Un en-tête de réponse est une paire nom-valeur qui indique au navigateur comment traiter le contenu demandé.
+
+Par exemple, vous pouvez définir l&#39;en-tête `Access-Control-Allow-Origin` pour indiquer les domaines auxquels le navigateur autorise l&#39;accès à cette page.
+Pour créer cette entrée, ajoutez ce qui suit au fichier `.replit` situé à la racine de votre Replit App :
+
+```
+[[deployment.responseHeaders]]
+path = "/*"
+name = "Access-Control-Allow-Origin"
+value = "origin"
+```
+
+Cet en-tête de réponse contient les paramètres suivants :
+
+* **path** : le modèle de chemin d&#39;URL correspondant à la ressource demandée
+* **name** : le nom de l&#39;en-tête HTTP
+* **value** : la valeur de l&#39;en-tête HTTP
+
+Vous pouvez ajouter plusieurs entrées `deployment.responseHeaders` dans le fichier `.replit`.
+
+Pour appliquer les modifications de configuration, republiez votre Replit App.
+
+<div id="section-2">
+  #### En-têtes réservés
+</div>
+
+Replit réserve les en-têtes HTTP suivants : vous ne pouvez pas les définir.
+
+```text [expandable] theme={null}
+Accept-Ranges
+Age
+Allow
+Alt-Svc
+Connection
+Content-Encoding
+Content-Length
+Content-Range
+Date
+Location
+Server
+Set-Cookie
+Trailer
+Transfer-Encoding
+Upgrade
+```
+
+<Tip>
+  Pour en savoir plus sur les en-têtes HTTP, consultez la page
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers" target="_blank">
+    En-têtes HTTP
+  </a>
+
+  de la documentation Web MDN.
+</Tip>
+
+<div id="404">
+  ## Créer une page 404 personnalisée
+</div>
+
+Une page 404 personnalisée s&#39;affiche lorsqu&#39;un utilisateur demande un chemin d&#39;URL qui ne correspond à aucun fichier ni à aucune règle de votre app publiée.
+
+Pour ajouter une page 404 personnalisée, créez un fichier nommé `404.html` à la racine de votre Replit App, puis rédigez-y le contenu de la page.
+
+Lorsqu&#39;un utilisateur tente d&#39;accéder à un chemin d&#39;URL inexistant, le HTML généré de votre page 404 personnalisée s&#39;affiche.
+
+<div id="url">
+  ## Définir des réécritures de chemin d&#39;URL
+</div>
+
+Les réécritures d&#39;URL permettent de modifier le chemin d&#39;URL d&#39;une requête avant que la Replit App ne la traite.
+L&#39;URL d&#39;origine reste affichée telle quelle dans le navigateur, mais le serveur charge la ressource définie par la règle de réécriture.
+
+Par exemple, vous pouvez faire en sorte que toutes les requêtes commençant par `/app` chargent le contenu du fichier `/app/index.html`.
+Pour créer cette entrée, ajoutez ce qui suit au fichier `.replit` situé à la racine de votre Replit App :
+
+```
+[[deployment.rewrites]]
+from = "/app/*"
+to = "/app/index.html"
+```
+
+* **from** : le modèle de chemin d&#39;URL correspondant à la ressource demandée
+* **to** : le chemin après réécriture. Il correspond à un fichier de votre déploiement statique.
+
+Vous pouvez ajouter plusieurs entrées `deployment.rewrites` dans le fichier `.replit`.
+Le serveur interprète les entrées dans l&#39;ordre indiqué et ignore les doublons.
+
+Pour appliquer les modifications de configuration, vous devez republier votre Replit App.
+
+Les sections suivantes décrivent les contraintes applicables aux règles de réécriture d&#39;URL.
+
+<div id="section-3">
+  ### Correspondance des chemins
+</div>
+
+Les contraintes suivantes s&#39;appliquent aux paramètres `from` et `to` d&#39;une règle de réécriture :
+
+* En l&#39;absence de `*`, la correspondance doit être exacte
+* `*` correspond au reste du chemin
+* `*` n&#39;est valide qu&#39;en fin de chemin
+* Si vous incluez `*` dans le paramètre `from`, vous pouvez également l&#39;inclure dans le paramètre `to` pour représenter la portion de chemin correspondante
+
+Par exemple, supposons que votre fichier `.replit` contienne la réécriture suivante :
+
+```
+[[deployment.rewrites]]
+from = "/v1/*"
+to = "/v2/*"
+```
+
+Lorsqu&#39;un utilisateur accède à `/v1/about-us.html`, la réécriture lui sert le fichier situé à `/v2/about-us.html`.
+
+<div id="section-4">
+  ### Masquage
+</div>
+
+Le masquage se produit lorsqu&#39;une réécriture correspond à un chemin d&#39;URL qui correspond aussi à un fichier présent dans le déploiement statique.
+Dans ce cas, le serveur cloud ignore la réécriture et sert le fichier directement.
+
+Par exemple, supposons que votre application publiée contienne les fichiers suivants :
+
+* `index.html`
+* `about.html`
+
+Le fichier `.replit` contient la réécriture suivante :
+
+```
+[[deployment.rewrites]]
+from = "/*"
+to = "/index.html"
+```
+
+Lorsqu&#39;un utilisateur accède à `/register.html`, le serveur réécrit la requête vers `/index.html` et sert ce fichier.
+En revanche, si l&#39;utilisateur accède à `/about.html`, le serveur ignore la réécriture et sert le fichier `about.html`, car celui-ci existe bien dans le déploiement statique.
+
+<div id="section-5">
+  ### Restrictions de domaine
+</div>
+
+Les réécritures ne s&#39;appliquent qu&#39;aux requêtes adressées au domaine principal du déploiement statique et
+ne peuvent rediriger que vers des fichiers contenus dans ce déploiement statique.

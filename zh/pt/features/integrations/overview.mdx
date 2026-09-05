@@ -1,0 +1,483 @@
+---
+title: "Agent 集成"
+description: "了解 Agent 支持哪些集成，以及它们如何根据你的 prompt 自动启用。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Frame>
+  <img src="/assets/mirror/agent-logo-e171ec584553.png" alt="Agent 徽标，周围环绕着集成连接示意图" width="1280" height="720" data-path="images/replitai/agent-logo.png" />
+</Frame>
+
+Agent 支持四种集成类型，助你快速把创意变成应用：
+
+* **Replit 托管**：内置集成，开箱即用。创建应用后，Agent 即可立即调用。
+* **连接器**：由 Replit 官方支持的自有集成。只需登录一次，Agent 就能通过 Chat 直接读写这些服务——获取数据、创建记录、发送消息——并在你的所有应用中基于它们进行构建。
+* **外部集成**：可用于构建应用的可信第三方服务。让 Agent 帮你完成配置，你只需提供 API 密钥。
+* **Agent 服务**：Agent 在后台使用的第三方付费 API——无需 API 密钥。用量将从你的 Replit 积分中扣除。
+
+<Note>
+  **各方案的可用性**：大多数连接器需要 Core、Pro 或 Enterprise 订阅，部分连接器在免费方案中即可使用。你 workspace 中的连接器目录会显示当前方案可使用哪些连接器。使用免费方案的构建者始终可以使用 Replit 托管的集成，例如数据库、身份验证等。
+</Note>
+
+<div id="primeiros-passos">
+  ## 快速上手
+</div>
+
+要使用某项集成，只需提及你需要的服务或功能即可。例如：
+
+<AiPrompt>
+  Create a web app that uses Stripe to accept payments and SendGrid to send confirmation emails
+</AiPrompt>
+
+Agent 会自动识别这些关键词，并生成所需的代码和配置。
+
+<div id="deixe-o-agent-sugerir-um-conector">
+  ### 让 Agent 推荐 连接器
+</div>
+
+有时多个服务可以完成同样的工作，比如存储文件或发送邮件。当你提出某项功能需求但没有指定身份提供方时，Agent 会列出一份符合需求的连接器简短清单，你可以任选其一。
+
+选择身份提供方后登录一次即可连接你的账户，Agent 在构建时会采用你的选择。你也可以直接按名称指定某个服务，跳过这份清单。
+
+<Frame>
+  <img src="/assets/mirror/agent-connector-suggestions-0cb07754b84c.png" alt="Agent 的“选择要连接的集成”选择器，列出 Google Drive、Dropbox、Microsoft OneDrive、Box 和 SharePoint Online" width="2000" height="786" data-path="images/replitai/agent-connector-suggestions.png" />
+</Frame>
+
+<div id="integraes-gerenciadas-pelo-replit">
+  ## 由 Replit 托管的集成
+</div>
+
+这些内置功能无需任何配置，只需让 Agent 使用即可。
+
+<AccordionGroup>
+  <Accordion title="Replit Database">
+    面向关系型数据和 SQL 查询的托管 PostgreSQL，已集成到每个 Replit App 中。
+    <AiPrompt>Add Replit Database to my app</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Replit App Storage">
+    用于存放应用文件和素材的内置存储。
+    <AiPrompt>Use Replit App Storage to save files</AiPrompt>
+  </Accordion>
+
+  <Accordion title="App Storage">
+    用于存放图片、视频和其他文件的云端存储。
+    <AiPrompt>Add App Storage to my app to store files</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Replit Auth">
+    原生身份验证，让用户可以直接使用 Replit 账号登录。
+    <AiPrompt>Add Replit Auth to my app</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Replit Domains">
+    为你的应用配置和管理自定义域名。
+    <AiPrompt>Set up a custom domain for my app</AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<div id="conectores">
+  ## 连接器
+</div>
+
+连接器让 Agent 能够直接读写你所使用的各项服务。它们是由 Replit 官方提供支持的原生集成。在 Project Editor 的连接器页面登录一次，即可在所有应用中复用这些连接。
+
+<Note>
+  这些连接与你的 Replit 账户绑定，并在你的所有应用中长期有效。一个服务只需连接一次，就能在你创建的任何应用中使用。
+</Note>
+
+<div id="conectores-disponveis">
+  ### 可用连接器
+</div>
+
+<AccordionGroup>
+  <Accordion title="Google Workspace" icon="google">
+    * **Google Drive**：访问和管理文件与文件夹
+    * **Google Docs**：创建、读取和编辑文档
+    * **Google Sheets**：读取和写入电子表格数据
+    * **Google Slides**：创建、读取和编辑演示文稿
+    * **Google Calendar**：读取和写入日程与设置
+    * **Gmail**：发送、接收和管理电子邮件
+  </Accordion>
+
+  <Accordion title="Microsoft 365" icon="microsoft">
+    * **OneDrive**：访问和管理文件与文件夹
+    * **Outlook**：收发电子邮件并管理日历事件
+    * **SharePoint**：读取、写入和管理站点与文档
+  </Accordion>
+
+  <Accordion title="开发者工具" icon="code">
+    * **Bitbucket**：访问仓库、项目和工作区
+    * **Bitbucket (版本控制)&#x20;**：将 Replit 的版本控制连接到 Bitbucket
+    * **GitHub**：访问仓库、用户和组织
+    * **GitHub (版本控制)&#x20;**：将 Replit 的版本控制连接到 GitHub
+    * **GitLab**：访问项目、议题、合并请求和流水线
+    * **GitLab (版本控制)&#x20;**：将 Replit 的版本控制连接到 GitLab
+    * **Linear**：创建和管理议题、评论及日程
+    * **Jira**：读取用户信息，管理工作项和议题
+    * **Asana**：读取任务和项目数据
+    * **Basecamp**：读取和管理项目、任务、消息及日程
+    * **Teamwork**：读取和管理项目、任务和工时记录
+    * **Confluence**：读取用户和群组，在空间中撰写内容
+    * **Productboard**：读取和更新功能、发布及客户反馈
+  </Accordion>
+
+  <Accordion title="云存储" icon="cloud">
+    * **Dropbox**：读取文件、内容和元数据
+    * **Box**：读取并访问文件和文件夹
+  </Accordion>
+
+  <Accordion title="沟通" icon="comments">
+    * **AgentMail**：以编程方式收发邮件
+    * **Discord**：访问服务器信息和用户资料
+    * **Intercom**：读写对话、联系人和支持流程
+    * **Resend**：发送事务性邮件
+    * **SendGrid**：发送事务性邮件
+    * **Slack**：搜索你的 Slack、读取对话和消息串、发送消息并管理 Canvas
+    * **Slack Agent**：构建原生 Slack Agent，实现更深度的 workspace 集成
+    * **Slack Agent Builder**：用于设计和配置 Slack Agent 的工具
+    * **Twilio**：发送短信和拨打语音电话
+    * **Zoom**：创建和管理会议、录制内容和联系人
+  </Accordion>
+
+  <Accordion title="CRM 和销售" icon="building">
+    * **Salesforce**：通过 REST API 访问 CRM 数据并执行操作
+    * **HubSpot**：读取 CRM 对象、联系人和交易
+    * **Zendesk**：对工单 API 具备读写权限，可用于客服支持流程
+  </Accordion>
+
+  <Accordion title="人力资源与招聘" icon="user-tie">
+    * **Ashby**：读取候选人、职位和面试数据
+  </Accordion>
+
+  <Accordion title="支付与变现" icon="credit-card">
+    * **RevenueCat**：管理应用内购买和订阅
+    * **Stripe**：处理付款并管理订阅。请参阅 [Stripe 付款指南](/zh/pt/features/monetization/stripe-payments)。
+    * **Square**：收款并管理订单、客户和库存
+    * **Plaid**：在所连接机构支持的情况下，获取金融账户余额、交易和投资数据。请参阅 [Plaid connector 指南](/zh/pt/features/integrations/plaid-connector)。
+    * **Shopify**：开通 Shopify 商店，搭建自定义店面，并通过 Agent 管理商品和库存。请参阅 [Shopify connector 指南](/zh/pt/features/integrations/shopify)。
+  </Accordion>
+
+  <Accordion title="AI 与媒体" icon="wand-magic-sparkles">
+    * **Browserbase**：运行托管的无头浏览器，实现网页抓取、搜索和端到端的会话自动化
+    * **ElevenLabs**：使用 AI 生成语音和音频内容
+    * **OpenAI**：使用 GPT 模型进行文本生成和构建智能助手
+    * **Quiver AI**：生成 SVG 插图，并将位图图像矢量化
+    * **Tripo3D**：根据文本或图像生成 3D 模型，适用于游戏、产品原型和 AR
+  </Accordion>
+
+  <Accordion title="数据和分析" icon="chart-line">
+    * **BigQuery**：查询和分析大规模数据集
+    * **Databricks (U2M)**：通过用户到机器身份验证连接 Databricks Apps
+    * **Databricks (M2M)**：通过机器到机器身份验证连接 Databricks
+    * **Snowflake**：查询和管理 Snowflake 数据仓库
+    * **Microsoft Fabric**：访问分析、数据工程和 BI 服务
+    * **PostgreSQL**：连接到 PostgreSQL 数据库
+    * **Hex**：构建并分享数据笔记本和数据应用
+    * **Amplitude**：获取产品分析和用户行为数据
+    * **Segment**：将事件和客户属性发送到你的数据管道
+  </Accordion>
+
+  <Accordion title="营销与社交媒体" icon="megaphone">
+    * **Facebook**：访问主页、帖子和广告数据
+    * **Instagram**：读取媒体内容、评论和账号数据
+    * **Mailchimp**：读取和管理受众、营销活动及邮件营销数据
+    * **Twitch**：读取直播、频道和观众活动
+    * **YouTube**：读取视频、频道和播放列表数据
+    * **X**：在 X (原 Twitter) 上读取和发布内容
+    * **Sprout Social**：管理社交消息、社交主页和报告
+  </Accordion>
+
+  <Accordion title="地图和定位" icon="map">
+    * **Mobile Maps**：在移动应用中嵌入地图体验
+  </Accordion>
+
+  <Accordion title="生产力" icon="list-check">
+    * **Airtable**：读写 base、表和记录
+    * **Calendly**：查看和管理已安排的日程
+    * **ClickUp**：查看和管理任务、列表和空间
+    * **Excalidraw**：创建和编辑图表与白板
+    * **Monday.com**：访问看板、条目和更新
+    * **Notion**：读写 workspace 和页面
+    * **Spotify**：访问和管理播放列表与音乐库
+    * **Todoist**：创建和管理任务与项目
+  </Accordion>
+</AccordionGroup>
+
+<div id="use-o-slack-com-o-agent">
+  ### 搭配 Agent 使用 Slack
+</div>
+
+连接 Slack，让 Agent 获取你有权访问的对话上下文。你可以让 Agent 搜索消息、文件、频道或人员，然后利用搜索结果回答问题或继续推进工作。
+
+在获得你的授权后，Agent 可以：
+
+* 读取你所参与的私有频道、私信和群组私信。
+* 在你需要上下文时，读取完整的话题回复。
+* 以你的名义发送消息。
+* 创建、读取和更新 Slack canvas。
+
+<AiPrompt>
+  Summarize the discussion in my direct message with Alex about the launch plan, then draft a follow-up for me.
+</AiPrompt>
+
+<Info>
+  Agent 只能访问已连接的 Slack 账户有权访问的 Slack 对话和内容。
+</Info>
+
+<div id="acessando-os-conectores">
+  ### 访问 连接器
+</div>
+
+你可以在 Project Editor 的侧边栏中访问 连接器：
+
+<Steps>
+  <Step title="打开 Project Editor">
+    在 Project Editor 中打开你的应用。
+  </Step>
+
+  <Step title="选择 连接器">
+    在侧边栏中选择 **连接器**。
+  </Step>
+
+  <Step title="添加新集成">
+    选择**添加新集成**，浏览可用的连接器。
+  </Step>
+
+  <Step title="连接">
+    在你想集成的服务旁选择**连接**。
+  </Step>
+</Steps>
+
+<Tip>
+  若要断开某个服务，请返回 连接器 面板，在已连接的服务旁选择**管理**。
+</Tip>
+
+<Frame>
+  <img src="/assets/mirror/connectors-overview-4295e541a5ab.png" alt="应用的连接器界面，展示可用集成，包括 GitHub、OneDrive、Outlook、Spotify、Linear、Dropbox、Monday.com、Google Docs 和 YouTube，以及各自的连接状态和管理选项" width="3456" height="1688" data-path="images/replitai/connectors-overview.png" />
+</Frame>
+
+当你为某个服务选择“连接”时，Replit 会将你跳转到该服务完成身份验证，并授权 Replit 访问你的数据：
+
+<Frame>
+  <img src="/assets/mirror/connectors-oauth-flow-3873e6fcdaf4.png" alt="OAuth 身份验证流程，展示 Linear 的连接对话框，其中包含说明数据使用和用户控制权的隐私与安全信息" width="1345" height="1213" data-path="images/replitai/connectors-oauth-flow.png" />
+</Frame>
+
+<div id="configurando-um-app-oauth-com-o-replit">
+  ### 在 Replit 中配置 OAuth 应用
+</div>
+
+<Note>
+  **仅限 Enterprise**：配置自定义 OAuth 应用需要 Enterprise 订阅。
+</Note>
+
+在 Enterprise 计划中，你可以为连接器使用自己的 OAuth 应用，而不必使用 Replit 的默认应用。这样，你的组织可以拥有 OAuth 客户端、在授权同意页面上展示自有品牌，并精确控制构建者可申请的权限范围。
+
+要使用自己的 OAuth 应用配置连接器，你需要从身份提供方获取三样东西：**Client ID**、**Client Secret** 以及你希望授权的**权限范围**。你还需要在身份提供方处注册 Replit 的回调 URL，身份验证才能顺利完成。
+
+<Frame>
+  <img src="/assets/mirror/connector-oauth-configuration-100911ce0c48.png" alt="连接器 的 OAuth 配置对话框，包含 Client ID、Client Secret 和 Connector 权限范围字段，以及设置为 https://replit.com/connectors/oauth/callback 的重定向 URL" width="1112" height="1218" data-path="images/replitai/connector-oauth-configuration.png" />
+</Frame>
+
+<Steps>
+  <Step title="在身份提供方处创建 OAuth 应用">
+    登录身份提供方的开发者控制台或管理员设置，创建一个新的 OAuth 2.0 应用。不同身份提供方对这一步的叫法各不相同——请查找类似**创建 OAuth 应用**、**注册应用程序**或**创建客户端凭据**的选项。
+  </Step>
+
+  <Step title="设置重定向 URL">
+    当身份提供方要求填写**授权重定向 URI** (有时称为**回调 URL**或**重定向 URL**) 时，请输入：
+
+    ```
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    构建者授权应用后，身份提供方会通过这个 URL 将他们送回 Replit。该地址必须完全一致——末尾斜杠、协议和子域都不能有出入。如果你添加了多个重定向 URI，其中必须包含这一个。
+  </Step>
+
+  <Step title="复制 Client ID 和 Client Secret">
+    创建应用后，身份提供方会显示一个 **Client ID** 和一个 **Client Secret**。
+
+    * **Client ID**：你的 OAuth 应用的公开标识符，可以安全地出现在 URL 和客户端代码中。
+    * **Client Secret**：用于证明请求来自你的应用的机密值。请像对待密码一样对待它——切勿将其提交到代码仓库或公开分享。Replit 会为你安全地存储它。
+
+    有些身份提供方只在创建时显示一次 client secret。请立即复制并妥善保管，直到你将其粘贴到 Replit 中。
+  </Step>
+
+  <Step title="选择权限范围">
+    **权限范围**即一组权限，用于定义你的 OAuth 应用可以代表构建者读取或写入哪些内容。每个身份提供方都会在其 API 文档中公布自己的权限范围列表。
+
+    在 Replit 中配置连接器时，你输入的权限范围必须与你在身份提供方处注册的权限范围**完全一致** (逐字符一致，包括任何 URL 前缀) 。出现不匹配错误的常见原因包括：
+
+    * 缺少完整的 URL 前缀 (例如写成 `drive.file` 而不是 `https://www.googleapis.com/auth/drive.file`) 。
+    * 多余的空白字符或末尾的逗号。
+    * 在 Replit 中申请了身份提供方应用中未启用的权限范围。
+
+    建议先从构建者所需的最小权限范围开始，之后如有需要再添加——大多数身份提供方都允许更新权限范围，无需重新创建应用。
+  </Step>
+
+  <Step title="在 Replit 中配置连接器">
+    在你所在组织的 **连接器** 页面上，选择**添加新集成**，选择相应服务，然后粘贴身份提供方的 **Client ID**、**Client Secret** 和**权限范围**。选择**配置**进行保存。
+  </Step>
+</Steps>
+
+<Note>
+  如果配置完成后身份验证仍然失败，请再次检查在身份提供方注册的重定向 URL 是否与 `https://replit.com/connectors/oauth/callback` 完全一致，并确认在 Replit 中填写的每个权限范围都已在身份提供方的应用中获得授权。
+</Note>
+
+<div id="exemplos-de-prompts">
+  ### prompt 示例
+</div>
+
+* &quot;Integrate with Outlook to create an email dashboard&quot;
+* &quot;Build a GitHub repository manager using my connected GitHub account&quot;
+* &quot;Create a Linear task tracker for my team&quot;
+* &quot;Build a Notion-powered website using my connected Notion workspace&quot;
+* &quot;Create a Monday.com project dashboard&quot;
+
+<Note>
+  连接器为你提供对外部服务的已认证访问，无需手动管理 API 密钥或认证令牌。
+</Note>
+
+<Tip>
+  想了解 Workspace 或组织级别的连接器管理？请参阅[管理你的连接器](/zh/pt/replitai/managing-connectors)。
+</Tip>
+
+<div id="integraes-externas">
+  ## 外部集成
+</div>
+
+可信赖的第三方服务。让 Agent 帮你配置，你只需提供 API 密钥。
+
+<Note>
+  API 密钥会安全地存储在应用的 [Secrets](/zh/pt/core-concepts/project-editor/app-setup/secrets) 中。需要时，Agent 会提示你添加密钥。
+</Note>
+
+<div id="provedores-de-ia">
+  ### AI 提供商
+</div>
+
+<AccordionGroup>
+  <Accordion title="OpenAI">
+    访问 GPT 模型，用于文本生成、分析和构建助手。
+    <AiPrompt>Create a web app that uses OpenAI to summarize text</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Google AI (Gemini)">
+    使用 Gemini 模型实现多模态理解与生成。
+    <AiPrompt>Use Google Gemini to analyze and summarize documents</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Anthropic (Claude)">
+    访问 Claude 模型，用于推理、写作和编程。
+    <AiPrompt>Create a web app that uses Anthropic to generate content</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Perplexity">
+    带引用来源的 AI 搜索与答案生成。
+    <AiPrompt>Create a web app that uses Perplexity to answer questions</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Mistral AI">
+    快速高效的语言模型，适用于自然语言处理任务。
+    <AiPrompt>Use Mistral to extract key facts from text</AiPrompt>
+  </Accordion>
+
+  <Accordion title="OpenRouter">
+    通过单一 API 访问来自多个提供商的数百种 AI 模型。
+    <AiPrompt>Use OpenRouter to access Llama models for my chatbot</AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<div id="negcios-e-automao">
+  ### 业务与自动化
+</div>
+
+<AccordionGroup>
+  <Accordion title="Workato">
+    在你的应用中触发自动化 recipe 并调用 API。
+    <AiPrompt>Connect my app to a Workato recipe that syncs leads</AiPrompt>
+  </Accordion>
+
+  <Accordion title="HubSpot">
+    访问 CRM 数据并管理联系人。
+    <AiPrompt>Connect my app to HubSpot to manage contacts</AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<div id="comunicao-e-comunidade">
+  ### 沟通与社区
+</div>
+
+<AccordionGroup>
+  <Accordion title="Discord">
+    在你的应用中发送消息并管理服务器。
+    <AiPrompt>Send a message to my Discord channel when a new signup happens</AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<div id="servios-do-agent">
+  ## Agent 服务
+</div>
+
+部分功能在底层使用了付费的第三方 API。Agent 会自动完成集成——无需 API 密钥，也无需任何配置。费用按身份提供方的费率计收，并从你的 Replit 积分中扣除。
+
+<AccordionGroup>
+  <Accordion title="Brave 图片搜索">
+    使用 Brave 图片搜索 API 在网络上搜索图片。
+    <AiPrompt>Find product images for my e-commerce store</AiPrompt>
+  </Accordion>
+
+  <Accordion title="ElevenLabs">
+    生成逼真的文本转语音音频和语音内容。
+    <AiPrompt>Add voice narration to my app&#39;s onboarding flow</AiPrompt>
+  </Accordion>
+
+  <Accordion title="Google Gemini 图片生成（Nano Banana）">
+    使用 Google 的 Gemini 图片模型生成图片。
+    <AiPrompt>Generate a hero image for my landing page</AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Agent 服务按身份提供方的公开 API 费率计费。费用从你的 Replit 积分中扣除，并显示在你的[用量页面](/zh/pt/billing/managing-spend)中。
+</Note>
+
+<div id="reconectando-integraes">
+  ## 重新连接集成
+</div>
+
+如果某个已连接的服务停止工作 (例如登录会话过期或权限发生变更) ，Replit 会在 Project Editor 中显示重新连接提醒。点击该提醒即可直接重新连接集成，无需离开编辑器。
+
+<div id="depurando-conectores">
+  ## 调试 连接器
+</div>
+
+连接服务时遇到问题？以下指南汇总了最常见的错误及其解决方法。
+
+<AccordionGroup>
+  <Accordion title="Google Workspace：&#x22;This app is blocked&#x22;">
+    如果在连接 Google Drive、Docs、Sheets、Calendar 或 Gmail 时看到 **&quot;This app is blocked&quot;**，很可能是你所在组织的 Google Workspace 限制了第三方 OAuth 应用。请参阅完整的故障排查指南来解决该问题。
+
+    [解决 Google 连接器 的 &quot;This app is blocked&quot; 问题](/zh/pt/features/troubleshooting/debugging-google-connectors)
+  </Accordion>
+
+  <Accordion title="Salesforce：&#x22;Connection Expired&#x22;">
+    如果你的 Salesforce 连接器 停止工作并报 **&quot;Connection Expired&quot;** 错误，很可能是你所在组织在 Salesforce 中的 refresh token 策略设置为令牌在一定时间后过期。请参阅完整的故障排查指南来更新 Connected App 的设置。
+
+    [修复 Salesforce 连接过期错误](/zh/pt/features/troubleshooting/debugging-salesforce-connectors)
+  </Accordion>
+</AccordionGroup>

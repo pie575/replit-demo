@@ -1,0 +1,161 @@
+---
+title: "设计着陆页"
+description: "基于 Notion 需求简报和品牌素材文件，在 Replit Design 中设计候补名单页或上线页面。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                这不是原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+适用于还没有页面的情况：新产品、等候名单或营销活动。以 Notion 中的简报和
+Google Drive 中的品牌文件为依据，在 Replit Design 中设计着陆页：
+主视觉、佐证、运作方式，以及一个行动号召。Agent 会使用 Notion 中的卖点与文案，
+以及 Drive 中的徽标、配色和字体排版。这不是用代码实现的网站，而是
+页面的视觉体系。真正动手构建时，把这些框架当作规格说明来用。
+
+<div id="section">
+  ## 适合人群
+</div>
+
+* 产品尚未上线，需要制作候补名单页或上线页面的产品设计师
+* 需要基于 Notion 简报和 Drive 素材，快速做出首个契合品牌调性布局的创业者
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "简报：卖点、目标受众、佐证、行动号召",
+},
+{
+id: "google-drive",
+name: "Google Drive",
+why: "徽标、配色、字体排版、品牌素材",
+},
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+请准备一个包含简报 (卖点、受众、行动号召) 的 Notion 页面，以及 Drive 中的品牌文件，并连接 Notion 和 Drive。请告诉我们页面面向的受众是谁，以及主要行动号召应该是什么 (注册、加入候补名单、预约演示或购买) 。
+
+<div id="agent">
+  ## 向 Agent 提出请求
+</div>
+
+<AiPrompt>
+  请根据这个 Notion 页面[链接]以及 Google Drive 中的品牌文件，
+  在 Replit Design 中为[候补名单/上线/预约演示]设计一个着陆页。
+  请沿用 Notion 中的卖点、目标受众、佐证和行动号召。请分别创建桌面端和
+  移动端框架：包含单一行动号召的主视觉区、社会证明、运作方式，
+  以及结尾的行动号召。请沿用现有的徽标、配色和字体排版。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期结果
+</div>
+
+Agent 会读取 Notion 简报和 Drive 品牌文件，然后在 Replit Design 中布置框架。你得到的
+是桌面端页面和移动端裁切版本，而不是已部署的应用。实际构建时，可以把这些框架当作规格说明
+来用，也可以在后续的 Build 工作流中让 Agent 来实现。桌面端和移动端可以并排预览。在把
+框架定为最终版之前，请对照 Notion 和 Drive 核对行动号召、佐证要点和配色。
+
+<div id="section-5">
+  ## 根据自己的需求调整
+</div>
+
+<AiPrompt>
+  请把它做成一个候补名单着陆页：一个核心承诺、三个佐证要点、邮箱收集，不要额外的导航。佐证要点请从 Notion 中获取。
+</AiPrompt>
+
+<AiPrompt>
+  请根据这个 Notion 表格[链接]添加三档定价方案区块。保持现有的视觉体系，并突出中间的那档方案。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排查
+</div>
+
+* **文案没有依据简报生成：** 请提供 Notion 页面链接，并要求 Agent 使用其中的卖点、目标受众、佐证和行动号召，而不是在站点上重新撰写。
+* **配色和字体与品牌不符：** 连接 Drive，并指定徽标、配色和字体文件。
+* **期望得到一个真实站点：** 此工作流生成的是 Replit Design 中的框架，而非已部署的应用。你可以将该框架用作规格说明，或在后续的 Build 工作流中要求 Agent 进行实现。
+
+<div id="section-7">
+  ## 相关文档
+</div>
+
+<CardGroup cols={2}>
+  <Card title="制作社交图标与横幅" href="/zh/ko/use-cases/create-social-kit">
+    头像和封面素材同样使用这套 Google Drive 品牌文件。
+  </Card>
+
+  <Card title="上线付费活动网站" href="/zh/ko/use-cases/launch-event-website">
+    不仅是框架，公开页面也使用同一个 Notion 数据源。
+  </Card>
+</CardGroup>

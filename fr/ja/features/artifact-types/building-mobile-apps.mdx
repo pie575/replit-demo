@@ -1,0 +1,717 @@
+---
+title: "Applications mobiles natives"
+description: "Découvrez comment créer des applications mobiles natives avec Agent, les tester sur votre smartphone et les soumettre à l'App Review en vue d'une publication sur l'App Store."
+---
+
+export const MobileArchitectureDiagram = () => {
+  if (typeof document !== 'undefined' && !document.getElementById('mobile-arch-styles-v3')) {
+    const style = document.createElement('style');
+    style.id = 'mobile-arch-styles-v3';
+    style.textContent = `
+      .mobile-arch-v3 {
+        --arch-bg: var(--replit-docs-bg, #F6F6F4);
+        --arch-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --arch-border: var(--replit-docs-border, #DEDAD5);
+        --arch-text: var(--replit-docs-text, #1D1D1D);
+        --arch-muted: var(--replit-docs-text-subtle, #858585);
+        --arch-accent: #F26522;
+        --arch-accent-soft: #FEF3EE;
+      }
+      
+      .dark .mobile-arch-v3,
+      html.dark .mobile-arch-v3,
+      [data-theme="dark"] .mobile-arch-v3 {
+        --arch-bg: var(--replit-docs-bg, #1E1E1F);
+        --arch-surface: var(--replit-docs-bg-elevated, #222223);
+        --arch-border: var(--replit-docs-border, #39393D);
+        --arch-text: var(--replit-docs-text, #F5F5F5);
+        --arch-muted: var(--replit-docs-text-subtle, #8E8F97);
+        --arch-accent: #F26522;
+        --arch-accent-soft: #1F1A17;
+      }
+
+      .arch-panel {
+        transition: all 0.25s ease;
+      }
+      .arch-panel:hover {
+        border-color: var(--arch-accent) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const serverItems = [{
+    label: 'Database',
+    detail: 'PostgreSQL for structured data'
+  }, {
+    label: 'Object Storage',
+    detail: 'Files, images, and media'
+  }, {
+    label: 'Secrets',
+    detail: 'API keys stored securely'
+  }, {
+    label: 'API routes',
+    detail: 'Server-side logic and endpoints'
+  }];
+  const clientItems = [{
+    label: 'Native UI',
+    detail: 'Real iOS and Android components'
+  }, {
+    label: 'Local state',
+    detail: 'Fast, offline-capable data'
+  }, {
+    label: 'Device APIs',
+    detail: 'Camera, location, notifications'
+  }, {
+    label: 'Live reload',
+    detail: 'Instant preview via Expo Go'
+  }];
+  return <div className="mobile-arch-v3" style={{
+    padding: '24px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-bg)'
+  }}>
+      {}
+      <div style={{
+    marginBottom: '20px'
+  }}>
+        <div style={{
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--arch-text)'
+  }}>
+          Architecture
+        </div>
+        <div style={{
+    fontSize: '14px',
+    color: 'var(--arch-muted)',
+    marginTop: '4px'
+  }}>
+          Your server runs on Replit. The app runs natively on devices.
+        </div>
+      </div>
+
+      {}
+      <div style={{
+    display: 'flex',
+    alignItems: 'stretch',
+    gap: '16px'
+  }}>
+        
+        {}
+        <div className="arch-panel" style={{
+    flex: 1,
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-surface)'
+  }}>
+          <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-accent)',
+    fontWeight: '600',
+    marginBottom: '6px'
+  }}>
+            Replit Cloud
+          </div>
+          <div style={{
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--arch-text)',
+    marginBottom: '16px'
+  }}>
+            Server
+          </div>
+          
+          <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  }}>
+            {serverItems.map(item => <div key={item.label}>
+                <div style={{
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--arch-text)'
+  }}>
+                  {item.label}
+                </div>
+                <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-muted)',
+    marginTop: '2px'
+  }}>
+                  {item.detail}
+                </div>
+              </div>)}
+          </div>
+        </div>
+
+        {}
+        <div className="arch-panel" style={{
+    flex: 1,
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-surface)'
+  }}>
+          <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-accent)',
+    fontWeight: '600',
+    marginBottom: '6px'
+  }}>
+            User device
+          </div>
+          <div style={{
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--arch-text)',
+    marginBottom: '16px'
+  }}>
+            Native app
+          </div>
+          
+          <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  }}>
+            {clientItems.map(item => <div key={item.label}>
+                <div style={{
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--arch-text)'
+  }}>
+                  {item.label}
+                </div>
+                <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-muted)',
+    marginTop: '2px'
+  }}>
+                  {item.detail}
+                </div>
+              </div>)}
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+export const MobileStackDiagram = () => {
+  if (typeof document !== 'undefined' && !document.getElementById('mobile-stack-styles-v3')) {
+    const style = document.createElement('style');
+    style.id = 'mobile-stack-styles-v3';
+    style.textContent = `
+      .mobile-stack-v3 {
+        --stack-bg: var(--replit-docs-bg, #F6F6F4);
+        --stack-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --stack-border: var(--replit-docs-border, #DEDAD5);
+        --stack-text: var(--replit-docs-text, #1D1D1D);
+        --stack-muted: var(--replit-docs-text-subtle, #858585);
+        --stack-accent: #F26522;
+        --stack-accent-soft: #FEF3EE;
+      }
+      
+      .dark .mobile-stack-v3,
+      html.dark .mobile-stack-v3,
+      [data-theme="dark"] .mobile-stack-v3 {
+        --stack-bg: var(--replit-docs-bg, #1E1E1F);
+        --stack-surface: var(--replit-docs-bg-elevated, #222223);
+        --stack-border: var(--replit-docs-border, #39393D);
+        --stack-text: var(--replit-docs-text, #F5F5F5);
+        --stack-muted: var(--replit-docs-text-subtle, #8E8F97);
+        --stack-accent: #F26522;
+        --stack-accent-soft: #1F1A17;
+      }
+
+      .stack-layer {
+        transition: all 0.25s ease;
+        cursor: pointer;
+      }
+      .stack-layer:hover,
+      .stack-layer.active {
+        background: var(--stack-accent-soft) !important;
+        border-color: var(--stack-accent) !important;
+      }
+      .stack-layer .layer-detail {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+        margin-top: 0;
+      }
+      .stack-layer.active .layer-detail {
+        max-height: 80px;
+        opacity: 1;
+        margin-top: 8px;
+      }
+      
+      .platform-item {
+        transition: all 0.2s ease;
+      }
+      .platform-item:hover {
+        border-color: var(--stack-accent) !important;
+        background: var(--stack-accent-soft) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleLayerClick = e => {
+    const layer = e.currentTarget;
+    const allLayers = document.querySelectorAll('.stack-layer');
+    const wasActive = layer.classList.contains('active');
+    allLayers.forEach(l => l.classList.remove('active'));
+    if (!wasActive) {
+      layer.classList.add('active');
+    }
+  };
+  const runAnimation = () => {
+    const btn = document.getElementById('stack-animate-btn');
+    if (!btn || btn.dataset.running === 'true') return;
+    btn.dataset.running = 'true';
+    btn.textContent = 'Running...';
+    btn.style.opacity = '0.6';
+    const layers = document.querySelectorAll('.stack-layer');
+    const platforms = document.getElementById('stack-platforms-container');
+    let step = 0;
+    const totalSteps = layers.length + 1;
+    const animate = () => {
+      layers.forEach(l => l.classList.remove('active'));
+      if (platforms) platforms.style.borderColor = 'var(--stack-border)';
+      if (step < layers.length) {
+        layers[step].classList.add('active');
+        step++;
+        setTimeout(animate, 4000);
+      } else if (step === layers.length) {
+        if (platforms) platforms.style.borderColor = 'var(--stack-accent)';
+        step++;
+        setTimeout(animate, 4000);
+      } else {
+        layers.forEach(l => l.classList.remove('active'));
+        if (platforms) platforms.style.borderColor = 'var(--stack-border)';
+        btn.dataset.running = 'false';
+        btn.textContent = 'See the flow';
+        btn.style.opacity = '1';
+      }
+    };
+    animate();
+  };
+  const layers = [{
+    title: 'Replit Agent',
+    summary: 'Builds your app from a prompt',
+    detail: 'Describe what you want in natural language. Agent writes TypeScript code, configures dependencies, and sets up your project.',
+    verb: 'writes'
+  }, {
+    title: 'Your code',
+    summary: 'TypeScript + React components',
+    detail: 'Your app is standard React code that you own and can customize. No vendor lock-in.',
+    verb: 'using'
+  }, {
+    title: 'Expo',
+    summary: 'Development framework',
+    detail: 'Expo simplifies React Native development with managed builds, over-the-air updates, and easy access to device APIs.',
+    verb: 'simplifies'
+  }, {
+    title: 'React Native',
+    summary: 'Cross-platform UI',
+    detail: 'React Native compiles your JavaScript to real native code, not a web view. True native performance.',
+    verb: 'compiles to'
+  }];
+  const platforms = ['iOS', 'Android', 'Web'];
+  return <div className="mobile-stack-v3" style={{
+    padding: '24px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-bg)'
+  }}>
+      {}
+      <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '20px'
+  }}>
+        <div>
+          <div style={{
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--stack-text)'
+  }}>
+            Technology stack
+          </div>
+          <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    marginTop: '4px'
+  }}>
+            Tap any layer to learn more
+          </div>
+        </div>
+        <button id="stack-animate-btn" onClick={runAnimation} data-running="false" style={{
+    padding: '8px 14px',
+    fontSize: '13px',
+    color: 'var(--stack-accent)',
+    background: 'transparent',
+    border: '1px solid var(--stack-accent)',
+    borderRadius: '4px',
+    cursor: 'pointer'
+  }}>
+          See the flow
+        </button>
+      </div>
+
+      {}
+      <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  }}>
+        {layers.map(layer => <div key={layer.title}>
+            <div className="stack-layer" onClick={handleLayerClick} style={{
+    padding: '16px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-surface)'
+  }}>
+              <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }}>
+                <div>
+                  <div style={{
+    fontSize: '16px',
+    fontWeight: '500',
+    color: 'var(--stack-text)'
+  }}>
+                    {layer.title}
+                  </div>
+                  <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    marginTop: '4px'
+  }}>
+                    {layer.summary}
+                  </div>
+                </div>
+                <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-accent)',
+    fontWeight: '500'
+  }}>
+                  {layer.verb}
+                </div>
+              </div>
+              <div className="layer-detail" style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    lineHeight: '1.5'
+  }}>
+                {layer.detail}
+              </div>
+            </div>
+          </div>)}
+      </div>
+
+      {}
+      <div id="stack-platforms-container" style={{
+    display: 'flex',
+    gap: '12px',
+    padding: '12px',
+    marginTop: '8px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-surface)',
+    transition: 'border-color 0.25s ease'
+  }}>
+        {platforms.map(platform => <div key={platform} className="platform-item" style={{
+    flex: 1,
+    padding: '12px',
+    borderRadius: '6px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-bg)',
+    textAlign: 'center',
+    fontSize: '15px',
+    fontWeight: '500',
+    color: 'var(--stack-text)'
+  }}>
+            {platform}
+          </div>)}
+      </div>
+    </div>;
+};
+
+<Frame>
+  <img src="/assets/mirror/mobile-screen-e5685fc26793.png" alt="Une application mobile lancée dans l'aperçu de l'éditeur de projet Replit, avec le panneau d'aperçu et un code QR affichés sur l'appareil" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
+</Frame>
+
+Utilisez Agent pour créer des applications iOS et Android, les prévisualiser sur votre smartphone et préparer les builds grâce à un flux guidé.
+
+<Note>
+  Pour créer ou prévisualiser des applications iOS natives, utilisez l&#39;éditeur de projet sur [replit.com](https://replit.com). Le travail sur les applications mobiles natives est également possible depuis l&#39;application Replit pour Android, lorsque cela est pris en charge.
+</Note>
+
+<div id="section">
+  ## Pour commencer
+</div>
+
+Vous pouvez créer une application mobile fonctionnelle en quelques étapes :
+
+<Steps>
+  <Step title="Créer une application mobile">
+    Sur l&#39;écran d&#39;accueil de Replit, décrivez l&#39;idée de votre application et sélectionnez **Application mobile** comme type d&#39;application.
+
+    <Frame>
+      <img src="/assets/mirror/prompt-5cb144699b45.png" alt="Prompt sur l'écran d'accueil de Replit avec Application mobile sélectionné" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Tester votre application">
+    Il existe deux façons de prévisualiser votre application mobile pendant sa création :
+
+    * **Dans l&#39;éditeur de projet** : dans le sélecteur d&#39;appareil du panneau d&#39;aperçu, choisissez **Simulateur iOS** ou **Émulateur Android**. Un véritable simulateur est diffusé directement dans l&#39;éditeur de projet : vous pouvez donc interagir avec l&#39;application au doigt sans quitter Replit. Ni Xcode ni Android Studio ne sont nécessaires.
+    * **Test sur appareil réel avec Expo Go** : installez [Expo Go](https://expo.dev/go) sur votre iPhone ou votre appareil Android. Dans le panneau d&#39;aperçu de l&#39;éditeur de projet, sélectionnez **Ouvrir dans Expo Go**, puis scannez le code QR.
+
+    <Frame>
+      <img src="/assets/mirror/workspace-dda0f81e6b83.png" alt="Éditeur de projet Replit affichant l'aperçu de l'application et les options d'aperçu sur appareil mobile" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Itérer avec Agent">
+    Demandez à Agent d&#39;ajouter des fonctionnalités, de se connecter à des sources de données ou d&#39;intégrer des services. Continuez à tester dans le simulateur ou sur votre smartphone au fil de vos itérations.
+  </Step>
+</Steps>
+
+<Tip>
+  Le **Simulateur iOS** et l&#39;**Émulateur Android** de l&#39;éditeur de projet affichent la version native de votre application, avec le style propre à chaque plateforme et la plupart des composants natifs. Pour les fonctionnalités qui dépendent du matériel réel, comme le retour haptique, l&#39;appareil photo, les notifications push ou la localisation, testez sur un appareil réel avec Expo Go.
+</Tip>
+
+<div id="section-2">
+  ## Prévisualiser dans un simulateur ou un émulateur
+</div>
+
+Avec Replit, vous pouvez utiliser Expo pour exécuter et tester des applications mobiles sur votre téléphone. Replit diffuse également un véritable **simulateur iOS** ou **émulateur Android** directement dans le panneau d&#39;aperçu. Les modifications effectuées avec Agent sont rechargées à chaud dans le simulateur et fonctionnent comme sur un appareil réel.
+
+<Note>
+  Les aperçus du simulateur iOS et de l’émulateur Android sont disponibles pour les créateurs disposant des forfaits Core, Pro et Enterprise. Uniquement pour les applications mobiles : l’option est masquée pour les projets exclusivement web.
+</Note>
+
+<div id="section-3">
+  ### Comment ouvrir le simulateur
+</div>
+
+<Steps>
+  <Step title="Ouvrir un projet mobile">
+    Ouvrez un projet contenant un artefact mobile.
+  </Step>
+
+  <Step title="Sélectionner un appareil">
+    Dans le sélecteur d&#39;appareil du panneau d&#39;aperçu situé en haut, choisissez **Simulateur iOS** ou **Émulateur Android**. Le simulateur se lance à la place de l&#39;aperçu web.
+  </Step>
+
+  <Step title="Interagir comme sur un appareil réel">
+    Utilisez la souris et le clavier pour toucher, balayer, saisir du texte et naviguer. Pour recharger l&#39;application sans redémarrer le simulateur, sélectionnez **Redémarrer** dans la barre d&#39;outils.
+  </Step>
+</Steps>
+
+<Tip>
+  Le simulateur s&#39;exécute dans le cloud et est diffusé vers votre navigateur : aucun téléchargement ni aucune configuration n&#39;est nécessaire. Les fichiers de votre projet restent sur Replit.
+</Tip>
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/ios-emulator-9013ff1b602f.mp4" />
+</Frame>
+
+<div id="section-4">
+  ### Prise en charge des navigateurs
+</div>
+
+* **Chrome**, **Safari** et les navigateurs basés sur Chromium sont entièrement pris en charge.
+* **Firefox** n&#39;est pas pris en charge. Si vous ouvrez Replit dans Firefox, les options iOS et Android sont désactivées et la mention « Firefox n&#39;est pas pris en charge » s&#39;affiche. Cette limitation est due à la technologie de streaming sur laquelle reposent les simulateurs.
+
+<div id="expo-go">
+  ### Quand utiliser Expo Go à la place
+</div>
+
+Si vous devez tester des fonctionnalités qui dépendent du matériel réel, ou si vous souhaitez partager un aperçu avec des personnes qui ne sont pas devant leur ordinateur, utilisez Expo Go sur un appareil physique :
+
+* Caméra, microphone, retour haptique et autres capteurs natifs
+* Notifications push
+* Géolocalisation GPS réelle
+* Partage d&#39;aperçus de développement avec des coéquipiers, des testeurs ou des investisseurs
+
+Pour Build votre application avec Expo Go, ouvrez votre projet sur [replit.com](https://replit.com), sélectionnez **Ouvrir dans Expo Go** dans le panneau d&#39;aperçu de l&#39;éditeur de projet, puis scannez le code QR avec l&#39;application [Expo Go](https://expo.dev/go) sur votre smartphone.
+
+<div id="section-5">
+  ### Simulateur en plein écran
+</div>
+
+Depuis la carte d&#39;artefact mobile, sélectionnez **Autres actions** → **Ouvrir dans le simulateur iOS** ou **Ouvrir dans l&#39;émulateur Android** pour ouvrir le simulateur dans un onglet dédié et profiter d&#39;une zone d&#39;affichage plus grande.
+
+<div id="section-6">
+  ## Pourquoi créer une application mobile ?
+</div>
+
+Créez une application mobile lorsque vous avez besoin des éléments suivants :
+
+* **Expérience native** : performances rapides, interactions fluides et interface conforme aux standards de la plateforme.
+* **Fonctionnalités de l&#39;appareil** : appareil photo, notifications push, géolocalisation, etc.
+* **Distribution sur l&#39;App Store** : une fiche partageable que les utilisateurs peuvent découvrir et installer, une fois le processus de validation d&#39;Apple terminé.
+
+<div id="section-7">
+  ## Fonctionnalités principales
+</div>
+
+* **Création axée sur l’IA** : décrivez votre application et Agent crée la structure d’une application mobile fonctionnelle.
+* **Aperçu dans l’éditeur de projet** : testez-la dans le simulateur iOS ou l’émulateur Android sans quitter Replit, ou prévisualisez-la sur votre téléphone avec Expo Go.
+* **Full stack par défaut** : ajoutez des routes côté serveur, une base de données, App Storage, des connecteurs et des intégrations d’IA à mesure que votre application évolue.
+* **Soumission guidée** : préparez des builds pour TestFlight et l’App Store sans avoir à gérer une chaîne d’outils iOS locale.
+
+<div id="section-8">
+  ## Flux de développement
+</div>
+
+Il existe trois étapes pour accéder à votre app, chacune avec son public et ses fonctionnalités :
+
+| Étape             | Qui peut y accéder               | Méthode d&#39;accès                                            | Idéal pour                                            |
+| ----------------- | -------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| **Développement** | Vous                             | Simulateur de l&#39;éditeur de projet, ou code QR pour Expo Go | Créer et itérer                                       |
+| **Déploiement**   | Testeurs disposant d&#39;Expo Go | URL publique avec code QR                                      | Aperçus de développement, prototypage, démonstrations |
+| **App Store**     | Tout le monde                    | Téléchargement depuis l&#39;App Store après l&#39;App Review   | Mise en production                                    |
+
+**Développement** : lorsque vous lancez votre app, vous pouvez la prévisualiser dans le **simulateur iOS** ou l&#39;**émulateur Android** de l&#39;éditeur de projet, ou scanner le code QR du panneau d&#39;aperçu pour l&#39;ouvrir dans Expo Go sur votre téléphone.
+
+**Déploiement** : lorsque vous cliquez sur **Publier**, Replit crée une URL publique accompagnée d&#39;un code QR pour Expo Go. C&#39;est idéal pour les aperçus de développement et le prototypage : vous pouvez la montrer à des investisseurs, recueillir des retours ou la tester avec des amis avant de vous lancer dans le processus de l&#39;App Store.
+
+**App Store** : lorsque vous soumettez votre app à l&#39;App Store, Apple la passe en revue, puis elle peut être téléchargée et installée depuis l&#39;App Store. Un compte Apple Developer est nécessaire.
+
+<div id="section-9">
+  ## Vue d&#39;ensemble de la publication
+</div>
+
+Lorsque vous préparez une version iOS, le processus se déroule généralement ainsi :
+
+* Publiez depuis l&#39;éditeur de projet
+* Soumettez la build à TestFlight
+* Faites passer la build TestFlight vers l&#39;App Store depuis App Store Connect
+
+<Note>
+  Apple exige une adhésion à l&#39;Apple Developer Program pour soumettre des builds à TestFlight et à l&#39;App Store.
+</Note>
+
+Pour un guide complet, consultez le tutoriel [Créer et lancer une application mobile](/fr/ja/build/mobile-app).
+
+<div id="section-10">
+  ## Où créer des applications mobiles natives
+</div>
+
+L&#39;environnement Replit s&#39;exécute dans le cloud, et non sur votre machine locale. Pour créer une application mobile native, utilisez l&#39;éditeur de projet sur [replit.com](https://replit.com). Les workflows d&#39;applications mobiles — génération de la structure par Agent, aperçu avec Expo Go, tests sur simulateur et émulateur, builds TestFlight, soumission à l&#39;App Store — s&#39;exécutent tous dans l&#39;éditeur de projet.
+
+Vous pouvez également travailler sur vos applications mobiles natives depuis l&#39;[application Replit pour Android](/fr/ja/features/platforms/mobile-app), qui est prise en charge. Si vous utilisez l&#39;application Replit pour iOS, ouvrez votre projet sur [replit.com](https://replit.com) pour créer, prévisualiser, compiler et soumettre vos applications mobiles natives.
+
+<div id="section-11">
+  ## Comment fonctionne la technologie
+</div>
+
+Les applications mobiles reposent sur un ensemble de technologies qui fonctionnent de concert. Cette section explique ce qui fait fonctionner votre application et comment chaque élément s&#39;articule avec les autres.
+
+<div id="section-12">
+  ### La pile technologique
+</div>
+
+<MobileStackDiagram />
+
+* **React Native** est un framework open source qui permet d&#39;écrire une seule base de code et de la compiler pour iOS, Android et le web. Plutôt que des vues web, il affiche les composants d&#39;interface natifs de chaque plateforme.
+* **Expo** simplifie le développement avec React Native : il prend en charge les builds, gère les modules natifs et fournit des outils comme Expo Go pour la prévisualisation.
+* **Expo Go** est une application gratuite à installer sur votre smartphone. Elle vous permet d&#39;exécuter des aperçus de développement sur un appareil réel, sans avoir à générer un binaire natif complet.
+
+Lorsque vous lancez votre application, le bundler Metro compile votre code et l&#39;envoie sur l&#39;appareil. Faute de cache, le premier build prend du temps. Les suivants sont beaucoup plus rapides.
+
+<div id="section-13">
+  ### Architecture : serveur et client
+</div>
+
+Lorsque vous prévisualisez une application mobile ou que vous la préparez pour la distribution, vous manipulez deux éléments :
+
+1. **Le serveur** : il s&#39;exécute sur Replit, dans le cloud. Il gère la base de données, les routes API, les intégrations d&#39;IA et la logique backend.
+2. **L&#39;application cliente** : elle s&#39;exécute sur le smartphone de l&#39;utilisateur. Pendant le développement, elle est prévisualisée dans Expo Go ; après validation, il s&#39;agit d&#39;une application native distribuée via les app stores.
+
+<MobileArchitectureDiagram />
+
+Cette séparation apporte de la souplesse. Vous pouvez exécuter la logique complexe sur le serveur (avec accès à Database, Object Storage et aux connectors de Replit) tout en gardant le client léger. Au fil de votre développement, demandez-vous ce qui doit se passer sur le smartphone et ce qui doit se passer dans le cloud.
+
+<div id="section-14">
+  ## Points à prendre en compte
+</div>
+
+* **Conditions de publication** : Apple définit les exigences de TestFlight et de l&#39;App Store, et examine les apps iOS avant leur distribution.
+* **Publication sur Android** : vous pouvez créer des apps multiplateformes pour iOS et Android. La publication sur Google Play n&#39;est pas encore prise en charge dans l&#39;expérience guidée, mais vous pouvez l&#39;effectuer manuellement.
+* **Modifications natives** : les changements tels que l&#39;icône de l&#39;app ou les autorisations nécessitent généralement une nouvelle version destinée à la boutique.
+
+<div id="section-15">
+  ## Dépannage
+</div>
+
+Si vous rencontrez des problèmes lors du développement de votre application mobile, consultez la page [Dépannage des applications mobiles](/fr/ja/features/troubleshooting/mobile-app), qui présente les problèmes courants et leurs solutions.
+
+<div id="section-16">
+  ## Prochaines étapes
+</div>
+
+* Découvrez le fonctionnement d&#39;Agent : [Agent](/fr/ja/features/agent/overview)
+* Explorez les intégrations : [Intégrations](/fr/ja/features/integrations/overview)
+* Utilisez Replit sur mobile : [Application mobile Replit](/fr/ja/features/platforms/mobile-app)
+* En savoir plus sur Expo : [Expo](https://expo.dev/)
+* Gérez TestFlight et vos soumissions : [App Store Connect](https://appstoreconnect.apple.com/)
+
+<div id="section-17">
+  ## Questions fréquentes
+</div>
+
+<AccordionGroup>
+  <Accordion title="Qu’est-ce qu’Expo ?">
+    Expo est l&#39;outil qu&#39;Agent utilise pour créer des applications mobiles sur Replit. Il s&#39;agit d&#39;une plateforme et d&#39;une chaîne d&#39;outils open source permettant de créer, exécuter et déployer des applications natives multiplateformes avec React Native. Pour en savoir plus, consultez [https://expo.dev.](https://expo.devをご覧ください。)
+  </Accordion>
+
+  <Accordion title="Qu’est-ce que React Native ?">
+    React Native est le framework open source de Meta permettant de créer des applications natives iOS et Android avec React et JavaScript ou TypeScript. Comme il affiche les composants d&#39;interface natifs de la plateforme plutôt que des vues web, votre application offre l&#39;apparence et le comportement d&#39;une application native.
+  </Accordion>
+
+  <Accordion title="Qu’est-ce qu’Expo Go ?">
+    Expo Go est une application gratuite à installer sur votre smartphone depuis l&#39;App Store ou Google Play. Elle vous permet de prévisualiser vos applications mobiles en cours de développement, sans avoir à générer un binaire natif complet. Lorsque vous scannez le code QR dans l&#39;éditeur de projet, Expo Go télécharge le code de l&#39;application et le Build.
+  </Accordion>
+
+  <Accordion title="Quelle est la différence entre Expo Go et les builds de développement ?">
+    **Expo Go** est une application précompilée qui exécute votre code. Sa configuration est rapide, mais elle ne prend en charge que les modules inclus dans le SDK Expo.
+
+    Une **build de développement** est un binaire natif personnalisé qui peut inclure n&#39;importe quel module natif. Elle demande davantage de configuration (EAS Build ou Xcode/Android Studio en local), mais offre plus de souplesse.
+
+    Replit utilise Expo Go pour les aperçus de développement. Si vous avez besoin de modules natifs non pris en charge par Expo Go, envisagez éventuellement une build de développement en consultant la [documentation d&#39;Expo](https://docs.expo.dev/develop/development-builds/introduction/).
+  </Accordion>
+
+  <Accordion title="Quelle est la différence avec une application web responsive ?">
+    Une application web responsive est un site web dont la mise en page s&#39;adapte au navigateur. Une application React Native, elle, est une application native installée sur l&#39;appareil : elle utilise les API de la plateforme (caméra, retour haptique, notifications push), offre un meilleur accès au matériel et aux fonctionnalités hors ligne, et se distribue via les boutiques d&#39;applications. Le web responsive l&#39;emporte sur la portée et l&#39;absence d&#39;installation, tandis que le natif s&#39;impose dès que vous avez besoin des capacités de l&#39;appareil, de performances ou d&#39;une distribution sur l&#39;App Store.
+  </Accordion>
+
+  <Accordion title="Ai-je besoin d’un Mac ou de Xcode ?">
+    Non. Replit et Expo gèrent le processus de build dans le cloud.
+  </Accordion>
+
+  <Accordion title="Puis-je prévisualiser sans compte Apple Developer ?">
+    Oui. Vous pouvez prévisualiser votre projet dans le simulateur iOS de l’éditeur de projet ou dans Expo Go sur votre smartphone. Vous n’avez besoin d’un compte Apple Developer que lorsque vous êtes prêt à soumettre votre App à TestFlight ou à l’App Store.
+  </Accordion>
+
+  <Accordion title="Android est-il pris en charge ?">
+    Oui. Vous pouvez créer des applications multiplateformes pour iOS et Android à partir d&#39;une même base de code. L&#39;aperçu est possible dans l&#39;émulateur Android de l&#39;éditeur de projet ou sur un appareil Android via Expo Go. La publication sur Google Play peut se faire manuellement.
+  </Accordion>
+
+  <Accordion title="Qu’advient-il des serveurs et de la base de données ?">
+    Utilisez PostgreSQL, l&#39;Object Storage, les connecteurs et les intégrations d&#39;IA intégrés à Replit — aucune infrastructure distincte n&#39;est nécessaire. Le serveur s&#39;exécute sur Replit, et l&#39;application mobile s&#39;y connecte.
+  </Accordion>
+
+  <Accordion title="Dois-je tester avec le simulateur de l’éditeur de projet ou sur un appareil réel ?">
+    Utilisez les deux selon les situations. Le **simulateur iOS** et l&#39;**émulateur Android** de l&#39;éditeur de projet affichent la version native de votre application et couvrent la majorité des tests quotidiens (mise en page, navigation, composants natifs, style propre à chaque plateforme). Lorsque vous devez tester des fonctionnalités qui dépendent du matériel réel, comme l&#39;appareil photo, le retour haptique, les notifications push ou la localisation GPS, passez à un appareil physique avec **Expo Go**.
+  </Accordion>
+</AccordionGroup>

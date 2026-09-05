@@ -1,0 +1,375 @@
+---
+title: "Clerk Auth"
+description: "Découvrez comment Clerk Auth apporte à votre Replit App un système d'authentification dédié, doté d'une image de marque personnalisable, de comptes utilisateurs indépendants et de fournisseurs SSO."
+---
+
+Clerk Auth apporte à votre application un système d&#39;authentification dédié, reposant sur [Clerk](https://clerk.com). Contrairement à [Replit Auth](/fr/ja/features/auth-and-identity/authentication), qui crée des comptes Replit via le système de connexion de Replit, Clerk Auth provisionne un **tenant Clerk distinct**, réservé à votre application. Les utilisateurs de votre application créent leur compte directement dans celle-ci, et non un compte Replit. Vous gardez ainsi la maîtrise totale de l&#39;image de marque, des méthodes de connexion et de l&#39;expérience de connexion.
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/auth-vid-e89aaccd245e.mp4" />
+</Frame>
+
+<Note>
+  **Clerk Auth ou Replit Auth ?** — Avec **Clerk Auth** (cette page), votre application dispose de son propre tenant d&#39;authentification, avec une image de marque entièrement personnalisable et des comptes utilisateurs indépendants de Replit. Avec **[Replit Auth](/fr/ja/features/auth-and-identity/authentication)**, les utilisateurs se connectent avec leur compte Replit et voient une page de connexion aux couleurs de Replit. Choisissez Clerk Auth si vous souhaitez appliquer votre propre image de marque à l&#39;expérience de connexion ou si vous avez besoin de comptes utilisateurs indépendants de Replit.
+</Note>
+
+<div id="clerk-auth-vs-replit-auth">
+  ## Comparaison entre Clerk Auth et Replit Auth
+</div>
+
+|                             | Clerk Auth                                                                                      | Replit Auth                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Comptes utilisateurs**    | Les utilisateurs créent un compte dans l&#39;application (aucun compte Replit n&#39;est requis) | Les utilisateurs se connectent avec leur compte Replit                                         |
+| **Image de marque**         | Entièrement personnalisable — nom, icône et couleurs de l&#39;application                       | Page de connexion aux couleurs de Replit                                                       |
+| **Identifiants SSO**        | Utilise des identifiants OAuth distincts pour chaque fournisseur                                | Utilise l&#39;application OAuth partagée de Replit                                             |
+| **Environnements**          | Environnements de développement et de production distincts                                      | Environnement unique                                                                           |
+| **Programme de parrainage** | Aucune intégration avec le programme de parrainage Replit                                       | Les inscriptions sont comptabilisées dans Replit Referrals                                     |
+| **Idéal pour**              | Applications à l&#39;image de marque personnalisée, produits professionnels ou commerciaux      | Configuration rapide, applications pour lesquelles l&#39;image de marque Replit est acceptable |
+
+<div id="section">
+  ## Prise en main
+</div>
+
+Ajoutez Clerk Auth à votre application en l&#39;incluant dans votre prompt Agent :
+
+```
+Help me create an app that [your app idea] and should feature Clerk Auth.
+```
+
+Agent s&#39;occupe de tout : création du tenant Clerk, stockage des identifiants, configuration des routes, ajout du middleware, etc. Aucun compte Clerk ni aucune configuration manuelle n&#39;est nécessaire.
+
+<div id="clerk-authreplit">
+  ## Fonctionnement de Clerk Auth sur Replit
+</div>
+
+Lorsque l&#39;Agent configure Clerk Auth dans votre application, voici ce qui se passe :
+
+1. **Création d&#39;un tenant Clerk dédié** — votre application dispose de sa propre application Clerk, avec des environnements de développement et de production distincts
+2. **Provisionnement des identifiants** — les clés d&#39;API et les secrets sont stockés sous forme de variables d&#39;environnement
+3. **Configuration du proxy** — l&#39;authentification fonctionne de manière transparente sur votre domaine publié
+4. **Mise en place des routes de connexion et d&#39;inscription** — des composants React Clerk prêts à l&#39;emploi sont ajoutés à votre application
+5. **Ajout d&#39;un middleware côté serveur** — vos routes d&#39;API sont protégées par le middleware Express de Clerk
+
+<Note>
+  Vous n&#39;avez ni compte Clerk à créer ni infrastructure à gérer : Replit s&#39;occupe automatiquement de tout.
+</Note>
+
+<div id="section-2">
+  ## Fonctionnalités
+</div>
+
+<div id="section-3">
+  ### Fonctionnalités prises en charge
+</div>
+
+Clerk Auth apporte à votre app les éléments suivants :
+
+* **Comptes utilisateurs indépendants** — les utilisateurs de votre app ne sont pas des utilisateurs Replit : ils existent uniquement dans le tenant Clerk de votre app
+* **Page de connexion entièrement à vos couleurs** — définissez le nom, le logo, les couleurs, les polices et les textes de votre app dans son code
+* **SSO à votre image** — en fournissant votre propre client OAuth pour chaque fournisseur, l&#39;écran de consentement OAuth affiche le nom et l&#39;identité visuelle de votre app plutôt que ceux par défaut
+* **Authentification par e-mail et mot de passe** — inscription et connexion intégrées, avec vérification de l&#39;adresse e-mail
+* **Connexion sociale (SSO)** — autorisez la connexion via Google, GitHub, Apple et X (Twitter)
+* **Gestion des utilisateurs** — affichez, recherchez et modérez les utilisateurs depuis le volet Auth
+* **Gestion des sessions** — jetons de session sécurisés gérés automatiquement
+* **Environnements de développement et de production** — testez l&#39;authentification en développement avant la publication
+
+<Note>
+  L&#39;essentiel de la configuration de Clerk Auth se gère depuis l&#39;outil Auth du Project Editor. Aucun compte Clerk n&#39;est nécessaire et vous n&#39;avez jamais besoin de passer par le tableau de bord Clerk.
+</Note>
+
+<div id="section-4">
+  ### Fonctionnalités non prises en charge
+</div>
+
+À ce jour, les fonctionnalités suivantes ne sont pas disponibles dans Clerk Auth (par rapport à une application Clerk externe que vous configurez vous-même). Pour plus de détails, consultez [cette FAQ](#how-does-clerk-auth-compare-to-external-clerk).
+
+* **Connexion avec un numéro de téléphone** — Connexion et authentification par SMS
+* **Prise en charge de l’AMF** — Authentification multifacteur pour les utilisateurs finaux
+* **Prise en charge complète des fournisseurs SSO** — Seuls Google, GitHub, Apple et X sont actuellement pris en charge
+* **Instances d’organisation** — Fonctionnalités d’organisation et d’appartenance à une équipe de Clerk
+
+<div id="section-5">
+  ## Environnements de développement et de production
+</div>
+
+Toute application utilisant Clerk Auth dispose de deux environnements Clerk totalement isolés : l&#39;environnement de **développement**, qui héberge l&#39;application de développement/prévisualisation pendant que vous la créez, et l&#39;environnement de **production**, qui héberge l&#39;application publiée. Ces environnements sont séparés dès la conception, avec des clés API et des bases d&#39;utilisateurs distinctes.
+
+<div id="api">
+  ### Clés API distinctes
+</div>
+
+Chaque environnement dispose de sa propre clé publiable et de sa propre clé API secrète. Les clés exposées à votre application basculent automatiquement selon que celle-ci est en développement ou en production :
+
+* Dans votre espace de travail, les Secrets `CLERK_PUBLISHABLE_KEY` et `CLERK_SECRET_KEY` contiennent des **clés de test** (`pk_test...` et `sk_test...`) qui pointent vers l’environnement de développement.
+
+<Frame>
+  <img src="/assets/mirror/clerk-check-dev-keys-5a23f6b7dd0c.png" alt="Outil Secrets de l’espace de travail affichant CLERK_SECRET_KEY et CLERK_PUBLISHABLE_KEY avec les préfixes sk_test_ et pk_test_" width="1946" height="402" data-path="images/workspace/auth/clerk-check-dev-keys.png" />
+</Frame>
+
+* Lorsque vous publiez votre application, le déploiement publié utilise des **clés actives** (`pk_live...` et `sk_live...`) qui pointent vers l’environnement de production. Pour vérifier les préfixes, ouvrez **Publishing → Vue d’ensemble → Ajuster les paramètres** et consultez `CLERK_PUBLISHABLE_KEY` et `CLERK_SECRET_KEY`.
+
+<Frame>
+  <img src="/assets/mirror/clerk-check-prod-keys-acccd7f68da1.png" alt="Secrets de l’application de production dans la vue d’ensemble de Publishing affichant CLERK_SECRET_KEY et CLERK_PUBLISHABLE_KEY avec les préfixes sk_live_ et pk_live_" width="1924" height="1664" data-path="images/workspace/auth/clerk-check-prod-keys.png" />
+</Frame>
+
+<Note>
+  Vous n’avez rien à faire pour changer d’environnement. Replit gère automatiquement les clés de développement et de production. Développez, testez et publiez simplement.
+</Note>
+
+<Warning>
+  Ne remplacez pas les clés de test par des clés actives, ne les modifiez pas dans le volet Secrets et ne les configurez pas manuellement dans le tableau de bord Clerk. Cela perturberait le basculement automatique entre les environnements de développement et de production, et Clerk Auth géré par Replit ne serait alors plus pris en charge.
+</Warning>
+
+<div id="section-6">
+  ### Bases d&#39;utilisateurs distinctes
+</div>
+
+Chaque environnement possède sa propre base d&#39;utilisateurs. Un compte créé dans l&#39;environnement de développement **n&#39;existe pas** dans l&#39;environnement de production, et inversement :
+
+* Les utilisateurs inscrits pendant vos tests sur l&#39;application de développement/prévisualisation ne sont créés que dans la base de développement.
+* Les utilisateurs inscrits sur l&#39;application publiée ne sont créés que dans la base de production.
+* De même, les sessions, les métadonnées utilisateur et les données associées au `userId` de Clerk restent limitées à l&#39;environnement dans lequel le compte a été créé.
+
+Ce comportement est normal. Pour consulter les utilisateurs de chaque environnement, ouvrez le **volet Auth** dans votre espace de travail, puis utilisez le sélecteur d&#39;environnement de l&#39;onglet **Users** pour passer du développement à la production.
+
+<Note>
+  Le développement est l&#39;espace où vous expérimentez et créez votre application. La production, elle, s&#39;adresse aux véritables utilisateurs de votre application en ligne. Les deux sont volontairement cloisonnés : les comptes et les données créés en développement n&#39;apparaissent pas en production.
+</Note>
+
+<div id="section-7">
+  ## Gestion des utilisateurs
+</div>
+
+Le volet Auth du Project Editor offre une vue complète des utilisateurs authentifiés. Clerk Auth crée un répertoire d’utilisateurs dédié à votre application. Les utilisateurs répertoriés ici disposent donc de comptes propres à votre application, et non de comptes Replit.
+
+<Frame>
+  <img src="/assets/mirror/clerk-users-4940ed365605.png" alt="Onglet Users de Clerk Auth affichant les utilisateurs authentifiés dans le volet Auth" width="2136" height="794" data-path="images/workspace/auth/clerk-users.png" />
+</Frame>
+
+Depuis l’onglet **Users**, vous pouvez :
+
+* **Afficher tous les utilisateurs** avec des informations telles que leur adresse e-mail, leur nom, leur dernière connexion et la date de création de leur compte
+* **Rechercher et filtrer** pour trouver des utilisateurs spécifiques
+* **Bannir et débannir des utilisateurs** pour contrôler l’accès à votre application
+* **Trier les utilisateurs** selon différents critères
+* **Changer d’environnement** — basculer entre le développement et la production pour gérer les utilisateurs de chaque environnement
+
+<div id="section-8">
+  ## Personnaliser la page de connexion
+</div>
+
+L’identité visuelle des pages de connexion et d’inscription (nom de l’application, logo, couleurs, polices et textes) se configure dans le code de l’application, et non dans le volet Auth. Pour les modifier, demandez à Agent :
+
+```
+Update my sign-in page to use [your app name] as the title, [describe your logo], and match my site's colors.
+```
+
+En interne, tout cela est géré par les propriétés `appearance` et `localization` transmises à `<ClerkProvider>`, ainsi que par le fichier de logo placé dans le répertoire `public/` de votre app. Agent les synchronise avec le thème de votre app.
+
+<Note>
+  Le nom d&#39;application affiché sur les **écrans de consentement OAuth de Google, d&#39;Apple, de GitHub et de X** (l&#39;écran qui s&#39;affiche après qu&#39;un utilisateur a cliqué sur « Se connecter avec Google », par exemple) est distinct. Il provient de l&#39;application OAuth enregistrée auprès du provider et ne change **pas** si vous modifiez le code de la page de connexion. Pour le modifier, vous devez [configurer des identifiants OAuth personnalisés](#configuring-oauth-credentials-for-an-sso-provider) pour ce provider.
+</Note>
+
+<div id="section-9">
+  ## Configurer les fournisseurs de connexion
+</div>
+
+Clerk Auth prend en charge Google, GitHub, Apple et X comme fournisseurs SSO. Depuis l’onglet Configure du volet Auth, vous pouvez choisir les fournisseurs affichés sur la page de connexion. En production, vous pouvez également définir si chaque fournisseur utilise des identifiants OAuth gérés par Replit ou vos propres identifiants pour une connexion aux couleurs de votre marque.
+
+<Frame>
+  <img src="/assets/mirror/clerk-configure-60169c473d64.png" alt="Barre latérale affichant les fournisseurs SSO, avec Production sélectionné et l’onglet Configure contenant une liste de fournisseurs avec des boutons bascule d’activation et des actions Edit" width="923" height="378" data-path="images/workspace/auth/clerk-configure.png" />
+</Frame>
+
+Ouvrez l’onglet **Configure**. Dans la barre latérale **SSO providers**, sélectionnez **Development** ou **Production**. **Development** est utilisé pour les applications de développement et de prévisualisation de votre workspace, tandis que **Production** est utilisé pour vos applications publiées. La liste des fournisseurs de chaque environnement s’affiche dans le panneau principal. Vous pouvez alors :
+
+* **Activer ou désactiver des fournisseurs** — Utilisez le bouton bascule pour contrôler l’affichage d’un fournisseur sur la page de connexion. Les fournisseurs désactivés sont masqués aux utilisateurs.
+* **Configurer des identifiants OAuth personnalisés (production uniquement)** — Consultez la section [Configurer les identifiants OAuth pour un fournisseur SSO](#configuring-oauth-credentials-for-an-sso-provider) ci-dessous.
+
+<div id="ssooauth">
+  ### Configuration des identifiants OAuth d’un fournisseur SSO
+</div>
+
+Par défaut, le fournisseur utilise les **identifiants gérés par Replit**. La connexion fonctionne immédiatement, mais l’écran de consentement OAuth affiche la marque Replit. En passant à **Custom credentials**, vous pouvez utiliser votre propre client OAuth depuis la console développeur du fournisseur afin que l’écran de consentement affiche le nom et la marque de votre application à la place de ceux par défaut.
+
+1. Ouvrez le volet Auth dans Project Editor. Accédez à l’onglet Configure, puis sélectionnez **Production** sous **SSO providers** dans la barre latérale.
+
+<Frame>
+  <img src="/assets/mirror/clerk-configure-60169c473d64.png" width="923" height="378" data-path="images/workspace/auth/clerk-configure.png" />
+</Frame>
+
+2. Sélectionnez l’icône **Edit** à côté du fournisseur à configurer. Par défaut, **Replit-managed credentials** est sélectionné.
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-default-credentials-525090775408.png" alt="Panneau de modification du fournisseur affichant les options d’identifiants gérés par Replit et d’identifiants personnalisés" width="1468" height="960" data-path="images/workspace/auth/clerk-sso-default-credentials.png" />
+</Frame>
+
+3. Sélectionnez **Custom credentials**. Le panneau s’ouvre et affiche les champs d’identifiants, ainsi qu’une liste de vérification **Provider setup** contenant les valeurs à enregistrer auprès du fournisseur.
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-custom-credentials-f24112a5cf07.png" alt="Panneau Custom credentials affichant les champs d’identifiant et de secret du client OAuth, ainsi qu’une liste de vérification Provider setup avec l’URL de rappel de redirection et l’origine JavaScript" width="1468" height="2246" data-path="images/workspace/auth/clerk-sso-custom-credentials.png" />
+</Frame>
+
+4. Suivez les instructions pour terminer la configuration. Elles comprennent des liens directs vers la console et de la documentation d’aide pertinente. Vous pouvez également consulter la documentation d’aide destinée aux fournisseurs dans [Additional resources](#additional-resources).
+5. Saisissez toutes les valeurs d’identifiants requises.
+6. Dans la console développeur du fournisseur, enregistrez toutes les entrées indiquées dans la liste de vérification **Provider setup**. Utilisez l’icône de copie pour copier chaque valeur avec précision, puis cochez les éléments une fois l’opération terminée ou sélectionnez **Mark all as done** une fois que tout est terminé.
+7. Sélectionnez **Save changes**.
+
+<div id="section-10">
+  ### Vérifier à nouveau la configuration après un changement de domaine
+</div>
+
+Les opérations liées aux domaines, comme la liaison d&#39;un nouveau domaine externe ou l&#39;[achat d&#39;un domaine via Replit](/fr/ja/build/domain-purchasing), peuvent modifier les URL de rappel de redirection et les origines JavaScript de votre app. Dans ce cas, les providers configurés avec des identifiants personnalisés doivent enregistrer les nouvelles valeurs dans la console développeur.
+
+Après le changement de domaine, revenez à l&#39;onglet **Configure**. Les rappels de configuration apparaissent sous la forme d&#39;icônes d&#39;avertissement dans l&#39;onglet, dans la barre latérale et à côté du provider dans la liste **SSO providers**. Si une icône d&#39;avertissement et la mention **setup steps remaining** s&#39;affichent à côté d&#39;un provider, c&#39;est que sa liste de vérification **Provider setup** comporte de nouvelles étapes à effectuer.
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-setup-reminders-a5b092846006.png" alt="Onglet Configure et barre latérale affichant des avertissements de configuration, liste SSO providers avec une icône d'avertissement et la mention setup steps remaining à côté du provider après un changement de domaine" width="923" height="378" data-path="images/workspace/auth/clerk-sso-setup-reminders.png" />
+</Frame>
+
+Ouvrez le panneau d&#39;édition du provider, copiez les valeurs mises à jour de **Provider setup**, enregistrez-les dans la console développeur du provider, puis sélectionnez **Mark all as done**.
+
+<div id="section-11">
+  ## Configuration du domaine pour la vérification par e-mail
+</div>
+
+Si votre application propose l&#39;**inscription par e-mail et mot de passe**, Clerk envoie un code de vérification dans la boîte de réception de chaque nouvel utilisateur. En configurant votre domaine pour l&#39;envoi des e-mails, vous garantissez que ces codes proviennent de l&#39;URL de votre application et qu&#39;ils ne sont ni retardés ni bloqués par les filtres antispam.
+
+<div id="section-12">
+  ### Quand cette configuration est nécessaire
+</div>
+
+Vous devez configurer ces enregistrements DNS uniquement si votre application est associée à un **domaine externe géré par un autre fournisseur** (par exemple, un domaine enregistré auprès de Cloudflare, GoDaddy, Namecheap ou d&#39;un service similaire).
+
+Aucune configuration n&#39;est nécessaire dans les cas suivants :
+
+* Si l&#39;application est hébergée sur un sous-domaine `.replit.app`
+* Pour les domaines [achetés via Replit](/fr/ja/build/domain-purchasing)
+
+Dans les deux cas, Replit gère les enregistrements DNS.
+
+<div id="dns">
+  ### Ajout d’enregistrements DNS pour l’envoi d’e-mails
+</div>
+
+Pour autoriser votre application à envoyer des e-mails d’authentification depuis un domaine externe, ajoutez des enregistrements DNS auprès de votre fournisseur de domaine.
+
+1. Ouvrez **Publishing** dans le Project Editor.
+2. Sélectionnez **Domains**.
+3. Repérez le domaine externe associé et sélectionnez **Manage**.
+4. Sous **Authentication DNS setup required**, copiez les enregistrements CNAME affichés par Replit. Clerk en a besoin pour envoyer des e-mails d’authentification depuis votre domaine.
+5. Connectez-vous à votre fournisseur DNS (Cloudflare, GoDaddy, Namecheap, etc.) et ajoutez chaque enregistrement exactement comme indiqué.
+
+<Frame>
+  <img src="/assets/mirror/clerk-domain-8797ea9f41fc.png" alt="Panneau Domain Manage affichant la section Authentication DNS setup required avec les enregistrements CNAME nécessaires à l’envoi d’e-mails par Clerk" width="1156" height="1524" data-path="images/workspace/auth/clerk-domain.png" />
+</Frame>
+
+La propagation des modifications DNS peut prendre jusqu’à 48 heures. Une fois les enregistrements actifs, les inscriptions par e-mail et mot de passe enverront automatiquement des codes d’authentification depuis votre domaine. Aucune action supplémentaire n’est requise dans le volet Auth.
+
+<div id="section-13">
+  ### Dépannage
+</div>
+
+* **E-mail d’authentification non reçu** — Vérifiez que chaque enregistrement a été ajouté exactement comme indiqué dans le panneau Manage. Veillez à inclure le point final requis par votre fournisseur DNS. Vérifiez le dossier de courrier indésirable du destinataire.
+* **Les enregistrements ne sont toujours pas détectés** — Attendez la propagation DNS (jusqu’à 48 heures), puis vérifiez à nouveau les enregistrements signalés comme manquants dans le panneau Manage.
+
+<div id="section-14">
+  ## Bonnes pratiques de sécurité
+</div>
+
+* **Validez toujours côté serveur** — vérifiez l&#39;authentification dans les routes d&#39;API, pas seulement dans l&#39;interface
+* **Utilisez des variables d&#39;environnement** — ne codez jamais en dur les clés et les secrets dans votre code
+* **Placez le middleware de proxy en premier** — dans les applications Express, le proxy Clerk doit être monté avant les analyseurs de corps de requête (body parsers)
+* **Ne redirigez pas la page d&#39;accueil vers la connexion** — laissez les visiteurs non authentifiés accéder à votre page d&#39;accueil publique
+
+<div id="faq">
+  ## FAQ
+</div>
+
+<div id="clerk-authclerk">
+  ### Ai-je besoin d&#39;un compte Clerk pour utiliser Clerk Auth ?
+</div>
+
+Non. Le tenant Clerk sur lequel repose Clerk Auth est créé et géré automatiquement par Replit lorsque l&#39;Agent configure votre application. Vous n&#39;avez pas besoin de créer un compte Clerk ni de gérer vous-même l&#39;infrastructure Clerk.
+
+<div id="replitclerkclerk">
+  ### Puis-je accéder au tableau de bord Clerk d’une instance Clerk gérée par Replit ?
+</div>
+
+Non. Les instances Clerk gérées par Replit ne sont pas accessibles depuis le tableau de bord Clerk. Gérez-les plutôt depuis l’outil Auth du Project Editor. Vous pouvez y configurer les fournisseurs, afficher les utilisateurs et basculer entre les environnements de développement et de production.
+
+<div id="clerkpk_test">
+  ### Ma clé publiable Clerk commence par `pk_test`. Comment passer à une clé live ?
+</div>
+
+Aucun changement n&#39;est nécessaire. Les clés `pk_test...` et `sk_test...` affichées dans le volet Secrets de l&#39;espace de travail appartiennent à l&#39;environnement Clerk de **développement** de votre application, celui que vous utilisez pendant le développement. Lorsque vous publiez votre application, le déploiement bascule automatiquement sur les clés `pk_live...` et `sk_live...` pour la production. Pour le vérifier, ouvrez **Publishing → Overview → Adjust settings** dans votre espace de travail et consultez la valeur de `CLERK_PUBLISHABLE_KEY` de l&#39;application publiée : elle doit commencer par `pk_live`. Ne modifiez pas ces clés manuellement. Pour en savoir plus, consultez [Environnements de développement et de production](#development-and-production-environments).
+
+<div id="section-15">
+  ### Pourquoi ne puis-je pas me connecter à mon application publiée avec le compte créé pendant le développement ?
+</div>
+
+Les environnements de **développement** et de **production** de Clerk Auth possèdent des bases d&#39;utilisateurs distinctes. Les comptes créés dans l&#39;application de développement ou de prévisualisation n&#39;existent que dans l&#39;environnement de développement et ne sont pas copiés vers la production au moment de la publication. Vous devez donc vous inscrire à nouveau dans l&#39;application publiée. Il en va de même pour les données associées au `userId` de Clerk. Dans votre espace de travail, ouvrez le **volet Auth**, puis utilisez le sélecteur d&#39;environnement de l&#39;onglet **Users** pour consulter les utilisateurs de chaque environnement. Pour en savoir plus, consultez [Bases d&#39;utilisateurs distinctes](#separate-user-stores).
+
+<div id="clerk-auth">
+  ### Clerk Auth est-il gratuit ?
+</div>
+
+Actuellement, Clerk Auth est gratuit. Comme les autres services Replit facturés à l’usage, il pourrait être soumis à une tarification à l’usage à l’avenir. Les éventuels frais seront ajoutés à votre facturation Replit existante. Vous n’aurez besoin ni d’une facture Clerk distincte ni d’un autre moyen de paiement.
+
+<div id="clerk-authmau">
+  ### Clerk Auth impose-t-il une limite d&#39;utilisateurs actifs mensuels (MAU) ?
+</div>
+
+Non. Contrairement aux forfaits Clerk externes, dont le nombre de MAU est plafonné selon le palier, Clerk Auth n&#39;impose aucune limite de MAU.
+
+<div id="clerk-authexternal-clerk">
+  ### En quoi Clerk Auth diffère-t-il d’External Clerk ?
+</div>
+
+Le tenant Clerk géré par Replit pour Clerk Auth présente plusieurs différences par rapport aux applications Clerk (**External Clerk**) que vous créez avec un compte Clerk. Le tableau ci-dessous présente les différences actuelles entre les deux. Il reflète l’état actuel de Clerk Auth, et les fonctionnalités prises en charge continueront de s’étoffer.
+
+|                                            | Clerk Auth                                                                                                 | External Clerk                                         |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **Configuration**                          | Provisionné automatiquement par Replit                                                                     | Configuration manuelle                                 |
+| **Propriété du tenant Clerk**              | Géré par Replit, détenu par l’App                                                                          | Détenu par le compte Clerk                             |
+| **Modèle tarifaire**                       | Actuellement gratuit (facturation à l’usage prévue ultérieurement)                                         | Abonnement + facturation à l’usage                     |
+| **Facturation**                            | Facturation Replit (actuellement gratuite)                                                                 | Facturation via le compte Clerk                        |
+| **Limite de MAU**                          | Illimitée                                                                                                  | Limites selon le forfait                               |
+| **Configuration du proxy et des domaines** | replit.app et les domaines achetés sont configurés automatiquement, les domaines liés le sont manuellement | Manuelle                                               |
+| **Fournisseurs SSO**                       | Seuls certains fournisseurs sont pris en charge : Google, Apple, GitHub, X                                 | Prise en charge d’un plus grand nombre de fournisseurs |
+| **Interface de gestion des utilisateurs**  | Outil Auth du Project Editor                                                                               | Tableau de bord de l’application Clerk                 |
+| **SMS**                                    | Non pris en charge                                                                                         | Pris en charge                                         |
+| **MFA**                                    | Non pris en charge                                                                                         | Pris en charge                                         |
+| **Tenant organisationnel**                 | Non pris en charge                                                                                         | Pris en charge                                         |
+
+<div id="clerk-auth-2">
+  ### Quels paramètres de Clerk Auth nécessitent une configuration manuelle ?
+</div>
+
+La majeure partie de la configuration de Clerk Auth est automatisée, mais certains paramètres doivent être configurés en dehors de l’outil Auth :
+
+* **Identifiants OAuth personnalisés pour un fournisseur SSO** — Si vous souhaitez afficher le nom et l’image de marque de votre application, plutôt que ceux utilisés par défaut par Replit, sur l’écran de consentement du fournisseur, enregistrez une application OAuth dans la console développeur du fournisseur et collez les identifiants dans le panneau Auth. Consultez [Configuration des identifiants OAuth pour un fournisseur SSO](#configuring-oauth-credentials-for-an-sso-provider).
+* **Enregistrements DNS pour la vérification par e-mail d’un domaine externe** — Si votre application associe un domaine externe géré par un autre fournisseur, vous devez ajouter des enregistrements DNS afin que les e-mails de vérification soient envoyés depuis ce domaine. Consultez [Configuration du domaine pour la vérification par e-mail](#domain-setup-for-email-verification).
+
+<div id="replitclerkclerk-2">
+  ### Puis-je utiliser ma propre application Clerk au lieu d’une application Clerk gérée par Replit ?
+</div>
+
+Oui. Si une application Clerk gérée par Replit est déjà provisionnée pour votre application, supprimez-la avant de connecter votre propre application Clerk externe :
+
+1. Ouvrez le volet Auth dans le Project Editor.
+2. Accédez à l’onglet Configure.
+3. Faites défiler la page jusqu’en bas, puis cliquez sur **Delete Clerk app**.
+
+La suppression de l’application Clerk supprime le tenant Clerk géré par Replit et libère les domaines associés. Vous pouvez ensuite connecter votre propre application Clerk et réutiliser ces domaines. Si votre application ne dispose pas encore d’une application Clerk gérée par Replit, ignorez cette étape et intégrez directement une application Clerk externe.
+
+<div id="section-16">
+  ## Ressources supplémentaires
+</div>
+
+* [Migrer de Replit Auth vers Clerk](/fr/ja/features/auth-and-identity/migrate-auth-to-clerk) — Utilisez Agent pour migrer une App Replit Auth existante vers Clerk Auth
+* [Planifier une migration d&#39;authentification personnalisée](/fr/ja/features/auth-and-identity/custom-auth-migration) — Bonnes pratiques pour migrer un système d&#39;authentification personnalisé vers Clerk Auth sans compromettre la continuité des comptes
+* [Configurer Google SSO](/fr/ja/features/auth-and-identity/sign-in-providers#google) — Configurer des identifiants OAuth Google personnalisés
+* [Configurer GitHub SSO](/fr/ja/features/auth-and-identity/sign-in-providers#github) — Configurer des identifiants OAuth GitHub personnalisés
+* [Configurer Apple SSO](/fr/ja/features/auth-and-identity/sign-in-providers#apple) — Configurer des identifiants Apple Sign In personnalisés
+* [Configurer X (Twitter) SSO](/fr/ja/features/auth-and-identity/sign-in-providers#x-twitter) — Configurer des identifiants OAuth X personnalisés
+* [Documentation Clerk](https://clerk.com/docs) — Référence destinée aux développeurs qui intègrent des applications Clerk externes

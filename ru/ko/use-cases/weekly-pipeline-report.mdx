@@ -1,0 +1,158 @@
+---
+title: "Создание еженедельного отчёта о продажах"
+description: "Показывает еженедельные изменения и тенденции в воронке продаж HubSpot."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent запросит ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Получите данные о воронке продаж HubSpot за эту неделю, сравните их с данными за прошлую неделю и подготовьте краткий отчёт о новых сделках,
+переходах между этапами, задержанных сделках и прогнозе. Добавьте таблицу в Google Таблицы
+и опубликуйте ключевые моменты в Slack, чтобы стендап был посвящён изменениям, а не
+статичному снимку.
+
+<div id="section">
+  ## Подходит, если вам нужно следующее
+</div>
+
+* Вы менеджер по продажам и вам нужен понедельничный стендап с актуальными изменениями, а не статичный снимок.
+* Вы отвечаете за операционную деятельность в сфере выручки и вам нужно отслеживать еженедельные изменения в воронке продаж в одном месте.
+
+<div id="section-2">
+  ## Коннекторы
+</div>
+
+<Connectors
+  items={[
+{ id: "hubspot", name: "HubSpot", why: "Сделки, этапы, суммы" },
+{
+id: "google-sheets",
+name: "Google Таблицы",
+why: "Таблица с проверяемыми трендами",
+},
+{ id: "slack", name: "Slack", why: "Отправка отчётов" },
+]}
+/>
+
+<Note>Также работает с другими CRM, включая Salesforce, Attio и Pipedrive.</Note>
+
+<div id="section-3">
+  ## Перед началом
+</div>
+
+Подключите HubSpot, Sheets и Slack. Укажите, какие воронки или команды следует включить.
+
+<div id="agent">
+  ## Запрос к Agent
+</div>
+
+<AiPrompt>
+  Создайте routine, которая запускается каждый понедельник в 9:00. Получайте из HubSpot
+  данные по воронке продаж за текущую неделю. Подготовьте еженедельный отчёт об изменениях
+  и тенденциях воронки продаж: новые сделки, переходы между этапами, задержанные сделки, прогноз по сравнению с прошлой неделей. Добавьте
+  таблицу в Google Таблицы и опубликуйте ключевые моменты в Slack.
+</AiPrompt>
+
+<div id="section-4">
+  ## Ожидаемый результат
+</div>
+
+Agent подготовит краткое описание и таблицу, сравнивающую эту неделю с прошлой. Сверьте несколько
+сумм сделок с данными HubSpot. Используйте основные моменты из Slack для стендапа,
+а таблицу сохраните для аудиторского следа. Выберите одну новую и одну задержанную
+сделку, откройте их в HubSpot и убедитесь, что этап, сумма и дата закрытия совпадают с данными в таблице.
+
+<div id="section-5">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Покажите сделки на сумму от [сумма], по которым не было активности последние 14 дней.
+</AiPrompt>
+
+<AiPrompt>
+  Добавьте раздел «Риск» на основе даты закрытия и последней активности.
+</AiPrompt>
+
+<div id="section-6">
+  ## Устранение неполадок
+</div>
+
+* **Суммы сделок не совпадают с данными HubSpot:** укажите, какие воронки или команды включить и какое поле суммы использовать (сумма или взвешенный прогноз). Прежде чем полагаться на таблицу, сверяйте несколько сделок с данными HubSpot.
+* **Задержанные сделки отображаются неверно:** проверьте дату закрытия и этап в HubSpot. Попросите Agent считать сделку задержанной только в том случае, если дата закрытия перенесена или этап перемещён назад.
+* **Публикации в Slack попадают не туда:** укажите канал и сообщите, нужны ли вам только основные моменты или ссылка на всю таблицу.
+
+<div id="section-7">
+  ## Связанные материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Мониторинг конкурентов" href="/ru/ko/use-cases/monitor-competitors">
+    Используйте те же уведомления Slack для отдела продаж до того, как изменения цен повлияют на сделки.
+  </Card>
+
+  <Card title="Создание презентации для инвесторов" href="/ru/ko/use-cases/pitch-deck-from-website">
+    Используйте тот же источник из Google Таблиц для основателей, создающих финансовые слайды для инвесторов.
+  </Card>
+</CardGroup>

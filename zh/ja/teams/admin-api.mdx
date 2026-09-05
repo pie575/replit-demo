@@ -1,0 +1,90 @@
+---
+title: "Admin API"
+description: "使用 Replit Enterprise Admin API，以编程方式访问账户使用情况、工作区、成员和项目。"
+---
+
+<Note>
+  Admin API 目前为**测试版**，可用的端点和行为可能会发生变更。
+</Note>
+
+Admin API 为 Enterprise 账户管理员提供基于作用域的编程访问能力，可用于账户分析和管理功能。大多数端点提供对账户数据的读取访问，写入作用域则支持更新预算等特定操作。您可以使用该 API 为 Enterprise 账户构建内部报表、运营工作流和集成。
+
+<div id="admin-api">
+  ## 可访问 Admin API 的用户
+</div>
+
+只有 Enterprise 账户的**账户管理员**可以使用 Admin API。账户管理员可以创建和管理 API 密钥。工作区管理员和其他账户成员无法访问 Admin API，也无法创建其密钥。
+
+有关 Enterprise 管理员角色的更多信息，请参阅[账户和工作区管理员](/zh/ja/teams/identity-and-access-management/account-and-workspace-admins)。
+
+<div id="api">
+  ## 创建 API 密钥
+</div>
+
+<Steps>
+  <Step title="打开开发者设置">
+    在 Enterprise 账户中打开**设置**，然后选择**开发者**。
+  </Step>
+
+  <Step title="创建 API 密钥">
+    选择**创建 API 密钥**，并选择只读或读写访问权限。
+  </Step>
+
+  <Step title="妥善保管密钥">
+    复制以 `rpl_` 开头的密钥，并将其保存在安全的密钥管理器中。请像对待密码一样对待它，切勿对外共享。
+  </Step>
+
+  <Step title="为集成进行认证">
+    在 API 请求中将该密钥作为 Bearer 令牌发送。
+  </Step>
+</Steps>
+
+<div id="section">
+  ## 可执行的操作
+</div>
+
+Admin API 使用作用域来控制各密钥可执行的操作。读取作用域提供用于生成报告的账户数据，特定写入作用域则支持更新预算等操作。
+
+* **使用情况：** 读取按工作区、成员、项目和时间段筛选或分组的账户使用情况及总账成本。
+* **工作区：** 读取工作区列表和详细信息，包括成员数、项目数、管理员和创建时间。
+* **成员：** 读取账户和工作区成员资格，可按角色筛选，也可按姓名、用户名和电子邮件地址搜索。
+* **项目：** 读取团队工作区中的项目，可按可见性或部署状态筛选，也可按标题、slug 和描述搜索。
+* **预算：** 读取账户预算。使用 `write:budgets` 作用域可更新预算。
+
+API 响应支持游标分页，并包含速率限制标头以及用于跟踪请求的 `X-Request-Id`。
+
+<div id="replit-agent">
+  ## 使用 Replit Agent 构建
+</div>
+
+你可以让 Replit Agent 基于 Admin API 构建自定义仪表板。只需说明你想追踪的账户数据，例如各工作区的使用情况或各项目的成本，Agent 就会为你构建仪表板及其 API 集成。
+
+<Steps>
+  <Step title="打开技能选择器">
+    在 Replit 项目中，点击聊天输入框旁边的 **+** 按钮，然后选择**使用技能**。
+  </Step>
+
+  <Step title="选择 Admin API 技能">
+    在 **Replit 技能**下选择 **Admin API**，为 Agent 提供该 API 的上下文和集成指导。
+  </Step>
+
+  <Step title="描述你的仪表板">
+    告诉 Agent 你想追踪哪些内容以及希望如何展示。例如，请它构建一个展示各工作区使用情况和各项目成本的仪表板。
+  </Step>
+
+  <Step title="安全地添加 API 密钥">
+    当 Agent 需要发起 API 请求时，请将 Admin API 密钥添加到项目的 Secrets 中。切勿将密钥粘贴到聊天中，也不要提交到项目里。
+  </Step>
+</Steps>
+
+<div id="api-2">
+  ## API 参考
+</div>
+
+有关端点详情、请求参数和集成示例，请参阅 [Admin API 开发者文档](https://api.replit.com/docs)。
+
+<div id="section-2">
+  ## 相关文档
+</div>
+
+* [Workspace 设置](/zh/ja/features/collaboration/workspace-settings)：配置 Enterprise 策略，指定各工作区可使用的 Agent 模型和模型提供商。

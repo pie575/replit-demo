@@ -1,6 +1,7 @@
 ---
 title: "Résoudre les problèmes de publication"
-description: "Diagnostiquez les problèmes courants lorsqu'une application Replit fonctionne dans l'Aperçu, ne parvient pas à se publier ou se comporte différemment à son URL publique."
+description: "Diagnostiquez les problèmes courants lorsqu'une app Replit fonctionne dans Preview, mais ne parvient pas à être publiée ou se comporte différemment à son URL publique."
+icon: "triangle-exclamation"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,219 +19,255 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-La publication transforme votre projet en application publique. Si la publication échoue, ou si l'URL publique se comporte différemment de l'Aperçu, traitez le problème dans l'ordre.
+Publishing transforme votre projet en application publique. Si la publication échoue ou si l’URL publique se comporte différemment dans Preview, examinez le problème étape par étape.
 
-Cette page est à la fois un guide de récupération pour Build et une référence de dépannage pour les déploiements. Commencez par la question la plus simple : l'application fonctionne-t-elle dans l'Aperçu ?
+Cette page sert à la fois de guide de récupération Build et de référence pour le dépannage des déploiements. Commencez par la question la plus simple : l’application fonctionne-t-elle dans Preview ?
 
-## Ce que vous accomplirez
+<div id="what-youll-achieve">
+  ## Ce que vous saurez faire
+</div>
 
-À la fin de cette page, vous saurez si le problème se situe dans votre application, la configuration de publication, les Secrets de production, le type de déploiement, la configuration des ports ou l'accès réseau/DNS.
+À la fin de cette page, vous devriez savoir si le problème vient de votre app, de votre configuration de publication, de vos Secrets de production, de votre type de déploiement, de votre configuration de port ou de votre accès au réseau/DNS.
 
-## Commencer par l'Aperçu
+<div id="start-with-preview">
+  ## Commencer par Preview
+</div>
 
-Avant de publier, vérifiez que l'application s'exécute correctement dans l'Éditeur de projet.
+Avant de publier, vérifiez que l&#39;application fonctionne correctement dans le Project Editor.
 
-Cliquez sur **Exécuter** en haut de l'Éditeur de projet et ouvrez l'Aperçu. Si l'Aperçu n'affiche pas votre application avec une URL `replit.dev`, corrigez l'application avant de publier.
+Sélectionnez **Run** en haut du Project Editor, puis ouvrez Preview. Si Preview n&#39;affiche pas votre application avec une URL `replit.dev`, corrigez l&#39;application avant de publier.
 
-Demandez à l'Agent de diagnostiquer l'Aperçu en premier :
-
-<AiPrompt>
-  Cette application ne fonctionne pas dans l'Aperçu.<br />
-  Vérifie la commande d'exécution, l'installation des dépendances, les erreurs de l'application, les ports et les Secrets manquants.<br />
-  Corrige d'abord le problème le plus petit et dis-moi comment vérifier que l'Aperçu fonctionne avant de publier.
-</AiPrompt>
-
-Si l'Aperçu est cassé, la publication ne le réparera pas.
-
-## Si l'Aperçu fonctionne mais que la publication échoue
-
-Lorsque l'Aperçu fonctionne mais que la publication échoue, vérifiez la configuration spécifique à la publication.
-
-### Vérifier les journaux
-
-Ouvrez l'onglet **Journaux** dans le volet **Publication**. Cherchez des traces de pile, des packages manquants, des commandes en échec, des variables d'environnement manquantes ou des erreurs de démarrage.
-
-Collez l'erreur pertinente dans l'Agent :
+Demandez d&#39;abord à Agent de diagnostiquer Preview :
 
 <AiPrompt>
-  La publication a échoué avec ce résultat de journaux : \[coller l'erreur].<br />
-  Explique la cause probable.<br />
-  Dis-moi s'il s'agit d'une erreur de commande, de dépendance, de Secret, de port, de build ou d'application.<br />
-  Recommande le correctif le plus petit et comment je dois le vérifier.
+  Cette application ne fonctionne pas dans Preview.<br />
+  Vérifie la commande d&#39;exécution, l&#39;installation des dépendances, les erreurs de l&#39;application, les ports et les Secrets manquants.<br />
+  Corrige d&#39;abord le plus petit problème et indique-moi comment vérifier que Preview fonctionne avant de publier.
 </AiPrompt>
 
-### Vérifier les commandes d'exécution et de build
+Si Preview ne fonctionne pas, la publication ne résoudra pas le problème.
 
-Les erreurs courantes incluent les fautes de frappe, les drapeaux incorrects, les mauvais fichiers d'entrée ou les commandes qui ne fonctionnent qu'en local.
+<div id="if-preview-works-but-publishing-fails">
+  ## Si Preview fonctionne, mais pas la publication
+</div>
 
-Vérifiez les commandes dans le volet **Publication**. Si votre application nécessite une commande de build et une commande de démarrage, confirmez que les deux sont correctes.
+Si Preview fonctionne mais que la publication échoue, vérifiez la configuration spécifique à la publication.
 
-### Vérifier les Secrets de production
+<div id="check-logs">
+  ### Vérifier les logs
+</div>
 
-Les Secrets que vous définissez dans l'Éditeur de projet ne se transmettent pas automatiquement à votre application publiée. Ajoutez tous les Secrets de production et variables d'environnement dans le volet **Publication**.
+Ouvrez l’onglet **Logs** dans le volet **Publishing**. Recherchez les traces de pile, les packages manquants, les commandes qui ont échoué, les variables d’environnement manquantes ou les erreurs de démarrage.
 
-Les Secrets manquants peuvent provoquer des erreurs concernant des valeurs indéfinies, des appels API échoués, des échecs de connexion à la base de données, des erreurs de connexion ou des échecs de paiement.
+Collez l’erreur pertinente dans Agent :
+
+<AiPrompt>
+  La publication a échoué avec la sortie de log suivante : [collez l’erreur].<br />
+  Expliquez la cause probable.<br />
+  Indiquez s’il s’agit d’une erreur de commande, de dépendance, de Secret, de port, de build ou d’application.<br />
+  Recommandez la correction la plus simple et indiquez comment la vérifier.
+</AiPrompt>
+
+<div id="check-run-and-build-commands">
+  ### Vérifier les commandes d’exécution et de build
+</div>
+
+Les erreurs courantes incluent les fautes de frappe, les options incorrectes, les mauvais fichiers d’entrée ou les commandes qui ne fonctionnent qu’en local.
+
+Vérifiez les commandes dans le volet **Publishing**. Si votre app nécessite une commande de build et une commande de démarrage, assurez-vous qu’elles sont toutes les deux correctes.
+
+<div id="check-production-secrets">
+  ### Vérifier les Secrets de production
+</div>
+
+Les Secrets définis dans le Project Editor ne sont pas automatiquement transférés vers votre app publiée. Ajoutez tous les Secrets et toutes les variables d’environnement de production dans le volet **Publishing**.
+
+L’absence de Secrets peut entraîner des erreurs de valeurs non définies, des échecs d’appels API, des échecs de connexion à la base de données, des erreurs de connexion ou des échecs de paiement.
 
 Consultez [Secrets](/fr/core-concepts/project-editor/app-setup/secrets).
 
-### Vérifier le comportement des processus de longue durée
+<div id="check-long-running-process-behavior">
+  ### Vérifier le comportement des processus de longue durée
+</div>
 
-Les applications publiées s'attendent à ce que votre programme continue de s'exécuter. Si votre programme s'exécute une fois et se termine, la plateforme le redémarre automatiquement.
+Les apps publiées nécessitent que votre programme continue de s’exécuter. S’il s’exécute une seule fois puis s’arrête, la plateforme le redémarre automatiquement.
 
-Assurez-vous que votre application démarre un processus de longue durée tel qu'un serveur web.
+Assurez-vous que votre application lance un processus de longue durée, tel qu’un serveur web.
 
-### Vérifier la configuration de l'hôte et du port
+<div id="check-host-and-port-configuration">
+  ### Vérifier la configuration de l’hôte et du port
+</div>
 
-Si vous exécutez un serveur web, les déploiements peuvent détecter automatiquement le port utilisé par votre serveur, mais celui-ci doit écouter sur `0.0.0.0`. Écouter uniquement sur `localhost` ou `127.0.0.1` ne fonctionne pas pour les applications publiées.
+Si vous exécutez un serveur web, Deployments peut détecter automatiquement le port utilisé par votre serveur, mais celui-ci doit écouter sur `0.0.0.0`. Écouter uniquement sur `localhost` ou `127.0.0.1` ne fonctionne pas pour les apps publiées.
 
-Si vous avez [des ports spécifiés dans votre configuration `.replit`](/fr/features/project-setup/configuration), la détection automatique des ports est désactivée. Vous devez spécifier un port avec `externalPort` défini sur `80` pour que l'étape de promotion réussisse. Vérifiez que votre serveur écoute sur le `localPort` spécifié.
+Si des [ports sont spécifiés dans votre configuration `.replit`](/fr/features/project-setup/configuration), la détection automatique des ports est désactivée. Vous devez spécifier un port avec `externalPort` défini sur `80` pour que l’étape de promotion aboutisse. Vérifiez que votre serveur écoute sur le `localPort` spécifié.
 
-Demandez à l'Agent de vérifier cela soigneusement :
+Demandez à Agent de vérifier attentivement les points suivants :
 
 <AiPrompt>
-  Vérifie si cette application est correctement configurée pour la publication.<br />
-  Vérifie que le serveur démarre un processus de longue durée, écoute sur 0.0.0.0, utilise le port attendu et correspond à toute configuration de ports dans .replit.<br />
-  Ne modifie pas le comportement de l'application au-delà du correctif de publication.
+  Vérifiez que cette app est correctement configurée pour la publication.<br />
+  Vérifiez que le serveur démarre un processus persistant, écoute sur 0.0.0.0, utilise le port attendu et correspond à toute configuration de port dans .replit.<br />
+  Ne modifiez pas le comportement de l’app au-delà des corrections nécessaires à la publication.
 </AiPrompt>
 
-### Vérifier le délai du contrôle de santé
+<div id="check-health-check-timing">
+  ### Vérifier le délai de la vérification d’état
+</div>
 
-Avant de marquer votre application publiée comme active, Replit envoie une requête HTTP à votre application. Si votre page d'accueil met plus de cinq secondes à répondre, le contrôle de santé peut expirer et la publication peut échouer à la dernière étape.
+Avant de mettre votre app publiée en ligne, Replit envoie une requête HTTP à votre app. Si votre page d’accueil met plus de cinq secondes à répondre, la vérification d’état peut expirer et la publication peut échouer lors de l’étape finale.
 
-Si le démarrage est lent, demandez à l'Agent de réduire le travail au démarrage, de déplacer les opérations coûteuses derrière une action utilisateur ou de mettre en cache les données si approprié.
+Si le démarrage est lent, demandez à Agent de réduire les tâches effectuées au démarrage, de reporter les tâches coûteuses à une action de l’utilisateur ou de mettre les données en cache lorsque cela est approprié.
 
-## Si la publication réussit mais que l'URL publique est cassée
+<div id="if-publishing-succeeds-but-the-public-url-is-broken">
+  ## Si la publication réussit, mais que l’URL publique ne fonctionne pas
+</div>
 
-Si l'Aperçu fonctionne et que la publication réussit, mais que l'URL publique est cassée, comparez le comportement de l'Aperçu et de la production.
+Si Preview fonctionne et que la publication réussit, mais que l’URL publique ne fonctionne pas, comparez le comportement dans Preview et en production.
 
-Vérifiez :
+Vérifiez :
 
-* Les Secrets de production et les variables d'environnement.
+* Les Secrets et les variables d’environnement de production.
 * Les paramètres de connexion à la base de données.
-* Les URL de callback ou de redirection de connexion.
+* Les URL de rappel ou de redirection de connexion.
 * Les paramètres de webhook ou de redirection de paiement.
-* Les listes d'autorisation API ou les paramètres CORS.
-* Les fichiers écrits localement au lieu d'être stockés dans une base de données ou un service de stockage.
-* La mise en page mobile et les différences de navigateur.
+* Les listes d’autorisation d’API ou les paramètres CORS.
+* Les fichiers écrits localement au lieu d’être stockés dans une base de données ou un service de stockage.
+* La disposition sur mobile et les différences entre navigateurs.
 
-Demandez à l'Agent de comparer les environnements :
+Demandez à Agent de comparer les environnements :
 
 <AiPrompt>
-  L'application fonctionne dans l'Aperçu mais pas à l'URL publiée.<br />
-  Aide-moi à comparer le comportement de l'Aperçu et de la production.<br />
-  Vérifie les Secrets, les paramètres de base de données, les appels API, les redirections de connexion, les redirections de paiement, la sortie de build et les journaux.<br />
-  Donne-moi la prochaine vérification la plus sûre.
+  L’application fonctionne dans Preview, mais pas à l’URL publiée.<br />
+  Aidez-moi à comparer le comportement dans Preview et en production.<br />
+  Vérifiez les Secrets, les paramètres de la base de données, les appels d’API, les redirections de connexion, les redirections de paiement, la sortie du build et les logs.<br />
+  Indiquez-moi la vérification la plus sûre à effectuer ensuite.
 </AiPrompt>
 
-## Problèmes de déploiement statique
+<div id="static-deployment-issues">
+  ## Problèmes de déploiement statique
+</div>
 
-Les déploiements statiques servent des fichiers statiques tels que HTML, CSS et JavaScript.
+Les déploiements statiques servent des fichiers tels que des fichiers HTML, CSS et JavaScript.
 
-Si votre application comprend un comportement côté serveur, des routes API, des callbacks d'authentification, des appels de base de données depuis le serveur ou une logique backend de longue durée, elle n'est peut-être pas adaptée aux déploiements statiques. Changez le type de déploiement vers Autoscale dans le volet **Publication** à la place.
+Si votre app comporte des fonctionnalités côté serveur, des routes API, des rappels d’authentification, des appels à la base de données depuis le serveur ou une logique backend s’exécutant sur une longue durée, elle n’est peut-être pas adaptée aux déploiements statiques. Modifiez plutôt le type de déploiement en Autoscale dans le volet **Publishing**.
 
-Les problèmes de déploiement statique proviennent souvent d'un répertoire public incorrect ou du choix de Statique pour une application qui nécessite un serveur.
+Les problèmes de déploiement statique sont souvent dus à un répertoire public incorrect ou au choix de Static pour une app nécessitant un serveur.
 
-## Limites de fichiers et de taille
+<div id="file-and-size-limits">
+  ## Limites de taille et de fichiers
+</div>
 
-Les déploiements Reserved VM et Autoscale prennent en charge les applications Replit jusqu'à 8 Go. Les déploiements statiques prennent en charge jusqu'à 1 Go.
+Les déploiements VM réservée et Autoscale prennent en charge les Replit Apps jusqu&#39;à 8 Go. Les déploiements statiques prennent en charge jusqu&#39;à 1 Go.
 
-Pour réduire la taille de l'application, supprimez les fichiers inutiles, évitez de valider les sorties générées ou utilisez un stockage externe pour les ressources volumineuses.
+Pour réduire la taille de l&#39;app, supprimez les fichiers inutiles, évitez de valider les fichiers générés ou utilisez un stockage externe pour les assets volumineux.
 
 <Warning>
-  Le système de fichiers dans les applications publiées n'est pas persistant et se réinitialise à chaque publication. Pour la persistance des données, utilisez une base de données telle que [Base de données SQL](/fr/features/data-and-storage/sql-database).
+  Le système de fichiers des apps publiées n&#39;est pas persistant et se réinitialise chaque fois que vous publiez. Pour conserver les données, utilisez une base de données telle que [SQL Database](/fr/features/data-and-storage/sql-database).
 </Warning>
 
-Si les fichiers téléversés ou les données générées disparaissent après la publication, stockez-les dans une base de données ou un service de stockage plutôt que dans le système de fichiers de l'application.
+Si des fichiers téléversés ou des données générées disparaissent après la publication, stockez-les plutôt dans une base de données ou un service de stockage que dans le système de fichiers de l&#39;app.
 
-## Problèmes d'accès aux URL `replit.app` et `replit.dev`
+<div id="access-issues-with-replitapp-and-replitdev-urls">
+  ## Problèmes d&#39;accès aux URL `replit.app` et `replit.dev`
+</div>
 
-Si vous avez du mal à accéder à votre application à son domaine `replit.app` ou `replit.dev`, des filtres web ou des restrictions réseau peuvent en être la cause.
+Si vous avez des difficultés à accéder à votre app via son domaine `replit.app` ou `replit.dev`, des filtres web ou des restrictions réseau peuvent en être la cause.
 
-Essayez d'utiliser des résolveurs DNS publics comme Google DNS (`8.8.8.8`) ou Cloudflare DNS (`1.1.1.1`).
+Essayez d&#39;utiliser des résolveurs DNS publics, tels que Google DNS (`8.8.8.8`) ou Cloudflare DNS (`1.1.1.1`).
 
-### Modifier les paramètres DNS
+<div id="change-dns-settings">
+  ### Modifier les paramètres DNS
+</div>
 
 <Tabs>
   <Tab title="Windows">
     1. Ouvrez le **Panneau de configuration**.
     2. Accédez au **Centre Réseau et partage**.
-    3. Sélectionnez **Modifier les paramètres de la carte** à gauche.
-    4. Faites un clic droit sur votre connexion réseau active et sélectionnez **Propriétés**.
-    5. Sélectionnez **Protocole Internet version 4 (TCP/IPv4)** et cliquez sur **Propriétés**.
-    6. Choisissez **Utiliser les adresses de serveur DNS suivantes**.
-    7. Entrez une adresse IP de serveur DNS public, par exemple `8.8.8.8` pour Google DNS ou `1.1.1.1` pour Cloudflare DNS.
-    8. Cliquez sur **OK** pour enregistrer vos modifications.
+    3. Sélectionnez **Modifier les paramètres de la carte** dans le volet de gauche.
+    4. Cliquez avec le bouton droit sur votre connexion réseau active, puis sélectionnez **Propriétés**.
+    5. Sélectionnez **Protocole Internet version 4 (TCP/IPv4)**, puis **Propriétés**.
+    6. Choisissez **Utiliser l&#39;adresse de serveur DNS suivante**.
+    7. Saisissez l&#39;adresse IP d&#39;un serveur DNS public, par exemple `8.8.8.8` pour Google DNS ou `1.1.1.1` pour Cloudflare DNS.
+    8. Sélectionnez **OK** pour enregistrer vos modifications.
 
-    Pour des instructions plus détaillées, consultez le [guide de configuration DNS de Microsoft](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace).
+    Pour obtenir des instructions plus détaillées, consultez le [guide de configuration DNS de Microsoft](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace).
   </Tab>
 
   <Tab title="macOS">
     1. Ouvrez les **Préférences Système**.
     2. Sélectionnez **Réseau**.
-    3. Sélectionnez votre connexion réseau active à gauche.
-    4. Cliquez sur **Avancé** dans le coin inférieur droit.
-    5. Accédez à l'onglet **DNS**.
-    6. Cliquez sur le bouton **+** pour ajouter un serveur DNS.
-    7. Entrez une adresse IP de serveur DNS public, par exemple `8.8.8.8` pour Google DNS ou `1.1.1.1` pour Cloudflare DNS.
-    8. Cliquez sur **OK** puis sur **Appliquer**.
+    3. Sélectionnez votre connexion réseau active dans le volet de gauche.
+    4. Sélectionnez **Avancé** dans le coin inférieur droit.
+    5. Accédez à l&#39;onglet **DNS**.
+    6. Sélectionnez le bouton **+** pour ajouter un serveur DNS.
+    7. Saisissez l&#39;adresse IP d&#39;un serveur DNS public, par exemple `8.8.8.8` pour Google DNS ou `1.1.1.1` pour Cloudflare DNS.
+    8. Sélectionnez **OK**, puis **Appliquer**.
 
-    Pour des instructions plus détaillées, consultez le [guide de configuration DNS d'Apple](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac).
+    Pour obtenir des instructions plus détaillées, consultez le [guide de configuration DNS d&#39;Apple](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac).
   </Tab>
 
   <Tab title="Linux">
     1. Modifiez le fichier `/etc/resolv.conf` pour ajouter des serveurs DNS publics. La méthode exacte varie selon la distribution.
-    2. Ajoutez les lignes suivantes :
+    2. Ajoutez les lignes suivantes :
 
     ```bash theme={null}
     nameserver 8.8.8.8
     nameserver 1.1.1.1
     ```
 
-    Pour plus d'informations sur la configuration DNS selon les différentes distributions, consultez le [guide de configuration réseau du Wiki Debian](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers).
+    Pour en savoir plus sur la configuration DNS selon les différentes distributions, consultez le [guide de configuration réseau du wiki Debian](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers).
   </Tab>
 </Tabs>
 
-### Vider le cache DNS
+<div id="clear-dns-cache">
+  ### Vider le cache DNS
+</div>
 
-Après avoir modifié les paramètres DNS, videz le cache DNS pour appliquer la nouvelle configuration :
+Après avoir modifié les paramètres DNS, videz le cache DNS pour appliquer la nouvelle configuration :
 
-* **Windows** : Exécutez `ipconfig /flushdns` dans l'Invite de commandes.
-* **macOS et Linux** : Exécutez `sudo systemctl restart NetworkManager` dans le Terminal. La commande exacte peut varier selon la distribution.
+* **Windows** : exécutez `ipconfig /flushdns` dans l’Invite de commandes.
+* **macOS et Linux** : exécutez `sudo systemctl restart NetworkManager` dans le Terminal. La commande exacte peut varier selon la distribution.
 
 <Note>
-  Pour améliorer les performances régionales et la stabilité, les URL `replit.dev` de vos
-  applications Replit peuvent occasionnellement changer lors des migrations de cluster. Une fois la migration
+  Afin d’améliorer les performances et la stabilité dans votre région, les URL `replit.dev` de vos
+  Replit Apps peuvent occasionnellement changer lors de migrations de clusters. Une fois la migration
   terminée, les URL restent stables pendant environ un an, sauf si vous
-  demandez explicitement un changement de localisation.
+  demandez explicitement un changement d’emplacement.
 </Note>
 
-## Publier une application Streamlit
+<div id="publish-a-streamlit-application">
+  ## Publier une application Streamlit
+</div>
 
-Les applications Streamlit fonctionnent avec les déploiements Replit. La façon la plus simple de commencer est d'utiliser le [template Streamlit](https://replit.com/@replit/Streamlit?v=1).
+Les applications Streamlit sont compatibles avec les déploiements Replit. Le plus simple pour commencer est d&#39;utiliser le [template Streamlit](https://replit.com/@replit/Streamlit?v=1).
 
-Vous pouvez également définir la commande d'exécution pour la publication sur :
+Vous pouvez également définir la commande d&#39;exécution utilisée pour la publication comme suit :
 
 ```bash theme={null}
 streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
 ```
 
-Si votre application utilise un fichier d'entrée différent, remplacez `main.py` par votre nom de fichier.
+Si votre application utilise un autre fichier d’entrée, remplacez `main.py` par le nom de ce fichier.
 
-## C'est terminé quand
+<div id="youre-done-when">
+  ## Vous avez terminé lorsque
+</div>
 
-* L'Aperçu fonctionne.
-* La publication se termine.
-* L'URL publique se charge.
-* Le flux principal de l'application fonctionne à l'URL publique.
-* Les Secrets de production et les paramètres sont configurés.
-* Les journaux ne montrent pas d'erreurs de démarrage cachées.
+* Preview fonctionne.
+* La publication est terminée.
+* L’URL publique se charge.
+* Le flux principal de l’app fonctionne à l’URL publique.
+* Les Secrets et les paramètres de production sont configurés.
+* Les logs n’affichent aucune erreur de démarrage masquée.
 
-## Ressources connexes
+<div id="related">
+  ## Articles associés
+</div>
 
-* [Déploiements Replit](/fr/learn/projects-and-artifacts/replit-deployments)
+* [Replit Deployments](/fr/learn/projects-and-artifacts/replit-deployments)
 * [Ajouter un domaine personnalisé](/fr/build/add-custom-domain)
 * [Domaines personnalisés](/fr/features/publishing/custom-domains)
 * [Secrets](/fr/core-concepts/project-editor/app-setup/secrets)
 * [Base de données SQL](/fr/features/data-and-storage/sql-database)
 
-Si vous avez besoin d'aide supplémentaire après avoir essayé ces étapes, visitez le [Replit Community Hub](https://replit.com/community) pour plus de ressources.
+Si vous avez besoin d’aide supplémentaire après avoir essayé ces étapes, consultez le [Replit Community Hub](https://replit.com/community) pour trouver davantage de ressources.

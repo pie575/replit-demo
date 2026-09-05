@@ -1,0 +1,359 @@
+---
+title: "Créez une vitrine Shopify"
+description: "Découvrez comment concevoir et lancer une vitrine Shopify personnalisée avec Replit."
+---
+
+export const CANDLE_STORE_PROMPT = `Crée-moi une boutique en ligne de bougies en cire de soja coulées à la main pour une marque appelée « Ember & Oak ». Utilise Shopify comme backend pour la boutique et ses produits.
+
+L’ambiance doit être chaleureuse, apaisante et haut de gamme — comme une marque d’articles pour la maison vendus en boutique. Utilise un fond crème doux, du texte anthracite profond et une touche ambrée discrète. Des titres élégants avec empattements, des espacements généreux et des cartes produit aux coins légèrement arrondis.
+
+De haut en bas :
+
+Un en-tête simple avec un petit logo texte « Ember & Oak » à gauche, quelques liens au milieu (Boutique, Parfums, Notre histoire) et une icône de panier à droite.
+
+Une section principale avec une grande photo d’ambiance d’une bougie allumée sur une table en bois, baignée d’une lumière chaude, un titre comme « Une lumière qui évoque la maison », un sous-titre d’une ligne et un bouton « Acheter des bougies ».
+
+Une grille de produits présentant chaque bougie avec sa photo, son nom, son parfum et son prix, ainsi qu’un bouton « Ajouter au panier » sur chaque carte. Récupère les produits depuis la boutique Shopify connectée.
+
+Une courte section « Notre histoire » avec une ou deux phrases sur les bougies coulées à la main en petites séries.
+
+Un pied de page simple avec le logo texte et les mêmes liens.
+
+Génère des photos chaleureuses et cocooning de bougies et d’intérieurs. Fais en sorte que cela ressemble à une véritable marque de boutique, et non à un modèle. Connecte la grille de produits et le panier à la boutique Shopify que tu as configurée — ne me demande aucune clé API Shopify.`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Copié !";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Copier le prompt
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Créer sur Replit ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Vous pouvez concevoir et lancer une vitrine Shopify personnalisée en décrivant simplement la boutique que vous souhaitez créer. Agent provisionne une boutique Shopify, crée l’interface et ajoute vos produits, le tout au cours d’une seule conversation. Lorsque vous êtes prêt à vendre, il vous suffit de vous rendre une seule fois sur Shopify pour revendiquer la boutique et activer les paiements.
+
+Dans ce guide, vous créerez **Ember &amp; Oak**, une boutique de bougies artisanales, du prompt à la publication de votre vitrine.
+
+<Frame>
+  <img src="/assets/mirror/ember-and-oak-candles-a7ab5795c737.png" alt="La vitrine finalisée Ember & Oak — un design de boutique chaleureux dans des tons crème et ambre, avec une image hero de bougie allumée, le titre « Light that feels like home » et une grille de produits de bougies en cire de soja avec des boutons Ajouter au panier" width="3452" height="1978" data-path="images/build-examples/ember-and-oak-candles.png" />
+</Frame>
+
+<PromptActions prompt={CANDLE_STORE_PROMPT} campaign="docs-ecommerce-store" />
+
+<div id="o-que-voc-vai-alcanar">
+  ## Ce que vous allez accomplir
+</div>
+
+À la fin de ce guide, vous aurez :
+
+* Une vitrine de bougies au design personnalisé, reliée à une véritable boutique Shopify.
+* Des produits et des prix créés dans Shopify et affichés dans la vitrine.
+* Un panier fonctionnel qui redirige les acheteurs vers la page de paiement Shopify.
+* Un processus clair pour mettre votre boutique en ligne : la revendiquer, activer les paiements et la lancer.
+
+<div id="o-que-voc-vai-aprender">
+  ## Ce que vous allez apprendre
+</div>
+
+Vous apprendrez à :
+
+* Décrire une boutique pour qu&#39;Agent recommande Shopify et le configure pour vous.
+* Connecter Shopify sans avoir à gérer de clés d&#39;API.
+* Ajouter et publier des produits en dialoguant avec Agent.
+* Affiner le design et le parcours d&#39;achat.
+* Faire passer la boutique du stade de développement à une vitrine en ligne prête à vendre.
+
+<div id="conectar-o-shopify">
+  ## Connecter Shopify
+</div>
+
+Shopify est disponible pour tous les créateurs, dans toutes les apps, et la connexion se fait directement dans la conversation. Commencez par décrire la boutique que vous souhaitez créer.
+
+<Steps>
+  <Step title="Décrivez votre boutique">
+    Copiez le prompt et collez-le dans la zone de prompt sur [replit.com](https://replit.com), ou cliquez sur **Build on Replit** pour ouvrir Replit avec le prompt prérempli.
+
+    <Frame>
+      <img src="/assets/mirror/describe-your-store-b5d724daee99.png" alt="La zone de prompt de Replit avec le prompt de la boutique de bougies Ember & Oak saisi, prêt à lancer la création" width="1440" height="900" data-path="images/replitai/shopify/describe-your-store.png" />
+    </Frame>
+
+    <PromptActions prompt={CANDLE_STORE_PROMPT} campaign="docs-ecommerce-store" />
+
+    Agent détecte que vous vendez un produit physique et recommande Shopify comme backend de votre vitrine.
+
+    <Frame>
+      <img src="/assets/mirror/connect-shopify-store-7f36389f976f.png" alt="Agent de Replit passant à la compétence Shopify pour la boutique de bougies Ember & Oak, affichant une carte « Connect to Shopify » avec un bouton Connect Shopify" width="3452" height="1984" data-path="images/replitai/shopify/connect-shopify-store.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Approuver la création d'une boutique Shopify">
+    Agent vous demande l&#39;autorisation de créer une boutique Shopify pour votre app. Approuvez, et Agent provisionne une boutique de développement propre à Replit puis la connecte. Aucune configuration supplémentaire n&#39;est nécessaire.
+    Votre adresse e-mail est communiquée à Shopify afin que vous puissiez revendiquer la boutique par la suite.
+
+    La boutique est protégée par mot de passe au départ et ne peut recevoir aucun paiement réel tant que vous n&#39;êtes pas passé en ligne : vous pouvez donc créer en toute liberté, sans risque.
+  </Step>
+</Steps>
+
+<Note>
+  Chaque boutique Shopify est liée à une seule app. Si vous créez une deuxième
+  boutique par la suite, Agent provisionne une nouvelle boutique Shopify pour cette app. Pour
+  tous les détails du connecteur, consultez [Connecter Shopify](/fr/pt/features/integrations/shopify).
+</Note>
+
+<div id="construir-a-vitrine">
+  ## Créer la vitrine
+</div>
+
+Une fois Shopify connecté, Agent conçoit et construit la vitrine intégrée à votre boutique.
+
+<Steps>
+  <Step title="Laissez Agent construire le front end">
+    Agent génère la vitrine à partir de votre prompt — la section hero, la grille de produits, le panier et les sections annexes. Une fois terminé, le panneau de droite bascule sur **Preview** pour vous permettre de faire défiler la page et de parcourir le design.
+
+    <Frame>
+      <img src="/assets/mirror/storefront-preview-f5ecb9011a8c.png" alt="La vitrine Ember & Oak affichée dans le panneau Preview de Replit à côté du chat d'Agent, montrant la section hero de bougies et la grille de produits" width="3452" height="1978" data-path="images/replitai/shopify/storefront-preview.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Ajoutez vos premiers produits">
+    Une nouvelle boutique démarre avec un catalogue vide. Demandez à Agent d&#39;ajouter un produit : il le crée dans Shopify et le publie sur la vitrine.
+
+    <AiPrompt>
+      Add a lavender soy candle for $18 with a short cozy description, then publish it to the storefront.
+    </AiPrompt>
+
+    Le produit est créé dans votre boutique Shopify et apparaît dans la grille de produits de la vitrine.
+
+    <Frame>
+      <img src="/assets/mirror/add-product-8b098e606340.png" alt="Chat d'Agent ajoutant une bougie au soja à la lavande, avec le nouveau produit apparaissant dans la grille de produits de la vitrine Ember & Oak" width="3452" height="1978" data-path="images/replitai/shopify/add-product.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Complétez le catalogue">
+    Continuez à ajouter des produits en les décrivant. Agent crée chacun d&#39;eux dans Shopify avec son prix, sa description et son image.
+
+    <AiPrompt>
+      Add three more candles: Cedar &amp; Sage at $20, Vanilla Bean at $16, and Sea Salt at $22. Give each a short description and publish them.
+    </AiPrompt>
+  </Step>
+</Steps>
+
+<Tip>
+  **Pour aller plus loin :** demandez à Agent de regrouper les produits en
+  collections (« Crée une collection Fêtes avec mes trois bougies les plus
+  vendues »), d&#39;ajouter des variantes de produits comme la taille ou le parfum,
+  ou de suivre l&#39;inventaire pour que la vitrine affiche ce qui est en stock.
+  Shopify reste le système de référence pour l&#39;ensemble de ces données.
+</Tip>
+
+<div id="iterar-no-design-e-no-checkout">
+  ## Itérer sur le design et le paiement
+</div>
+
+Chaque partie de la vitrine peut être modifiée par conversation. Affinez son apparence, puis vérifiez l’ensemble du parcours d’achat.
+
+<Steps>
+  <Step title="Affinez le design">
+    Décrivez ce que vous souhaitez modifier, et Agent met à jour la vitrine.
+
+    <AiPrompt>
+      Donnez à la section héroïne un style plus éditorial — un titre plus grand, davantage d’espace blanc et un accent ambré plus doux sur les boutons.
+    </AiPrompt>
+  </Step>
+
+  <Step title="Testez le panier et le paiement">
+    Dans Preview, ajoutez une bougie au panier et lancez le paiement. Le panier redirige les acheteurs vers la page de paiement hébergée par Shopify. Pendant le développement, votre boutique est protégée par mot de passe. L’aperçu du paiement peut donc afficher une page demandant un mot de passe : c’est normal et cela ne signifie pas qu’un problème est survenu.
+  </Step>
+</Steps>
+
+<Tip>
+  **Pour aller plus loin :** demandez à Agent d’ajouter une page produit,
+  un panneau latéral de panier, une fonction de recherche ou une section de produits à la une. Comme la
+  vitrine est un véritable projet Replit, vous pouvez l’enrichir de tout ce que
+  vous pouvez décrire — un blog, une liste de souhaits ou des pages de campagne
+  personnalisées — tandis que Shopify gère le paiement et les commandes.
+</Tip>
+
+<div id="publicar">
+  ## Publier
+</div>
+
+La mise en ligne se déroule sur Shopify. Demandez à Agent de lancer le flux de mise en ligne, puis effectuez les étapes qui relèvent du marchand.
+
+<Steps>
+  <Step title="Revendiquez votre boutique sur Shopify">
+    La revendication se fait sur Shopify : c&#39;est la seule étape réalisée en
+    dehors de Replit. Votre adresse e-mail ayant été communiquée à Shopify lors
+    de la création de la boutique, vous pouvez la revendiquer via le lien fourni
+    par Replit ou via l&#39;e-mail envoyé par Shopify.
+
+    Shopify envoie un e-mail contenant une **Invitation de propriétaire de boutique**
+    qui vous guide pas à pas. Ouvrez-le et sélectionnez **Commencer**.
+
+    <Frame>
+      <img src="/assets/mirror/claim-store-email-a0d108f2191c.png" alt="E-mail « Invitation de propriétaire de boutique » de Shopify vous invitant à devenir propriétaire de la boutique, avec un bouton « Commencer »" width="856" height="1024" data-path="images/replitai/shopify/claim-store-email.png" />
+    </Frame>
+
+    Connectez-vous avec votre compte Shopify existant ou créez-en un pour accepter
+    l&#39;invitation.
+
+    <Frame>
+      <img src="/assets/mirror/claim-store-create-account-99d2e132da19.png" alt="Écran « Créer un compte » de Shopify pour accepter l'invitation, avec des options de connexion par e-mail, Google, Apple et Facebook" width="3452" height="1978" data-path="images/replitai/shopify/claim-store-create-account.png" />
+    </Frame>
+
+    Sélectionnez **Revendiquer la boutique** pour autoriser l&#39;app Replit dans votre
+    boutique et démarrer votre période d&#39;essai gratuite. Vous accédez ensuite à
+    votre tableau de bord Shopify en tant que propriétaire principal.
+
+    <Frame>
+      <img src="/assets/mirror/claim-store-4facb7c8b10c.png" alt="Écran « Revendiquez votre boutique » de Replit avec un bouton « Revendiquer la boutique » pour démarrer une période d'essai gratuite Shopify" width="3452" height="1978" data-path="images/replitai/shopify/claim-store.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Choisissez un forfait et activez les paiements">
+    Choisissez un forfait Shopify et activez Shopify Payments ou un autre
+    fournisseur. Shopify collecte les données d&#39;identité et bancaires nécessaires
+    pour vous verser vos paiements — rien de tout cela ne se passe sur Replit.
+  </Step>
+
+  <Step title="Configurez la livraison, les taxes et un domaine">
+    Définissez vos frais de livraison et vérifiez les taxes dans Shopify, et
+    connectez éventuellement un domaine personnalisé.
+  </Step>
+
+  <Step title="Lancez et publiez">
+    Supprimez le mot de passe de la vitrine dans Shopify pour l&#39;ouvrir aux
+    acheteurs. De retour sur Replit, cliquez sur **Publier** pour déployer
+    votre vitrine sur l&#39;URL publique.
+  </Step>
+</Steps>
+
+<Note>
+  Les paiements, la vérification d&#39;identité, les taxes, la livraison et les
+  contrôles antifraude restent gérés par Shopify. Pour la liste complète des
+  vérifications de mise en ligne et les détails du connecteur, consultez
+  [Connecter Shopify](/fr/pt/features/integrations/shopify#go-live-on-shopify).
+</Note>
+
+<div id="prximos-passos">
+  ## Prochaines étapes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Connecter Shopify" icon="bag-shopping" href="/fr/pt/features/integrations/shopify">
+    La référence du connecteur : le fonctionnement de la connexion à Shopify et
+    la liste complète des vérifications à effectuer avant la mise en ligne.
+  </Card>
+
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/pt/build/add-custom-domain">
+    Offrez à votre boutique une URL à votre image avant le lancement.
+  </Card>
+
+  <Card title="Améliorer le SEO" icon="magnifying-glass" href="/fr/pt/build/improve-seo">
+    Aidez les acheteurs à trouver votre boutique dans les résultats de recherche.
+  </Card>
+
+  <Card title="Lancer une landing page" icon="rectangle-list" href="/fr/pt/build/landing-page">
+    Créez une page de campagne ciblée pour générer du trafic vers votre
+    boutique.
+  </Card>
+</CardGroup>
+
+<div id="relacionados">
+  ## Articles connexes
+</div>
+
+* [Connecter Shopify](/fr/pt/features/integrations/shopify)
+* [Ajouter un domaine personnalisé](/fr/pt/build/add-custom-domain)
+* [Intégrations de l’Agent](/fr/pt/features/integrations/overview)

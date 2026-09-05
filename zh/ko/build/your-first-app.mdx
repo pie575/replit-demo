@@ -1,0 +1,222 @@
+---
+title: "构建你的第一个应用"
+description: "从提示词开始，在 Free Mode 中使用 Agent 构建一个小型应用，在 Preview 中测试，然后通过有针对性的后续提示词不断改进。"
+---
+
+export const FreeModePlanAvailability = `Starter、Core 和 Pro 套餐均可使用 Free Mode。您的 Free Mode 限制取决于所选套餐；Core 和 Pro 均包含每 ${FreeModeAllowanceRefreshPeriod} 刷新一次的额度。`;
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "已复制！";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        复制提示词
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        在 Replit 上构建 ↗
+      </button>
+    </div>;
+};
+
+export const GATHER_PROMPT = `构建一款名为 Gather 的响应式工作坊发现应用。
+
+访客应能浏览即将举办的工作坊、查看活动详情，并提交 RSVP。应用应包含逼真的示例数据。
+
+成功标准是导航功能正常，提交 RSVP 后会显示清晰的确认信息，并且布局在移动设备和桌面设备上均能良好显示。
+
+暂时不要添加登录、数据库、支付或外部集成。`;
+
+⏰ *预计用时：10 分钟*
+
+完成本指南后，你将使用 **Free Mode**，通过 prompt 构建并完善一个小型 App。
+
+<Frame>
+  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="完成后的 Gather workshop App，在 Preview 中显示“我的回复”视图" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+</Frame>
+
+<PromptActions prompt={GATHER_PROMPT} campaign="docs-your-first-app" />
+
+<div id="before-you-start">
+  ## 开始之前
+</div>
+
+你需要一个 [Replit 账户](https://replit.com)。本指南使用 **Free Mode**，它会通过智能模型路由选择模型。{FreeModePlanAvailability}
+
+本指南旨在练习一套可重复使用的 prompt 循环：
+
+1. 描述一个有用的目标成果。
+2. 添加可验证的成功标准。
+3. 明确暂时不需要构建的内容。
+4. 在 Preview 中测试结果。
+5. 提出一项有针对性的改进请求。
+
+<div id="build-the-first-version">
+  ## 构建第一个版本
+</div>
+
+<Steps>
+  <Step title="创建新 Website">
+    新建一个 Conversation，并选择 **Website** 作为 artifact。你可以从 **New** 菜单中选择，也可以在提示框中依次选择 **Add attachment → Create something new → Website**。
+
+    打开模式选择器，选择 **Free**。
+
+    <Tip>
+      你也可以直接用自然语言让 Replit 构建网站。先选择 Website 可明确目标 artifact，并在 prompt 中添加 Website 标签。
+    </Tip>
+  </Step>
+
+  <Step title="描述预期结果和成功标准">
+    使用以下 prompt：
+
+    <PromptActions prompt={GATHER_PROMPT} campaign="docs-your-first-app" />
+
+    <Frame>
+      <img src="/assets/mirror/01-prompt-free-mode-f5c56ce766c8.jpg" alt="已选择 Website artifact 并启用 Free Mode、准备发送的 Gather prompt" width="1280" height="720" data-path="images/first-app-gather/01-prompt-free-mode.jpg" />
+    </Frame>
+
+    该 prompt 从一个目标开始：构建一个用于发现工作坊的 app。接着说明访客必须能够完成哪些操作，定义可观察的成功标准，并暂不处理登录、数据、支付和集成。
+
+    这些边界能让首次构建保持聚焦。核心体验正常运行后，你可以再添加生产环境所需的功能。
+  </Step>
+
+  <Step title="让 Agent 在 Free Mode 中构建">
+    发送 prompt。Agent 会规划 artifact、创建 app、启动 app 并检查结果。你可以在 Chat 中查看进度，等待 Agent 展示 Website artifact 且 Preview 开始运行。
+
+    Free Mode 完成一次完整的首次构建可能需要几分钟。如果 Replit 针对更复杂的请求推荐更高的模式，你可以决定是否升级；此 Gather 构建可在 Free Mode 中完成。
+
+    <Frame>
+      <img src="/assets/mirror/02-first-version-163a5fb49aac.jpg" alt="默认 Build 布局中的首个可运行 Gather 网站，包含 Agent chat 和 Preview" width="1393" height="868" data-path="images/first-app-gather/02-first-version.jpg" />
+    </Frame>
+  </Step>
+
+  <Step title="在 Preview 中测试结果">
+    像访客一样使用 app。确认你可以：
+
+    * 浏览工作坊列表。
+    * 打开工作坊详情页面。
+    * 提交 RSVP。
+    * 提交后看到清晰的确认信息。
+    * 使用主导航。
+    * 将 Preview 调整至手机屏幕宽度。
+
+    将结果与 prompt 中的成功标准进行对照。如果某项功能无法正常运行，请向 Agent 描述症状，而不是尝试自行诊断代码。
+  </Step>
+</Steps>
+
+<div id="improve-the-app-with-a-focused-prompt">
+  ## 使用聚焦的 prompt 改进应用
+</div>
+
+核心功能可用后，每次只提出一项明确的改进。对于 Gather，添加一个仅在当前会话中显示已提交 RSVP 的视图：
+
+> 添加“我的 RSVP”视图，让已提交的工作坊显示在当前会话中。保留现有视觉风格，不要添加登录功能或数据库。
+
+<Frame>
+  <img src="/assets/mirror/03-refinement-prompt-94b96ae38acb.jpg" alt="一条聚焦的后续 prompt，要求 Agent 在 Free Mode 中添加仅限当前会话的“我的 RSVP”视图" width="1393" height="868" data-path="images/first-app-gather/03-refinement-prompt.jpg" />
+</Frame>
+
+再次测试 RSVP 流程，然后打开 **我的 RSVP**。已提交的工作坊应显示在当前浏览器会话中。
+
+<Frame>
+  <img src="/assets/mirror/04-refined-my-rsvps-aaebb6cc8e6c.jpg" alt="改进后的 Gather 应用，在“我的 RSVP”视图中显示已提交的工作坊" width="1393" height="868" data-path="images/first-app-gather/04-refined-my-rsvps.jpg" />
+</Frame>
+
+现在，你已完成 Replit 的核心循环：**prompt、Build、测试和改进**。
+
+<div id="grow-your-app">
+  ## 扩展你的 App
+</div>
+
+第一个 prompt 有意将生产环境功能留到后续添加。核心体验准备就绪后，再添加这些功能：
+
+<CardGroup cols={2}>
+  <Card title="添加登录功能" icon="user" href="/zh/build/add-login">
+    为参与者提供账户和私密 RSVP 历史记录。
+  </Card>
+
+  <Card title="添加数据库" icon="database" href="/zh/build/add-database">
+    跨会话持久保存工作坊和 RSVP 信息。
+  </Card>
+
+  <Card title="添加支付功能" icon="credit-card" href="/zh/build/add-payments">
+    为付费工作坊售卖门票。
+  </Card>
+
+  <Card title="添加集成" icon="plug" href="/zh/build/add-integrations">
+    发送确认通知，或连接日历和其他服务。
+  </Card>
+</CardGroup>
+
+准备好分享 App 后，请按照 [Publish your app](/zh/build/publish-your-app) 中的说明操作。

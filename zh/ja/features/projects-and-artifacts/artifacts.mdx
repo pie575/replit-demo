@@ -1,0 +1,264 @@
+---
+title: "什么是 Artifact？"
+description: "Artifact 是你可以在 Replit 上发布的作品——Web 应用、移动应用、幻灯片、动画、数据可视化、3D 游戏，以及可部署、可分享的设计。"
+---
+
+export const ArtifactGrid = () => {
+  if (typeof document !== "undefined" && !document.getElementById("artifact-grid-styles")) {
+    const style = document.createElement("style");
+    style.id = "artifact-grid-styles";
+    style.textContent = `
+      .artifact-grid-wrap {
+        --ag-bg: var(--replit-docs-bg, #F6F6F4);
+        --ag-icon-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ag-icon-border: var(--replit-docs-border, #DEDAD5);
+        --ag-text: var(--replit-docs-text-muted, #5C5C5C);
+        --ag-icon-color: var(--replit-docs-text-muted, #5C5C5C);
+      }
+      .dark .artifact-grid-wrap,
+      html.dark .artifact-grid-wrap,
+      [data-theme="dark"] .artifact-grid-wrap {
+        --ag-bg: var(--replit-docs-bg, #1E1E1F);
+        --ag-icon-bg: var(--replit-docs-bg-elevated, #222223);
+        --ag-icon-border: var(--replit-docs-border, #39393D);
+        --ag-text: var(--replit-docs-text-muted, #B8B8BE);
+        --ag-icon-color: var(--replit-docs-text-muted, #B8B8BE);
+      }
+      @keyframes ag-fade-in {
+        from { transform: translateY(8px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @media (hover: hover) {
+        .artifact-grid-wrap .ag-icon-btn:hover {
+          background: var(--ag-icon-border) !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const types = [{
+    name: "Web",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Design",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Animation",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Data Viz",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 14.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-1.5 0v-6a.75.75 0 0 1 .75-.75ZM12 8.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75ZM19 2.25a.75.75 0 0 1 .75.75v18a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75Z" />
+        </svg>
+  }, {
+    name: "3D Game",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M11.25 9.675A3.751 3.751 0 0 1 12 2.25a3.75 3.75 0 0 1 .75 7.425v4.575H19A2.75 2.75 0 0 1 21.75 17v2A2.75 2.75 0 0 1 19 21.75H5A2.75 2.75 0 0 1 2.25 19v-2A2.75 2.75 0 0 1 5 14.25h.25V13a.75.75 0 0 1 1.5 0v1.25h4.5V9.675ZM9.75 6a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0ZM4.116 16.116A1.25 1.25 0 0 1 5 15.75h14A1.25 1.25 0 0 1 20.25 17v2A1.25 1.25 0 0 1 19 20.25H5a1.25 1.25 0 0 1-1.244-1.126L3.75 19v-2c0-.331.132-.65.366-.884Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const rows = [types.slice(0, 4), types.slice(4, 7)];
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ag-icon-border)",
+    borderRadius: "12px",
+    background: "var(--ag-icon-bg)",
+    cursor: "default",
+    color: "var(--ag-icon-color)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  return <div className="artifact-grid-wrap" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+    padding: "32px",
+    background: "var(--ag-bg)",
+    borderRadius: "16px",
+    width: "100%",
+    maxWidth: "460px",
+    margin: "32px auto",
+    opacity: 0,
+    animation: "ag-fade-in 300ms ease-out forwards"
+  }}>
+      {rows.map((row, ri) => <div key={ri} style={{
+    display: "flex",
+    gap: "12px",
+    justifyContent: "center"
+  }}>
+          {row.map(type => <div key={type.name} style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "6px"
+  }}>
+              <div className="ag-icon-btn" style={iconBtnStyle}>
+                {type.icon}
+              </div>
+              <span style={{
+    fontSize: "11px",
+    color: "var(--ag-text)",
+    textAlign: "center",
+    lineHeight: "1.2"
+  }}>
+                {type.name}
+              </span>
+            </div>)}
+        </div>)}
+    </div>;
+};
+
+<div id="section">
+  ## 什么是 artifact？
+</div>
+
+artifact 就是你可以在 Replit 上发布的成果，比如 Web 应用、移动应用、幻灯片、动画、数据应用、3D 游戏、设计等等。每个 artifact 都是完整且独立的作品，发布后会获得专属的可分享 URL。
+
+项目中的其他内容 (文件、图片、CSV、代码) 都是为 artifact 服务的，无法单独发布。
+
+<ArtifactGrid />
+
+<div id="section-2">
+  ## 可以创建的内容
+</div>
+
+| 类型                                                           | 说明                            |
+| ------------------------------------------------------------ | ----------------------------- |
+| **[Web 应用](/zh/ja/features/artifact-types/web-apps)**           | 精美而强大的网站，可处理用户、数据库等。          |
+| **[移动应用](/zh/ja/features/artifact-types/building-mobile-apps)** | 适用于 iPhone 和 Android 手机的原生应用。 |
+| **[幻灯片](/zh/ja/features/artifact-types/slide-decks)**           | 可用于演示或导出的幻灯片。                 |
+| **[动画](/zh/ja/features/artifact-types/animated-videos)**        | 动态图形与动画视频，可导出为 MP4。           |
+| **[数据可视化](/zh/ja/features/artifact-types/data-apps)**           | 用于探索数据、创建图表的交互式仪表板与可视化内容。     |
+| **3D 游戏**                                                    | 3D 游戏、模拟和交互式体验。               |
+| **[Design](/zh/ja/design/canvas)**                              | 在设计 Canvas 上探索视觉方向、快速构建创意原型。  |
+
+各类型在不同套餐中的可用情况，请参阅其专属页面。
+
+<div id="section-3">
+  ## 开始使用
+</div>
+
+在 Replit 主页上，有两种创建方式：
+
+* **描述需求**：直接输入你想要的东西——比如&quot;做一个食谱应用&quot;或&quot;做一份创业路演材料&quot;。Agent 会判断哪种类型最合适，并着手构建。
+* **选择类型**：在描述你的创意之前，先选择想要的产物 (Web 应用、移动应用、数据可视化、动画、3D 游戏或其他支持的类型) 。
+
+你也可以随时在聊天中让 Agent 添加，或点击预览面板中的 **+** 按钮，将其添加到现有项目中。
+
+<div id="section-4">
+  ## 切换制品
+</div>
+
+如果项目中有多个制品，可以在**预览面板**或**库侧边栏**中切换。你也可以直接问 Agent——比如“给我看看移动应用”或“切换到幻灯片”。
+
+<div id="section-5">
+  ### 库侧边栏
+</div>
+
+库侧边栏为你提供了一个集中浏览项目内所有内容的位置，其中会显示 artifact、Agent 生成或下载的图片以及其他项目资源。从左侧面板打开库侧边栏，即可查找并复用整个项目中的资源。
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/stock_image_library_compressed-3c901589aea3.mp4" />
+</Frame>
+
+<div id="section-6">
+  ## 一个项目包含多个 artifact
+</div>
+
+一个项目最多可包含 **7 个 artifact**，其中**移动应用最多 1 个**。例如，你可以在同一个项目中构建面向客户的 Web 应用、面向团队的移动应用，以及面向投资人的幻灯片。
+
+<ArtifactGrid />
+
+<div id="section-7">
+  ### 向项目添加工件
+</div>
+
+向现有项目添加工件有三种方式：
+
+* **聊天**：直接告诉 Agent —— “给这个项目添加一个移动应用”或“制作一份面向投资人的幻灯片”
+* **加号按钮**：点击预览面板中的 **+** 按钮，选择你想构建的内容
+* **库侧边栏**：浏览现有的工件、图片和其他资源，并从中添加新工件
+
+<div id="section-8">
+  ### 共享数据与后端
+</div>
+
+同一项目中的各个构件会自动共享同一套数据和后端逻辑。当客户在 Web 应用中下单时，移动应用和数据看板会立即看到这笔订单。无需配置连接，也无需重复编写代码——开箱即用。
+
+<Note>
+  发布时，整个项目会一次性部署。所有构件同时发布，因此始终保持同步。
+</Note>
+
+<div id="section-9">
+  ### 组合示例
+</div>
+
+* **Web 应用 + 移动应用**：一家餐厅同时拥有面向顾客的 Web 应用和面向员工的移动应用 —— 两者连接同一个 API 和数据库
+* **应用 + 管理后台**：主产品搭配内部管理面板，用于管理内容、用户和设置
+* **应用 + 幻灯片**：产品与路演幻灯片放在同一个项目中，让幻灯片始终反映最新版本
+* **数据看板 + 视频**：实时数据可视化，搭配讲解重点内容的动画视频
+
+<div id="section-10">
+  ## 发布
+</div>
+
+应用、幻灯片和视频均可发布并分享。部署后，每一项都会获得专属的可分享 URL。
+
+不属于工件的文件或资源 (如 CSV、图片、Markdown 文件等) 无法单独发布。如需分享，请将其添加到应用中，或创建新的工件。
+
+<div id="section-11">
+  ## 常见问题
+</div>
+
+<Accordion title="一个 project 可以包含多个 artifact 吗？">
+  可以。一个 project 最多可包含 **7 个 artifact**，其中**每个 project 只能有 1 个移动应用**。同一 project 内的所有 artifact 会自动共享相同的后端和数据。
+
+  如果已达到移动应用上限，但还想再构建一个移动应用，请在新的 project 中创建。如果已达到 7 个 artifact 的上限，请先删除现有 artifact，或将 project 拆分，然后再添加新的 artifact。
+</Accordion>
+
+<Accordion title="开始之前需要先选择类型吗？">
+  不需要。只需描述你想要的内容，Agent 就会选择合适的类型。如果愿意，你也可以从下拉菜单中手动选择类型。
+</Accordion>
+
+<Accordion title="可以只发布 project 中的某一个 artifact 吗？">
+  目前还不行。发布时整个 project 会一起部署，因此所有 artifact 始终保持同步。如果需要独立部署，请使用不同的 project。
+</Accordion>
+
+<Accordion title="artifact 之间会共享数据吗？">
+  会。同一 project 内的所有 artifact 共享同一个数据库和后端服务。Web 应用写入数据后，移动应用和数据看板可以立即读取到这些数据。
+</Accordion>
+
+<Accordion title="artifact 和文件有什么区别？">
+  artifact 是可以发布的内容 —— 应用、幻灯片、视频。而文件 (CSV、图片、代码等) 是 project 中用于支撑 artifact 的资源，无法单独发布。
+</Accordion>
+
+<Accordion title="移动应用缺少 Web 应用中的某些功能，这是怎么回事？">
+  Agent 在不同 artifact 类型之间转换功能时，某些内容可能无法完全沿用 —— 尤其是在不同平台上表现各异的交互和布局。你可以在聊天中继续追问，补齐缺失的部分。
+</Accordion>
+
+如需了解可构建内容的完整列表，请参阅 [project 概览](/zh/ja/features/projects-and-artifacts/projects)。

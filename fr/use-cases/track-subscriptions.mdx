@@ -1,6 +1,8 @@
 ---
 title: "Suivre les abonnements"
-description: "Trouvez les paiements récurrents dans vos e-mails et calculez leur coût mensuel."
+description: "Repérez les paiements récurrents dans vos e-mails et calculez leur coût mensuel."
+sidebarTitle: "Suivre les abonnements"
+icon: "receipt"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                Ce n’est pas un connecteur natif. Agent vous demandera votre clé API.
               </div> : null}
           </div>
         </div>)}
@@ -67,78 +69,90 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Analysez Gmail pour trouver les e-mails d'abonnement et de reçu, identifiez les paiements
-récurrents, et calculez le coût mensuel dans Google Sheets. L'Agent extrait le fournisseur,
-le montant et la fréquence, et signale tout ce qui ressemble à un essai gratuit oublié avant
-son renouvellement.
+Analysez Gmail pour repérer les e-mails d’abonnement et les reçus, identifiez les paiements récurrents et calculez le
+coût mensuel dans Google Sheets. Agent extrait le fournisseur, le montant et la périodicité, et signale
+tout essai potentiellement oublié avant son renouvellement.
 
-## Idéal pour
+<div id="best-for">
+  ## Idéal pour
+</div>
 
-* Les fondateurs et responsables opérations qui ont besoin de connaître la dépense mensuelle réelle sur les outils et services.
-* Les responsables finance et administratifs qui ont besoin de repérer les essais gratuits oubliés avant leur renouvellement.
+* Les fondateurs et responsables opérationnels qui ont besoin de connaître les dépenses mensuelles réelles liées aux outils et services.
+* Les responsables financiers et administratifs qui doivent repérer les essais oubliés avant leur renouvellement.
 
-## Connecteurs
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 { id: "gmail", name: "Gmail", why: "Reçus et e-mails de renouvellement" },
 {
-  id: "google-sheets",
-  name: "Google Sheets",
-  why: "Liste courante des abonnements et coût mensuel",
+id: "google-sheets",
+name: "Google Sheets",
+why: "Liste actualisée des abonnements et de leur coût mensuel",
 },
 ]}
 />
 
-## Avant de commencer
+<div id="before-you-start">
+  ## Avant de commencer
+</div>
 
-Connectez Gmail et une Google Sheet (ou demandez à l'Agent d'en créer une). Indiquez à
-l'Agent quelle boîte de réception ou quel libellé chercher.
+Connectez Gmail et une feuille Google Sheet (ou demandez à Agent d’en créer une). Indiquez à Agent dans quelle boîte de réception ou quel
+libellé effectuer la recherche.
 
-## Invite à l'Agent
-
-<AiPrompt>
-  Crée une routine qui s'exécute chaque lundi à 9h00. Analyse Gmail pour
-  trouver les e-mails d'abonnement et de reçu. Identifie les paiements
-  récurrents, extrais le fournisseur, le montant et la fréquence, et écris
-  une Google Sheet qui calcule le coût mensuel. Signale tout ce qui ressemble
-  à un essai gratuit oublié.
-</AiPrompt>
-
-## À quoi s'attendre
-
-L'Agent construit un tableau des fournisseurs, montants, fréquence de facturation, et un
-total mensuel. Vérifiez quelques lignes par rapport aux e-mails d'origine. La première
-exécution manquera les fournisseurs qui ne disent pas « abonnement » dans le sujet ; ajoutez
-ces libellés et relancez. Choisissez trois fournisseurs que vous connaissez, ouvrez le reçu
-Gmail, et confirmez le montant et la fréquence avant de faire confiance au total mensuel.
-
-## Adaptez-le à vos besoins
+<div id="prompt-the-agent">
+  ## Donnez une instruction à l’agent
+</div>
 
 <AiPrompt>
-  Regroupe les abonnements par catégorie (outils dev, design, IA, personnel)
-  et mets en évidence tout ce qui dépasse \[montant] par mois.
+  Créez une routine qui s’exécute chaque lundi à 9 h. Analysez Gmail pour y repérer les e-mails
+  d’abonnement et les reçus. Identifiez les paiements récurrents, extrayez le fournisseur, le montant et
+  la périodicité, puis créez un Google Sheet qui calcule le coût mensuel. Signalez tout ce qui
+  ressemble à un essai oublié.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## À quoi vous attendre
+</div>
+
+Agent crée un tableau indiquant les fournisseurs, les montants, la périodicité de facturation et un total mensuel. Vérifiez
+quelques lignes en les comparant aux e-mails d&#39;origine. Lors de la première exécution, certains fournisseurs dont l&#39;objet ne contient pas
+« subscription » ne seront pas détectés ; ajoutez ces libellés, puis relancez. Choisissez trois fournisseurs que vous connaissez,
+ouvrez leur reçu Gmail et confirmez le montant et la périodicité avant de vous fier au total mensuel.
+
+<div id="make-it-work-for-you">
+  ## Adaptez-le à vos besoins
+</div>
+
+<AiPrompt>
+  Regroupez les abonnements par catégorie (outils de développement, Design, IA, personnel) et
+  mettez en évidence ceux qui dépassent $[amount] par mois.
 </AiPrompt>
 
 <AiPrompt>
-  Envoie un rappel Slack 3 jours avant tout renouvellement annuel supérieur à
-  \[montant].
+  Envoyez un rappel Slack 3 jours avant tout renouvellement annuel supérieur à $[amount].
 </AiPrompt>
 
-## Dépannage
+<div id="troubleshooting">
+  ## Dépannage
+</div>
 
-* **La feuille manque des abonnements que vous connaissez :** indiquez à l'Agent quel libellé ou quelle recherche Gmail utiliser, et incluez les fournisseurs qui ne disent pas « abonnement » dans le sujet. Vérifiez quelques lignes par rapport aux e-mails d'origine.
-* **Les montants ou la fréquence semblent incorrects :** les reçus montrent souvent la taxe, des crédits, ou une devise différente. Demandez à l'Agent de conserver le montant de la ligne et la période de facturation de l'e-mail, et de signaler les lignes qu'il a déduites.
-* **Le même fournisseur apparaît deux fois :** demandez à l'Agent de fusionner par nom de fournisseur et de conserver le reçu le plus récent, puis de recalculer le total mensuel.
+* **La feuille ne contient pas certains abonnements dont vous avez connaissance :** indiquez à Agent le libellé Gmail ou la recherche à utiliser, et incluez les fournisseurs qui ne mentionnent pas « subscription » dans l’objet. Vérifiez quelques lignes par rapport aux e-mails d’origine.
+* **Les montants ou la périodicité semblent incorrects :** les reçus indiquent souvent des taxes, des crédits ou une devise différente. Demandez à Agent de conserver le montant de chaque poste et la période de facturation indiqués dans l’e-mail, et de signaler les lignes qu’il a déduites.
+* **Le même fournisseur apparaît deux fois :** demandez à Agent de fusionner les entrées par nom de fournisseur et de conserver le reçu le plus récent, puis de recalculer le total mensuel.
 
-## Voir aussi
+<div id="related">
+  ## Articles connexes
+</div>
 
 <CardGroup cols={2}>
-  <Card title="Rattraper le retard après une absence" href="/fr/use-cases/catch-up-while-away">
-    Le même connecteur Gmail pour les fondateurs et responsables opérations après une absence.
+  <Card title="Rattraper son retard après une absence" href="/fr/use-cases/catch-up-while-away">
+    Un même connecteur Gmail pour les fondateurs et les équipes opérationnelles après une absence.
   </Card>
 
-  <Card title="Créer un tableau de bord API en temps réel" href="/fr/use-cases/live-api-dashboard">
-    Un tableau de bord en temps réel au lieu d'un tableau hebdomadaire.
+  <Card title="Créer un dashboard d’API en temps réel" href="/fr/use-cases/live-api-dashboard">
+    Un dashboard en temps réel plutôt qu’un tableau hebdomadaire.
   </Card>
 </CardGroup>

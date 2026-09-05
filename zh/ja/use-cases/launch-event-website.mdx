@@ -1,0 +1,161 @@
+---
+title: "发布付费活动网站"
+description: "从 Notion 导入议程、演讲嘉宾、场地和付费门票并发布。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                非原生 connector。Agent 会要求你提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+创建一个包含活动日程、演讲嘉宾、场地、前往方式和票务结账功能的完整付费
+活动网站。将参与者信息存储在Replit Database中，通过Stripe收款，
+使用Resend发送确认邮件，并导出名单。分享链接前，请先进行测试下单。
+
+<div id="section">
+  ## 适用场景
+</div>
+
+* 需要为会议、聚会和发布活动提供公开页面及付费门票的
+  活动营销人员。
+* 希望直接在应用内编辑议程、无需使用单独内容管理系统的社区
+  负责人。
+
+<div id="section-2">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "演讲嘉宾、议程和场次时间",
+},
+{ id: "resend", name: "Resend", why: "购买后的确认邮件" },
+{ id: "stripe", name: "Stripe", why: "付费门票和结账流程" },
+]}
+/>
+
+<div id="section-3">
+  ## 开始前
+</div>
+
+请准备活动名称、日期、场地、票价，以及演讲嘉宾的 Notion 数据库 (姓名、照片、
+场次) 。连接 Notion、Resend 和 Stripe。Agent 将在应用中搭建
+结账流程。
+
+<div id="section-4">
+  ## 给 Agent 的指示
+</div>
+
+<AiPrompt>
+  根据此 Notion 页面[链接]创建一个完整的付费活动网站：包括活动日程、
+  演讲嘉宾、场地、前往方式和门票结账。使用 Notion 中的嘉宾姓名、照片、职位、
+  简介和场次时间。通过 Stripe 按每张门票[价格]收费。
+  将参与者信息保存到 Replit Database，使用 Resend 发送确认邮件，并
+  导出名单。
+</AiPrompt>
+
+<div id="section-5">
+  ## 您将获得什么
+</div>
+
+Agent 会构建一个可公开访问的网站，并接入结账、支付、确认邮件和参与者名单。
+分享链接前，请先进行测试下单。使用 Stripe 的测试模式和测试卡，
+确认能够收到确认邮件、参与者已添加到名单中，且导出内容包含参与者，
+然后再切换至实际收费。
+
+<div id="section-6">
+  ## 按需自定义
+</div>
+
+<AiPrompt>
+  根据这个Notion数据库[链接]添加演讲嘉宾页面。使用姓名、照片、职位、简介和
+  场次时间。Notion有更新时，也同步更新页面。
+</AiPrompt>
+
+<AiPrompt>
+  当参与人数达到[n]人时，停止售票，改为显示候补登记表。
+</AiPrompt>
+
+<div id="section-7">
+  ## 故障排除
+</div>
+
+* **未收到确认邮件：**请确认 Resend 已连接，且发信域名已通过验证。创建测试订单，并在 Resend 控制台中确认邮件是否已发送。
+* **演讲者或时间有误：**请向 Agent 指定 Notion 数据库 (姓名、照片、职位、简介、场次时间) ，并要求它在 Notion 内容变更时同步更新页面。
+* **结账时未收费：**请确认 Stripe 已连接，并且当前处于测试模式。分享链接前，请先创建测试订单。
+
+<div id="section-8">
+  ## 相关信息
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计落地页" href="/zh/ja/use-cases/design-landing-page">
+    您还可以将同一 Notion 内容源用于候补名单和发布页面。
+  </Card>
+
+  <Card title="创建社交媒体图标和横幅" href="/zh/ja/use-cases/create-social-kit">
+    适合还需要个人资料和封面素材的活动营销人员。
+  </Card>
+</CardGroup>

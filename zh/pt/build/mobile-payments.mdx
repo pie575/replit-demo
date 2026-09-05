@@ -1,0 +1,256 @@
+---
+title: "使用 RevenueCat 添加支付功能"
+description: "在你的 App 中通过 RevenueCat 向玩家收取内容费用。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const subscriptionPrompt = "为 PixelGames 添加月度订阅服务，订阅后可解锁 Snake、Racer 和 Pinball。";
+export const paywallPrompt = "在 PixelGames 的付费墙中，以封面图形式展示四款可解锁游戏。";
+
+<div id="o-que-o-revenuecat">
+  ## 什么是 RevenueCat
+</div>
+
+在 PixelGames 中，Snake、Racer 和 Pinball 均标记为“即将推出”。RevenueCat 可让
+你的 App 通过销售订阅来解锁这些内容，无需直接集成 Apple 和 Google 的应用内购买
+系统；只需让 Agent 添加订阅并连接 RevenueCat，其余工作都由它完成。
+
+<Warning>
+  Apple 和 Google 要求此类数字内容必须使用各自的应用内购买系统，
+  并且都会从销售额中抽成。你不能通过外部付款链接绕过这一要求。
+</Warning>
+
+<div id="antes-de-comear">
+  ## 开始之前
+</div>
+
+* 一个已配置为移动应用的 Replit 项目。
+* 一个 RevenueCat 账户，只需邮箱和密码即可注册，暂时无需绑定银行账户。
+
+<div id="comece">
+  ## 开始使用
+</div>
+
+<Steps>
+  <Step title="让 Agent 添加订阅">
+    <AiPrompt>
+      {subscriptionPrompt}
+    </AiPrompt>
+  </Step>
+
+  <Step title="连接 RevenueCat 账户">
+    Agent 会提示你连接 RevenueCat。选择 **Connect RevenueCat** 开始连接。
+
+    <Frame caption="Replit 检测到该功能后提示连接 RevenueCat。">
+      <img src="/assets/mirror/revenuecat-36ef7466a2e7.png" alt="Replit 的 Connect RevenueCat 配置对话框" data-path="images/pixelgames/mobile/revenuecat.png" width="964" height="297" data-path="images/pixelgames/mobile/revenuecat.png" />
+    </Frame>
+  </Step>
+
+  <Step title="授权 Replit">
+    在 RevenueCat 授权页面中，授予 **Read &amp; Write** 权限。
+  </Step>
+
+  <Step title="由 Agent 构建订阅功能">
+    Agent 会创建 RevenueCat 项目，配置产品和权益，并将购买流程集成到你的 App 中。
+  </Step>
+</Steps>
+
+<div id="teste-as-assinaturas">
+  ## 测试订阅
+</div>
+
+Replit 的预览使用 RevenueCat 的测试模式。在 Expo Go 中测试购买会弹出测试购买对话框，不会产生实际扣款。待 Apple 批准你的 app 上架 App Store 后，购买将使用真实资金，因此提交前请仔细核对定价。
+
+<Frame caption="PixelGames 中的付费墙，以及 Expo Go 中显示的测试购买对话框。">
+  <img src="/assets/mirror/paywall-7b66dd10c595.png" alt="PixelGames 的付费墙界面与 RevenueCat 测试购买对话框并排展示" data-path="images/pixelgames/mobile/paywall.png" width="2274" height="1470" data-path="images/pixelgames/mobile/paywall.png" />
+</Frame>
+
+上面的测试购买对话框并不是玩家实际看到的界面。Expo Go 是一个共享 app，用于预览所有 Expo 项目，因此它无法在 RevenueCat 中识别出你 app 的真实身份，只能显示通用的测试流程。等你有了正式构建版本或 app 正式发布后，付费墙本身就是一个 RevenueCat 界面，由远程提供，而非内嵌在你的 app 中。
+
+<div id="personalize-o-paywall">
+  ## 自定义付费墙
+</div>
+
+由于付费墙由远程提供，您无需重新构建，即可通过以下两种方式更改其设计：
+
+**请 Agent 完成**
+
+<AiPrompt>
+  {paywallPrompt}
+</AiPrompt>
+
+**或手动编辑**
+
+<Steps>
+  <Step title="打开付费墙编辑器">
+    在 RevenueCat 控制面板中，前往 **Paywalls**，然后使用其可视化编辑器创建或编辑付费墙：
+    颜色、背景图片、标题文字、按钮样式，以及任何与您的 App 外观相协调的内容。
+
+    <Frame caption="RevenueCat 的可视化付费墙编辑器。">
+      <img src="/assets/mirror/customize-paywall-86e04fd14d95.png" alt="RevenueCat 付费墙编辑器，显示 PixelGames 高级版付费墙的布局和属性" data-path="images/pixelgames/mobile/customize-paywall.png" width="1920" height="991" data-path="images/pixelgames/mobile/customize-paywall.png" />
+    </Frame>
+  </Step>
+
+  <Step title="将其关联到您的套餐">
+    将付费墙关联到您当前的套餐。
+  </Step>
+
+  <Step title="更改会远程发布">
+    新设计会在下次打开付费墙时显示，无论是在 TestFlight 中还是在部署后，都无需更新 App Store 上的应用。
+  </Step>
+</Steps>
+
+<Frame caption="TestFlight 中启用的自定义付费墙，带有真实的系统购买确认。">
+  <img src="/assets/mirror/paywall-testflight-4949e275cd87.png" alt="TestFlight 中的 PixelGames 付费墙，旁边显示真实的系统购买确认界面" data-path="images/pixelgames/mobile/paywall-testflight.png" width="2274" height="1470" data-path="images/pixelgames/mobile/paywall-testflight.png" />
+</Frame>
+
+这就是玩家实际看到的内容：真实的购买确认，而不是 Expo Go 的测试对话框；以及您的自定义设计，而不是默认布局。
+
+<div id="sincronize-com-o-app-store-connect">
+  ## 与 App Store Connect 同步
+</div>
+
+同步功能让你可以直接在 RevenueCat 或 Replit Agent 中创建或修改应用内订阅和产品。
+
+在连接 App Store Connect 之前，需要先满足以下三个条件：
+
+* 如果尚未加入，请先**注册** Apple Developer Program，该计划需缴纳年费。
+* 将你的 App **提交**至 App Store，如果尚未提交，请参阅[提交你的 App](/zh/build/mobile-upload-ios)，
+  RevenueCat 需要有对应的 App 记录才能同步产品。
+* **绑定**银行账户并**签署** Apple 的 Paid Apps Agreement，这两项均在 App Store Connect 中完成，
+  否则 Apple 不会处理任何付款。
+
+<Steps>
+  <Step title="从 Replit 发起同步">
+    在 Replit 中，打开 **Publishing → Manage**，然后选择 **Sync RevenueCat to App Store
+    Connect**。将应用提交至 TestFlight 后，此按钮便会显示。
+
+    <Frame caption="在 Replit 的 Publishing 面板中开始同步。">
+      <img src="/assets/mirror/rev-co-step1-e86c72c18850.png" alt="Replit 的 Publishing 面板，Manage 选项卡已打开，并显示“Sync RevenueCat to App Store Connect”按钮" data-path="images/pixelgames/mobile/rev-co-step1.png" width="997" height="420" data-path="images/pixelgames/mobile/rev-co-step1.png" />
+    </Frame>
+  </Step>
+
+  <Step title="打开 App Store Connect API 页面">
+    在 App Store Connect 中，前往 **Users and Access → Integrations → App Store Connect API**
+    ([直接打开](https://appstoreconnect.apple.com/access/integrations/api)) ，
+    然后点击 **+** 添加新密钥。
+
+    <Frame caption="导航至 App Store Connect API 密钥页面。">
+      <img src="/assets/mirror/rev-co-step2-642a879843a1.png" alt="App Store Connect 的 Users and Access 页面，Integrations 标签页，App Store Connect API 部分" data-path="images/pixelgames/mobile/rev-co-step2.png" width="1466" height="657" data-path="images/pixelgames/mobile/rev-co-step2.png" />
+    </Frame>
+  </Step>
+
+  <Step title="生成密钥">
+    为其命名 (例如 &quot;RevenueCat&quot;) ，将 **Access** 设置为 **App Manager**，然后
+    选择 **Generate**。
+
+    <Frame caption="为 RevenueCat 生成 App Store Connect API 密钥。">
+      <img src="/assets/mirror/rev-co-step3-dcfbd73aafd8.png" alt="Generate API Key 弹窗，含名称字段，并已选择 App Manager 访问权限" data-path="images/pixelgames/mobile/rev-co-step3.png" width="1453" height="436" data-path="images/pixelgames/mobile/rev-co-step3.png" />
+    </Frame>
+  </Step>
+
+  <Step title="复制密钥详细信息">
+    复制 **Key ID** 并下载密钥文件。
+
+    <Frame caption="复制 Key ID 并下载 App Store Connect API 密钥。">
+      <img src="/assets/mirror/rev-co-step4-24337a1cd6db.png" alt="App Store Connect API 密钥列表，其中包含新建的 RevenueCat 密钥以及 Copy 和 Download 操作" data-path="images/pixelgames/mobile/rev-co-step4.png" width="1522" height="695" data-path="images/pixelgames/mobile/rev-co-step4.png" />
+    </Frame>
+  </Step>
+
+  <Step title="添加到 Replit">
+    返回 Replit 的同步弹窗 (第 1 步，共 2 步) ，上传密钥文件，粘贴
+    **Key ID** 和 **Issuer ID**，然后选择 **Continue**。
+
+    <Frame caption="在 Replit 中填入 App Store Connect 的 API 密钥。">
+      <img src="/assets/mirror/rev-co-step5-73640bd1925f.png" alt="Replit 弹窗第 1 步（共 2 步），上传 App Store Connect API 密钥并粘贴其详细信息" data-path="images/pixelgames/mobile/rev-co-step5.png" width="995" height="591" data-path="images/pixelgames/mobile/rev-co-step5.png" />
+    </Frame>
+  </Step>
+
+  <Step title="对 In-App Purchase 密钥重复此操作">
+    在 App Store Connect 的同一位置，切换到 **In-App Purchase** 标签页
+    ([直接打开](https://appstoreconnect.apple.com/access/integrations/api/subs)) ，
+    再生成一个密钥并复制其详细信息。
+
+    <Frame caption="生成并复制 In-App Purchase API 密钥。">
+      <img src="/assets/mirror/rev-co-step6-aed01868e734.png" alt="App Store Connect 的 In-App Purchase 密钥列表，带有 Download 和 Copy 操作" data-path="images/pixelgames/mobile/rev-co-step6.png" width="1547" height="593" data-path="images/pixelgames/mobile/rev-co-step6.png" />
+    </Frame>
+  </Step>
+
+  <Step title="添加至 Replit">
+    回到 Replit 的同步弹窗 (第 2 步，共 2 步) ，同样上传该密钥文件，粘贴 **Key ID** 和 **Issuer ID**，然后选择 **Continue**。
+
+    <Frame caption="在 Replit 中填入 In-App Purchase API 密钥。">
+      <img src="/assets/mirror/rev-co-step7-26d78bff7cc4.png" alt="Replit 弹窗第 2 步（共 2 步），上传 In-App Purchase API 密钥并粘贴相关信息" data-path="images/pixelgames/mobile/rev-co-step7.png" width="997" height="591" data-path="images/pixelgames/mobile/rev-co-step7.png" />
+    </Frame>
+  </Step>
+
+  <Step title="确认并同步">
+    同步完成后，你可以随时在 Replit 的同一个 **Publishing → Manage** 面板中手动修改产品价格。
+
+    <Frame caption="同步到 App Store Connect 前确认产品。">
+      <img src="/assets/mirror/rev-co-step8-a790ee2b52ee.png" alt="Replit 的 Products to Sync 界面，高级月度订阅已准备好同步" data-path="images/pixelgames/mobile/rev-co-step8.png" width="996" height="550" data-path="images/pixelgames/mobile/rev-co-step8.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="soluo-de-problemas">
+  ## 故障排查
+</div>
+
+* **购买完成但未解锁任何内容：** 请检查 RevenueCat 中的权益
+  是否映射到了正确的产品 ID。
+* **测试时正常，发布后失效：** 请确认产品已与 App Store Connect
+  同步，并已签署 Apple 的 Paid Apps Agreement。
+
+<div id="perguntas-frequentes">
+  ## 常见问题
+</div>
+
+<AccordionGroup>
+  <Accordion title="使用 RevenueCat 需要银行账户吗？">
+    不需要。创建账户只需电子邮件和密码。准备好收款后，再通过 Apple 或 Google
+    单独关联银行账户。
+  </Accordion>
+
+  <Accordion title="测试购买会收费吗？">
+    不会。Replit 预览使用 RevenueCat 的测试模式，所有购买均为模拟购买。
+    只有在 Apple 批准您的 App 上架 App Store 后，才会开始实际收费。
+  </Accordion>
+
+  <Accordion title="我可以通过 RevenueCat 配置哪些内容？">
+    定价、权益和付费墙。让 Agent 进行任何更改，它会
+    同时更新 RevenueCat 配置和您的 App 代码。
+  </Accordion>
+</AccordionGroup>
+
+<div id="o-que-vem-a-seguir">
+  ## 下一步
+</div>
+
+<CardGroup cols={2}>
+  <Card title="收集评价和评分" icon="star" href="/zh/pt/build/mobile-collect-reviews">
+    邀请满意的玩家为 PixelGames 评分。
+  </Card>
+</CardGroup>
+
+<div id="relacionado">
+  ## 相关内容
+</div>
+
+* [在移动 App 中存储图片](/zh/pt/build/mobile-store-images)
+* [发布到 App Store](/zh/build/mobile-publish-ios)
+* [发布到 Google Play](/zh/build/mobile-publish-android)

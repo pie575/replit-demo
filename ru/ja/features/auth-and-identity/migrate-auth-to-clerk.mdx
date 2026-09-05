@@ -1,0 +1,125 @@
+---
+title: "Миграция с Replit Auth на Clerk Auth"
+description: "С помощью Agent перенесите существующее App с Replit Auth на Clerk Auth, сохранив пользовательские данные."
+---
+
+С помощью этого руководства перенесите существующее App с [Replit Auth](/ru/ja/features/auth-and-identity/authentication) на [Clerk Auth](/ru/ja/features/auth-and-identity/clerk-auth). Agent выполнит миграцию App, поэтому существующие пользователи сохранят доступ к своим данным.
+
+<Note>
+  Эта автоматическая миграция предназначена для App, использующих Replit Auth. Не используйте этот процесс, если ваше App использует другую систему аутентификации.
+</Note>
+
+<div id="section">
+  ## Начало миграции
+</div>
+
+Миграцию с помощью Agent всегда следует выполнять в новой задаче.
+
+Начать миграцию можно одним из следующих способов.
+
+<div id="agent">
+  ### Начните с Agent
+</div>
+
+<Steps>
+  <Step title="Создайте новую задачу">
+    Нажмите **+** на боковой панели или **Cmd+Shift+P** (Mac) либо **Ctrl+Shift+P** (Windows), чтобы создать новую задачу.
+
+    <Frame caption="Планирование новой задачи: опишите, что хотите сделать, и Agent создаст план.">
+      <img src="/assets/mirror/replit-auth-to-clerk-new-task-090bed68b68c.png" alt="Экран New task с выделенной кнопкой создания новой задачи на боковой панели. Подсказка с сочетанием клавиш Cmd Shift P и пустое состояние Plan a new task над полем ввода Message Agent" width="1750" height="1948" data-path="images/workspace/auth/replit-auth-to-clerk-new-task.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выполните миграцию с помощью Agent">
+    В новой задаче попросите Agent перенести ваше App с Replit Auth на Clerk.
+  </Step>
+</Steps>
+
+<div id="auth">
+  ### Начните с панели Auth
+</div>
+
+<Steps>
+  <Step title="Откройте Tools">
+    В Project Editor откройте **Tools**.
+
+    <Frame caption="При открытии вкладки Tools рядом с активными инструментами отображается список инструментов.">
+      <img src="/assets/mirror/replit-auth-to-clerk-open-tools-6eeea4995d4f.png" alt="В Project Editor открыта вкладка Tools: рядом с обзором Publishing отображается список инструментов, включая Publishing, Domains, Monitoring и Users & Auth" width="1500" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-open-tools.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите Users & Auth">
+    <Frame caption="Users & Auth в списке инструментов.">
+      <img src="/assets/mirror/replit-auth-to-clerk-users-auth-684bf872c3b2.png" alt="В списке инструментов выделен Users & Auth и показана подсказка «Let users log in to your App using a prebuilt login page»" width="1154" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-users-auth.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите Update now">
+    На баннере **Introducing a new Replit Auth** выберите **Update now**.
+
+    <Frame caption="В инструменте Users & Auth отображается баннер Introducing a new Replit Auth с действием Update now.">
+      <img src="/assets/mirror/replit-auth-to-clerk-banner-64d3b381da86.png" alt="В Project Editor с выбранным Users & Auth отображается баннер Introducing a new Replit Auth с кнопкой Update now" width="1220" height="764" data-path="images/workspace/auth/replit-auth-to-clerk-banner.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите Ask agent to migrate">
+    В диалоговом окне выберите **Ask agent to migrate**.
+
+    <Frame caption="В диалоговом окне с обзором миграции описываются изменения в Clerk Auth и предлагается действие Ask agent to migrate.">
+      <img src="/assets/mirror/replit-auth-to-clerk-dialog-c485c7e997bc.png" alt="Диалоговое окно Introducing a new Replit Auth с кнопкой Ask agent to migrate" width="1259" height="790" data-path="images/workspace/auth/replit-auth-to-clerk-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="section-2">
+  ### Проверка плана миграции
+</div>
+
+Независимо от выбранного способа Agent создаст задачу **Migrate from Replit Auth to Clerk** и подготовит план миграции. Прежде чем задача продолжит выполнение, выберите **View plan**, чтобы ознакомиться с планом.
+
+<Frame caption="Задача Migrate from Replit Auth to Clerk начинается с действия View plan, чтобы вы могли ознакомиться с инструкциями по миграции.">
+  <img src="/assets/mirror/replit-auth-to-clerk-task-998d61b55c3d.png" alt="Задача Agent с названием Migrate from Replit Auth to Clerk, в которой показаны кнопка View plan и проверка инструкций по миграции" width="575" height="900" data-path="images/workspace/auth/replit-auth-to-clerk-task.png" />
+</Frame>
+
+Пока Agent работает, не изменяйте код аутентификации App или учётные данные Clerk.
+
+<div id="agent-2">
+  ## Что делает Agent
+</div>
+
+Agent выполняет миграцию в следующем порядке:
+
+1. Переносит в Clerk пользовательские данные Replit Auth, включая сведения об идентификации аккаунта и поддерживаемые учетные данные для входа.
+2. Дожидается завершения миграции данных, прежде чем вносить изменения в App.
+3. Обновляет логику входа и сеансов в App, перезапускает App и запускает доступные автоматические проверки.
+
+<div id="section-3">
+  ## Данные App остаются без изменений
+</div>
+
+Agent изменяет только код аутентификации App. Существующие данные и схемы базы данных App не обновляются. Таблицы и связи сохраняются без изменений.
+
+Существующие пользователи по-прежнему будут связаны с принадлежащими им записями, включая профили, сохранённые результаты работы и разрешения.
+
+<div id="section-4">
+  ## Необходимое время
+</div>
+
+Работа Agent может занять от 10 минут до часа. Сама миграция данных может занять несколько минут для небольших App и до нескольких часов для App с большим числом пользователей. Agent не начнёт вносить изменения в код App, пока миграция данных не завершится.
+
+<div id="section-5">
+  ## После миграции
+</div>
+
+Перед публикацией протестируйте App, обновлённое в Development.
+
+1. Войдите в существующий аккаунт и убедитесь, что сохранённые данные доступны.
+2. Выйдите из аккаунта и войдите снова.
+3. Создайте новый тестовый аккаунт и убедитесь, что App работает должным образом.
+
+<div id="section-6">
+  ## Дополнительные ресурсы
+</div>
+
+* [Обзор Clerk Auth](/ru/ja/features/auth-and-identity/clerk-auth) — как работает Clerk Auth в Replit
+* [Планирование миграции пользовательской аутентификации](/ru/ja/features/auth-and-identity/custom-auth-migration) — как спланировать миграцию с пользовательской системы аутентификации

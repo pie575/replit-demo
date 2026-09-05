@@ -1,0 +1,120 @@
+---
+title: "Ajouter des paiements"
+description: "Percevez un dépôt remboursable lorsque vos clients réservent un véhicule Velocity, puis facturez le solde au moment de la prise en charge."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Une fois cette étape terminée, les clients de Velocity pourront verser un acompte remboursable lors de la réservation d&#39;une voiture, puis payer le solde à la prise en charge.
+
+Vous avez ajouté une fonctionnalité de connexion et une base de données à Velocity. Transformons maintenant cette application en véritable service de réservation : réservez provisoirement les voitures grâce à un **acompte** remboursable lors de la réservation, puis **facturez le solde à la prise en charge**. Replit traite les paiements via Stripe, vous n&#39;avez donc pas besoin d&#39;écrire vous-même du code Stripe.
+
+<div id="section">
+  ## Définir les montants de l’acompte et du solde
+</div>
+
+Avant de demander à Agent de créer l’application, définissez le mode de calcul :
+
+* **Acompte à la réservation :** montant fixe ou pourcentage du montant total ? Un acompte fixe de 500 $ est facile à comprendre, tandis qu’un acompte de 20 % s’adapte au véhicule.
+* **Solde à la prise en charge :** part restante des frais de location, facturée au client lorsqu’il récupère les clés.
+* **Délai de remboursement :** jusqu’à quand l’acompte est-il remboursable en cas d’annulation ? Un délai de 48 heures est courant.
+
+Dans ce guide, Velocity prélève un acompte remboursable fixe de 500 $ à la réservation, facture le solde à la prise en charge et rembourse intégralement les annulations effectuées au moins 48 heures à l’avance. Adaptez ces paramètres à votre activité.
+
+<div id="agentstripe">
+  ## Demander à Agent d’ajouter le tunnel de paiement Stripe
+</div>
+
+<AiPrompt>
+  Ajoute à Velocity des paiements d’acompte et de solde avec Stripe en mode test.<br />
+  Lors de la réservation, prélève un acompte remboursable de 500 $ et enregistre le moyen de paiement du client.<br />
+  Lors de la récupération, prélève le solde restant sur le moyen de paiement enregistré.<br />
+  Si le client annule plus de 48 heures avant la récupération, rembourse intégralement l’acompte. Dans les 48 heures précédentes, conserve-le.<br />
+  Enregistre le statut de l’acompte et la référence de la carte enregistrée dans la base de données afin que le client puisse les consulter dans sa réservation.<br />
+  Indique-moi exactement quelles clés secrètes je dois copier depuis Stripe et où les coller.<br />
+  Donne-moi une liste de contrôle pour tester les cas de réussite de l’acompte, d’annulation de l’acompte, de prélèvement du solde et de remboursement après annulation.
+</AiPrompt>
+
+Agent configurera Stripe en arrière-plan, ajoutera les flux d’acompte et de solde, et vous indiquera les clés secrètes à récupérer depuis Stripe. Lorsque Agent vous le demandera, collez les clés dans les paramètres de l’application : enregistrez-y les clés de test et ne les écrivez jamais dans le code.
+
+<Frame>
+  <img src="/assets/mirror/stripe-secrets-b04a3e238f51.png" alt="Les clés API Stripe (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET) qu’Agent a demandé au créateur de coller sont affichées dans le volet Replit Secrets" width="1280" height="720" data-path="images/velocity/add-payments/stripe-secrets.png" />
+</Frame>
+
+<div id="section-2">
+  ## Tester l’ensemble du parcours en mode test
+</div>
+
+Stripe propose des cartes de test spéciales qui permettent d’effectuer des paiements réalistes sans utiliser d’argent réel : `4242 4242 4242 4242`, n’importe quelle date d’expiration future et n’importe quel CVC à 3 chiffres.
+
+1. Connectez-vous à Velocity dans Preview et réservez une voiture du samedi au dimanche suivants.
+2. Lors du tunnel de paiement, vous devriez voir « Acompte aujourd’hui : $500 » et « Solde restant à la prise en charge : $1,900 » (ou les montants que vous avez calculés).
+3. Payez l’acompte avec la carte de test `4242`. Vous devriez revenir à une page de confirmation indiquant que l’acompte a été payé et qu’un moyen de paiement est enregistré pour le solde restant.
+4. Ouvrez la réservation depuis « My bookings » et utilisez l’action d’administration ou de prise en charge pour facturer le solde restant. Vérifiez que le solde restant est indiqué comme payé.
+5. Effectuez une deuxième réservation et annulez-la plus de 48 heures à l’avance. L’acompte devrait être remboursé sur la carte de test (vous pouvez le vérifier dans le tableau de bord du mode test de Stripe).
+6. Effectuez une troisième réservation et annulez-la dans les 48 heures. L’acompte devrait être conservé et cette règle clairement expliquée au client.
+7. Essayez d’effectuer le tunnel de paiement avec la carte de test Stripe simulant un paiement échoué (`4000 0000 0000 0002`). La réservation ne doit pas être confirmée et le client doit voir un message d’échec clair.
+
+Si l’acompte est débité, mais que la réservation n’est pas confirmée, dites à Agent :
+
+<AiPrompt>
+  L’acompte de test Stripe pour Velocity a été débité, mais la réservation n’apparaît pas comme confirmée.<br />
+  Associe l’événement `deposit-success` au statut de la réservation dans la base de données.<br />
+  Montre-moi comment le vérifier avec une autre réservation de test.
+</AiPrompt>
+
+<div id="section-3">
+  ## Passez aux paiements en direct lorsque vous êtes prêt
+</div>
+
+Le mode test est fait pour vous. Le mode réel est destiné aux vrais clients qui paient avec de l&#39;argent réel. Lorsque Velocity est prêt :
+
+1. Dans Stripe, passez du mode test au mode réel et copiez votre clé secrète **réelle**.
+2. Dans les paramètres de votre application, remplacez la clé de test par la clé réelle.
+3. Publiez à nouveau Velocity depuis le chat Agent.
+4. Ouvrez l&#39;URL publique et réservez une voiture à bas prix avec votre propre carte afin de vérifier que les flux d&#39;acompte et de solde fonctionnent tous deux de bout en bout.
+
+Avant de partager largement l&#39;URL publique, effectuez ce test une fois avec une vraie carte. Velocity est maintenant prêt à accepter de vraies réservations avec de l&#39;argent réel.
+
+<div id="section-4">
+  ## Prochaines étapes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/ja/build/add-integrations">
+    Envoyez chaque réservation dans le calendrier de vos clients.
+  </Card>
+
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/ja/build/add-custom-domain">
+    Migrez Velocity vers une URL de marque avant de facturer vos clients.
+  </Card>
+</CardGroup>
+
+<div id="section-5">
+  ## Si vous avez besoin d’aide supplémentaire
+</div>
+
+* **L’acompte a bien été effectué, mais la réservation n’est pas confirmée :** demandez à Agent d’associer l’événement `Success` de Stripe au statut de la réservation dans la base de données.
+* **Le mode test fonctionne, mais pas le mode réel :** vérifiez que vous avez remplacé les clés de test par les clés du mode réel dans les paramètres de l’application.
+* **Vous souhaitez un paiement intégral à la réservation plutôt qu’un acompte + solde :** demandez à Agent de modifier Velocity afin que le montant total soit payé en une seule fois au moment de la réservation.
+* **Vous avez besoin d’un abonnement mensuel (accès mensuel à la flotte) :** Replit prend également en charge RevenueCat — demandez à Agent d’utiliser RevenueCat à la place de Stripe.
+
+<div id="section-6">
+  ## Informations connexes
+</div>
+
+* [Paiements Stripe](/fr/ja/features/monetization/stripe-payments)
+* [Abonnements RevenueCat](/fr/ja/features/monetization/revenuecat-subscriptions)

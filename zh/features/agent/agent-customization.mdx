@@ -1,0 +1,182 @@
+---
+title: "Agent 自定义"
+description: "通过在 Workspace 设置中集中管理的 workspace 级自定义指令和 skills，让 Agent 掌握团队的规范。"
+sidebarTitle: "Agent 自定义"
+icon: "sliders"
+---
+
+Agent 自定义为 Agent 提供必要的上下文，让它从第一个 prompt 起就能按照你和团队的方式工作。你不必在每个 project 中反复说明自己的规范，只需为 workspace 定义一次，Agent 便会处处沿用。
+
+它包含两个部分：
+
+* **自定义指令**：始终生效的准则，适用于 workspace 中的每一个 project。
+* **Skills**：可复用的指令，Agent 仅在遇到相关任务时才会加载。
+
+两者均在 **Workspace 设置 → 自定义** 中管理。
+
+<Frame>
+  <img src="/assets/mirror/agent-customization-create-skill-fcb794e6de4e.png" alt="Workspace 设置中的“自定义”选项卡，包含 Skills 和自定义指令子选项卡，并打开了创建 skill 的表单" width="2168" height="1350" data-path="images/replitai/agent-customization-create-skill.png" />
+</Frame>
+
+<div id="custom-instructions-vs-skills">
+  ## 自定义指令与 skill 的区别
+</div>
+
+自定义指令会随每条消息加载；而 skill 只有在 Agent 判断其与当前任务相关时才会加载。少数始终适用的准则应写入自定义指令，而特定的工作流、约定和参考资料则应交给 skill。
+
+要了解这样划分的原因——上下文预算、哪些内容该放在哪里，以及如何写好 skill——请参阅 [Agent skills](/zh/learn/agent-skills)。要了解 skill 的结构以及 Agent 如何加载它们，请参阅 [Agent Skills](/zh/features/agent/skills)。
+
+<div id="custom-instructions">
+  ## 自定义指令
+</div>
+
+自定义指令是始终生效的准则，会在任何人输入 prompt 之前，就注入到 Agent 在每个 project、每次会话中的上下文里。你只需在 Workspace 设置中编写一次，Agent 便会在整个 workspace 中一体遵循。它们最适合用来描述那些始终成立的规则，例如安全与合规要求、获批使用的库和框架，或数据处理策略。
+
+内容要简短。指令越聚焦、越具体，越有可能被严格遵循，也能为 Agent 实际要完成的工作留出更多空间。
+
+<Warning>
+  自定义指令可能会影响 Agent 的表现。Agent 会被引导去遵循这些指令，但无法保证严格满足硬性要求。越简短、越具体的准则，遵循起来越稳定。
+</Warning>
+
+<Note>
+  workspace 自定义指令与 project 中的 `custom_instruction/instructions.md` 文件不同。workspace 自定义指令在 Workspace 设置中设置一次，即对所有 project 生效；而按 project 配置的文件只存在于单个 project 内部——该用法请参阅[创建自定义设计系统](/zh/teams/custom-design-system)。
+</Note>
+
+<div id="skills">
+  ## Skills
+</div>
+
+skill 是一组可复用的指令，只有在遇到相关任务时 Agent 才会加载。workspace skills 会显示在 workspace 中每个 project 的 **+** 菜单顶部，因此整个团队共用同一套 skills。
+
+创建 skill 有三种方式：
+
+* **上传**已有的 skill 文件夹。
+* 直接在表单中**编写**新的 skill。
+* **让 Agent** 帮你起草一个 skill，再进一步完善。
+
+<Note>
+  你可以将 Agent 起草的 skills 上传到 Workspace。让 Agent 下载该 skill，Agent 会将其打包为可下载的 `.zip` 压缩包，并提供一个 **Download file** 按钮 (如下图所示) 。下载该 zip 文件后，在 **Workspace 设置 → 自定义 → Skills** 中通过 **Create skill → Choose file or folder** 重新上传，即可在整个 workspace 中共享。
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/agent-customization-download-skill-3727b188c5a8.png" alt="Agent has packaged a workspace skill as a downloadable ux-designer-skill.zip archive, with a Download file button" width="1716" height="864" data-path="images/replitai/agent-customization-download-skill.png" />
+</Frame>
+
+有关完整的 skill 结构 (`SKILL.md`、支持文件、开放标准) ，请参阅 [Agent skills](/zh/features/agent/skills)。若要浏览 Replit 及合作伙伴已经构建好的 skills，请参阅 [skills 目录](/zh/features/agent/skills-directory)。
+
+<Note>
+  请克制地使用 skills。Agent 在处理每个任务时都会读取所有 skill 的名称和描述，数量过多 (或彼此重叠) 会分散它的注意力，也会让 Agent 更难挑出合适的那一个。请让每个 skill 的适用范围保持聚焦，并及时删除不再需要的 skills。
+</Note>
+
+<div id="availability-and-permissions">
+  ## 可用性与权限
+</div>
+
+| 功能     | 适用方案             | 谁可以管理                                     |
+| ------ | ---------------- | ----------------------------------------- |
+| 自定义指令  | Pro 和 Enterprise | Enterprise：管理员。Pro：任意 workspace 成员        |
+| Skills | 所有付费方案           | Enterprise：管理员。Core 和 Pro：任意 workspace 成员 |
+
+在 Enterprise workspace 中，只有管理员可以创建、编辑或删除自定义指令和 skills。在 Pro workspace 中，任意 workspace 成员均可执行这些操作。在 Core workspace 中，任意成员都可以管理 skills——但 Core 不提供自定义指令。无论哪种情况，workspace 的每位成员都可以使用已创建的 skills。
+
+<div id="create-a-custom-instruction">
+  ## 创建自定义指令
+</div>
+
+<Steps>
+  <Step title="打开 Workspace 设置">
+    前往 **Workspace 设置 → 自定义**。
+
+    <Frame>
+      <img src="/assets/mirror/agent-customization-tab-930af2e8ed74.png" alt="Workspace 设置中的 自定义 标签页，显示 Skills 和 自定义指令 子标签页" width="1065" height="394" data-path="images/replitai/agent-customization-tab.png" />
+    </Frame>
+  </Step>
+
+  <Step title="编写指令">
+    在 **自定义指令** 部分，写下你希望 Agent 在所有 project 中都遵循的准则。
+  </Step>
+
+  <Step title="保存">
+    保存更改。该指令将应用于你 workspace 中新建的 project。
+  </Step>
+</Steps>
+
+<div id="create-a-skill">
+  ## 创建 skill
+</div>
+
+<Steps>
+  <Step title="打开 Workspace 设置">
+    前往 **Workspace 设置 → 自定义**。
+  </Step>
+
+  <Step title="创建 skill">
+    在 **Skills** 部分点击 **Create skill**，然后上传 skill 文件夹、自行编写说明，或让 Agent 帮你起草一份。
+
+    <Frame>
+      <img src="/assets/mirror/agent-customization-create-skill-fcb794e6de4e.png" alt="Workspace 设置 中的 自定义 选项卡，显示 Skills 和 自定义指令 子选项卡，并打开了创建 skill 的表单" width="2168" height="1350" data-path="images/replitai/agent-customization-create-skill.png" />
+    </Frame>
+  </Step>
+
+  <Step title="编写清晰的描述">
+    为 skill 写一段简明扼要的描述，说明什么情况下该用它、什么情况下不该用。Agent 正是依据这段描述来判断该 skill 是否适用。
+  </Step>
+
+  <Step title="保存">
+    保存该 skill。此后它会出现在你 workspace 中每个 project 的 **+** 菜单里。
+  </Step>
+</Steps>
+
+<div id="use-a-workspace-skill-in-a-project">
+  ## 在 project 中使用 workspace skill
+</div>
+
+skill 描述写得精准很重要。Agent 会读取每个 workspace skill 的描述，当你的 prompt 与某个 skill 的用途大致匹配时自动引入它，因此你不必每次都手动挑选 skill。如果你想确保某个 skill 一定生效，也可以显式选择它。
+
+手动选择的方法：
+
+<Steps>
+  <Step title="打开 skill 选择器">
+    在 project 中，点击聊天输入框旁边的 **+** 按钮。你的 workspace skills 会集中显示在顶部。
+
+    <Frame>
+      <img src="/assets/mirror/agent-customization-skill-picker-4643f3a453c7.png" alt="从 + 按钮打开的 skill 选择器，顶部显示 Workspace skills 分组，其下方为 Replit skills" width="1668" height="1170" data-path="images/replitai/agent-customization-skill-picker.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择一个 skill">
+    选择你想启用的 skill。你也可以输入 `/` 加 skill 名称来直接调用它。
+  </Step>
+
+  <Step title="继续提示">
+    像平常一样继续操作。当任务与 skill 的描述匹配时，Agent 就会使用该 skill。
+  </Step>
+</Steps>
+
+<div id="manage-instructions-and-skills">
+  ## 管理指令与 skills
+</div>
+
+所有管理操作都在 **Workspace 设置 → 自定义** 中完成。你可以在此编辑自定义指令，也可以编辑、停用或删除任意 skill。更改仅对后续的对话生效，不影响正在进行中的对话。
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card icon="users" href="/zh/learn/agent-skills">
+    编写可在团队中规模化推广的指令和 skills 的思维模型与最佳实践。
+  </Card>
+
+  <Card icon="puzzle-piece" href="/zh/features/agent/skills">
+    了解 skills 的结构，以及 Agent 如何加载它们。
+  </Card>
+
+  <Card title="Skills 目录" icon="grid" href="/zh/features/agent/skills-directory">
+    浏览由 Replit 及合作伙伴打造的 skills，并了解安装方法。
+  </Card>
+
+  <Card title="使用 skill" icon="wand-magic-sparkles" href="/zh/build/use-agent-skills">
+    将 skill 附加到消息中，或安装到 project 中。
+  </Card>
+</CardGroup>

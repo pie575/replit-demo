@@ -1,0 +1,139 @@
+---
+title: "Gestion du contexte"
+description: "Découvrez comment fonctionnent les fenêtres de contexte et comment fournir à l’IA les bonnes informations lorsque vous développez avec Replit Agent."
+sidebarTitle: "Gestion du contexte"
+icon: "file-lines"
+---
+
+Le contexte correspond aux informations qu’un modèle d’IA utilise pour générer sa prochaine réponse. La gestion du contexte consiste à fournir au modèle les bonnes informations au bon moment.
+
+C’est important, car l’IA ne se base pas uniquement sur votre intention. Elle s’appuie sur le texte, les fichiers, les captures d’écran, les logs, les exemples et l’historique de conversation disponibles dans sa fenêtre de contexte.
+
+<div id="o-que-uma-janela-de-contexto">
+  ## Qu’est-ce qu’une fenêtre de contexte ?
+</div>
+
+Un modèle d’IA est limité dans la quantité d’informations qu’il peut prendre en compte à la fois. Cette limite est appelée fenêtre de contexte.
+
+La fenêtre de contexte peut inclure :
+
+* Votre prompt
+* Les messages précédents de la conversation
+* Les fichiers ou le code auxquels le modèle a accès
+* Les messages d’erreur et les logs
+* Des captures d’écran, des images ou des références de Design
+* Les instructions du projet, telles que `replit.md`
+* Les résultats des outils utilisés lors des étapes précédentes
+
+Le modèle utilise ce contexte pour déterminer ce qu’il doit générer ensuite.
+
+<div id="por-que-as-janelas-de-contexto-so-importantes">
+  ## Pourquoi les fenêtres de contexte sont importantes
+</div>
+
+Si des détails importants ne figurent pas dans le contexte, le modèle risque de les deviner. Si le contexte contient trop d’informations sans rapport, le modèle peut se concentrer sur le mauvais élément.
+
+Par exemple, ce prompt fournit peu de contexte :
+
+```text theme={null}
+Améliorez la page d’inscription.
+```
+
+Ce prompt fournit un contexte utile :
+
+```text theme={null}
+Améliorez la page d’inscription destinée aux fondateurs débutants qui hésitent à rejoindre la liste d’attente.
+Conservez les champs actuels. Clarifiez la proposition de valeur au-dessus du formulaire.
+Ne modifiez pas la section des tarifs.
+```
+
+Le deuxième prompt indique au modèle à qui s’adresse la page, ce qu’il doit améliorer et préserver, ainsi que ce qui ne relève pas de son périmètre.
+
+<div id="os-tamanhos-das-janelas-de-contexto-variam">
+  ## La taille des fenêtres de contexte varie
+</div>
+
+Les différents modèles d’IA peuvent gérer des quantités de contexte variables. Les fenêtres de contexte plus grandes peuvent prendre en compte davantage de texte à la fois, mais plus grand n’est pas toujours mieux. Un contexte pertinent reste plus important que de déverser tous les détails dans la conversation.
+
+Exemples de tailles de fenêtres de contexte disponibles publiquement :
+
+| Famille de modèles | Exemple de fenêtre de contexte |
+| ------------------ | ------------------------------ |
+| GPT-4.1            | Jusqu’à 1 million de jetons    |
+| Claude Sonnet 4.5  | Jusqu’à 200 000 jetons         |
+| Gemini 2.5 Pro     | Jusqu’à 1 million de jetons    |
+
+Ces chiffres évoluent au fil du temps et ne garantissent pas que chaque produit donne accès à la limite complète du modèle. À retenir : gardez les informations importantes claires et ciblées.
+
+<div id="tipos-de-contexto">
+  ## Types de contexte
+</div>
+
+| Type de contexte       | Exemple                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| **Objectif**           | &quot;Cette page de destination doit recueillir des inscriptions à la liste d’attente.&quot; |
+| **Public cible**       | &quot;Ceci s’adresse aux propriétaires de restaurants très occupés.&quot;                    |
+| **Contraintes**        | &quot;Conservez la palette de couleurs actuelle et les champs du formulaire.&quot;           |
+| **Non-objectifs**      | &quot;N’ajoutez pas encore de fonctionnalité de paiement.&quot;                              |
+| **Exemples**           | Une capture d’écran, une maquette, des données d’exemple ou la page d’un concurrent.         |
+| **État du projet**     | Le fichier, le composant, le message d’erreur ou le flux utilisateur actuel.                 |
+| **Définition de prêt** | &quot;Un visiteur peut envoyer le formulaire et voir un message de remerciement.&quot;       |
+
+<div id="contexto-fresco-e-contexto-persistente">
+  ## Contexte récent et contexte persistant
+</div>
+
+Certains éléments de contexte appartiennent à la conversation en cours. Utilisez-les lorsque vous demandez une modification précise, déboguez un problème ou donnez votre avis sur un résultat récent.
+
+D&#39;autres éléments de contexte doivent être conservés dans l&#39;ensemble du projet. Utilisez le contexte persistant pour le style de code, les directives de marque, les conventions de nommage, les règles de produit réutilisables et les contraintes dont Agent doit se souvenir d&#39;une session de travail à l&#39;autre. Dans Replit, [replit.md](/fr/pt/features/project-setup/replit-dot-md) permet de fournir à Agent un contexte persistant pour le projet.
+
+<div id="quando-o-contexto-fica-ruidoso">
+  ## Quand le contexte devient trop chargé
+</div>
+
+Les longues conversations peuvent s’égarer. Si un fil de discussion a mélangé de nombreuses décisions sans rapport, l’Agent peut prêter attention à des éléments de contexte anciens qui ne sont plus pertinents.
+
+Commencez un nouveau fil de discussion lorsque :
+
+* Vous passez à une fonctionnalité sans rapport
+* La conversation comporte de nombreuses pistes abandonnées
+* L’Agent continue d’appliquer d’anciennes contraintes
+* Vous souhaitez un plan clair pour un nouveau domaine
+
+Lorsque vous repartez de zéro, résumez le contexte important au lieu de supposer que l’Agent sait ce qui importe encore.
+
+```text theme={null}
+Contexte : ce projet est une application de liste d’attente pour des coachs sportifs locaux.
+Le flux principal est le suivant : page de destination → formulaire d’inscription → message de confirmation.
+Pour ce fil de discussion, améliorez uniquement le message de confirmation et le texte de suivi.
+```
+
+<div id="equvocos-comuns">
+  ## Idées reçues courantes
+</div>
+
+* **« Plus il y a de contexte, mieux c&#39;est. »** Un contexte pertinent est préférable. Trop de contexte non pertinent peut distraire le modèle.
+* **« Le modèle se souvient parfaitement de tout. »** L&#39;IA utilise le contexte disponible, mais vous devez rappeler les contraintes importantes lorsqu&#39;elles comptent.
+* **« Le contexte n&#39;est que du texte. »** Les captures d&#39;écran, les fichiers, les données, les designs, les logs et les exemples peuvent aussi constituer du contexte.
+
+<div id="para-onde-ir-a-seguir">
+  ## Étapes suivantes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Introduction à l’IA" icon="sparkles" href="/fr/pt/learn/foundations/introduction-to-ai">
+    Découvrez le fonctionnement des modèles de langage et comment les agents d’IA utilisent des modèles et des outils pour agir.
+  </Card>
+
+  <Card title="Créer avec Agent" icon="robot" href="/fr/pt/learn/build-with-agent">
+    Découvrez comment ajouter du contexte lorsque vous travaillez avec Agent.
+  </Card>
+
+  <Card title="Prompts efficaces" icon="comment-dots" href="/fr/pt/learn/effective-prompting">
+    Consultez des exemples de prompts incluant un contexte utile.
+  </Card>
+
+  <Card title="replit.md" icon="file-code" href="/fr/pt/features/project-setup/replit-dot-md">
+    Découvrez comment fournir un contexte de projet persistant.
+  </Card>
+</CardGroup>

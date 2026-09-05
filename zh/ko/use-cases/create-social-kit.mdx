@@ -1,0 +1,162 @@
+---
+title: "创建社交图标和横幅"
+description: "基于你的网站和 Drive，生成符合各社交平台尺寸要求的头像图标和封面横幅。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生 connector。Agent 会要求您提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+根据网站和 Google Drive 中的品牌文件，为 X、LinkedIn、Instagram、Facebook、TikTok
+等指定的社交平台生成头像图标和封面横幅。Agent 会采用各平台当前的尺寸规格和安全区域，
+确保人脸、徽标和文字在实际的个人主页上不会被裁切。请保持统一的视觉体系，并导出为 PNG。
+如果某个网络需要不同的裁切方式，请单独创建专属画板，不要直接拉伸。
+
+<div id="section">
+  ## 适用对象
+</div>
+
+* 需要一次性为多个社交平台制作头像和封面素材的品牌设计师
+* 需要基于现有徽标和网站制作可直接导出的图标和横幅的营销人员
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "徽标、颜色和现有品牌素材",
+},
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+请准备好网站 URL，以及存放在 Drive 中的徽标 (或品牌资源文件夹) ，并告诉我们你需要
+哪些社交平台。如果徽标 是文字标识，请说明图标应采用图形符号、字母造型，还是两者结合。
+
+<div id="agent">
+  ## 向 Agent 提出请求
+</div>
+
+<AiPrompt>
+  请根据这个网站[URL]和 Google Drive 中的品牌文件，在 Replit Design 中制作一套
+  社交媒体素材包：包括 X、LinkedIn、Instagram、Facebook、TikTok 的头像
+  和封面横幅。请使用各社交平台当前的官方尺寸和安全区域，确保人脸、徽标 和
+  文字不被裁切。请保持统一的视觉风格。
+  请导出为 PNG。如果某个社交平台需要不同的裁切方式，请不要拉伸，而是
+  单独创建专用画板。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期结果
+</div>
+
+Agent 会读取你的网站和 Drive 素材，然后按精确的像素尺寸为每个素材各创建一个画板。常见的一套尺寸如下：
+
+* **X：** 头像 400×400，横幅 1500×500
+* **LinkedIn：** 头像 400×400，横幅 1584×396
+* **Instagram：** 头像 320×320 (如需帖子和快拍封面，另加 1080×1080、1080×1920)
+* **Facebook：** 头像 320×320，封面 820×312 (或 2 倍尺寸 1640×624)
+* **TikTok：** 头像 200×200，封面 1080×1920
+
+上传前，请检查圆形头像和宽幅横幅的裁切效果。可以先导出一个图标和一个横幅，分别放入圆形头像和宽幅页头中试看，并确认小尺寸下的留白是否合适。
+
+<div id="section-5">
+  ## 按我的需求调整
+</div>
+
+<AiPrompt>
+  请添加 YouTube (头像 800×800，横幅 2560×1440，安全区域 1546×423) 和
+  Pinterest (头像 165×165，Pin 图 1000×1500) 。
+</AiPrompt>
+
+<AiPrompt>
+  请为所有图标制作浅色和深色两个版本。横幅请沿用网站的主色调。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排除
+</div>
+
+* **徽标或人脸被裁切：**在圆形头像和宽幅横幅中检查每个素材。留出安全区域；如果需要不同的裁切方式，请让 Agent 创建专用画板。不要拉伸。
+* **尺寸不符合社交平台要求：**告知 Agent 所需的社交平台，并让其使用各社交平台当前的官方尺寸。社交平台经常调整这些尺寸，因此请在上传前再次确认。
+
+<div id="section-7">
+  ## 相关文档
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计着陆页" href="/zh/ko/use-cases/design-landing-page">
+    候补名单页面或上线页面同样可以使用这套 Google Drive 品牌文件。
+  </Card>
+
+  <Card title="制作面向投资人的路演演示文稿" href="/zh/ko/use-cases/pitch-deck-from-website">
+    幻灯片同样可以使用这套 Google Drive 品牌文件。
+  </Card>
+</CardGroup>

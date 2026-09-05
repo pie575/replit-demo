@@ -1,6 +1,8 @@
 ---
-title: "Générer un rapport de ventes hebdomadaire"
-description: "Montrez les changements et tendances du pipeline commercial depuis HubSpot chaque semaine."
+title: "Générer un rapport commercial hebdomadaire"
+description: "Suivez chaque semaine l’évolution et les tendances du pipeline commercial HubSpot."
+sidebarTitle: "Générer un rapport commercial hebdomadaire"
+icon: "chart-line"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                Ce n'est pas un connecteur natif. Agent vous demandera votre clé API.
               </div> : null}
           </div>
         </div>)}
@@ -67,79 +69,93 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Récupérez le pipeline commercial de la semaine depuis HubSpot, comparez-le à la semaine
-précédente, et rédigez un court rapport : nouveaux deals, mouvements d'étape, deals repoussés,
-et prévisions. Placez le tableau dans Google Sheets et publiez les points marquants sur
-Slack pour que le standup porte sur le changement, pas sur un instantané figé.
+Récupérez le pipeline commercial de cette semaine dans HubSpot, comparez-le à celui de la semaine dernière et rédigez un
+court rapport : nouvelles opportunités, évolution des étapes, opportunités reportées et prévisions. Ajoutez le tableau à
+Google Sheets et publiez les points clés sur Slack afin que le point quotidien porte sur les évolutions plutôt que sur un instantané
+statique.
 
-## Idéal pour
+<div id="best-for">
+  ## Idéal pour
+</div>
 
-* Les directeurs commerciaux qui ont besoin de standups du lundi avec du mouvement, pas un instantané figé.
-* Les responsables revenue operations qui ont besoin du changement de pipeline semaine par semaine au même endroit.
+* Les responsables commerciaux qui ont besoin de points quotidiens le lundi axés sur les évolutions, et non d’un aperçu statique.
+* Les responsables des opérations de revenus qui doivent suivre l’évolution hebdomadaire du pipeline en un seul endroit.
 
-## Connecteurs
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
-{ id: "hubspot", name: "HubSpot", why: "Deals, étapes et montants" },
+{ id: "hubspot", name: "HubSpot", why: "Opportunités, étapes et montants" },
 {
-  id: "google-sheets",
-  name: "Google Sheets",
-  why: "Tableau de tendance que vous pouvez auditer",
+id: "google-sheets",
+name: "Google Sheets",
+why: "Tableau des tendances vérifiable",
 },
-{ id: "slack", name: "Slack", why: "Livrer le rapport" },
+{ id: "slack", name: "Slack", why: "Envoyer le rapport" },
 ]}
 />
 
-<Note>Fonctionne aussi avec Salesforce, Attio, Pipedrive, ou un autre CRM.</Note>
+<Note>Fonctionne également avec Salesforce, Attio, Pipedrive ou tout autre CRM.</Note>
 
-## Avant de commencer
+<div id="before-you-start">
+  ## Avant de commencer
+</div>
 
-Connectez HubSpot, Sheets et Slack. Précisez quel pipeline ou quelle équipe inclure.
+Connectez HubSpot, Sheets et Slack. Indiquez le pipeline ou l’équipe à inclure.
 
-## Invite à l'Agent
-
-<AiPrompt>
-  Crée une routine qui s'exécute chaque lundi à 9h00. Récupère le pipeline de
-  la semaine depuis HubSpot. Rédige un rapport hebdomadaire montrant les
-  changements et tendances du pipeline : nouveaux deals, mouvements d'étape,
-  deals repoussés, et prévisions par rapport à la semaine précédente. Place
-  le tableau dans Google Sheets et publie les points marquants sur Slack.
-</AiPrompt>
-
-## À quoi s'attendre
-
-L'Agent compare cette semaine à la précédente et rédige un court récit accompagné d'une
-feuille. Vérifiez quelques montants de deals par rapport à HubSpot. Utilisez les points
-marquants Slack pendant le standup ; gardez la feuille pour la piste d'audit. Choisissez un
-nouveau deal et un deal repoussé, ouvrez-les dans HubSpot, et confirmez que l'étape, le
-montant, et la date de clôture correspondent à la feuille.
-
-## Adaptez-le à vos besoins
+<div id="prompt-the-agent">
+  ## Donnez des instructions à l’agent
+</div>
 
 <AiPrompt>
-  Signale les deals de plus de \[montant] qui n'ont pas bougé depuis 14 jours.
+  Créez une routine qui s’exécute chaque lundi à 9:00. Récupérez le pipeline de la semaine
+  depuis HubSpot. Rédigez un rapport hebdomadaire présentant les évolutions et tendances du pipeline : nouvelles
+  opportunités, évolution des étapes, opportunités reportées et prévisions par rapport à la semaine précédente. Placez le tableau
+  dans Google Sheets et publiez les principaux points à retenir dans Slack.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## À quoi vous attendre
+</div>
+
+Agent compare cette semaine à la précédente et rédige un court résumé ainsi qu&#39;une feuille de calcul. Vérifiez quelques
+montants d’opportunités dans HubSpot. Utilisez les points clés de Slack lors du point quotidien ; conservez la feuille pour la
+piste d&#39;audit. Choisissez une nouvelle opportunité et une opportunité reportée, ouvrez-les dans HubSpot et confirmez que l&#39;étape,
+le montant et la date de clôture correspondent à la feuille.
+
+<div id="make-it-work-for-you">
+  ## Adaptez-le à vos besoins
+</div>
+
+<AiPrompt>
+  Signalez les opportunités de plus de $[montant] sans activité depuis 14 jours.
 </AiPrompt>
 
 <AiPrompt>
-  Ajoute une section « à risque » basée sur la date de clôture et la dernière
-  activité.
+  Ajoutez une section « à risque » en fonction de la date de clôture et de la dernière activité.
 </AiPrompt>
 
-## Dépannage
+<div id="troubleshooting">
+  ## Résolution des problèmes
+</div>
 
-* **Les montants de deals ne correspondent pas à HubSpot :** précisez quel pipeline ou quelle équipe inclure, et quel champ de montant utiliser (montant ou prévision pondérée). Vérifiez quelques deals par rapport à HubSpot avant de faire confiance à la feuille.
-* **Les deals repoussés semblent incorrects :** vérifiez les dates de clôture et les étapes dans HubSpot. Demandez à l'Agent de ne considérer un deal comme repoussé que lorsque la date de clôture a reculé ou que l'étape est revenue en arrière.
-* **Slack publie au mauvais endroit :** nommez le canal et précisez si vous voulez uniquement les points marquants ou un lien vers la feuille complète.
+* **Les montants des opportunités ne correspondent pas à ceux de HubSpot :** indiquez le pipeline ou l’équipe à inclure, ainsi que le champ de montant à utiliser (montant ou prévisions pondérées). Vérifiez quelques opportunités dans HubSpot avant de vous fier à la feuille.
+* **Les opportunités reportées semblent incorrectes :** vérifiez les dates de clôture et les étapes dans HubSpot. Demandez à Agent de considérer une opportunité comme reportée uniquement si la date de clôture a été repoussée ou si l’étape a reculé.
+* **Les publications Slack sont envoyées au mauvais endroit :** indiquez le canal et précisez si vous souhaitez uniquement les points clés ou un lien vers la feuille complète.
 
-## Voir aussi
+<div id="related">
+  ## À découvrir également
+</div>
 
 <CardGroup cols={2}>
-  <Card title="Surveiller la concurrence" href="/fr/use-cases/monitor-competitors">
-    Les mêmes alertes Slack pour les ventes avant qu'un changement de prix n'affecte un deal.
+  <Card title="Surveiller les concurrents" href="/fr/use-cases/monitor-competitors">
+    Mêmes alertes Slack pour les équipes commerciales avant qu’un changement de prix ne fasse échouer une affaire.
   </Card>
 
-  <Card title="Créer un pitch deck pour investisseurs" href="/fr/use-cases/pitch-deck-from-website">
-    La même source Google Sheets pour les fondateurs qui construisent la diapositive financière investisseur.
+  <Card title="Créer une présentation pour les investisseurs" href="/fr/use-cases/pitch-deck-from-website">
+    Même source Google Sheets pour les fondateurs créant la diapositive
+    des données financières destinées aux investisseurs.
   </Card>
 </CardGroup>

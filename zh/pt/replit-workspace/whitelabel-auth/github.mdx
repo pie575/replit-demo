@@ -1,0 +1,74 @@
+---
+title: "配置 GitHub OAuth"
+description: "将 GitHub 配置为 App 身份验证的社交登录身份提供方"
+---
+
+本指南将逐步介绍如何在 GitHub 开发者设置中创建 GitHub OAuth App。你需要获取 **Client ID** 和 **Client Secret**，并将其填入 **Auth 面板**。
+
+<Note>
+  本页面仅介绍在 GitHub 开发者设置中进行的身份提供方配置。有关 Clerk Auth 的完整流程——包括启用 GitHub 并在 **Auth 面板** 中输入凭证——请参阅 Clerk Auth 文档中的[为 SSO 身份提供方配置 OAuth 凭证](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+</Note>
+
+<div id="pr-requisitos">
+  ## 前提条件
+</div>
+
+* 一个 [GitHub 账户](https://github.com)
+* 一个[已部署的 Replit 应用](/zh/category/replit-deployments) —— 自定义 OAuth 凭证仅在**生产 (Production) **环境中可用
+* 打开 **GitHub** 身份提供方的编辑面板：**Auth 面板** → **Configure** 标签页 → **SSO providers** 区域 → 选择 **Production** 环境 → 点击 **GitHub** 旁的 **Edit**
+
+<div id="passo-1-criar-um-app-oauth-do-github">
+  ## 第 1 步：创建 GitHub OAuth app
+</div>
+
+1. 访问 [GitHub 开发者设置](https://github.com/settings/developers)
+2. 在侧边栏中选择 **OAuth Apps**
+3. 选择 **New OAuth App**
+4. 填写应用信息：
+
+**Application name：**
+
+为应用输入一个名称。
+
+**Homepage URL** 和 **Authorization callback URL：**
+
+两者都需填入 **Auth 面板**的 **Provider setup** 中显示的确切值。查找方法请参阅[为 SSO 身份提供方配置 OAuth 凭证](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+
+5. 选择 **Register application**
+
+<div id="passo-2-gerar-as-credenciais-do-cliente">
+  ## 第 2 步：生成客户端凭证
+</div>
+
+1. 在应用设置页面可以看到你的 **Client ID**，将其复制下来
+2. 选择 **Generate a new client secret**
+3. 立即复制你的 **Client Secret**
+
+<Warning>
+  请将 Client Secret 妥善保存在安全位置。离开该页面后将无法再次查看，一旦丢失，只能重新生成。
+</Warning>
+
+<div id="soluo-de-problemas">
+  ## 故障排查
+</div>
+
+<div id="incompatibilidade-de-uri-de-redirecionamento">
+  ### 重定向 URI 不匹配
+</div>
+
+* 确认 Authorization callback URL 与 **Auth 面板**中 **Provider setup**显示的值完全一致
+* 检查是否有拼写错误或协议错误
+* 不要添加尾部斜杠
+
+<div id="cliente-invlido">
+  ### 客户端无效
+</div>
+
+* 请再次检查 Client ID 和 Client Secret 是否复制正确
+* 确保粘贴时没有多余的空格
+
+<div id="no-est-funcionando-no-domnio-personalizado">
+  ### 在自定义域名上无法正常工作
+</div>
+
+* 使用 **Auth 面板**的 **Provider setup** 中显示的自定义域名值，更新 Homepage URL 和 Authorization callback URL

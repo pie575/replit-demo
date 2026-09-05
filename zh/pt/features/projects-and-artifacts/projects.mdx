@@ -1,0 +1,249 @@
+---
+title: "什么是项目？"
+description: "了解 Replit 中的项目——它是你所构建的一切内容的容器，涵盖 Web 应用和移动应用、幻灯片演示以及动画视频。"
+---
+
+export const ArtifactGrid = () => {
+  if (typeof document !== "undefined" && !document.getElementById("artifact-grid-styles")) {
+    const style = document.createElement("style");
+    style.id = "artifact-grid-styles";
+    style.textContent = `
+      .artifact-grid-wrap {
+        --ag-bg: var(--replit-docs-bg, #F6F6F4);
+        --ag-icon-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --ag-icon-border: var(--replit-docs-border, #DEDAD5);
+        --ag-text: var(--replit-docs-text-muted, #5C5C5C);
+        --ag-icon-color: var(--replit-docs-text-muted, #5C5C5C);
+      }
+      .dark .artifact-grid-wrap,
+      html.dark .artifact-grid-wrap,
+      [data-theme="dark"] .artifact-grid-wrap {
+        --ag-bg: var(--replit-docs-bg, #1E1E1F);
+        --ag-icon-bg: var(--replit-docs-bg-elevated, #222223);
+        --ag-icon-border: var(--replit-docs-border, #39393D);
+        --ag-text: var(--replit-docs-text-muted, #B8B8BE);
+        --ag-icon-color: var(--replit-docs-text-muted, #B8B8BE);
+      }
+      @keyframes ag-fade-in {
+        from { transform: translateY(8px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @media (hover: hover) {
+        .artifact-grid-wrap .ag-icon-btn:hover {
+          background: var(--ag-icon-border) !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const types = [{
+    name: "Web",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm-9.217 11.5a9.25 9.25 0 0 0 7.468 8.333 15.25 15.25 0 0 1-2.982-8.333H2.783Zm13.948 0a15.249 15.249 0 0 1-2.983 8.333 9.25 9.25 0 0 0 7.469-8.333H16.73Zm-7.958 0A13.748 13.748 0 0 0 12 20.876a13.748 13.748 0 0 0 3.227-8.126H8.773Zm1.478-9.834a9.251 9.251 0 0 0-7.468 8.334H7.27a15.251 15.251 0 0 1 2.982-8.334ZM12 3.123a13.747 13.747 0 0 0-3.227 8.127h6.454A13.748 13.748 0 0 0 12 3.123Zm1.748-.207a15.25 15.25 0 0 1 2.983 8.334h4.486a9.251 9.251 0 0 0-7.469-8.334Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Mobile",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M7 2.75c-.69 0-1.25.56-1.25 1.25v16c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25V4c0-.69-.56-1.25-1.25-1.25H7ZM4.25 4A2.75 2.75 0 0 1 7 1.25h10A2.75 2.75 0 0 1 19.75 4v16A2.75 2.75 0 0 1 17 22.75H7A2.75 2.75 0 0 1 4.25 20V4Zm7 14a.75.75 0 0 1 .75-.75h.01a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Slides",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M20 2.25A2.75 2.75 0 0 1 22.75 5v14A2.75 2.75 0 0 1 20 21.75h-8A2.75 2.75 0 0 1 9.25 19V5A2.75 2.75 0 0 1 12 2.25h8Zm-8 1.5c-.69 0-1.25.56-1.25 1.25v14c0 .69.56 1.25 1.25 1.25h8c.69 0 1.25-.56 1.25-1.25V5c0-.69-.56-1.25-1.25-1.25h-8Z" clipRule="evenodd" />
+          <path d="M6 4.25a.75.75 0 0 1 .75.75v14a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 6 4.25ZM2 6.25a.75.75 0 0 1 .75.75v10a.75.75 0 0 1-1.5 0V7A.75.75 0 0 1 2 6.25Z" />
+        </svg>
+  }, {
+    name: "Design",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.5 11.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM17.5 9.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM8.5 6.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13.5 5.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
+          <path fillRule="evenodd" d="M12 1.25c2.827 0 5.553 1.01 7.573 2.828C21.596 5.9 22.75 8.388 22.75 11A5.749 5.749 0 0 1 17 16.75h-2.25a1 1 0 0 0-.8 1.6l.3.4.1.143a2.5 2.5 0 0 1-2.1 3.857H12a10.75 10.75 0 1 1 0-21.5Zm0 1.5a9.25 9.25 0 1 0 0 18.5h.25a1 1 0 0 0 .8-1.6l-.3-.4a2.5 2.5 0 0 1 2-4H17l.21-.005A4.25 4.25 0 0 0 21.25 11c0-2.161-.953-4.252-2.68-5.807C16.84 3.636 14.476 2.75 12 2.75Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Animation",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M10.024 7.25c.31.004.613.091.878.251l4.996 2.996a1.752 1.752 0 0 1 .625 2.367 1.75 1.75 0 0 1-.625.639v-.001l-4.995 2.995.001.001a1.75 1.75 0 0 1-2.654-1.505v-5.99a1.75 1.75 0 0 1 1.774-1.753Zm-.02 1.5a.252.252 0 0 0-.22.124.253.253 0 0 0-.034.127v5.998a.252.252 0 0 0 .127.219.253.253 0 0 0 .252-.004l.002-.001 4.997-2.997.002-.001a.252.252 0 0 0 .122-.215.25.25 0 0 0-.122-.215h-.002L10.13 8.786h-.002a.25.25 0 0 0-.125-.037Z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12 1.25c5.937 0 10.75 4.813 10.75 10.75S17.937 22.75 12 22.75 1.25 17.937 1.25 12 6.063 1.25 12 1.25Zm0 1.5a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5Z" clipRule="evenodd" />
+        </svg>
+  }, {
+    name: "Data Viz",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 14.25a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-1.5 0v-6a.75.75 0 0 1 .75-.75ZM12 8.25a.75.75 0 0 1 .75.75v12a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75ZM19 2.25a.75.75 0 0 1 .75.75v18a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75Z" />
+        </svg>
+  }, {
+    name: "3D Game",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path fillRule="evenodd" d="M11.25 9.675A3.751 3.751 0 0 1 12 2.25a3.75 3.75 0 0 1 .75 7.425v4.575H19A2.75 2.75 0 0 1 21.75 17v2A2.75 2.75 0 0 1 19 21.75H5A2.75 2.75 0 0 1 2.25 19v-2A2.75 2.75 0 0 1 5 14.25h.25V13a.75.75 0 0 1 1.5 0v1.25h4.5V9.675ZM9.75 6a2.25 2.25 0 1 0 4.5 0 2.25 2.25 0 0 0-4.5 0ZM4.116 16.116A1.25 1.25 0 0 1 5 15.75h14A1.25 1.25 0 0 1 20.25 17v2A1.25 1.25 0 0 1 19 20.25H5a1.25 1.25 0 0 1-1.244-1.126L3.75 19v-2c0-.331.132-.65.366-.884Z" clipRule="evenodd" />
+        </svg>
+  }];
+  const rows = [types.slice(0, 4), types.slice(4, 7)];
+  const iconBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "48px",
+    height: "48px",
+    border: "1px solid var(--ag-icon-border)",
+    borderRadius: "12px",
+    background: "var(--ag-icon-bg)",
+    cursor: "default",
+    color: "var(--ag-icon-color)",
+    padding: 0,
+    transition: "background 120ms ease-out",
+    flexShrink: 0
+  };
+  return <div className="artifact-grid-wrap" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+    padding: "32px",
+    background: "var(--ag-bg)",
+    borderRadius: "16px",
+    width: "100%",
+    maxWidth: "460px",
+    margin: "32px auto",
+    opacity: 0,
+    animation: "ag-fade-in 300ms ease-out forwards"
+  }}>
+      {rows.map((row, ri) => <div key={ri} style={{
+    display: "flex",
+    gap: "12px",
+    justifyContent: "center"
+  }}>
+          {row.map(type => <div key={type.name} style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "6px"
+  }}>
+              <div className="ag-icon-btn" style={iconBtnStyle}>
+                {type.icon}
+              </div>
+              <span style={{
+    fontSize: "11px",
+    color: "var(--ag-text)",
+    textAlign: "center",
+    lineHeight: "1.2"
+  }}>
+                {type.name}
+              </span>
+            </div>)}
+        </div>)}
+    </div>;
+};
+
+<div id="o-que-um-projeto">
+  ## 什么是项目？
+</div>
+
+项目是你在 Replit 上构建的一切的容器。它保存你的代码、数据以及你创建的所有 artifact——Web 应用、移动应用、幻灯片演示、数据仪表板和视频。当你告诉 Agent 你想要什么时，它会创建一个项目，并在其中构建相应的 artifact。
+
+可以把项目想象成你桌上的一块工作台。所有东西都集中在一处，可以共用相同的信息，但每一件都有各自的用途。
+
+例如，如果你让 Agent 构建一个健身追踪应用，它会创建一个项目，其中包含一个移动应用 artifact，以及运行所需的后端、数据库和存储。
+
+<ArtifactGrid />
+
+核心概念：
+
+* **项目**：容纳一切的容器——你的代码、数据和所有 artifact
+* **Artifact**：项目内可发布的产出 (Web 应用、幻灯片演示、视频等)
+* **资源**：每个 artifact 都会自动获得后端、数据库和文件存储——无需任何配置
+
+<Note>
+  部署会一次性发布你的整个项目。所有 artifact 同时上线，因此始终保持同步。
+</Note>
+
+<div id="o-que-voc-pode-construir">
+  ## 你可以构建什么
+</div>
+
+| 类型                                                           | 说明                            | 示例                 |
+| ------------------------------------------------------------ | ----------------------------- | ------------------ |
+| **[Web 应用](/zh/pt/features/artifact-types/web-apps)**           | 人们在浏览器中访问的网站或 Web 应用          | 在线商店、预订工具、作品集网站    |
+| **[移动应用](/zh/pt/features/artifact-types/building-mobile-apps)** | 人们安装在手机上的原生应用                 | 健身追踪器、餐厅点餐应用       |
+| **[数据可视化](/zh/pt/features/artifact-types/data-apps)**           | 带有图表、筛选器和实时数据的交互式仪表板          | 销售报告、指标追踪器、分析视图    |
+| **[幻灯片演示](/zh/pt/features/artifact-types/slide-decks)**         | 可以放映或导出的演示文稿                  | 路演演示、团队进展汇报、产品概览   |
+| **[动画](/zh/pt/features/artifact-types/animated-videos)**        | 可导出为 MP4 的 motion graphics 视频 | 产品发布视频、讲解视频、社交媒体内容 |
+| **3D 游戏**                                                    | 3D 游戏、模拟或互动体验                 | 益智游戏、物理模拟、互动体验     |
+| **[Design](/zh/pt/design/canvas)**                              | 在设计 Canvas 上探索的视觉方向与原型设计      | 情绪板、模型稿、设计探索       |
+
+一个 项目 可以包含多个 artifact。例如，你可以为客户构建一个 Web 应用、为团队构建一个移动应用，再为投资人制作一份幻灯片演示——全部都在同一个 项目 里。当多个 artifact 位于同一个 项目 中时，它们会自动共享相同的数据和后端逻辑。要了解更多信息，请参阅 [Artifact](/zh/pt/features/projects-and-artifacts/artifacts#multiple-artifacts-in-one-project)。
+
+<div id="gerenciando-seus-projetos">
+  ## 管理你的项目
+</div>
+
+“项目”页面会列出你创建或受邀加入的所有项目。在繁忙的 workspace 中，这是回到近期工作、快速找到目标项目的最佳方式。
+
+<div id="veja-rapidamente-o-que-h-em-cada-projeto">
+  ### 快速查看每个 项目 中的内容
+</div>
+
+每个 项目 卡片都会用小图标展示其中包含的 artifact，涵盖该 项目 中的每个 Web 应用、移动应用、幻灯片演示、数据可视化和动画。将鼠标悬停在任一图标上，即可直接在卡片上预览该 artifact 的截图，无需逐个打开 项目 就能分辨它们。
+
+<Frame>
+  <img src="/assets/mirror/projects-page-artifacts-a9eb175ffbaf.png" alt="Projects 页面上的 项目 卡片，显示 artifact 图标以及列出该 项目 内所有 artifact 的下拉菜单" width="721" height="1022" data-path="images/replitai/projects-page-artifacts.png" />
+</Frame>
+
+<div id="filtre-por-artefato">
+  ### 按artifact筛选
+</div>
+
+使用 Projects 页面顶部的 **Build 类型** 下拉菜单，按artifact筛选列表。选择某一项后，只显示包含该类型artifact的 项目：
+
+* **Web** — 包含 Web 应用的 项目
+* **Mobile** — 包含移动应用的 项目
+* **Data** — 包含数据可视化的 项目
+* **Slides** — 包含幻灯片演示的 项目
+* **Design** — 处于 Design 模式的 项目
+* **3D 游戏**、**Agent 与自动化** 等
+
+选择 **任意 Build 类型** 即可清除筛选。
+
+<Frame>
+  <img src="/assets/mirror/projects-page-build-type-filter-9e23df1b365a.png" alt="Projects 页面上的 Build 类型下拉菜单按artifact筛选，包含 Design、Web、Data、Mobile、3D 游戏和 Slides 选项" width="472" height="622" data-path="images/replitai/projects-page-build-type-filter.png" />
+</Frame>
+
+<div id="ordene-por-ltima-abertura">
+  ### 按最近打开时间排序
+</div>
+
+“项目”页面默认按**你最近打开的时间**排序——你近期花时间最多的项目会排在最上方。这在团队 workspace 中尤其实用，否则其他成员的近期编辑会把你手头的工作淹没。
+
+如需更改排序方式，可以点击其他列标题 (例如**最近更新**或**名称**) 。
+
+<div id="fixe-os-projetos-que-voc-mais-usa">
+  ### 固定你最常用的项目
+</div>
+
+固定项目后，它会始终显示在列表顶部。固定状态**仅你自己可见**——在团队 workspace 中固定项目不会影响其他成员看到的内容。
+
+要固定项目，请在项目卡片上打开选项菜单 (三个点) ，然后选择**固定**。在同一菜单中选择**取消固定**即可解除固定。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={3}>
+  <Card title="Artifact" href="/zh/pt/features/projects-and-artifacts/artifacts" icon="layer-group">
+    了解如何创建、切换和管理 artifact
+  </Card>
+
+  <Card title="Web 应用" href="/zh/pt/features/artifact-types/web-apps" icon="globe">
+    构建 full-stack Web 应用
+  </Card>
+
+  <Card title="移动应用" href="/zh/pt/features/artifact-types/building-mobile-apps" icon="mobile">
+    创建 iOS 和 Android 原生应用
+  </Card>
+
+  <Card title="数据可视化" href="/zh/pt/features/artifact-types/data-apps" icon="chart-bar">
+    构建交互式仪表板和数据探索工具
+  </Card>
+
+  <Card title="幻灯片演示" href="/zh/pt/features/artifact-types/slide-decks" icon="presentation-screen">
+    通过对话创建演示文稿
+  </Card>
+</CardGroup>

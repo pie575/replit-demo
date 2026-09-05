@@ -1,0 +1,295 @@
+---
+title: "自动化示例"
+description: "使用 Replit Agent 并借助 Linear、Jira、Gmail、Slack、Discord 等连接器构建的真实自动化案例。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Replit Agent 能够构建 full-stack 自动化流程：连接你的各类工具、响应事件，并按计划定时运行——这一切只需一个 prompt。结合[连接器](/zh/replitai/integrations)和[部署](/zh/category/replit-deployments)，你可以用真正归自己所有、由自己掌控的应用，取代脆弱的胶水代码和昂贵的无代码平台。
+
+<div id="o-que-voc-pode-automatizar">
+  ## 您可以实现哪些自动化
+</div>
+
+Replit 自动化不只是简单的触发器。由于 Agent 能够使用完整代码构建真正的应用，您可以：
+
+* **响应事件**，对来自任何支持 webhook 的服务的事件作出响应 (Linear、Jira、GitHub、Confluence、Discord 等)
+* **按计划运行**，使用基于 cron 的自动化 (每日摘要、每周报告、定期同步)
+* **在单个自动化中串联多个服务** (Jira 事件触发通过 Twilio 发送 SMS，Google Drive 文件创建 Notion 页面)
+* **为任何工作流添加 AI 处理** — 使用内置 AI 集成总结、分类、提取或生成内容
+* **部署后无需操心** — 自动化将在 Replit 的云基础设施上全天候运行，无需管理服务器
+
+与传统自动化平台的主要区别在于：您可以获得完整的源代码。您可以自定义逻辑、添加错误处理、扩展功能，并像管理其他软件项目一样对自动化进行版本控制。
+
+<div id="como-as-automaes-funcionam">
+  ## 自动化的工作原理
+</div>
+
+大多数自动化都遵循一个简单的模式：
+
+1. **触发** — 某个事件发生 (webhook、cron 定时任务或 API 轮询)
+2. **处理** — 你的应用接收事件、执行逻辑，并可选择调用 AI 进行摘要或分析
+3. **执行** — 你的应用调用另一个服务来发送消息、创建记录或更新数据
+
+Agent 会负责整个构建过程：配置 webhook 端点、设置 cron 定时任务、通过[连接器](/zh/replitai/integrations)完成与各服务的身份验证，以及部署你的自动化。
+
+<Tip>
+  要开始使用，请在 Replit 首页选择 **Agents &amp; Automations**，然后描述你想要自动化的内容。详细步骤请参阅[入门指南](/zh/pt/core-concepts/agent/agents-and-automations)。
+</Tip>
+
+<div id="exemplos-por-integrao">
+  ## 按集成分类的示例
+</div>
+
+以下是在 Replit 上构建并实际运行的自动化案例。你可以从中获取灵感，或将其作为自己搭建自动化时的初始 prompt。
+
+<div id="gerenciamento-de-projetos">
+  ### 项目管理
+</div>
+
+<AccordionGroup>
+  <Accordion title="Linear：issue 评论的邮件通知" icon="diagram-project">
+    当分配给你的 Linear issue 有新评论时，你会收到邮件通知，不错过任何关于自己任务的反馈。
+
+    **服务：** Linear、电子邮件
+
+    <AiPrompt>
+      当分配给我的 Linear issue 有新评论时，给我发送一封邮件
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Jira：新 issue 的 AI 邮件摘要" icon="jira">
+    当你的 Jira workspace 中创建 issue 时，你会收到一封邮件，其中包含由 AI 生成的摘要，突出关键细节与背景信息。
+
+    **服务：** Jira、电子邮件、AI
+
+    <AiPrompt>
+      当我的 workspace 中创建 issue 时，给我发送一封带 AI 摘要的邮件
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Jira + Twilio：紧急 issue 的短信提醒" icon="message-sms">
+    当创建紧急的 Jira issue 时，通过 Twilio 立即发送短信通知，让你即使不在电脑前也能及时处理紧急 issue。
+
+    **服务：** Jira、Twilio
+
+    <AiPrompt>
+      当创建紧急的 Jira issue 时，通过 Twilio 给我发送短信
+    </AiPrompt>
+
+    <Note>
+      此自动化使用一个指向你应用 webhook URL 的 Jira webhook。Agent 负责配置该端点——你需要设置 Jira webhook 指向它。
+    </Note>
+  </Accordion>
+
+  <Accordion title="Asana + Slack：截止日期通知" icon="list-check">
+    当有 Asana 任务分配给你且本周到期时，自动发送 Slack 通知，让团队随时掌握进展。
+
+    **服务：** Asana、Slack
+
+    <AiPrompt>
+      当有 Asana 任务分配给我且本周到期时，发送一条 Slack 通知
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Todoist + Google Sheets：生产力记录" icon="table">
+    当你完成一项 Todoist 任务时，自动将其记录到 Google 表格中，便于长期跟踪你的生产力。
+
+    **服务：** Todoist、Google Sheets
+
+    <AiPrompt>
+      当我完成一项 Todoist 任务时，把它记录到我的 Google 生产力表格中
+    </AiPrompt>
+
+    <Note>
+      这是一个基于 cron 的自动化，会定期检查已完成的任务并进行记录。
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+<div id="comunicao-e-notificaes">
+  ### 沟通与通知
+</div>
+
+<AccordionGroup>
+  <Accordion title="Gmail + Google Calendar：每日激励与日程" icon="calendar">
+    每天早上 7 点，在 Gmail 中收到一封邮件，内含一句励志名言和当天的完整日程——开启清晨的专属简报。
+
+    **服务：** Gmail、Google Calendar
+
+    <AiPrompt>
+      创建一个自动化任务，每天早上 7 点通过 Gmail 给我发送一封邮件，内含一句励志名言和我当天的日程
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Confluence + Slack：页面更新通知" icon="file-lines">
+    当特定空间中的 Confluence 页面更新时，自动在 Slack 中通知团队，让所有人及时同步规格文档的变更。
+
+    **服务：** Confluence、Slack
+
+    <AiPrompt>
+      当“产品规格”空间中的 Confluence 页面更新时，在 Slack 中通知产品团队
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Discord：向新成员发送欢迎私信" icon="discord">
+    当有新成员加入你的 Discord 服务器时，自动发送一条欢迎私信，附上入门资源和上手链接。
+
+    **服务：** Discord
+
+    <AiPrompt>
+      当有新成员加入我的 Discord 服务器时，发送一条包含入门资源的欢迎私信
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Spotify + Discord：播放列表分享" icon="spotify">
+    当你在 Spotify 中创建新播放列表时，自动分享到你的 Discord 服务器，让社区第一时间发现你最新的音乐品味。
+
+    **服务：** Spotify、Discord
+
+    <AiPrompt>
+      当我在 Spotify 中创建新播放列表时，将其分享到我的 Discord 服务器
+    </AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<div id="documentos-e-gerenciamento-de-arquivos">
+  ### 文档与文件管理
+</div>
+
+<AccordionGroup>
+  <Accordion title="Google Drive + Notion：共享文档笔记" icon="google-drive">
+    当有人通过 Google Drive 与您共享文档时，自动在 Notion 中创建一个页面，包含 AI 提取的要点和重点内容。
+
+    **服务：** Google Drive、Notion、AI
+
+    <AiPrompt>
+      当有人通过 Google Drive 与我共享文档时，在 Notion 中创建一个包含要点的页面
+    </AiPrompt>
+
+    <Note>
+      这是一个基于 cron 的自动化，会定期检查新共享的文档。
+    </Note>
+  </Accordion>
+
+  <Accordion title="Box：共享文档的电子邮件要点摘要" icon="box">
+    当有人在 Box 中共享文档或创建笔记时，接收一封包含 AI 生成要点摘要的电子邮件，以便快速判断是否需要关注。
+
+    **服务：** Box、电子邮件、AI
+
+    <AiPrompt>
+      当有人在 Box 中共享文档或创建笔记时，通过电子邮件向我发送要点摘要
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Dropbox：共享文件的电子邮件摘要" icon="dropbox">
+    当有人通过 Dropbox 与您共享文件时，接收一封包含 AI 提取要点的摘要电子邮件。
+
+    **服务：** Dropbox、电子邮件、AI
+
+    <AiPrompt>
+      当有人通过 Dropbox 与我共享文件时，通过电子邮件向我发送包含要点的摘要
+    </AiPrompt>
+
+    <Note>
+      这是一个基于 cron 的自动化，会定期检查新共享的文件。
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+<div id="crm-e-suporte-ao-cliente">
+  ### CRM 和客户支持
+</div>
+
+<AccordionGroup>
+  <Accordion title="HubSpot：新联系人的 AI 洞察" icon="hubspot">
+    在 HubSpot 中创建新联系人后，您会收到一封电子邮件，其中包含 AI 生成的联系人洞察，帮助您提前做好联系准备。
+
+    **服务：**HubSpot、电子邮件、AI
+
+    <AiPrompt>
+      创建 HubSpot 联系人后，向我发送一封包含 AI 洞察的电子邮件
+    </AiPrompt>
+  </Accordion>
+
+  <Accordion title="Zendesk：已分配工单的电子邮件摘要" icon="ticket">
+    当 Zendesk 工单分配给您后，您会收到一封包含关键信息的电子邮件摘要，以便更快地确定优先级并回复。
+
+    **服务：**Zendesk、电子邮件
+
+    <AiPrompt>
+      工单分配给我后，向我发送电子邮件摘要
+    </AiPrompt>
+  </Accordion>
+</AccordionGroup>
+
+<div id="construindo-suas-prprias-automaes">
+  ## 构建你自己的自动化
+</div>
+
+这些示例只是起点。由于 Agent 构建的是真实可用的应用，你可以组合任意服务并添加自定义逻辑：
+
+* **多步骤工作流**：串联三个或更多服务 (例如：Jira 创建 issue → AI 生成摘要 → 在 Slack 发送通知 → 记录到 Google Sheets)
+* **条件逻辑**：添加筛选条件 (例如：仅在出现高优先级 issue 时通知，仅记录特定项目的任务)
+* **AI 增强处理**：为任意自动化添加摘要、分类、情感分析或内容生成能力
+* **自定义调度**：让自动化每小时运行、每天在指定时间运行、每周运行，或按任意 cron 计划运行
+
+<AiPrompt>
+  当 Jira 的 &quot;Backend&quot; 项目中创建了高优先级 issue 时，用 AI 生成摘要，向 Slack 的 #engenharia 频道发送通知，并记录到 Google Sheets
+</AiPrompt>
+
+<div id="servios-suportados">
+  ## 支持的服务
+</div>
+
+自动化可与通过[连接器](/zh/replitai/integrations)提供的任何服务配合使用，包括：
+
+<CardGroup cols={3}>
+  <Card title="项目管理" icon="diagram-project">
+    Linear, Jira, Asana, Todoist
+  </Card>
+
+  <Card title="沟通" icon="comments">
+    Slack, Discord, Twilio, Gmail, Outlook
+  </Card>
+
+  <Card title="文档" icon="file">
+    Google Drive, Google Docs, Notion, Confluence, Box, Dropbox
+  </Card>
+
+  <Card title="CRM 和客户支持" icon="building">
+    HubSpot, Salesforce, Zendesk
+  </Card>
+
+  <Card title="效率工具" icon="table">
+    Google Sheets, Google Calendar, Spotify
+  </Card>
+
+  <Card title="AI 服务提供商" icon="wand-magic-sparkles">
+    OpenAI, Anthropic, Gemini, Perplexity
+  </Card>
+</CardGroup>
+
+你还可以通过使用 API 密钥的[外部集成](/zh/replitai/integrations#external-integrations)，连接到任何提供公共 API 的服务。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+* [开始使用 Agent 与自动化](/zh/pt/core-concepts/agent/agents-and-automations) — 配置你的第一个自动化流程
+* [浏览可用的连接器](/zh/replitai/integrations) — 查看所有可连接的服务
+* [了解部署](/zh/category/replit-deployments) — 了解自动化如何 24/7 全天候运行
+* [探索 Agent 的能力](/zh/pt/core-concepts/agent) — 看看 Agent 还能为你构建什么

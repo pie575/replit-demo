@@ -1,0 +1,460 @@
+---
+title: "Коннектор Databricks"
+description: "Выберите и настройте коннектор Databricks, чтобы Replit Agent мог создавать приложения на основе данных из вашего рабочего пространства Databricks."
+sidebarTitle: "Databricks"
+icon: "database"
+---
+
+<Info>
+  Коннектор Databricks доступен только на тарифе Enterprise.
+</Info>
+
+<Frame>
+  <img src="/assets/mirror/templates-dropdown-zoom-9e06ca94568a.png" alt="Поле промпта на главной странице Replit с открытым выпадающим списком Templates, в котором отображается организационный шаблон Databricks App" width="1680" height="300" data-path="images/connectors/databricks/templates-dropdown-zoom.png" />
+</Frame>
+
+Коннектор Databricks позволяет Replit Agent выполнять запросы к вашему рабочему пространству Databricks. Разработчики могут создавать панели мониторинга, инструменты отчётности и приложения для работы с данными с помощью естественного языка. Знание SQL не требуется.
+
+Replit поддерживает два типа подключений Databricks. Выберите подходящий вариант в зависимости от того, под каким идентификатором должен выполняться каждый запрос.
+
+<div id="section">
+  ## Выберите тип подключения
+</div>
+
+|                                    | **Пользователь — машина (U2M)**                     | **Сервисный принципал (M2M)**                      |
+| ---------------------------------- | --------------------------------------------------- | -------------------------------------------------- |
+| Имя коннектора в Replit            | Databricks for Databricks Apps (U2M)                | Databricks (Service Principal)                     |
+| От чьего имени выполняются запросы | Отдельные разработчики                              | Общий сервисный принципал                          |
+| Права доступа в Databricks         | Права Unity Catalog каждого разработчика            | Права сервисного принципала                        |
+| Атрибуция в аудите                 | Разработчик, выполнивший запрос                     | Сервисный принципал                                |
+| Вход разработчика                  | Каждый разработчик входит в свой аккаунт Databricks | Индивидуальный вход в Databricks не требуется      |
+| Лучше всего подходит для           | Индивидуальных прав доступа и атрибуции в аудите    | Общего доступа и неинтерактивных рабочих процессов |
+
+<CardGroup cols={2}>
+  <Card title="Настройка подключения «пользователь — машина» (U2M)" icon="user" href="#set-up-the-u2m-connector">
+    Используйте Databricks ID каждого разработчика, его права доступа и атрибуцию в аудите.
+  </Card>
+
+  <Card title="Настройка сервисного принципала (M2M)" icon="server" href="#set-up-the-service-principal-connector">
+    Используйте один общий Databricks
+    ID и набор прав доступа для авторизованных разработчиков.
+  </Card>
+</CardGroup>
+
+<div id="u2m">
+  ## Настройка коннектора U2M
+</div>
+
+Для настройки U2M необходимы три роли.
+
+1. **Администратор аккаунта Databricks**: создаёт подключение OAuth-приложения и предоставляет сведения о SQL-хранилище.
+2. **Администратор организации Replit**: настраивает коннектор с учётными данными OAuth.
+3. **Разработчик**: входит в свой аккаунт Databricks и приступает к разработке.
+
+<div id="u2m-2">
+  ### Предварительные требования для U2M
+</div>
+
+Перед началом убедитесь, что выполнены следующие условия:
+
+* Вы являетесь **администратором аккаунта** Databricks. Подключения App настраиваются в консоли аккаунта, а не в настройках управления рабочим пространством.
+* Вы являетесь администратором организации Replit.
+* У всех разработчиков, использующих коннектор, есть аккаунты Databricks.
+* У всех разработчиков есть доступ к рабочему пространству, включая разрешение **Can use** для SQL-хранилища и необходимые разрешения Unity Catalog.
+
+<div id="1oauth">
+  ### Шаг 1. Создайте подключение OAuth-приложения
+</div>
+
+<Note>Для выполнения этого шага необходимы права администратора аккаунта Databricks.</Note>
+
+Администратор аккаунта Databricks регистрирует Replit как OAuth-приложение. Подключение приложения предоставляет идентификатор клиента и секрет клиента для настройки Replit.
+
+<Steps>
+  <Step title="Откройте консоль аккаунта Databricks">
+    В рабочем пространстве Databricks откройте переключатель рабочих пространств в правом верхнем углу и выберите **Manage account**.
+
+    <Frame>
+      <img src="/assets/mirror/manage-account-6374ed6bf0f2.png" alt="Переключатель рабочих пространств Databricks с пунктом Manage account" width="2000" height="1144" data-path="images/connectors/databricks/u2m/manage-account.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Откройте App connections">
+    В консоли аккаунта выберите **Settings** и откройте вкладку **App connections**.
+
+    <Frame>
+      <img src="/assets/mirror/app-connections-96228e7f0f2e.png" alt="Страница Settings аккаунта Databricks с выбранной вкладкой App connections и кнопкой Add connection" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-connections.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Настройте подключение Replit">
+    Выберите **Add connection**. Введите название приложения, позволяющее идентифицировать Replit (например, `replit-u2m`).
+
+    В поле **Redirect URLs** введите следующее.
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    В разделе **Access scopes** выберите **All APIs**. Это позволит Agent использовать Databricks SQL и Databricks API, необходимые для создания и управления Databricks Apps.
+
+    Выберите **Generate a client secret**. Databricks не позволяет добавить секрет после создания этого подключения.
+
+    Установите срок действия токенов в соответствии с политиками безопасности вашей организации. В этом примере используются максимальные значения, отображаемые Databricks: **Access token TTL** — `1440` минут (24 часа), а **Refresh token TTL** — `129600` минут (90 дней). При более коротком сроке действия refresh token разработчикам может потребоваться чаще входить в систему.
+
+    Выберите **Add**.
+
+    <Warning>
+      **All APIs** предоставляет более широкие права доступа, чем только SQL. Фактические права доступа коннектора определяются разрешениями Databricks каждого разработчика.
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/app-configuration-6799b5769326.png" alt="Форма Add connection в Databricks с указанными названием приложения Replit, URL перенаправления, доступом All APIs, созданием Client Secret и сроками действия токенов" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-configuration.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Сохраните учетные данные OAuth">
+    Скопируйте **Client ID** и **Client Secret** и сохраните их в менеджере секретов вашей организации.
+
+    <Warning>
+      Databricks отображает Client Secret только один раз. Запишите срок его действия и обновите подключение приложения до истечения срока действия секрета.
+    </Warning>
+
+    <Frame>
+      <img src="/assets/mirror/oauth-credentials-15b2e6c67309.png" alt="Диалог Connection created в Databricks с замаскированными Client ID и Client Secret, предупреждением об одноразовом секрете и сроком действия" width="2000" height="1144" data-path="images/connectors/databricks/u2m/oauth-credentials.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<Note>
+  Новое или обновленное подключение приложения OAuth может стать доступным не сразу — это может занять до 30 минут.
+</Note>
+
+<div id="2sql">
+  ### Шаг 2. Предоставьте сведения о SQL-хранилище
+</div>
+
+При авторизации U2M-коннектора каждый разработчик вводит сведения о SQL-хранилище. Разместите эти значения в доступном для разработчиков месте, например на внутренней странице онбординга.
+
+<Steps>
+  <Step title="Откройте SQL Warehouses">
+    В рабочем пространстве Databricks выберите **SQL Warehouses** и откройте хранилище, которое будут использовать разработчики.
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="Страница Databricks SQL Warehouses со списком доступных хранилищ" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Скопируйте сведения о подключении">
+    Выберите **Connection details** и скопируйте **Server hostname** и **HTTP path**.
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="Страница сведений о подключении к Databricks SQL-хранилищу с именем хоста сервера и путём HTTP" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="3replitu2m">
+  ### Шаг 3: включите U2M в Replit
+</div>
+
+<Note>Чтобы настроить коннектор, необходимо быть администратором организации Replit.</Note>
+
+<Steps>
+  <Step title="Откройте и включите коннектор U2M">
+    На главной странице учётной записи Replit откройте **Settings**, затем **интеграции**. Найдите `Databricks U2M`, выберите **Databricks for Databricks Apps (U2M)** и нажмите **Enable**.
+
+    Введите **Client ID** и **Client Secret** подключения приложения Databricks.
+
+    Убедитесь, что URL перенаправления, отображаемый в Replit, совпадает с URL, настроенным в Databricks.
+
+    ```text theme={null}
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    В разделе **Connector Scopes** включите `all-apis` и `offline_access`. Область действия `offline_access` позволяет Replit получать токены обновления для длительных сеансов.
+
+    Выберите **Configure**.
+
+    <Frame>
+      <img src="/assets/mirror/enable-connector-39c1eeebd230.png" alt="Панель включения в настройках интеграции Replit, отфильтрованная по Databricks U2M, с URL перенаправления, полями учётных данных OAuth и областями действия коннектора" width="2000" height="1144" data-path="images/connectors/databricks/u2m/enable-connector.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Убедитесь, что коннектор включён">
+    Убедитесь, что в разделе **Your integrations** отображается **Databricks for Databricks Apps (U2M)**.
+  </Step>
+</Steps>
+
+<div id="4">
+  ### Шаг 4. Войдите как разработчик
+</div>
+
+Перед использованием коннектора каждый разработчик должен войти в свой аккаунт Databricks. Replit может обновлять сеанс до истечения срока действия токена обновления.
+
+<Steps>
+  <Step title="Войдите в коннектор">
+    На странице **интеграции** найдите **Databricks for Databricks Apps (U2M)** и выберите **Sign in**. Ознакомьтесь со сведениями о подключении и выберите **Continue to Databricks for Databricks Apps**.
+
+    <Frame>
+      <img src="/assets/mirror/connect-modal-8ae2c2569658.png" alt="Модальное окно Connect Databricks for Databricks Apps с информацией о перенаправлении, конфиденциальности и управлении разрешениями" width="2000" height="1144" data-path="images/connectors/databricks/u2m/connect-modal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Введите сведения о SQL-хранилище">
+    Введите предоставленный администратором Databricks **HTTP path** SQL-хранилища и выберите **Next**.
+
+    <Frame>
+      <img src="/assets/mirror/http-path-9e8a8a14b6ab.png" alt="Диалоговое окно Connect Databricks for Databricks Apps: шаг 1 из 2, запрос HTTP-пути SQL-хранилища" width="2000" height="1144" data-path="images/connectors/databricks/u2m/http-path.png" />
+    </Frame>
+
+    Затем Replit запросит **Server hostname** SQL-хранилища. Введите его, чтобы перейти в Databricks. При появлении запроса войдите в систему, проверьте запрошенные разрешения и подтвердите запрос.
+
+    Все запросы, выполняемые Agent через это подключение, используют ваши разрешения Databricks и фиксируются в журналах аудита Databricks как выполненные вами.
+
+    После подтверждения Databricks вернёт вас в Replit, и коннектор станет доступен.
+  </Step>
+</Steps>
+
+<div id="section-2">
+  ## Настройка коннектора сервисного принципала
+</div>
+
+В настройке сервисного принципала участвуют три роли.
+
+1. **Администратор Databricks**: создаёт сервисный принципал в Databricks и назначает ему разрешения.
+2. **Администратор организации Replit**: настраивает коннектор и права доступа в Replit.
+3. **Разработчик**: начинает работу с общим идентификатором Databricks.
+
+<div id="section-3">
+  ### Предварительные требования для сервисного принципала
+</div>
+
+Перед началом убедитесь, что у вас есть:
+
+* Права администратора аккаунта Databricks или рабочего пространства.
+* Права администратора организации Replit.
+
+<div id="1databricks">
+  ### Шаг 1. Создайте сервисный принципал в Databricks
+</div>
+
+<Note>
+  Для выполнения этого шага необходимо быть администратором аккаунта Databricks или администратором рабочего пространства.
+</Note>
+
+Администратор Databricks создаёт сервисный принципал — идентификатор для межмашинного взаимодействия, который Replit использует для подключения к Databricks (см. [service principals](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)).
+
+<Steps>
+  <Step title="Откройте настройки">
+    В Databricks выберите свой аватар в правом верхнем углу, затем выберите **Settings**.
+
+    <Frame>
+      <img src="/assets/mirror/settings-menu-8f2dcd4dbee3.png" alt="Меню рабочего пространства Databricks с выбранным пунктом Settings" width="3438" height="1984" data-path="images/connectors/databricks/settings-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите Identity and access">
+    На боковой панели Settings выберите **Identity and access**.
+
+    <Frame>
+      <img src="/assets/mirror/settings-page-2a8bcd7c22a4.png" alt="Страница настроек Databricks с пунктом Identity and access на боковой панели" width="3438" height="1984" data-path="images/connectors/databricks/settings-page.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Перейдите к управлению сервисными принципалами">
+    В разделе **Management and permissions** найдите **Service principals** и выберите **Manage**.
+
+    <Frame>
+      <img src="/assets/mirror/identity-and-access-0e79404ed30f.png" alt="Страница настроек идентификации и доступа с кнопкой Manage для Service principals" width="3438" height="1984" data-path="images/connectors/databricks/identity-and-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Добавьте новый сервисный принципал">
+    Выберите **Add service principal**, затем выберите **Add new**.
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-ac5b52f21f4c.png" alt="Диалог добавления сервисного принципала с кнопкой Add new" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Присвойте сервисному принципалу имя">
+    Введите понятное имя сервисного принципала и выберите **Add**.
+
+    <Frame>
+      <img src="/assets/mirror/add-service-principal-name-897df9e5f7ac.png" alt="Диалог добавления сервисного принципала с введённым именем сервисного принципала" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal-name.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Проверьте сведения о сервисном принципале">
+    После создания сервисного принципала в Databricks убедитесь, что он активен. Если сведения о сервисном принципале понадобятся при настройке коннектора Replit, оставьте эту страницу открытой.
+
+    <Frame>
+      <img src="/assets/mirror/service-principal-details-15a381d388bc.png" alt="Страница сведений о сервисном принципале Databricks" width="3438" height="1984" data-path="images/connectors/databricks/service-principal-details.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Предоставьте доступ">
+    Откройте вкладку **Permissions**, выберите **Grant access**, выберите сервисный принципал, установите разрешение **Manage** и выберите **Save**.
+
+    <Frame>
+      <img src="/assets/mirror/grant-access-edbaa2541a7d.png" alt="Диалог предоставления доступа к сервисному принципалу Databricks с выбранным разрешением Manage" width="3438" height="1984" data-path="images/connectors/databricks/grant-access.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="2sql-2">
+  ### Шаг 2: Получите сведения о подключении к SQL-хранилищу
+</div>
+
+Коннектору Replit нужны сведения о подключении к SQL-хранилищу Databricks, чтобы направлять запросы к нужным вычислительным ресурсам.
+
+<Steps>
+  <Step title="Откройте SQL-хранилища">
+    На боковой панели Databricks выберите **SQL Warehouses**.
+
+    <Frame>
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="Страница SQL-хранилищ Databricks с доступными хранилищами" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите или создайте хранилище">
+    Выберите SQL-хранилище, которое будет использовать Replit Agent. Если у вас ещё нет хранилища, выберите **Create SQL warehouse**, чтобы создать новое.
+  </Step>
+
+  <Step title="Скопируйте сведения о подключении">
+    Откройте хранилище и выберите **Connection details**. Найдите значения **Server hostname** и **HTTP path**. Они понадобятся при создании коннектора Databricks в Replit.
+
+    <Frame>
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="Страница сведений о подключении к SQL-хранилищу Databricks с именем хоста сервера и HTTP-путём" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="3replitdatabricks">
+  ### Шаг 3: Создайте коннектор Databricks в Replit
+</div>
+
+<Note>Для настройки коннектора необходимы права администратора организации Replit.</Note>
+
+Администратор Replit добавляет в Replit сведения о подключении к Databricks, чтобы разработчики могли использовать коннектор.
+
+<Steps>
+  <Step title="Перейдите в раздел «Интеграции»">
+    На главной странице учётной записи Replit откройте страницу **Интеграции**. В разделе **Connectors** найдите **Databricks (Service Principal)** и выберите **Sign in**.
+
+    <Frame>
+      <img src="/assets/mirror/integrations-databricks-signin-75d3367013da.png" alt="Страница Replit Integrations, отфильтрованная по Databricks, с коннектором Databricks (Service Principal) и кнопкой Sign in" width="3436" height="1978" data-path="images/connectors/databricks/integrations-databricks-signin.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Подтвердите подключение">
+    Перед перенаправлением в Databricks для аутентификации Replit отобразит диалог подтверждения. Проверьте сведения и выберите **Continue to Databricks**.
+
+    <Frame>
+      <img src="/assets/mirror/connect-databricks-intro-e842722d93ea.png" alt="Диалог подключения Databricks с информацией о перенаправлении OAuth, использовании данных и разрешениях" width="3436" height="1978" data-path="images/connectors/databricks/connect-databricks-intro.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Введите HTTP-путь SQL-хранилища">
+    Вставьте значение **HTTP path** из сведений о подключении SQL-хранилища Databricks (например, `/sql/1.0/warehouses/abcdef1234567890`) и выберите **Next**.
+
+    <Frame>
+      <img src="/assets/mirror/connector-http-path-5c8ae35516f8.png" alt="Шаг 1 из 2 диалога подключения Databricks с запросом HTTP-пути SQL-хранилища" width="3436" height="1978" data-path="images/connectors/databricks/connector-http-path.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Введите имя хоста сервера SQL-хранилища">
+    Вставьте значение **Server hostname** из тех же сведений о подключении (например, `abc-12345678-wxyz.cloud.databricks.com`) и выберите **Continue to Databricks**, чтобы завершить аутентификацию.
+
+    <Frame>
+      <img src="/assets/mirror/connector-server-hostname-b97fb74713f1.png" alt="Шаг 2 из 2 диалога подключения Databricks с запросом имени хоста сервера SQL-хранилища" width="3436" height="1978" data-path="images/connectors/databricks/connector-server-hostname.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Настройте доступ">
+    С помощью ролевого контроля доступа выберите, какие участники или группы вашей организации могут использовать этот коннектор.
+  </Step>
+
+  <Step title="Убедитесь, что коннектор активен">
+    Вернитесь на страницу **Интеграции** и убедитесь, что **Databricks (Service Principal)** отображается в разделе **Connectors** со статусом подключения **Активный**.
+
+    <Frame>
+      <img src="/assets/mirror/integrations-page-d3e1d6b88376.png" alt="Страница Replit Integrations с коннектором Databricks (Service Principal) со статусом подключения Активный" width="1680" height="1199" data-path="images/connectors/databricks/integrations-page.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="agent">
+  ## Создание с Agent
+</div>
+
+После подключения любым из способов вы можете использовать Agent для создания приложений с данными Databricks.
+
+<Steps>
+  <Step title="Выберите шаблон Databricks App для деплоя">
+    Если вы хотите развернуть готовое приложение в среде Databricks, выберите шаблон **Databricks App**. Этот шаблон не нужен, если вам требуется только доступ к данным и ресурсам Databricks через настроенный коннектор.
+
+    На главной странице Replit откройте селектор шаблонов и выберите **Databricks App**.
+
+    <Frame>
+      <img src="/assets/mirror/databricks-template-cdfbbba1a2ab.png" alt="Главная страница Replit с выбранным шаблоном Databricks App над полем промпта" width="1200" height="400" data-path="images/connectors/databricks/u2m/databricks-template.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Опишите приложение">
+    После предварительно заполненных инструкций добавьте промпт. Для вдохновения ознакомьтесь с [шаблонами Databricks Dev Hub](https://www.databricks.com/devhub/templates).
+  </Step>
+
+  <Step title="Проверяйте и дорабатывайте">
+    Проверяйте сгенерированный Agent SQL, таблицы, к которым он обращается, и структуру приложения. Вы можете запрашивать изменения на естественном языке.
+  </Step>
+</Steps>
+
+<div id="section-4">
+  ## Устранение неполадок
+</div>
+
+<AccordionGroup>
+  <Accordion title="Запрос возвращает пустой результат">
+    Проверьте разрешения Databricks для идентификатора, от имени которого выполняется запрос. Для U2M это отдельный разработчик, а для коннектора с сервисным принципалом — общий сервисный принципал. У идентификатора может быть доступ к метаданным, но не быть разрешения на чтение данных. Предоставьте необходимые разрешения на каталог, схему или таблицу и повторите попытку.
+  </Accordion>
+
+  <Accordion title="Коннектор не может подключиться к SQL-хранилищу">
+    Убедитесь, что значения **Server hostname** и **HTTP path** соответствуют параметрам подключения к SQL-хранилищу Databricks.
+    Для U2M проверьте значения, введённые соответствующим разработчиком. Также убедитесь, что
+    хранилище запущено и идентификатор, выполняющий запрос, имеет разрешение на его
+    использование.
+  </Accordion>
+
+  <Accordion title="Сбой аутентификации">
+    Для U2M убедитесь, что в **Redirect URLs** подключения приложения Databricks указан
+    `https://replit.com/connectors/oauth/callback` без косой черты в конце.
+    Если аутентификация не проходит у всех разработчиков, проверьте общий Client ID и
+    Client Secret, убедитесь, что срок действия секрета не истёк и область действия Replit
+    соответствует подключению приложения Databricks.
+
+    Для коннектора с сервисным принципалом убедитесь, что сведения о сервисном принципале,
+    введённые в Replit, соответствуют сервисному принципалу, созданному в Databricks.
+    Если учётные данные были заменены, обновите коннектор в Replit.
+  </Accordion>
+
+  <Accordion title="Коннектор снова запрашивает вход">
+    Это может происходить, если токен обновления U2M истёк или был отозван.
+    Повторно пройдите процесс авторизации Databricks. Если разработчикам приходится
+    переподключаться чаще, чем того требует политика безопасности, проверьте срок действия
+    токенов подключения приложения.
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-5">
+  ## Связанная документация
+</div>
+
+* [Обзор коннекторов к хранилищам данных](/ru/ja/connectors/warehouses/overview)：Все поддерживаемые коннекторы к хранилищам данных.
+* [Подключение к Snowflake](/ru/ja/connectors/warehouses/snowflake)：Пошаговая настройка Snowflake.
+* [Управление коннекторами](/ru/ja/replitai/managing-connectors)：Управление и настройка коннекторов.
+* [OAuth-авторизация пользователей в Databricks](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-u2m)：Документация Databricks по OAuth для пользователей.
+* [Включение авторизации пользовательских приложений (OAuth) в Databricks](https://docs.databricks.com/aws/en/integrations/enable-disable-oauth)：Документация Databricks по подключению приложений.
+* [Сервисные принципы Databricks](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)：Документация Databricks по сервисным принципам.
+* [SQL-хранилища Databricks](https://docs.databricks.com/aws/en/compute/sql-warehouse/)：Документация Databricks по вычислительным ресурсам SQL-хранилищ.

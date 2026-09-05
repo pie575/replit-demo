@@ -1,0 +1,68 @@
+---
+title: "Bases de données"
+description: "Réponses aux questions fréquentes sur les bases de données : corriger un endpoint désactivé, restaurer des tables, migrer vers la production, résoudre les erreurs de connexion, etc."
+---
+
+Vous trouverez ici des réponses aux questions fréquentes sur les bases de données de production. Pour une référence détaillée, consultez [Base de données de production](/fr/ja/features/data-and-storage/development-and-production) et [Base de données SQL](/fr/ja/features/data-and-storage/sql-database).
+
+<AccordionGroup>
+  <Accordion title="L’endpoint de la base de données est désactivé — comment corriger l’erreur « endpoint has been disabled » ?">
+    Cette erreur signifie que le point de terminaison de calcul de la base de données est suspendu. Pour le réactiver :
+
+    1. Ouvrez le volet **Database** et sélectionnez **Development** dans le menu déroulant.
+    2. Si le bouton **Unpause database** s’affiche, sélectionnez-le.
+    3. Basculez le menu déroulant sur **Production** et sélectionnez à nouveau **Unpause database** s’il s’affiche.
+
+    Si le bouton ne s’affiche pas, il est peut-être masqué par un secret `DATABASE_URL` en conflit. Ouvrez le volet **Secrets**, comparez l’entrée `DATABASE_URL` à la chaîne de connexion du volet **Database**, puis mettez à jour ou supprimez le secret en conflit afin que les deux correspondent.
+
+    Les causes fréquentes sont une facture impayée (réglez-la pour éviter que cela ne se reproduise) ou une suspension temporaire pendant la publication (que vous pouvez résoudre en suivant les étapes de réactivation ci-dessus). Consultez la [base de données de production](/fr/ja/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="La page d’état signale une panne de la base de données de production — dois-je soumettre un ticket ?">
+    Ce n&#39;est pas nécessaire. Si la panne est déjà signalée sur [status.replit.com](https://status.replit.com), nos équipes y travaillent déjà, et soumettre un ticket n&#39;accélérera pas la résolution. Ouvrez l&#39;incident en cours et abonnez-vous aux mises à jour pour suivre l&#39;avancement.
+
+    Si le problème de base de données n&#39;apparaît *pas* sur la page de statut, [contactez l&#39;assistance Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Comment restaurer des tables de base de données supprimées ou ayant fait l’objet d’une commande DROP ?">
+    Replit prend en charge la restauration à un instant précis des bases de données de production. La fenêtre de restauration varie selon le forfait : 7 jours pour [Core](/fr/ja/billing/plans/replit-core) et 28 jours pour [Pro](/fr/ja/billing/plans/replit-pro).
+
+    Pour restaurer une base de données, ouvrez le volet **Database**, accédez à la base de données, ouvrez les paramètres de restauration, sélectionnez l’horodatage souhaité, puis confirmez. Si l’horodatage souhaité se situe en dehors de la fenêtre de restauration, [contactez l’assistance Replit](https://replit.com/support). Consultez la page [Bases de données de production](/fr/ja/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="La base de données est suspendue et le bouton Unpause ne s’affiche pas">
+    Il arrive fréquemment qu&#39;une URL de base de données en conflit masque le bouton **Unpause**. Ouvrez le volet **Secrets**, repérez l&#39;entrée `DATABASE_URL` et comparez-la à la chaîne de connexion du volet **Database**. Si elles diffèrent, c&#39;est que le secret remplace l&#39;URL correcte — supprimez-le, actualisez, puis vérifiez à nouveau le volet **Database**.
+
+    Si le bouton n&#39;apparaît toujours pas après la suppression du secret en conflit, [contactez l&#39;assistance Replit](https://replit.com/support) en indiquant l&#39;URL de votre projet.
+  </Accordion>
+
+  <Accordion title="Mon アプリ affiche l’erreur « connection pool exhausted » : qu’est-ce que cela signifie ?">
+    Le nombre de connexions à la base de données ouvertes simultanément par l’application dépasse la capacité du pool. Causes fréquentes :
+
+    * Les connexions ne sont pas fermées après chaque requête
+    * Une augmentation soudaine du trafic
+    * Des requêtes lentes qui maintiennent les connexions ouvertes
+
+    La plupart des frameworks sont conçus pour utiliser un pool de connexions partagé, plutôt qu’une nouvelle connexion pour chaque requête.
+
+    Pour résoudre le problème rapidement, ouvrez un nouveau chat Agent, décrivez l’erreur et demandez à Agent de vérifier comment votre application gère les connexions à la base de données.
+  </Accordion>
+
+  <Accordion title="Comment migrer d’une base de données de développement vers une base de données de production ?">
+    Replit sépare les bases de données de développement et de production afin que les modifications de test n’affectent pas les données en production. Pour exécuter des migrations en production, ajoutez la commande de migration à l’étape de build ou de pré-déploiement afin qu’elle s’exécute à chaque déploiement. Par exemple, avec Drizzle, utilisez `drizzle-kit migrate`. Vous pouvez également exécuter manuellement des migrations depuis le Shell de production.
+
+    Consultez [Créer une base de données de production lors de la publication](/fr/ja/features/data-and-storage/development-and-production).
+  </Accordion>
+
+  <Accordion title="La facturation est à jour, mais la base de données affiche « endpoint disabled »">
+    Cela peut se produire indépendamment de la facturation. Essayez de réactiver la base de données manuellement : ouvrez le volet **Database**, sélectionnez **Development**, puis **Unpause database** si l&#39;option s&#39;affiche, et répétez l&#39;opération pour **Production**.
+
+    Si le bouton n&#39;apparaît pas ou si le problème persiste, [contactez l&#39;assistance Replit](https://replit.com/support) en indiquant l&#39;URL de votre projet — une réactivation manuelle peut s&#39;avérer nécessaire. Consultez [Base de données de production](/fr/ja/features/data-and-storage/development-and-production).
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## Et si le problème persiste ?
+</div>
+
+Si vous ne trouvez pas ici la réponse à votre question sur les bases de données, [contactez l&#39;assistance Replit](https://replit.com/support).

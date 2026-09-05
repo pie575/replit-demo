@@ -1,0 +1,142 @@
+---
+title: "Git 灾难恢复"
+description: "介绍如何使用 Replit 的自动备份系统恢复 Git 历史记录和代码。"
+---
+
+Replit 会自动备份 Git 仓库，以便你在 `.git` 文件夹损坏或提交历史记录丢失等情况下进行恢复。该备份系统在后台运行，无需任何额外操作，即可保护你的工作内容。
+
+<div id="section">
+  ## 工作原理
+</div>
+
+所有 Replit App 都会保留 Git 仓库的安全备份。当 Replit Agent 修改代码或部署应用时，这些更改会自动同步到该备份中。如果本地 Git 仓库损坏或无法使用，您可以从备份中恢复完整的提交历史记录。
+
+<Info>
+  备份远程仓库名为 `gitsafe-backup`，由 Replit 自动管理。您无需进行任何设置；它已在后台运行。
+</Info>
+
+<div id="section-2">
+  ## 查看备份历史
+</div>
+
+查看提交历史最简单的方法是使用 [Git 窗格](/zh/ja/features/workspace-tools/git-interface)。在项目编辑器的 Tools 区域中打开它，即可查看完整的提交历史，包括所有 Agent 检查点。大多数情况下都可以使用这种方法，无需运行命令。
+
+如果需要直接查看 gitsafe-backup 远程仓库，可以使用 Shell：
+
+```bash theme={null}
+git fetch gitsafe-backup main
+git log gitsafe-backup/main
+```
+
+这将显示完整的提交历史记录，包括所有 Agent 检查点和手动提交。你可以用它确认工作是否已备份，或查找需要恢复的特定提交。
+
+<div id="git">
+  ## 从 Git 问题中恢复
+</div>
+
+如果遇到 Git 错误或仓库损坏，请先尝试使用 [Git 窗格](/zh/ja/features/workspace-tools/git-interface)。无需使用 Shell 命令，即可解决大多数常见问题，例如重置到之前的提交或从远程拉取。
+
+如果 Git 窗格无法解决问题 (例如 `.git` 文件夹已完全损坏) ，请使用以下基于 Shell 的步骤。
+
+<div id="section-3">
+  ### 检查备份是否可用
+</div>
+
+首先，确认备份远程仓库是否存在：
+
+```bash theme={null}
+git remote -v
+```
+
+如果输出中显示`gitsafe-backup`，即可继续恢复。
+
+<div id="section-4">
+  ### 恢复仓库
+</div>
+
+<Warning>
+  此过程会用备份版本替换当前的`.git`文件夹。工作文件不会受到影响，但本地 Git 历史记录将替换为备份中的历史记录。
+</Warning>
+
+<Steps>
+  <Step title="保存当前 Git 配置">
+    备份 Git 配置文件，以保留自定义设置：
+
+    ```bash theme={null}
+    cp .git/config .git_config_backup
+    ```
+  </Step>
+
+  <Step title="克隆备份仓库">
+    从备份创建临时克隆：
+
+    ```bash theme={null}
+    git clone --bare git://gitsafe:5418/backup.git /tmp/gitsafe-restore
+    ```
+  </Step>
+
+  <Step title="替换 Git 文件夹">
+    将损坏的`.git`文件夹移至其他位置，然后用备份替换：
+
+    ```bash theme={null}
+    mv .git .git_corrupted_backup
+    mv /tmp/gitsafe-restore/ .git
+    ```
+  </Step>
+
+  <Step title="恢复配置">
+    将 Git 配置文件移回原处：
+
+    ```bash theme={null}
+    mv .git_config_backup .git/config
+    ```
+  </Step>
+</Steps>
+
+完成这些步骤后，运行`git status`，确认仓库是否正常运行。
+
+<div id="section-5">
+  ## 常见问题排查
+</div>
+
+<div id="fatal-repository-not-found">
+  ### “fatal: repository not found”或找不到备份远程仓库
+</div>
+
+较早创建的项目可能未启用备份系统。如果您需要协助恢复较早创建的项目，请联系支持团队。
+
+<div id="section-6">
+  ### 最近的提交未包含在恢复内容中
+</div>
+
+备份会在每次 Agent 提交时同步。如果你进行了更改但未提交，这些更改不会包含在备份中。请检查工作目录，确认是否有未提交的文件。
+
+<div id="git-2">
+  ### Git 操作缓慢或无响应
+</div>
+
+如果 Git 操作无响应，可能是存在旧的锁定文件。你可以放心将其删除：
+
+```bash theme={null}
+rm -f .git/index.lock
+```
+
+<div id="section-7">
+  ## 防止数据丢失
+</div>
+
+备份系统会自动保护 Git 历史记录，但你还可以采取以下额外措施，进一步保护你的工作：
+
+* **频繁提交**：进行小而频繁的提交，确保持续备份进度
+* **善用检查点**：使用 [Replit Agent](/zh/ja/features/agent/overview) 时，检查点会在重要里程碑自动创建提交
+* **连接 GitHub**：对于重要项目，请[将应用连接到 GitHub](/zh/ja/build/import-from-providers)，增加一层额外的备份保障
+
+<div id="section-8">
+  ## 后续步骤
+</div>
+
+如需进一步了解 Replit 的版本控制：
+
+* [版本控制概述](/zh/ja/learn/projects-and-artifacts/version-control)：了解所有版本控制选项
+* [如何使用 Git 窗格](/zh/ja/features/workspace-tools/git-interface)：无需使用命令行即可直观地管理 Git
+* [检查点和回滚](/zh/ja/features/version-control/checkpoints-and-rollbacks)：了解 Agent 检查点 的工作原理

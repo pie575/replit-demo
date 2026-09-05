@@ -1,6 +1,8 @@
 ---
-title: "Ajouter une connexion"
-description: "Permettez à chaque client Velocity de se connecter pour voir ses propres réservations et voitures sauvegardées."
+title: "Ajouter la connexion"
+description: "Permettez à chaque client Velocity de se connecter pour consulter ses réservations et ses voitures enregistrées."
+sidebarTitle: "Ajouter la connexion"
+icon: "user-lock"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,79 +20,120 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-À la fin, chaque client Velocity pourra se connecter et voir uniquement ses propres réservations et voitures sauvegardées.
+À la fin, chaque client Velocity se connectera et ne verra que ses propres réservations et voitures enregistrées.
 
 <Frame>
-  <img src="/assets/mirror/home-signed-in-f795a14fee54.png" alt="Écran d'accueil Velocity après connexion montrant le nom du client dans l'en-tête en haut à droite, la section Mes réservations avec une réservation à venir et la rangée de voitures sauvegardées en dessous" width="100%" data-path="images/velocity/add-login/home-signed-in.png" />
+  <img src="/assets/mirror/home-signed-in-f795a14fee54.png" alt="Écran d'accueil de Velocity après connexion, affichant le nom du client dans l'en-tête en haut à droite, la section Mes réservations avec une réservation à venir et la rangée de voitures enregistrées en dessous" width="100%" data-path="images/velocity/add-login/home-signed-in.png" />
 </Frame>
 
-Vous avez découvert Velocity dans [Bienvenue sur Replit](/fr/welcome) — une application de location de supercars haut de gamme. Pour l'instant, n'importe qui visitant l'URL publique peut voir toutes les réservations. Personne ne loue une Lamborghini anonymement. Ajoutez la connexion et chaque client disposera de ses propres réservations et voitures sauvegardées.
+Vous avez découvert Velocity dans [Bienvenue sur Replit](/fr/welcome) : une application haut de gamme de location de supercars. Pour l&#39;instant, toute personne qui consulte l&#39;URL publique peut voir toutes les réservations. Personne ne réserve une Lamborghini anonymement. Ajoutez la connexion pour que chaque client accède à ses propres réservations et voitures enregistrées.
 
-## Demandez à l'Agent d'ajouter la connexion
+<div id="tell-agent-to-add-sign-in">
+  ## Demander à Agent d’ajouter une connexion
+</div>
 
-Pour Velocity, utilisez Clerk. L'intégration Clerk de Replit donne à votre application son propre écran de connexion personnalisé, des comptes clients qui existent dans Velocity (et non des comptes Replit), ainsi qu'un contrôle total sur l'apparence — idéal pour une marque de location haut de gamme. L'Agent configure tout automatiquement, sans inscription au tableau de bord Clerk ni clés à coller.
+Pour Velocity, utilisez Clerk. L’intégration Clerk de Replit offre à votre app son propre écran de connexion personnalisé, des comptes clients propres à Velocity (et non des comptes Replit), ainsi qu’un contrôle total de son apparence — idéal pour une marque de location haut de gamme. Agent configure tout automatiquement : aucune inscription au tableau de bord Clerk ni clé à coller n’est nécessaire.
 
 <AiPrompt>
-  Ajoute la connexion à Velocity pour que chaque client ait ses propres réservations et voitures sauvegardées.<br />
-  Utilise Clerk Auth.<br />
-  Garde les pages de navigation des voitures publiques pour que les visiteurs puissent encore explorer la flotte sans compte.<br />
-  Exige une connexion avant qu'un utilisateur puisse réserver une voiture ou l'ajouter à ses favoris.<br />
-  Après connexion, affiche le nom du client dans l'en-tête et une section « Mes réservations » avec uniquement ses réservations.<br />
-  Ajoute un bouton de déconnexion.<br />
-  Donne-moi une liste de contrôle de test avec deux clients différents.
+  Ajoute une connexion à Velocity afin que chaque client ait ses propres réservations et
+  voitures enregistrées.
+
+  <br />
+
+  Utilise Clerk Auth.
+
+  <br />
+
+  Laisse les pages de consultation des voitures accessibles publiquement afin que les visiteurs puissent toujours explorer la flotte
+  sans compte.
+
+  <br />
+
+  Exige une connexion avant qu’une personne puisse réserver une voiture ou en enregistrer une dans ses
+  favoris.
+
+  <br />
+
+  Après la connexion, affiche le nom du client dans l’en-tête et une section « Mes réservations »
+  contenant uniquement ses réservations.
+
+  <br />
+
+  Ajoute un bouton de déconnexion.
+
+  <br />
+
+  Donne-moi une checklist de test avec deux clients différents.
 </AiPrompt>
 
-L'Agent va provisionner un tenant Clerk pour Velocity, ajouter les composants de connexion, protéger le flux de réservation derrière cette connexion, associer chaque réservation au client connecté et ajouter la déconnexion. Regardez la construction dans le chat de l'Agent.
+Agent provisionnera un tenant Clerk pour Velocity, ajoutera les composants de connexion, protégera le processus de réservation, associera chaque réservation au client connecté et ajoutera la déconnexion. Suivez la création dans le Chat Agent.
 
 <Frame>
   <img src="/assets/mirror/auth-modal-65f82eb6fafb.png" width="100%" data-path="images/velocity/add-login/auth-modal.png" />
 </Frame>
 
-## Testez avec deux clients
+<div id="test-it-with-two-customers">
+  ## Testez avec deux clients
+</div>
 
-Un seul compte ne suffit pas — vous en avez besoin de deux pour prouver que les réservations restent séparées.
+Un seul compte ne suffit pas : il vous en faut deux pour vérifier que les réservations restent bien distinctes.
 
-1. Ouvrez Velocity dans l'aperçu et parcourez les voitures sans vous connecter. La flotte doit rester visible.
-2. Cliquez sur Réserver sur une voiture. Vous devriez arriver sur l'écran de connexion Clerk.
-3. Inscrivez-vous avec votre propre e-mail et effectuez une réservation (par exemple, une réservation de week-end sur une 911).
-4. Déconnectez-vous. La section « Mes réservations » doit disparaître et le flux de réservation doit demander une connexion à nouveau.
-5. Ouvrez l'aperçu dans une fenêtre de navigation privée et inscrivez-vous avec un e-mail différent. Réservez une voiture différente.
-6. Revenez à votre première fenêtre, connectez-vous et confirmez que vous voyez toujours votre propre réservation — pas celle du deuxième client.
+1. Ouvrez Velocity dans Preview et parcourez les voitures sans vous connecter. La flotte doit rester visible.
+2. Cliquez sur Reserve pour une voiture. Vous devez arriver sur l’écran de connexion Clerk.
+3. Inscrivez-vous avec votre propre adresse e-mail et effectuez une réservation (par exemple, pour un week-end avec une 911).
+4. Déconnectez-vous. La section « My bookings » doit disparaître et le processus de réservation doit à nouveau demander une connexion.
+5. Ouvrez Preview dans une fenêtre de navigation privée et inscrivez-vous avec une autre adresse e-mail. Réservez une autre voiture.
+6. Revenez à votre première fenêtre, connectez-vous et vérifiez que vous voyez toujours votre propre réservation, et non celle du deuxième client.
 
-Si les deux clients voient les mêmes réservations, les réservations ne sont pas encore associées à la personne connectée. Indiquez le symptôme exact à l'Agent :
+Si les deux clients voient les mêmes réservations, elles ne sont pas encore associées à la personne connectée. Décrivez le problème exact à Agent :
 
 <AiPrompt>
-  Les deux clients peuvent voir les réservations de l'autre dans Velocity.<br />
-  Associe chaque réservation et chaque voiture sauvegardée au client connecté pour que chaque personne ne voie que les siennes.<br />
-  Montre-moi comment le vérifier avec deux comptes de test.
+  Les deux clients peuvent voir les réservations de l&#39;autre dans Velocity.
+
+  <br />
+
+  Associez chaque réservation et chaque voiture enregistrée au client connecté afin que chaque
+  personne ne voie que les siennes.
+
+  <br />
+
+  Montrez-moi comment le vérifier avec deux comptes de test.
 </AiPrompt>
 
-## Publiez et connectez-vous depuis l'URL publique
+<div id="publish-and-sign-in-on-the-public-url">
+  ## Publier et se connecter sur l’URL publique
+</div>
 
-Publiez Velocity à nouveau depuis le chat de l'Agent ou la tuile de publication, puis ouvrez l'URL publique dans un nouvel onglet et connectez-vous. Clerk est provisionné avec des environnements de Développement et de Production séparés — l'Agent connecte automatiquement les identifiants de Production à l'application publiée, donc la connexion fonctionne directement sur l'URL publique.
+Publiez à nouveau Velocity depuis le chat Agent ou la vignette Publishing, puis ouvrez l’URL publique dans un nouvel onglet et connectez-vous. Clerk est configuré avec des environnements de développement et de production distincts — Agent intègre automatiquement les identifiants de production dans l’App publiée, pour que la connexion fonctionne immédiatement sur l’URL publique.
 
-Velocity dispose maintenant de vrais clients. Chacun se connecte à un garage personnel de réservations — personne d'autre ne peut les voir.
+Velocity a désormais de vrais clients. Chacun se connecte à son garage personnel, qui contient ses réservations — personne d’autre ne peut les voir.
 
-## Améliorer ensuite
+<div id="improve-it-next">
+  ## Améliorez-la ensuite
+</div>
 
 <CardGroup cols={2}>
   <Card title="Ajouter une base de données" icon="database" href="/fr/build/add-database">
-    Faites persister les voitures, la disponibilité et les réservations entre les sessions.
+    Conservez les voitures, les disponibilités et les réservations d&#39;une session à l&#39;autre.
   </Card>
 
   <Card title="Ajouter des paiements" icon="credit-card" href="/fr/build/add-payments">
-    Prenez un dépôt remboursable lorsqu'un client réserve une voiture.
+    Demandez un dépôt remboursable lorsqu&#39;un client réserve une voiture.
   </Card>
 </CardGroup>
 
-## Besoin d'aide supplémentaire ?
+<div id="need-further-help">
+  ## Besoin d’aide supplémentaire ?
+</div>
 
-* **Toute l'application est masquée :** demandez à l'Agent de garder la navigation des voitures publique et de protéger uniquement les pages de réservation et de compte.
-* **Les clients voient les réservations des autres :** demandez à l'Agent d'associer chaque réservation et voiture sauvegardée au client connecté.
-* **La connexion fonctionne dans l'aperçu mais pas après la publication :** ouvrez l'URL publique dans un nouvel onglet et indiquez à l'Agent l'erreur exacte que vous voyez. Assurez-vous que l'Agent a provisionné l'environnement Clerk de Production.
-* **Vous souhaitez une connexion sans configuration pour les prototypes :** Replit Auth utilise les comptes Replit de vos clients sans tenant Clerk à gérer — voir [Replit Auth](/fr/features/auth-and-identity/authentication).
+* **Toute l’application est masquée :** demandez à Agent de laisser la consultation des voitures accessible au public et de protéger uniquement les pages de réservation et de compte.
+* **Les clients voient les réservations des autres :** demandez à Agent d’associer chaque réservation et chaque voiture enregistrée au client connecté.
+* **La connexion fonctionne dans Preview, mais pas après la publication :** ouvrez l’URL publique dans un nouvel onglet et indiquez à Agent l’erreur exacte qui s’affiche. Assurez-vous qu’Agent a provisionné l’environnement Clerk de production.
+* **Vous souhaitez une connexion plus rapide et sans configuration pour les prototypes :** Replit Auth utilise les comptes Replit de vos clients, sans tenant Clerk à gérer — consultez [Replit Auth](/fr/features/auth-and-identity/authentication).
 
-## Ressources connexes
+<div id="related">
+  ## Articles associés
+</div>
 
 * [Clerk Auth](/fr/features/auth-and-identity/clerk-auth)
 * [Replit Auth](/fr/features/auth-and-identity/authentication)

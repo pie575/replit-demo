@@ -1,0 +1,160 @@
+---
+title: "Résoudre le problème « Cette application est bloquée » avec les connecteurs Google"
+description: "Corrigez l’erreur « Cette application est bloquée » lors de la connexion de connecteurs Google Drive, Docs, Sheets, Calendar ou Gmail à Replit."
+---
+
+<div id="viso-geral">
+  ## Vue d&#39;ensemble
+</div>
+
+Si le message d&#39;erreur **« Cette application est bloquée »** s&#39;affiche lorsque vous tentez de connecter un service Google Workspace (Drive, Docs, Sheets, Calendar ou Gmail) via les [Connecteurs](/fr/pt/features/integrations/overview#connectors), cela provient généralement d&#39;une mauvaise configuration OAuth de Google au sein de votre organisation Google Workspace.
+
+Ce guide vous explique comment résoudre le problème afin de pouvoir connecter les services Google à vos applications Replit.
+
+<Frame>
+  <img src="/assets/mirror/app-is-blocked-837b32f44f72.png" alt="Boîte de dialogue d'erreur Google affichant le message « Cette application est bloquée » empêchant l'accès OAuth" width="1279" height="502" data-path="images/replitai/debugging-google-connectors/app-is-blocked.png" />
+</Frame>
+
+<Warning>
+  Ces étapes s&#39;appliquent uniquement aux comptes **Google Workspace** (comptes gérés par une organisation). Si vous utilisez un compte Google personnel lié à une adresse `@gmail.com` et que le connecteur Replit est bloqué, vous ne pouvez pas modifier vous-même la politique OAuth — contactez l&#39;administrateur de votre Google Workspace ou utilisez un autre compte.
+</Warning>
+
+<div id="etapas-de-soluo-de-problemas">
+  ## Étapes de dépannage
+</div>
+
+<div id="etapa-1-tente-o-modo-de-navegao-annima">
+  ### Étape 1 : Essayez le mode de navigation privée
+</div>
+
+Les extensions de navigateur ou les données en cache peuvent perturber le flux OAuth. Le mode de navigation privée permet de contourner ces problèmes.
+
+<Steps>
+  <Step title="Ouvrir une fenêtre de navigation privée">
+    Ouvrez une nouvelle fenêtre de **navigation privée** (Chrome) ou **privée** (Firefox/Safari) dans votre navigateur.
+  </Step>
+
+  <Step title="Se connecter à Replit">
+    Connectez-vous à votre compte Replit sur [replit.com](https://replit.com).
+  </Step>
+
+  <Step title="Réessayer la connexion">
+    Ouvrez votre application dans l&#39;éditeur de projet, accédez à **Connectors** dans la barre latérale et essayez de connecter à nouveau le service Google.
+  </Step>
+</Steps>
+
+Si l&#39;erreur persiste, passez à l&#39;étape 2.
+
+<div id="etapa-2-verificar-as-configuraes-oauth-no-google-workspace">
+  ### Étape 2 : Vérifier la configuration OAuth dans Google Workspace
+</div>
+
+<Note>
+  Vous devez disposer d&#39;un accès à la **console d&#39;administration Google** de votre organisation pour cette étape. Contactez votre équipe informatique si vous ne disposez pas d&#39;un accès administrateur.
+</Note>
+
+<Steps>
+  <Step title="Ouvrir la console d'administration Google">
+    Connectez-vous à la [console d&#39;administration Google](https://admin.google.com) de votre organisation.
+  </Step>
+
+  <Step title="Confirmer que l'utilisateur existe">
+    Accédez à la section **Users** et vérifiez que le compte qui tente la connexion à Replit y figure bien.
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-users-c21d8fd43f71.png" alt="Section Utilisateurs de la console d'administration Google affichant les comptes utilisateurs" width="1104" height="596" data-path="images/replitai/debugging-google-connectors/google-workspace-users.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Accéder à API Controls">
+    Rendez-vous dans **Security &gt; Access and data control &gt; API controls**.
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-api-controls-b811709315cf.png" alt="Console d'administration Google affichant le chemin de navigation Security > API Controls" data-og-width="1140" width="1140" data-og-height="631" height="631" data-path="images/replitai/debugging-google-connectors/google-workspace-api-controls.png" data-optimize="true" data-opv="3" srcset="/assets/mirror/google-workspace-api-controls-a27d4577aee8.png 280w, /assets/mirror/google-workspace-api-controls-d681943c082d.png 560w, /assets/mirror/google-workspace-api-controls-8f1b1659e60a.png 840w, /assets/mirror/google-workspace-api-controls-795bc698b885.png 1100w, /assets/mirror/google-workspace-api-controls-c122b9eb493f.png 1650w, /assets/mirror/google-workspace-api-controls-2415c93b4f41.png 2500w" />
+    </Frame>
+  </Step>
+
+  <Step title="Ouvrir l'accès aux applications tierces">
+    Sélectionnez **Manage third-party app access**.
+
+    <Frame>
+      <img src="/assets/mirror/third-party-app-access-eb5c94107497.png" alt="Page des contrôles d'API de la console d'administration Google avec le bouton Manage third-party app access mis en évidence" width="1686" height="468" data-path="images/replitai/debugging-google-connectors/third-party-app-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Vérifier l'accès OAuth">
+    Vérifiez que l&#39;accès OAuth est activé pour les utilisateurs dans Google Workspace. S&#39;il est restreint, accordez l&#39;accès nécessaire afin que Replit puisse mener à bien le flux OAuth.
+  </Step>
+</Steps>
+
+Si la connexion échoue toujours, passez à l&#39;étape 3.
+
+<div id="etapa-3-adicionar-o-replit-como-cliente-oauth-confivel">
+  ### Étape 3 : Ajouter Replit comme client OAuth approuvé
+</div>
+
+Si votre organisation restreint par défaut l’accès aux applications tierces, vous devez explicitement approuver Replit.
+
+<Steps>
+  <Step title="Ouvrir la console d'administration Google">
+    Connectez-vous à la [console d&#39;administration Google](https://admin.google.com) de votre organisation.
+  </Step>
+
+  <Step title="Accéder à API Controls">
+    Accédez à **Security &gt; Access and data control &gt; API controls**.
+  </Step>
+
+  <Step title="Ouvrir l'accès aux applications tierces">
+    Dans **App access control**, sélectionnez **Manage third-party app access**.
+  </Step>
+
+  <Step title="Ajouter une nouvelle application">
+    Sélectionnez le bouton **Add app**, puis choisissez **OAuth App Name or Client ID** dans le menu déroulant.
+  </Step>
+
+  <Step title="Rechercher Replit">
+    Saisissez le Client ID de Replit :
+
+    ```
+    1012035106355-2dhot2e6o0malvog2ofss7akj2nsp8nq.apps.googleusercontent.com
+    ```
+
+    Sélectionnez **Search**. Lorsque l’application Replit apparaît dans les résultats, sélectionnez-la.
+  </Step>
+
+  <Step title="Définir le niveau d'accès">
+    Définissez le niveau d’accès sur **Trusted**.
+  </Step>
+
+  <Step title="Enregistrer">
+    Sélectionnez **Save**.
+  </Step>
+</Steps>
+
+<Tip>
+  Les modifications des règles Google Workspace peuvent prendre quelques minutes à se propager. Attendez 5 à 10 minutes après l’enregistrement, puis essayez à nouveau de connecter votre service Google à Replit.
+</Tip>
+
+<div id="ainda-bloqueado">
+  ## Toujours bloqué ?
+</div>
+
+Si vous avez suivi les trois étapes et que l&#39;erreur persiste :
+
+* **Vérifiez à nouveau l&#39;unité organisationnelle (UO)** : les règles Google Workspace peuvent s&#39;appliquer à des UO spécifiques. Assurez-vous que les paramètres OAuth et d&#39;application approuvée s&#39;appliquent bien à l&#39;UO dont dépend l&#39;utilisateur qui tente de se connecter.
+* **Consultez les alertes Google Workspace** : dans la console d&#39;administration, ouvrez **Reporting &gt; Audit and investigation &gt; OAuth log events** pour repérer les demandes refusées liées à Replit.
+* **Contactez l&#39;assistance Replit** : si le problème ne vient pas de Google Workspace, contactez l&#39;[assistance Replit](https://replit.com/support) pour obtenir de l&#39;aide.
+
+<div id="documentao-relacionada">
+  ## Documentation associée
+</div>
+
+* [Présentation des connecteurs](/fr/pt/features/integrations/overview) -- Découvrez tous les types d&#39;intégration, y compris les connecteurs Google Workspace
+* [Gérer vos connecteurs](/fr/pt/replitai/managing-connectors) -- Configuration administrateur pour les connecteurs de Workspace et d&#39;organisation
+* [Aide Google Workspace Admin : contrôler l&#39;accès des applications tierces](https://support.google.com/a/answer/7281227) -- Guide officiel de Google pour gérer l&#39;accès des applications OAuth
+
+***
+
+<Note>
+  Un grand merci à l&#39;équipe d&#39;[Element451](https://element451.com) pour le [guide original sur la résolution de cette erreur](https://help.element451.com/en/articles/9999308-resolving-this-app-is-blocked-error-for-google-drive-connectors), qui a servi de base à cet article.
+</Note>

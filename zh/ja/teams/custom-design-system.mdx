@@ -1,0 +1,210 @@
+---
+title: "设置设计系统"
+description: "将组织的设计系统（组件库、品牌资源、设计令牌和视觉标准）配置给 Agent，确保所有应用、网站和产物都遵循您的设计语言。"
+sidebarTitle: "设计系统"
+icon: "palette"
+---
+
+设计系统为 Agent 提供构建符合品牌风格的界面所需的信息，适用于组织在 Replit 上创建的所有内容，包括 Web 应用、移动应用、幻灯片和其他产物。通过在标准的 Replit pnpm 单体仓库中设置组件库、设计令牌、品牌资源和使用规则，Agent 能从第一条提示词起应用您的视觉语言。
+
+<Note>
+  设计系统仅适用于 **Enterprise** 计划。只有组织管理员可以设置和管理设计系统。
+</Note>
+
+<div id="section">
+  ## 为什么要设置设计系统
+</div>
+
+如果没有设计系统，每位构建者都必须手动向 Agent 说明组件库、颜色令牌和布局规范。设置设计系统可以解决这一问题：
+
+* **固化视觉标准**：Agent 会使用准确的组件、颜色和间距，而不是通用默认值
+* **确保一致性**：所有应用都遵循相同的设计语言
+* **缩短上手时间**：新构建者可立即产出符合品牌规范的成果
+* **沉淀隐性知识**：为 Agent 记录团队成员脑海中的设计决策和组件使用模式
+
+<div id="section-2">
+  ## 所需材料
+</div>
+
+* 前端代码组件库，以 tar 文件或 tar 文件集的形式提供
+* 设计系统所用的字体资源和图标
+* 设计系统的 AI 文档 (MCP、Agent 技能)
+
+<div id="section-3">
+  ## 可配置的内容
+</div>
+
+设计系统的配置包括三个部分：
+
+1. **自定义说明**。`custom_instruction/instructions.md` 文件为 Agent 提供适用于所有项目的高层规则：使用哪些组件库、参考哪些设计令牌，以及遵循哪些模式。Agent 始终会将此文件纳入上下文。
+
+2. **技能**。`.agents/skills/` 中的技能为 Agent 提供可按需加载的详细参考资料。可用于存放组件 API 文档、主题指南、布局模式库，以及其他不适合放入主说明文件的详细参考内容。
+
+3. **设计和品牌资源**。将徽标、图标、字体和其他品牌资源放入专用文件夹 (例如 `src/assets/brand/`) 。配置 Vite 路径别名，让 Agent 和构建者可通过 `@brand/logo.svg` 等简洁的导入路径引用这些资源，避免使用容易出错的相对路径。这样可确保整个项目中的资源引用保持一致。
+
+<div id="section-4">
+  ## 分步指南
+</div>
+
+本指南介绍如何使用打包为 tar 文件的现有组件库，端到端地配置设计系统：
+
+1. **创建一个新的 Replit 应用**并上传 tar 文件。
+2. **让 Replit Agent 安装软件包并显示所有组件。** Agent 会配置项目并渲染组件库。
+3. **检查输出结果。** 确认所有组件都能正确显示并符合预期。确认无误后，继续[创建设计系统 skill](#creating-the-design-system-skill)。
+
+<div id="section-5">
+  ### 创建设计系统技能
+</div>
+
+组件准备就绪后，最后一步是创建设计系统技能，让 Agent 能够在所有项目中引用组件、令牌和使用模式。
+
+复制以下完整提示词并粘贴到 Agent 中。将 `<your-design-system-name>` 替换为你的设计系统名称：
+
+````
+このプロジェクトのコンポーネントとパッケージから`<your-design-system-name>`デザインシステムスキルを作成してください。
+
+以下に示すファイル構造を使用します。ルートに`SKILL.md`、ガイドとコンポーネントドキュメントのための`references/`ディレクトリ、機能に必要なすべての依存関係を含む`packages/`ディレクトリ。
+
+プロジェクト内のすべてのコンポーネントを確認し、`references/components/`以下のそれぞれのファイルに、プロパティ、バリアント、使用例を含めてドキュメント化してください。
+
+`SKILL.md`をガイドとコンポーネント参照ファイルへのリンクを含むインデックスとしてフォーマットし、以下の例に従って「一般的なガイダンス」セクションと「コンポーネント」セクションを含めてください。
+
+ファイル構造：
+
+.agents/skills/your-design-system/
+├── SKILL.md
+├── references/
+│   ├── guides/
+│   │   ├── setup.md
+│   │   ├── guardrails.md
+│   │   ├── layout-and-spacing.md
+│   │   └── ...
+│   └── components/
+│       ├── component-index.md
+│       ├── button.md
+│       ├── checkbox.md
+│       └── ...
+└── packages/
+    └── (Tarファイルまたはコードコンポーネント)
+
+`SKILL.md`ファイルはガイドとコンポーネント参照の別のMarkdownファイルへのリンクを含むインデックスとして機能します。各リンクされたファイルは1つのトピックを詳細にカバーします。生成された`SKILL.md`の例を以下に示します：
+
+```markdown
+---
+name: your-design-system
+description: UIを構築または変更する際に使用します。デザインシステムのコンポーネントAPIリファレンス、レイアウトガイダンス、ビジュアルスタイルルールを提供します。
+---
+
+# Your Design System
+
+## 一般的なガイダンス
+
+- [セットアップ](references/guides/setup.md) — インストール、プロジェクト設定、プロバイダーのセットアップ
+- [ガードレール](references/guides/guardrails.md) — 破ってはいけないハードルール（禁止パターン、必須トークン、アクセシビリティの最小要件）
+- [レイアウトとスペーシング](references/guides/layout-and-spacing.md) — グリッドシステム、スペーシングスケール、レスポンシブブレークポイント、ページテンプレート
+- ...
+
+## コンポーネント
+
+- [コンポーネントインデックス](references/components/component-index.md) — ステータスとカテゴリを含む利用可能なコンポーネントの全リスト
+
+個々のコンポーネント参照（プロパティ、バリアント、例）：
+
+- [ボタン](references/components/button.md)
+- [チェックボックス](references/components/checkbox.md)
+- ...
+```
+
+ガイドファイルはそれぞれ1つのトピックをカバーします。セットアップとインストールの手順、ベストプラクティスとルール、トークン値の参照テーブル、正しい使用法を示す短いコード例。
+
+コンポーネントファイルはそれぞれ1つのコンポーネントをドキュメント化します。コンポーネント名、簡単な説明、プロパティテーブル、使用例、ガイドラインまたは制約を含みます。これらのファイルが完全であるほど、Agentの出力が向上します。
+````
+
+<div id="agentxx">
+  ### 将技能 XX 连接到 Agent
+</div>
+
+创建技能后，确认 `custom_instruction/instructions.md` 已将 Agent 指向该技能：
+
+```markdown theme={null}
+# 设计系统
+
+请加载并遵循 `.agents/skills/your-design-system/` 中的设计系统技能。
+构建或修改界面时，请始终应用设计系统。
+```
+
+最后，为使 Agent 从一开始就能理解视觉标准，请在 `replit.md` 中预先配置设计系统专属的上下文。其中包括项目概述、首选组件库、主要设计偏好 (间距尺度、无障碍要求) 以及技术架构栈。
+
+<div id="section-6">
+  ### 验证设置
+</div>
+
+部署设计系统前，请确认满足以下要求：
+
+* `custom_instruction/instructions.md`会引导 Agent 使用设计系统技能
+* `.agents/skills/`包含含有组件参考资料、指南和软件包的技能
+* `replit.md`已预先配置项目概述、偏好设置和架构
+* 已包含设计令牌文件 (`tokens.css`或等效文件)
+* 已在`package.json`中预先安装设计系统软件包
+* 创建一个新的测试应用，确认 Agent 能够正确使用设计系统
+
+<div id="section-7">
+  ### 将设计系统固定到组织
+</div>
+
+设计系统准备就绪后，将其固定，让组织中的所有成员都能使用：
+
+1. 前往组织中的设计系统应用
+2. 打开应用的操作菜单 (三点菜单)
+3. 选择**固定到 Agent 输入框**
+
+<img src="/assets/mirror/custom-templates-pin-to-agent-b733d3eb9a80.png" alt="显示“固定到 Agent 输入框”选项的应用操作菜单" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  只有组织管理员 (拥有 `system_admins` 角色的成员) 可以固定或取消固定设计系统。
+</Note>
+
+将成员访问权限设为**只读**，这样成员就能查看和使用已固定的设计系统，但无法进行编辑。
+
+<img src="/assets/mirror/custom-templates-members-read-only-cf6aa160c8ef.png" alt="成员访问权限设为只读的邀请对话框" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+设计系统会显示在组织内所有成员的 Agent 输入框下方，并以可选标签的形式呈现。要移除它，请打开同一菜单并选择**从 Agent 输入框取消固定**。
+
+<img src="/assets/mirror/custom-templates-input-box-553384ac7dd0.png" alt="设计系统在 Agent 输入框中显示为可选标签" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+<div id="section-8">
+  ## 持续维护设计系统
+</div>
+
+设计系统会不断演进。请始终保持其最新状态：
+
+* 当设计系统发布新的颜色、间距和排版值时，**更新令牌文件**
+* 当组件新增属性、变体和使用模式时，**更新技能**
+* 当设计原则或标准发生变更时，**更新指令**
+* 当设计系统发布新版本时，**更新软件包版本**
+* 通过创建新的应用并确认 Agent 能生成正确的输出，**定期测试**
+
+<div id="section-9">
+  ## 设计系统与自定义模板的比较
+</div>
+
+设计系统和[自定义模板](/zh/ja/teams/custom-templates)的用途不同：
+
+|          | 设计系统                              | 自定义模板                       |
+| -------- | --------------------------------- | --------------------------- |
+| **用途**   | 将前端技术栈定制为团队专用，并使用代码组件             | 完全替换默认技术栈 (例如：Rust、Go、C++)  |
+| **技术栈**  | 在标准的 Replit pnpm 单体仓库 中运行     | 定义完全自定义的项目结构                |
+| **提供内容** | 组件库规范、设计令牌、品牌资源和视觉能力              | 完整样板：运行时、构建配置、依赖项、项目布局      |
+| **适用范围** | Web 应用、移动应用、幻灯片、产物等 Agent 构建的所有内容 | 仅适用于基于该特定模板创建的应用            |
+
+如果你希望 Agent 在整个 Replit 使用体验中遵循统一的视觉标准进行构建，请使用设计系统。如果需要完全不同的技术栈，请使用自定义模板。
+
+<div id="section-10">
+  ## 相关资源
+</div>
+
+* [自定义模板](/zh/ja/teams/custom-templates) - 为组织配置完全自定义的技术栈
+* [Agent 技能](/zh/ja/features/agent/skills) - 了解技能的工作原理及创建方法
+* [使用技能](/zh/ja/build/use-agent-skills) - 使用技能的实操指南
+* [replit.md](/zh/ja/features/project-setup/replit-dot-md) - 在项目上下文中自定义 Agent 的行为
+* [Enterprise 概览](/zh/ja/category/teams) - 了解 Enterprise 的功能

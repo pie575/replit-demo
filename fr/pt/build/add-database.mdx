@@ -1,0 +1,115 @@
+---
+title: "Ajouter une base de données"
+description: "Assurez-vous que les voitures, la disponibilité et les réservations de Velocity soient conservées après une actualisation, un redémarrage et une publication."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Au final, toutes les voitures, tous les créneaux de disponibilité et toutes les réservations de Velocity seront encore là demain.
+
+<Frame>
+  <img src="/assets/mirror/persisted-bookings-384fb48e8a6d.png" alt="Velocity après rechargement montrant la liste Mes réservations du client connecté avec deux réservations enregistrées et la page de la flotte avec les voitures dans le même ordre, toutes deux inchangées par rapport à avant le rechargement" width="1280" height="720" data-path="images/velocity/add-database/persisted-bookings.png" />
+</Frame>
+
+Vous avez ajouté un système de connexion à Velocity dans [Ajouter une connexion](/fr/pt/build/add-login). Mais les voitures de la flotte et les réservations effectuées par les clients disparaissent encore lorsque la page est rechargée : elles ne sont stockées que dans le navigateur. Ajoutez une base de données pour que tout persiste.
+
+<div id="pea-ao-agent-para-salvar-os-dados">
+  ## Demandez à Agent d’enregistrer les données
+</div>
+
+Pour Velocity, utilisez Neon, la base de données Postgres gérée par Replit. Neon gère efficacement les réservations simultanées, s’adapte au trafic réel des clients, et Agent le provisionne automatiquement avec des environnements de développement et de production distincts. Aucune inscription sur le panneau Neon ni aucune clé à coller.
+
+<AiPrompt>
+  Enregistrez les données de Velocity dans une base de données afin que les voitures, les disponibilités et les réservations ne disparaissent pas lors de l’actualisation.<br />
+  Utilisez Neon (Postgres).<br />
+  Enregistrez : chaque voiture (marque, modèle, année, tarif journalier, photo, emplacement), le calendrier de disponibilité de chaque voiture et chaque réservation (date de prise en charge, date de retour, voiture, client).<br />
+  Associez chaque réservation au client connecté afin que chaque personne ne voie que les siennes.<br />
+  Empêchez qu’une même voiture soit réservée à des dates qui se chevauchent.<br />
+  Indiquez-moi ce qu’il faut tester après la modification.
+</AiPrompt>
+
+Agent provisionnera une base de données Neon, y migrera la flotte et les réservations actuellement stockées en mémoire, et ajoutera une vérification des chevauchements afin qu’une même Lamborghini ne puisse pas être réservée deux fois.
+
+<Frame>
+  <img src="/assets/mirror/agent-db-connected-e266fa2f9db8.png" alt="Chat d’Agent après la migration vers Neon montrant la liste de vérification — prévention des chevauchements, blocage sans connexion, réservations par utilisateur, rejet des dates non valides, rejet des voitures non valides — et un indicateur de checkpoint effectué à l’instant, à côté du Preview de Velocity affichant la flotte persistante" width="1280" height="720" data-path="images/velocity/add-database/agent-db-connected.png" />
+</Frame>
+
+<div id="teste-que-tudo-persiste">
+  ## Vérifiez que tout persiste
+</div>
+
+1. Ouvrez Velocity dans Preview et réservez une voiture pour samedi prochain.
+2. Actualisez la page. La réservation doit toujours figurer dans « Mes réservations ».
+3. Redémarrez l’app via le Chat d’Agent. La flotte et la réservation doivent toujours être présentes.
+4. Essayez de réserver la même voiture le même samedi avec un second compte. Velocity doit indiquer que la voiture n’est pas disponible et proposer une autre date ou une autre voiture.
+5. Déconnectez-vous, puis reconnectez-vous. Votre réservation doit toujours être présente.
+
+Si une réservation disparaît à une étape quelconque, collez le symptôme exact dans Agent :
+
+<AiPrompt>
+  J’ai réservé une voiture dans Velocity, mais la réservation disparaît après l’actualisation.<br />
+  Vérifiez si la réservation est enregistrée dans la base de données ou seulement stockée sur la page.<br />
+  Corrigez le problème le plus mineur possible et indiquez-moi comment vérifier.
+</AiPrompt>
+
+Vous pouvez également demander à Agent une vue administrative simple pour voir ce qui se trouve dans la base de données :
+
+<AiPrompt>
+  Montrez-moi une page administrative simple dans Velocity qui liste chaque voiture et chaque réservation dans la base de données, regroupées par voiture.<br />
+  Affichez-la uniquement pour moi, en tant que propriétaire du projet.
+</AiPrompt>
+
+<div id="publicar-e-confirmar-na-url-pblica">
+  ## Publier et vérifier sur l’URL publique
+</div>
+
+La configuration de Neon par Agent fournit à Velocity des environnements de développement et de production distincts dès le départ. Publiez à nouveau Velocity via le Chat d’Agent ou la tuile Publication, puis ouvrez l’URL publique dans un nouvel onglet. Replit associe automatiquement les identifiants Neon de production au déploiement publié : effectuez une réservation sur l’URL publique, actualisez la page et vérifiez qu’elle est toujours présente.
+
+Velocity mémorise désormais chaque voiture, chaque date disponible et chaque réservation. La prochaine mise à jour ne fera perdre aucune réservation.
+
+<div id="melhorias-a-seguir">
+  ## Prochaines améliorations
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter des paiements" icon="credit-card" href="/fr/pt/build/add-payments">
+    Facturez un dépôt de garantie remboursable lorsqu’un client réserve une voiture.
+  </Card>
+
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/pt/build/add-integrations">
+    Envoyez chaque réservation dans le calendrier du client.
+  </Card>
+
+  <Card title="Créer un dashboard à partir de données" icon="chart-simple" href="/fr/pt/build/dashboard">
+    Transformez les réservations enregistrées en graphiques d’utilisation.
+  </Card>
+</CardGroup>
+
+<div id="precisa-de-mais-ajuda">
+  ## Besoin d’aide supplémentaire ?
+</div>
+
+* **Les réservations sont enregistrées dans le Preview, mais pas sur l’URL publique :** demandez à Agent de vérifier que les identifiants Neon de production sont associés au déploiement publié.
+* **Les données sont difficiles à examiner :** demandez à Agent d’ajouter une vue d’administration simple qui répertorie toutes les données de la base de données.
+* **Vous souhaitez préremplir la flotte :** demandez à Agent d’ajouter un script à usage unique qui charge vos vrais véhicules dans la base de données.
+* **Vous souhaitez une base de données sans configuration pour un prototype rapide :** utilisez plutôt [Replit Database](/fr/pt/features/data-and-storage/sql-database) — il est intégré à chaque Repl, sans provisionnement distinct.
+
+<div id="relacionado">
+  ## Articles associés
+</div>
+
+* [Bases de données de production](/fr/pt/features/data-and-storage/development-and-production)
+* [Replit Database](/fr/pt/features/data-and-storage/sql-database)

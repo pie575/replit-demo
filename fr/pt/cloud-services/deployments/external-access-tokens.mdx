@@ -1,0 +1,235 @@
+---
+title: "Jetons d'accès externes"
+description: "Permettez aux pipelines de CI, aux webhooks et à d'autres services automatisés d'accéder à votre app Replit privée sans avoir à se connecter."
+---
+
+Les jetons d&#39;accès externes sont des jetons bearer que vous créez pour un Replit App donné.
+Ils permettent à des services automatisés — pipelines de CI, webhooks, vérificateurs d&#39;uptime, bots Slack,
+scripts internes — d&#39;accéder à l&#39;app même lorsque son URL est protégée par
+[une URL de Dev privée](/fr/pt/cloud-services/deployments/private-deployments)
+ou par un [Private Deployment](/fr/pt/cloud-services/deployments/private-deployments).
+
+Traitez chaque jeton comme un mot de passe : quiconque le détient peut accéder à votre app tant qu&#39;il n&#39;a pas expiré ou été révoqué.
+
+<Note>
+  Les jetons d&#39;accès externes sont disponibles avec les forfaits Replit Core et Pro.
+  Les clients Enterprise doivent en faire la demande auprès de Replit pour que la fonctionnalité soit
+  activée sur leur workspace. Les jetons n&#39;apparaissent dans les paramètres de publication
+  qu&#39;une fois le déploiement rendu privé.
+</Note>
+
+<div id="quando-usar-um-token">
+  ## Quand utiliser un jeton
+</div>
+
+Utilisez un jeton d&#39;accès externe lorsqu&#39;un élément *extérieur* à votre navigateur doit appeler votre Replit App privée. Cas courants :
+
+* Un workflow GitHub Actions qui exécute un smoke test sur votre URL de développement à chaque commit.
+* Un moniteur d&#39;uptime (Better Stack, Pingdom, UptimeRobot) qui interroge un endpoint de santé sur votre app publiée.
+* Un récepteur de webhook — Stripe, Slack, GitHub — qui envoie un POST vers un Private Deployment.
+* Un appel `curl` ou `fetch` depuis la machine d&#39;un collègue lors du débogage.
+
+Les jetons d&#39;accès externe sont conçus pour le **trafic d&#39;API**, et non pour ouvrir des pages d&#39;UI dans le navigateur. Les applications monopages (Vite, Next.js, etc.) chargent des bundles JavaScript via des requêtes ultérieures qui ne transporteront pas votre jeton, ce qui fera échouer ces requêtes. Pour une navigation interactive, connectez-vous normalement.
+
+<div id="ambientes-de-tokens">
+  ## Environnements de jetons
+</div>
+
+Chaque jeton est lié à un environnement :
+
+| Environnement | Où il fonctionne                                                             | Utilisation                                                         |
+| :------------ | :--------------------------------------------------------------------------- | :------------------------------------------------------------------ |
+| `Development` | L&#39;URL de développement du workspace de l&#39;app (`*.replit.dev`)        | Accéder à un Repl en cours d&#39;exécution pendant le développement |
+| `Production`  | Le déploiement publié de l&#39;app (`*.replit.app` et domaines personnalisés) | Accéder à un Private Deployment depuis des services externes        |
+
+Un jeton `Production` est lié au déploiement *actuellement publié*. Si vous
+republiez vers un nouveau déploiement, les jetons de production existants cessent de fonctionner
+et vous devez en créer de nouveaux.
+
+<div id="criar-um-token-de-acesso-externo">
+  ## Créer un jeton d’accès externe
+</div>
+
+<Steps>
+  <Step>
+    Ouvrez l’app que vous souhaitez exposer, puis ouvrez l’outil **Publishing**.
+  </Step>
+
+  <Step>
+    Sélectionnez **Adjust settings** pour afficher les options de republication.
+  </Step>
+
+  <Step>
+    Dans la section **Security**, recherchez **External access tokens**.
+  </Step>
+
+  <Step>
+    Sélectionnez **Create access token** et renseignez les champs suivants :
+
+    * **Label** (facultatif) : un nom court permettant d’identifier le jeton ultérieurement,
+      comme `CI` ou `Stripe webhook`. 120 caractères maximum.
+    * **Environment** : choisissez `Development` ou `Production` selon l’environnement depuis lequel
+      le service appelant doit accéder à l’app.
+    * **Expires after** : choisissez une durée de validité — `1 hour`, `24 hours`, `7 days`,
+      `30 days`, `3 months`, `1 year` ou `5 years`. Choisissez la durée la plus courte
+      répondant à vos besoins. Il n’existe pas d’option « n’expire jamais ».
+  </Step>
+
+  <Step>
+    Sélectionnez **Create**.
+  </Step>
+</Steps>
+
+Replit affiche le jeton **une seule fois**. Copiez-le maintenant : une fois la boîte de dialogue fermée, vous ne pourrez plus l’afficher. Si vous le perdez, révoquez-le et créez-en un nouveau.
+
+L’écran affiche deux options de copie :
+
+* **Copy query parameter** — copie `?project-protection-bypass=<token>` pour
+  l’ajouter à une URL. Utile pour effectuer des vérifications rapides avec `curl`.
+* **Copy token only** — copie le jeton brut, adapté à l’envoi dans un
+  en-tête `Authorization: Bearer`.
+
+<Info>
+  La création du premier jeton active automatiquement l’accès externe à l’app si
+  ce n’est pas déjà le cas. Sans protection, le jeton n’aurait rien à contourner.
+</Info>
+
+<div id="usar-um-token">
+  ## Utiliser un jeton
+</div>
+
+Présentez le jeton de l&#39;une des deux façons suivantes :
+
+<div id="cabealho-authorization-recomendado">
+  ### En-tête Authorization (recommandé)
+</div>
+
+```bash theme={null}
+curl -H "Authorization: Bearer <token>" https://your-app.replit.app/health
+```
+
+C&#39;est le bon choix dans presque tous les cas : webhooks, scripts de CI,
+appels de backend à backend. Le jeton n&#39;apparaît jamais dans les logs qui capturent les URL
+et ne reste jamais dans l&#39;historique du navigateur.
+
+<div id="parmetro-de-consulta">
+  ### Paramètre de requête
+</div>
+
+```bash theme={null}
+curl "https://your-app.replit.app/health?project-protection-bypass=<token>"
+```
+
+N&#39;utilisez la forme en paramètre de requête que lorsqu&#39;il est impossible de définir des en-têtes — par exemple, dans un
+service qui n&#39;accepte qu&#39;une URL. Les URL contenant des jetons se retrouvent souvent dans les logs de proxy,
+l&#39;historique du Shell et les captures d&#39;écran : privilégiez donc l&#39;en-tête dès que possible.
+
+<div id="gerenciar-tokens-existentes">
+  ## Gérer les jetons existants
+</div>
+
+La section **Jetons d’accès externes** répertorie tous les jetons que vous avez créés pour
+l’App, du plus récent au plus ancien, ainsi que leur libellé, leur environnement, leur date de création,
+leur durée de validité et leur statut de révocation. Les derniers caractères de chaque jeton sont affichés
+sur chaque ligne pour vous aider à les distinguer, car la valeur complète n’est affichée
+qu’au moment de sa création.
+
+Vous ne voyez que les jetons que *vous* avez créés. Les jetons des autres collaborateurs restent privés,
+même si vous êtes propriétaire de l’App.
+
+<div id="revogar-um-token">
+  ## Révoquer un jeton
+</div>
+
+Révoquez un jeton dès qu&#39;il n&#39;est plus nécessaire, ou dès que vous soupçonnez qu&#39;il
+a pu être exposé. Pour le révoquer :
+
+<Steps>
+  <Step>
+    Ouvrez la section **External access tokens** dans les paramètres de publication de l&#39;app.
+  </Step>
+
+  <Step>
+    Repérez le jeton dans la liste et sélectionnez l&#39;icône de corbeille.
+  </Step>
+
+  <Step>
+    Confirmez la révocation.
+  </Step>
+</Steps>
+
+La révocation est **immédiate et irréversible**. Tout trafic utilisant encore ce
+jeton est rejeté en quelques secondes. Si vous avez de nouveau besoin d&#39;un accès, créez un
+nouveau jeton.
+
+Vous ne pouvez révoquer que les jetons que vous avez créés. Retirer un collaborateur du
+workspace révoque automatiquement les jetons qu&#39;il a créés pour cette app.
+
+<div id="mantenha-seus-tokens-seguros">
+  ## Protégez vos jetons
+</div>
+
+Les jetons d’accès externes sont des identifiants. Traitez-les avec le même soin qu’une clé d’API ou un mot de passe.
+
+<div id="o-que-fazer">
+  ### Ce qu&#39;il faut faire
+</div>
+
+* **Stockez les jetons dans un gestionnaire de secrets** — les Secrets GitHub Actions, le coffre-fort de votre
+  fournisseur de CI, le stockage de secrets de votre fournisseur cloud ou un gestionnaire de mots de passe.
+  Ne les committez jamais dans un dépôt.
+* **Utilisez des durées de vie courtes** dans la mesure du possible. Un jeton de 7 jours pour une
+  intégration ponctuelle est plus sûr qu&#39;un jeton de 5 ans qui traîne.
+* **Attribuez un libellé à chaque jeton** afin de savoir à quoi il sert et s&#39;il est encore utilisé. Les jetons sans libellé sont les premiers à fuiter et les derniers à être révoqués.
+* **Créez un jeton distinct par consommateur.** Un jeton par job de CI, un par
+  source de webhook, un par contrôle d&#39;uptime. En cas de compromission — ou
+  lorsqu&#39;un fournisseur n&#39;est plus nécessaire — vous ne révoquez que celui-là.
+* **Privilégiez l&#39;en-tête `Authorization`** plutôt que les paramètres de requête pour éviter que le jeton
+  ne fuite via les logs d&#39;URL, l&#39;historique du navigateur ou les en-têtes de référence.
+* **Révoquez immédiatement** tout jeton susceptible d&#39;avoir été exposé — un log divulgué,
+  un commit dans un dépôt public, un enregistrement d&#39;écran, l&#39;ordinateur portable d&#39;un ancien employé.
+  La révocation prend effet immédiatement ; créez un jeton de remplacement ensuite.
+
+<div id="o-que-no-fazer">
+  ### Ce qu&#39;il ne faut pas faire
+</div>
+
+* **Ne partagez pas un jeton entre coéquipiers ou entre services.** Si deux systèmes partagent
+  le même jeton, vous ne pouvez pas en révoquer un sans casser l&#39;autre.
+* **Ne collez pas de jetons dans un chat, un e-mail, une capture d&#39;écran ou un outil de suivi de tickets.**
+  Ces canaux sont archivés, indexés et partagés de façons que vous ne pouvez pas prévoir.
+* **N&#39;intégrez pas de jetons dans du code côté client** — applications web, applications mobiles,
+  binaires de bureau. Tout ce qui est livré sur l&#39;appareil d&#39;un utilisateur doit être considéré comme public.
+* **Ne comptez pas sur les jetons pour les sessions de navigateur.** Les jetons servent aux appels d&#39;API,
+  pas à charger une SPA dans un onglet de navigateur. Pour cela, utilisez une connexion Replit classique.
+* **Ne choisissez pas une validité de 5 ans par défaut.** Adaptez la durée de vie au temps
+  pendant lequel le consommateur a réellement besoin d&#39;un accès.
+
+<div id="soluo-de-problemas">
+  ## Résolution des problèmes
+</div>
+
+<Accordion title="Mon jeton de production a soudainement cessé de fonctionner">
+  Les jetons de production sont liés à un déploiement publié précis. Si vous
+  avez republié l&#39;app — par exemple en changeant le type de déploiement ou
+  en supprimant puis recréant le déploiement — les jetons de production existants sont
+  invalidés. Créez un nouveau jeton dans les paramètres du nouveau déploiement.
+</Accordion>
+
+<Accordion title="Mon jeton fonctionne avec `curl`, mais le navigateur affiche toujours la page de connexion">
+  Les jetons d&#39;accès externe sont destinés au trafic d&#39;API, pas aux sessions de navigateur. Lorsqu&#39;une application monopage se charge dans le navigateur, la requête HTML initiale peut transmettre le jeton via un paramètre de requête, mais les requêtes suivantes vers les bundles JavaScript, les fichiers CSS et les appels d&#39;API ne l&#39;incluront pas et seront rejetées. Pour naviguer dans l&#39;app de manière interactive, connectez-vous à Replit normalement.
+</Accordion>
+
+<Accordion title="J'ai perdu le jeton — puis-je le consulter à nouveau ?">
+  Non. Replit n&#39;affiche le jeton qu&#39;une seule fois, au moment de sa création. La vue en liste affiche
+  les métadonnées (libellé, environnement, validité, derniers caractères), mais jamais la valeur complète du jeton. Si vous l&#39;avez perdu, révoquez ce jeton et créez-en un nouveau.
+</Accordion>
+
+<div id="prximas-etapas">
+  ## Prochaines étapes
+</div>
+
+* [Private Deployments](/fr/pt/cloud-services/deployments/private-deployments) :
+  la fonctionnalité de contrôle d&#39;accès sous-jacente que ces jetons contournent.
+* [Gestion des accès aux Replit Apps](/fr/pt/teams/identity-and-access-management/repl-access-management) :
+  déterminez quels utilisateurs Replit peuvent se connecter à vos apps privées.

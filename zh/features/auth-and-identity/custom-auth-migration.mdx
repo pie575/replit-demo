@@ -1,0 +1,59 @@
+---
+title: "规划自定义认证迁移"
+description: "规划从自定义认证系统安全迁移到 Clerk Auth，同时保留应用的用户数据和访问规则。"
+sidebarTitle: "自定义认证迁移"
+icon: "right-left"
+---
+
+如果你的应用拥有自己的认证系统、用户存储或会话逻辑，请参考本页面。迁移到 [Clerk Auth](/zh/features/auth-and-identity/clerk-auth) 是一次数据与身份的迁移，而不仅仅是代码改动。缺乏规划时，老用户再次登录时可能会发现自己无法访问原有数据。
+
+<Note>
+  **正在使用 Replit Auth？** 自动迁移流程仅适用于符合条件的 Replit Auth 应用，请改为参照[从 Replit Auth 迁移到 Clerk](/zh/features/auth-and-identity/migrate-auth-to-clerk)。
+
+  Replit 不会自动迁移自定义认证系统。本页面提供的是规划与验证方面的指导，而非自动导入流程。
+</Note>
+
+<div id="plan-identity-continuity">
+  ## 规划身份连续性
+</div>
+
+* 明确当前将用户与应用数据关联起来的稳定标识值。它可能是用户 ID、电子邮件地址、用户名，也可能是独立的账户记录。
+* 梳理依赖该值的所有数据表和服务，包括所有权、权限、订阅、偏好设置和审计记录。
+* 在更改登录行为之前，先确定新的身份系统如何匹配每一条现有的本地记录。
+* 明确切换完成后如何为新用户分配身份并关联到本地记录。
+
+<Warning>
+  切勿假定身份提供方的用户 ID、电子邮件地址或首次登录时创建的新账户能与现有记录相匹配。切换前请使用具有代表性的账户验证映射关系。
+</Warning>
+
+<div id="account-credentials-and-sessions">
+  ## 账户凭据与会话
+</div>
+
+* 分别清点密码哈希、OAuth 身份、MFA 因素、验证状态和活跃会话，它们在可迁移性和安全性方面的要求可能各不相同。
+* 在处理真实账户之前，先对照所选身份提供方的最新文档验证密码迁移方案。如果某项凭据无法安全迁移，请规划密码重置或账户关联流程。
+* 不要默认 OAuth 身份或活跃会话会自动迁移。请提前规划现有用户如何重新登录，以及如何避免产生重复账户。
+* 除非你已明确规划了替代方案，否则请将授权数据和应用专属数据保留在本地数据模型中。身份验证与授权通常需要分别开展迁移工作。
+
+<div id="test-before-cutover">
+  ## 切换前测试
+</div>
+
+* 在非生产环境中使用有代表性的非敏感账户和数据进行测试。
+* 以现有账户登录，然后打开会读取用户专属数据的页面，例如仪表板、个人资料或已保存的条目。
+* 验证授权规则、账户找回、退出登录以及新账户注册流程。
+* 在切换期间密切关注是否出现重复记录和访问失败。在验证完成之前，请保留回滚方案。
+
+<div id="get-help">
+  ## 获取帮助
+</div>
+
+* 如果你需要将自定义认证系统迁移到由 Replit 托管的 Clerk Auth，请在修改生产环境账户数据之前[联系 Replit 支持团队](https://replit.com/support)。
+* 如果你使用其他身份提供方管理身份验证，请参考该提供商的最新迁移文档，并在切换前验证身份映射。
+
+<div id="additional-resources">
+  ## 更多资源
+</div>
+
+* [Clerk Auth 概览](/zh/features/auth-and-identity/clerk-auth) — Clerk Auth 在 Replit 上的工作原理
+* [从 Replit Auth 迁移到 Clerk](/zh/features/auth-and-identity/migrate-auth-to-clerk) — 为 Replit Auth 使用符合条件应用的迁移流程

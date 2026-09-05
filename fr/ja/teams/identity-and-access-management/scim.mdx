@@ -1,0 +1,281 @@
+---
+title: "SCIM"
+description: "Configurez SCIM pour automatiser le provisionnement depuis votre fournisseur d’identité, puis gérez l’association des groupes synchronisés aux espaces de travail, rôles et administrateurs de compte Replit."
+icon: "arrows-rotate"
+---
+
+<div id="section">
+  ## Introduction
+</div>
+
+<Note>
+  SCIM est disponible uniquement pour les clients Enterprise. Pour activer cette fonctionnalité pour votre organisation, contactez notre équipe commerciale à l’adresse [sales@replit.com](mailto:sales@replit.com).
+</Note>
+
+Le système de gestion des identités interdomaines ([SCIM](https://en.wikipedia.org/wiki/System_for_Cross-domain_Identity_Management)) est un protocole standardisé qui automatise le provisionnement et le déprovisionnement des utilisateurs entre le fournisseur d’identité (IdP) de votre entreprise et Replit.
+
+Une fois SCIM activé, vous pouvez gérer directement dans Replit la façon dont les groupes et les membres synchronisés sont associés aux espaces de travail et aux rôles Replit. Pour en savoir plus, consultez [Gérer l’accès à l’espace de travail](#managing-workspace-access).
+
+<div id="section-2">
+  ## Fonctionnalités principales
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Gestion automatisée des membres" icon="user-plus">
+    Provisionnement et déprovisionnement automatiques des membres selon l’annuaire de votre IdP
+  </Card>
+
+  <Card title="Synchronisation des rôles" icon="shield">
+    Synchronisation des rôles et des autorisations des membres avec la structure de votre organisation
+  </Card>
+
+  <Card title="Opérations groupées" icon="users">
+    Gestion efficace des grandes équipes grâce aux opérations groupées
+  </Card>
+
+  <Card title="Prise en charge des principaux IdP" icon="plug">
+    Intégration directe avec Microsoft Entra ID, Okta et d’autres grands fournisseurs d’identité
+  </Card>
+</CardGroup>
+
+<div id="section-3">
+  ## Avantages
+</div>
+
+L’intégration SCIM offre plusieurs avantages aux équipes Enterprise :
+
+* **Sécurité renforcée** : tirez parti de vos systèmes de gestion des identités existants pour un contrôle d’accès robuste
+* **Gestion simplifiée** : gérez automatiquement les membres de l’équipe via votre fournisseur d’identité
+* **Intégration efficace** : provisionnez facilement des équipes de grande taille sans intervention manuelle
+* **Contrôle d’accès cohérent** : maintenez des politiques d’accès uniformes dans toute l’organisation
+
+<div id="section-4">
+  ## Premiers pas
+</div>
+
+<Steps>
+  <Step title="Activer SCIM">
+    Ouvrez **Paramètres** &gt; **Paramètres avancés** &gt; **Identité et gouvernance**, puis activez SCIM pour votre organisation Enterprise.
+  </Step>
+
+  <Step title="Configurer votre IdP">
+    Accédez directement au portail d’intégration SCIM depuis les paramètres d’identité et de gouvernance. Ce portail fournit des instructions pas à pas adaptées à votre fournisseur d’identité pour synchroniser votre répertoire d’utilisateurs.
+  </Step>
+
+  <Step title="Tester l’intégration">
+    Provisionnez un utilisateur de test pour vérifier la connexion.
+  </Step>
+
+  <Step title="Passer en production">
+    Commencez à utiliser SCIM pour automatiser la gestion des membres, puis attribuez les groupes synchronisés à votre espace de travail dans [Accès SCIM à l’espace de travail](#managing-workspace-access).
+  </Step>
+</Steps>
+
+<div id="section-5">
+  ## Bonnes pratiques
+</div>
+
+* Documentez les attributions de rôles des membres Replit existants avant d’activer SCIM.
+* Configurez un espace de travail par défaut afin que tous les groupes synchronisés disposent au minimum de l’accès **Lecteur**. Sans espace de travail par défaut, les membres n’auront aucun rôle tant que vous n’aurez pas attribué les groupes à des espaces de travail.
+* Testez le provisionnement avec un petit groupe de membres avant d’activer le provisionnement en masse.
+* Après la synchronisation initiale, examinez et configurez les autorisations des groupes personnalisés en fonction des besoins de contrôle d’accès de votre organisation.
+* Réservez les groupes de contrôle des rôles à la gestion des niveaux d’accès des membres provisionnés et utilisez les autres groupes poussés pour la catégorisation et la gestion groupée des autorisations.
+* Documentez votre configuration SCIM pour référence ultérieure.
+
+<div id="section-6">
+  ## Synchronisation des groupes
+</div>
+
+Tous les groupes transmis par votre IdP sont synchronisés avec Replit, ainsi que les membres que votre IdP y provisionne. Lorsque vous transmettez le groupe « Ingénierie » via SCIM, Replit crée le groupe correspondant avec les membres provisionnés.
+
+L’appartenance aux groupes est automatiquement mise à jour pour refléter celle définie dans votre IdP. Vous pouvez utiliser ces groupes synchronisés pour modifier les autorisations des membres en masse, par exemple en partageant une appli avec tous les membres du groupe « Ingénierie ».
+
+<div id="microsoft-entra-id">
+  ### Utiliser des groupes plats avec Microsoft Entra ID
+</div>
+
+<Warning>
+  Microsoft Entra ID ne provisionne que les utilisateurs qui sont membres directs de groupes explicitement attribués. Les groupes imbriqués ne sont pas développés. Les utilisateurs qui appartiennent uniquement à un sous-groupe ne sont pas ajoutés au groupe parent dans Replit. Microsoft Entra ID ne les provisionne pas, sauf si un autre groupe attribué les répertorie directement.
+</Warning>
+
+Utilisez des groupes plats pour le provisionnement SCIM en ajoutant directement les utilisateurs à chaque groupe attribué à Replit. Si vous devez conserver des groupes imbriqués dans Microsoft Entra ID, attribuez à l’application Replit tous les groupes contenant directement des utilisateurs. Pour en savoir plus, consultez les [conseils de Microsoft sur le ciblage basé sur les attributions](https://learn.microsoft.com/en-us/entra/identity/app-provisioning/how-provisioning-works#assignment-based-scoping).
+
+<div id="scim">
+  ### Créer des groupes personnalisés en parallèle de SCIM
+</div>
+
+Même lorsque SCIM est activé, vous pouvez créer des groupes personnalisés dans Replit. Utilisez-les pour organiser les membres selon le travail sur des projets non géré dans votre fournisseur d’identité, pour accorder des autorisations ponctuelles ou selon d’autres critères.
+
+* **Les groupes SCIM restent verrouillés.** Les groupes synchronisés depuis votre IdP ne peuvent être modifiés ou supprimés que via votre fournisseur d’identité.
+* **Les groupes personnalisés sont gérés dans Replit.** Les administrateurs de l’organisation peuvent créer, modifier et supprimer des groupes personnalisés directement depuis la page des groupes.
+* **Les membres peuvent appartenir aux deux types de groupes.** Les membres provisionnés via SCIM peuvent également être ajoutés à des groupes personnalisés sans affecter les rôles gérés par l’IdP.
+
+Pour en savoir plus sur les groupes, consultez [Groupes et autorisations](/fr/ja/teams/identity-and-access-management/groups-and-permissions).
+
+<div id="section-7">
+  ## Gestion des accès à l’espace de travail
+</div>
+
+Une fois SCIM activé, utilisez l’interface d’administration du produit pour consulter et gérer l’association des groupes synchronisés aux espaces de travail et aux rôles, et pour désigner le groupe des administrateurs de compte. L’IdP reste la source de référence pour les adhésions et le provisionnement. Cette interface gère l’association des groupes et membres synchronisés aux espaces de travail et aux rôles Replit ; elle n’ajoute, ne supprime ni ne reprovisionne de membres.
+
+<div id="section-8">
+  ### Configurer votre espace de travail
+</div>
+
+Nous vous recommandons de regrouper les membres dans un **seul espace de travail** et de ne créer des espaces de travail supplémentaires que s&#39;il existe une raison valable de ne pas partager les membres, les groupes et les budgets, par exemple pour des divisions distinctes. Veillez à ce que tous les membres qui doivent collaborer fassent partie du même espace de travail.
+
+Vous pouvez attribuer des groupes synchronisés à un espace de travail. Dans l&#39;espace de travail, les groupes attribués s&#39;affichent comme des **groupes personnalisés** et peuvent servir à appliquer des contrôles au niveau de l&#39;espace de travail, tels que les **budgets de groupe** (par exemple, un budget de 100 000 pour l&#39;équipe Revenue).
+
+<div id="scim-2">
+  ### Ouvrir l’accès SCIM de l’espace de travail
+</div>
+
+1. Ouvrez le sélecteur d’espaces de travail et sélectionnez votre espace de travail Enterprise.
+2. Ouvrez **Paramètres**, puis sélectionnez **Paramètres avancés**.
+3. Développez la section **Identité et gouvernance**, puis recherchez la carte **Provisionnement automatique des membres (SCIM)**.
+4. Lorsque SCIM est **actif**, le panneau d’administration s’affiche directement dans cette carte.
+
+<Frame>
+  <img src="/assets/mirror/scim-workspace-access-overview-09bbb29aff91.png" alt="Aperçu de l’accès SCIM de l’espace de travail montrant une carte SCIM active, l’onglet des espaces de travail avec les espaces de travail répertoriés, ainsi qu’un bloc de groupe d’administrateurs de compte attribué au groupe Engineering et des étiquettes d’attribution de groupes." width="2342" height="1390" data-path="images/teams/identity-and-access-management/scim-workspace-access-overview.png" />
+</Frame>
+
+<div id="section-9">
+  ### Désigner le groupe d’administrateurs du compte
+</div>
+
+Commencez par configurer ce paramètre. Le bloc **Groupe d’administrateurs du compte** en haut de la page affiche le groupe synchronisé avec l’IdP dont les membres détiennent le rôle d’administrateur du compte dans tous les espaces de travail. Ils ont accès aux paramètres au niveau du compte, y compris aux autorisations de gestion SCIM.
+
+Sélectionnez **Modifier** pour choisir un autre groupe synchronisé. Le groupe désigné est remplacé : le nouveau groupe devient le groupe d’administrateurs du compte et l’ancien perd ce rôle. Les administrateurs du compte disposant de puissantes autorisations, toute modification doit être confirmée avant de prendre effet.
+
+<Frame>
+  <img src="/assets/mirror/scim-workspace-access-account-admin-group-3bd9468f581a.png" alt="Boîte de dialogue Groupe d’administrateurs du compte expliquant que les membres du groupe synchronisé avec l’IdP sélectionné détiennent le rôle d’administrateur du compte. Elle inclut une liste de boutons radio des groupes synchronisés, avec Engineering indiqué comme groupe actuel, ainsi que le nombre de membres." width="1674" height="2634" data-path="images/teams/identity-and-access-management/scim-workspace-access-account-admin-group.png" />
+</Frame>
+
+<Note>
+  L’appartenance au groupe d’administrateurs du compte est entièrement gérée dans le fournisseur d’identité. Pour ajouter ou supprimer des administrateurs du compte, modifiez les membres du groupe désigné dans l’IdP. Cet écran reflète cette appartenance, mais ne permet pas de la modifier.
+</Note>
+
+<div id="section-10">
+  ### Afficher et gérer les affectations d&#39;espaces de travail
+</div>
+
+L&#39;onglet **Espaces de travail** répertorie tous les espaces de travail de votre organisation, ainsi que les groupes synchronisés qui y sont affectés et le rôle de chacun.
+
+L&#39;**espace de travail par défaut** — indiqué par le badge **Par défaut** — constitue la base de l&#39;accès provisionné. Tous les groupes synchronisés y reçoivent automatiquement au moins l&#39;accès **Lecteur**, afin que les membres disposent toujours d&#39;un espace auquel accéder. Un espace de travail ne devient l&#39;espace de travail par défaut que lorsqu&#39;un administrateur le configure comme tel. D&#39;ici là, les membres n&#39;obtiennent l&#39;accès que via les affectations de groupes que vous effectuez.
+
+* Utilisez le champ de recherche pour filtrer les espaces de travail par nom.
+* Chaque ligne affiche les **affectations de groupes** sous forme de badges au format *groupe・rôle* (par exemple, *Engineering・Admin*). Lorsque les affectations d&#39;un espace de travail ne tiennent pas sur une seule ligne, un badge **+ N de plus** indique les affectations restantes.
+* Le menu **⋮** de la ligne vous permet de modifier les affectations ou de définir l&#39;espace de travail comme espace de travail par défaut de l&#39;organisation, ou de le retirer comme tel.
+
+<div id="section-11">
+  ### Attribuer des groupes à l’espace de travail et définir leurs rôles
+</div>
+
+Dans le menu **⋮** de la ligne de l’espace de travail, sélectionnez **Modifier les attributions** pour ouvrir la boîte de dialogue **Modifier l’accès à l’espace de travail**. Vous pouvez y sélectionner les groupes synchronisés ayant accès à l’espace de travail et définir le rôle de chacun :
+
+* **Administrateur** — Accès administratif complet aux paramètres et aux ressources de l’espace de travail.
+* **Membre** — Peut créer et modifier des Replit Apps.
+* **Lecteur** — Accès en lecture seule aux applications et aux déploiements.
+* **Invité** — Peut accéder uniquement aux applications partagées.
+
+Les autorisations du groupe d’administrateurs du compte (indiquées par une icône de cadenas) sont verrouillées. Elles sont gérées dans le cadre de la désignation des administrateurs du compte, et non au niveau de chaque espace de travail.
+
+<Frame>
+  <img src="/assets/mirror/scim-workspace-access-edit-assignments-886c65f54221.png" alt="Boîte de dialogue Modifier l’accès à l’espace de travail affichant une liste de groupes synchronisés avec des cases à cocher et des sélecteurs de rôle pour chaque groupe. Le groupe Engineering est étiqueté comme groupe d’administrateurs du compte et possède un rôle Admin verrouillé, tandis que les autres groupes disposent de sélecteurs de rôle modifiables." width="1674" height="2154" data-path="images/teams/identity-and-access-management/scim-workspace-access-edit-assignments.png" />
+</Frame>
+
+<div id="section-12">
+  ### Afficher les membres des groupes et les espaces de travail attribués
+</div>
+
+L’onglet **Groupes d’utilisateurs** affiche un tableau des groupes synchronisés, avec des colonnes indiquant le **nom** du groupe, les **espaces de travail attribués** (sous forme de puces de *rôle d’espace de travail*) et le **nombre de membres**. Les groupes définis comme groupes d’administrateurs de compte comportent une puce **Groupe d’administrateurs de compte**. Lorsque le nombre de groupes est important, le tableau est paginé. Utilisez les commandes de pagination en bas de page pour naviguer entre les pages.
+
+<Frame>
+  <img src="/assets/mirror/scim-workspace-access-user-groups-31742064305d.png" alt="Onglet Groupes d’utilisateurs affichant un tableau de groupes synchronisés (Engineering, Marketing, Sales, Design et Product), avec des puces de rôle d’espace de travail attribué et une colonne indiquant le nombre de membres. Le groupe Engineering comporte le libellé Groupe d’administrateurs de compte, et un sélecteur de page « Page 1 sur 2 » est affiché en bas." width="2342" height="1710" data-path="images/teams/identity-and-access-management/scim-workspace-access-user-groups.png" />
+</Frame>
+
+Développez une ligne de groupe pour consulter ses membres dans une liste indiquant leur **nom** et leur **e-mail**. Les membres sont chargés à la demande et paginés ; pour les grands groupes, vous pouvez ainsi consulter tous les membres page par page, plutôt que de les charger tous à la fois.
+
+<div id="section-13">
+  ## Limitations
+</div>
+
+* **L’IdP reste la source de référence.** L’ajout, la suppression et le provisionnement de membres, ainsi que la modification de l’appartenance à des groupes, s’effectuent dans le fournisseur d’identité. Replit gère l’*attribution* d’espaces de travail et de rôles aux groupes déjà présents dans le répertoire synchronisé.
+* **Microsoft Entra ID ne développe pas les groupes imbriqués.** Utilisez des groupes plats, comme décrit dans [Utiliser des groupes plats avec Microsoft Entra ID](#use-flat-groups-with-microsoft-entra-id), ou attribuez à l’application Replit tous les groupes contenant directement des utilisateurs.
+* **Le groupe d’administrateurs du compte peut être modifié, mais pas supprimé.** Vous pouvez désigner un autre groupe d’administrateurs du compte, mais aucune option ne permet de laisser l’organisation sans groupe d’administrateurs.
+
+<div id="faq">
+  ## FAQ
+</div>
+
+<div id="scimreplitcom">
+  ### Que se passe-t-il pour les membres qui possèdent déjà un compte sur replit.com avant la configuration de SCIM ?
+</div>
+
+Lorsque SCIM est activé, les membres existants sont traités de deux manières :
+
+1. **Membres provisionnés via SCIM** :
+   * Leurs rôles sont mis à jour en fonction de ceux fournis par l’IdP.
+   * Ces membres peuvent uniquement être ajoutés, supprimés ou voir leurs rôles modifiés via l’IdP.
+   * Afin de maintenir la synchronisation des autorisations, les administrateurs ne peuvent plus modifier les rôles ni inviter de nouveaux membres dans Replit.
+2. **Membres non provisionnés via SCIM** :
+   * Ces membres restent inchangés et sont considérés comme des membres « hérités ».
+   * Les adhésions à l’organisation et les rôles ne sont pas automatiquement supprimés afin d’éviter tout déprovisionnement involontaire.
+   * Les membres hérités peuvent être supprimés depuis l’interface Replit par les administrateurs de l’organisation si nécessaire.
+
+<Warning>
+  Après la mise en place de SCIM, tous les membres provisionnés via l’IdP doivent être gérés via l’IdP afin de maintenir la synchronisation. Seuls les membres hérités (ceux qui ne sont pas provisionnés via SCIM) peuvent être déprovisionnés directement dans Replit.
+</Warning>
+
+<div id="scim-3">
+  ### Quels rôles peuvent être provisionnés via SCIM ?
+</div>
+
+Les utilisateurs SCIM peuvent se voir attribuer l’un des quatre rôles suivants :
+
+* **Admin** : accès complet aux paramètres et ressources de l’organisation
+* **Member** : accès standard pour créer et modifier des applications Replit
+* **Guest** : accès limité destiné aux collaborateurs externes. Modification possible uniquement des applications explicitement partagées
+* **Viewer** : accès en lecture seule aux applications publiées
+
+Le mappage des groupes IdP aux rôles Replit se configure pour chaque espace de travail dans [Accès SCIM à l’espace de travail](#managing-workspace-access). Par exemple, vous pouvez attribuer le rôle Member au groupe « Engineering » dans un espace de travail et le rôle Viewer dans un autre.
+
+<div id="scim-4">
+  ### Puis-je ajouter ou supprimer des membres via l’accès à l’espace de travail SCIM ?
+</div>
+
+Non. Les adhésions et le provisionnement sont gérés par votre fournisseur d’identité. Cet écran permet de gérer le mappage des groupes et membres synchronisés vers les espaces de travail et les rôles. Pour la gestion quotidienne des membres en dehors de SCIM, consultez la [gestion des membres](/fr/ja/teams/identity-and-access-management/managing-members).
+
+<div id="section-14">
+  ### En quoi les rôles diffèrent-ils des groupes ?
+</div>
+
+Les groupes sont synchronisés depuis l’IdP. Les rôles (administrateur, membre, lecteur, invité) déterminent ce qu’un groupe peut faire dans un espace de travail donné. Un même groupe peut avoir des rôles différents selon l’espace de travail. Par exemple, **membre** dans un espace de travail et **lecteur** dans un autre.
+
+<div id="section-15">
+  ### La modification du groupe d’administrateurs de compte affecte-t-elle les autres rôles ?
+</div>
+
+La désignation d’un nouveau groupe d’administrateurs de compte modifie uniquement le rôle d’administrateur de compte pour l’ensemble de l’organisation. Les attributions aux autres groupes et espaces de travail, ainsi que les rôles associés, ne sont pas affectés. Pour en savoir plus sur le fonctionnement du rôle d’administrateur de compte, consultez [Administrateurs de compte et d’espace de travail](/fr/ja/teams/identity-and-access-management/account-and-workspace-admins).
+
+<div id="section-16">
+  ## Ressources associées
+</div>
+
+<CardGroup cols={2}>
+  <Card title="SAML SSO" icon="key" href="/fr/ja/teams/identity-and-access-management/saml">
+    Découvrez l’intégration de l’authentification unique SAML
+  </Card>
+
+  <Card title="Groupes et autorisations" icon="shield" href="/fr/ja/teams/identity-and-access-management/groups-and-permissions">
+    Découvrez comment gérer les rôles et les accès des utilisateurs
+  </Card>
+
+  <Card title="Administrateurs de compte et d’espace de travail" icon="user-shield" href="/fr/ja/teams/identity-and-access-management/account-and-workspace-admins">
+    Découvrez les capacités des administrateurs de compte et d’espace de travail
+  </Card>
+
+  <Card title="Sièges d’observateur" icon="eye" href="/fr/ja/teams/identity-and-access-management/viewer-seats">
+    Découvrez les accès en lecture seule et les sièges d’observateur
+  </Card>
+</CardGroup>

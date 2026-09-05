@@ -1,6 +1,8 @@
 ---
 title: "Analyser les retours clients"
-description: "Transformez les tickets d'assistance en thèmes, tendances et tableau de bord exploitable par l'équipe."
+description: "Transformez les tickets de support en thèmes, en tendances et en un dashboard sur lequel l'équipe peut s'appuyer."
+sidebarTitle: "Analyser les retours clients"
+icon: "comments"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                Ce n’est pas un connector natif. Agent vous demandera votre clé API.
               </div> : null}
           </div>
         </div>)}
@@ -67,75 +69,83 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Récupérez les tickets d'assistance depuis Zendesk, catégorisez les problèmes,
-identifiez les tendances, et mettez à jour un tableau de bord Notion avec les
-principaux thèmes, le volume par rapport à la semaine précédente, et des
-suggestions de suivi. Alertez Slack si un nouveau thème apparaît ou si le
-volume augmente, afin que l'équipe puisse agir avant que cela n'atteigne la
+Récupérez les tickets d&#39;assistance depuis Zendesk, catégorisez les problèmes, identifiez les tendances et
+mettez à jour un dashboard Notion avec les principaux thèmes, le volume par rapport à la semaine précédente et les suivis suggérés.
+Envoyez une alerte sur Slack si un nouveau thème émerge ou si le volume grimpe, afin que l&#39;équipe puisse agir avant que le sujet n&#39;arrive dans la
 feuille de route.
 
-## Idéal pour
+<div id="best-for">
+  ## Idéal pour
+</div>
 
-* Les chefs de produit qui ont besoin de revues hebdomadaires depuis Zendesk.
-* Les responsables support et produit qui doivent repérer un nouveau problème avant qu'il n'atteigne la feuille de route.
+* Les chefs de produit qui ont besoin d’examens hebdomadaires de Zendesk.
+* Les responsables du support et des produits qui doivent repérer un nouveau problème avant qu’il ne soit ajouté à la feuille de route.
 
-## Connecteurs
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
-{ id: "zendesk", name: "Zendesk", why: "Tickets et texte des conversations" },
+{ id: "zendesk", name: "Zendesk", why: "Tickets et contenu des conversations" },
 { id: "slack", name: "Slack", why: "Alerte en cas de pic ou de nouveau thème" },
-{ id: "notion", name: "Notion", why: "Journal des thèmes et tableau de bord" },
+{ id: "notion", name: "Notion", why: "Journal des thèmes et dashboard" },
 ]}
 />
 
-<Note>Fonctionne aussi avec Intercom, Front et Zoho Desk.</Note>
+<Note>Fonctionne également avec Intercom, Front et Zoho Desk.</Note>
 
-## Avant de commencer
+<div id="before-you-start">
+  ## Avant de commencer
+</div>
 
-Connectez Zendesk, Slack et Notion. Indiquez à l'Agent quels produits ou tags inclure.
+Connectez Zendesk, Slack et Notion. Indiquez à Agent les produits ou les tags à inclure.
 
-## Invite à l'Agent
-
-<AiPrompt>
-  Crée une routine qui s'exécute chaque lundi à 9h00. Récupère les tickets de
-  la semaine précédente depuis Zendesk. Catégorise les problèmes, identifie
-  les tendances, et mets à jour un tableau de bord Notion avec les principaux
-  thèmes, le volume par rapport à la semaine précédente, et des suggestions de
-  suivi. Alerte Slack si un nouveau thème apparaît ou si le volume augmente.
-</AiPrompt>
-
-## À quoi s'attendre
-
-L'Agent regroupe les tickets en thèmes, compte le volume, et rédige un court « quoi
-faire ». Examinez quelques tickets par thème pour vérifier les étiquettes. Après la
-première semaine, augmentez ou réduisez ce qui compte comme un pic pour que Slack
-reste utile. Ouvrez deux tickets par thème principal dans Zendesk et confirmez que
-l'étiquette convient. Si Slack a été déclenché, vérifiez que le volume a réellement
-augmenté par rapport à la semaine précédente.
-
-## Adaptez-le à vos besoins
+<div id="prompt-the-agent">
+  ## Donnez un prompt à l’Agent
+</div>
 
 <AiPrompt>
-  Sépare les bugs, la facturation et les demandes de fonctionnalités. Classe
-  les demandes de fonctionnalités par fréquence.
+  Créez une Routine qui s’exécute tous les lundis à 9:00. Récupérez les tickets de la semaine
+  précédente dans Zendesk. Catégorisez les problèmes, identifiez les tendances et mettez à jour un dashboard Notion
+  avec les principaux thèmes, le volume par rapport à la semaine précédente et les suivis suggérés. Envoyez une alerte sur Slack si
+  un nouveau thème apparaît ou si le volume augmente brusquement.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## À quoi vous attendre
+</div>
+
+Agent regroupe les tickets par thème, en calcule le volume et rédige une courte note indiquant quoi faire. Consultez quelques tickets de chaque thème pour vérifier les libellés. Après la première semaine, ajustez le seuil à partir duquel une hausse est considérée comme un pic afin que Slack reste utile. Ouvrez deux tickets pour chacun des principaux thèmes dans Zendesk et vérifiez que le libellé est approprié. Si Slack s’est déclenché, vérifiez que le volume a réellement augmenté par rapport à la semaine précédente.
+
+<div id="make-it-work-for-you">
+  ## Adaptez-le à vos besoins
+</div>
+
+<AiPrompt>
+  Distinguez les bugs, les problèmes de facturation et les demandes de fonctionnalités. Classez les demandes de fonctionnalités par
+  fréquence.
 </AiPrompt>
 
 <AiPrompt>
-  Rédige un modèle de réponse client pour le thème principal de cette semaine.
+  Rédigez un modèle de réponse client pour le principal thème de la semaine.
 </AiPrompt>
 
-## Dépannage
+<div id="troubleshooting">
+  ## Dépannage
+</div>
 
-* **Les thèmes sont trop vagues ou mélangent des tickets sans rapport :** indiquez à l'Agent quels produits ou tags inclure, et demandez-lui de séparer les bugs, la facturation et les demandes de fonctionnalités. Examinez quelques tickets par thème pour vérifier les étiquettes.
-* **Slack alerte à chaque petit changement :** relevez la barre : n'alertez que lorsqu'un nouveau thème apparaît ou que le volume augmente d'un pourcentage que vous définissez.
-* **Les tickets viennent du mauvais espace de travail :** connectez Zendesk au bon espace de travail et indiquez quels produits ou tags inclure.
+* **Les thèmes sont trop vagues ou mélangent des tickets sans rapport :** indiquez à Agent quels produits ou tags inclure et demandez-lui de séparer les bugs, la facturation et les demandes de fonctionnalités. Passez en revue quelques tickets par thème pour vérifier les libellés.
+* **Des notifications Slack à chaque petit changement :** relevez le seuil : n&#39;envoyez une alerte que lorsqu&#39;un nouveau thème apparaît ou que le volume augmente d&#39;un pourcentage que vous définissez.
+* **Les tickets proviennent du mauvais workspace :** connectez Zendesk au bon workspace et précisez quels produits ou tags inclure.
 
-## Voir aussi
+<div id="related">
+  ## Ressources associées
+</div>
 
 <CardGroup cols={2}>
-  <Card title="Surveiller les mentions de marque" href="/fr/use-cases/monitor-brand-mentions">
-    La même configuration Slack et Notion pour le sentiment public, pas seulement les tickets.
+  <Card title="Surveiller les mentions de votre marque" href="/fr/use-cases/monitor-brand-mentions">
+    La même configuration Slack et Notion, appliquée au sentiment du public plutôt qu&#39;aux tickets.
   </Card>
 
   <Card title="Générer des notes de version" href="/fr/use-cases/generate-release-notes">

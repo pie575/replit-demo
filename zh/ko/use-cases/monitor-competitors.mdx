@@ -1,0 +1,157 @@
+---
+title: "监测竞争对手"
+description: "检测价格和功能变更，让竞争情报页面始终保持最新。"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                这不是原生 connector。Agent 会要求你提供 API key。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+监控竞争对手的定价、变更日志和功能页面。一旦出现重要变更，
+自动总结变更内容、在 Slack 中发出通知，并及时更新 Notion 上的
+竞争情报页面。在同步给销售团队之前，请先到实际网站上核实这些变更。
+
+<div id="section">
+  ## 适合以下场景
+</div>
+
+* 需要一个实时更新的竞品页面的产品经理。
+* 需要在交易告吹前及时掌握价格变动的客户经理。
+
+<div id="section-2">
+  ## 连接器
+</div>
+
+<Connectors
+  items={[
+{
+id: "slack",
+name: "Slack",
+why: "重要变更通知",
+},
+{ id: "notion", name: "Notion", why: "竞争情报页面" },
+]}
+/>
+
+<div id="section-3">
+  ## 开始之前
+</div>
+
+将竞争对手名单以及需要关注的页面 (定价、变更日志、功能) 告诉 Agent。
+连接 Slack 和 Notion。
+
+<div id="agent">
+  ## 向 Agent 提出请求
+</div>
+
+<AiPrompt>
+  请创建一个每天早上 8 点运行的例程，监控以下竞争对手：
+  [URL 列表]。检测价格或功能变更，总结有哪些变化，
+  在有重要变动时通过 Slack 通知我，并保持 Notion 中的竞争情报页面
+  始终最新。
+</AiPrompt>
+
+<div id="section-4">
+  ## 预期结果
+</div>
+
+Agent 会将每个页面与历史版本对比，生成一份简明的“变更内容”说明，并同步更新
+Notion。在转交给销售团队之前，请到实际站点上核实这些变更。页面改版后的头几天
+可能会有较多干扰信息，因此请告诉 Agent 哪些内容才是重点。收到 Slack 通知后，
+先打开实际 URL 亲自确认变更，再进行转交。
+
+<div id="section-5">
+  ## 按自己的需求调整
+</div>
+
+<AiPrompt>
+  仅在价格或套餐变更时通知 Slack。其他页面改动
+  记录到 Notion，无需通知。
+</AiPrompt>
+
+<AiPrompt>
+  价格发生变更时，请在 Notion 中写一份 5 行的销售简报，说明变更了什么、
+  会影响谁，以及与我们相比如何。
+</AiPrompt>
+
+<div id="section-6">
+  ## 故障排查
+</div>
+
+* **每次改版都像是价格变动：** 告诉 Agent 要监控哪些页面 (价格、变更日志、功能) ，以及哪些信息最重要。转给销售团队前，请先在实际网站上核实变更。
+* **完全没有通知：** 可能无法访问页面，或者竞争对手列表过于狭窄。请提供完整 URL，并要求 Agent 在无法加载页面时通知您。
+* **Notion 变成一次性笔记堆：** 告诉 Agent 使用一个竞争情报页面，并要求它直接在该页面中更新，而不是每天早上新建页面。
+
+<div id="section-7">
+  ## 相关文档
+</div>
+
+<CardGroup cols={2}>
+  <Card title="监控品牌提及" href="/zh/ko/use-cases/monitor-brand-mentions">
+    除了竞争对手的网站，用户的讨论内容同样可以沿用这套 Slack 和 Notion 设置。
+  </Card>
+
+  <Card title="生成每周销售报告" href="/zh/ko/use-cases/weekly-pipeline-report">
+    适合需要掌握销售管道变化的客户经理与销售主管阅读。
+  </Card>
+</CardGroup>

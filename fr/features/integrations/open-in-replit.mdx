@@ -1,6 +1,8 @@
 ---
-title: "Ouvrir dans Replit"
-description: "Apprenez à créer un bouton « Ouvrir dans Replit » qui permet aux visiteurs de commencer à construire depuis votre application ou site web."
+title: "Open in Replit"
+description: "Découvrez comment créer un bouton Open in Replit qui permet aux visiteurs de se lancer dans la création directement depuis votre app ou votre site web."
+sidebarTitle: "Open in Replit"
+icon: "arrow-up-right-from-square"
 ---
 
 export const CreateUrlLinkBuilder = () => {
@@ -107,7 +109,7 @@ export const CreateUrlLinkBuilder = () => {
     </div>;
 };
 
-<Frame caption="Cliquer sur ce badge ouvre automatiquement Replit et remplit l'invite et les paramètres.">
+<Frame caption="Cliquer sur ce badge ouvre automatiquement Replit et pré-remplit le prompt ainsi que les paramètres.">
   <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
     <a href="https://replit.com/?stack=Build&prompt=A4Jw9gtsAuQ&referrer=replit-docs" target="_blank">
       <img src="https://replit.com/badge?caption=Open%20in%20Replit" alt="Open in Replit" noZoom />
@@ -115,7 +117,9 @@ export const CreateUrlLinkBuilder = () => {
   </div>
 </Frame>
 
-## Créer un lien
+<div id="building-a-link">
+  ## Créer un lien
+</div>
 
 Pour créer un lien, utilisez le format ci-dessous.
 
@@ -123,33 +127,41 @@ Pour créer un lien, utilisez le format ci-dessous.
 https://replit.com/?stack=Build&prompt=A4Jw9gtsAuQ&referrer=replit-docs
 ```
 
-### Paramètres d'URL
+<div id="url-parameters">
+  ### Paramètres d&#39;URL
+</div>
 
-Assurez-vous d'inclure les paramètres suivants dans votre URL.
+Veillez à inclure les paramètres suivants dans votre URL.
 
-| Paramètre  | Type   | Description                                                                                                                                                                                                                                       | Requis/Optionnel |
-| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `stack`    | string | Le mode de construction à utiliser. Doit être soit `Design` soit `Build`. `Design` ouvre [Canvas](/fr/design/canvas) pour le prototypage visuel. `Build` ouvre [Agent](/fr/features/agent/overview) pour le développement d'applications complet. | Requis           |
-| `prompt`   | string | Texte décrivant l'application à créer, **compressé avec [LZ-string](https://pieroxy.net/blog/pages/lz-string/index.html)**. L'invite non compressée peut contenir jusqu'à 50 000 caractères.                                                      | Requis           |
-| `referrer` | string | Le nom ou l'URL de la page contenant ce lien. Utilisé pour l'attribution.                                                                                                                                                                         | Optionnel        |
+| Paramètre  | Type   | Description                                                                                                                                                                                                                             | Requis/Facultatif |
+| ---------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `stack`    | chaîne | Le Mode Build à utiliser. Doit être `Design` ou `Build`. `Design` ouvre [Canvas](/fr/design/canvas) pour le prototypage visuel. `Build` ouvre [Agent](/fr/features/agent/overview) pour le développement complet d&#39;une application. | Requis            |
+| `prompt`   | chaîne | Texte décrivant l&#39;application à créer, **compressé avec [LZ-string](https://pieroxy.net/blog/pages/lz-string/index.html)**. Le prompt non compressé peut compter jusqu&#39;à 50 000 caractères.                                     | Requis            |
+| `referrer` | chaîne | Le nom ou l&#39;URL de la page contenant ce lien. Utilisé pour l&#39;attribution.                                                                                                                                                       | Facultatif        |
 
 <Note>
   Le paramètre `prompt` doit être compressé avec la compression LZ-string avant
-  d'être ajouté à l'URL. Cela aide les URL à rester dans les limites de longueur
-  du navigateur et à être analysées correctement.
+  d&#39;être ajouté à l&#39;URL. Les URL restent ainsi dans les limites de longueur
+  des navigateurs et sont analysées correctement.
 </Note>
 
-### Générateur de lien interactif
+<div id="interactive-link-builder">
+  ### Générateur de lien interactif
+</div>
 
-Utilisez l'outil ci-dessous pour générer votre lien **Ouvrir dans Replit**. Entrez votre invite, sélectionnez le mode stack, et le lien sera généré automatiquement avec la compression LZ-string appliquée.
+Utilisez l&#39;outil ci-dessous pour générer votre lien **Open in Replit**. Saisissez votre prompt et sélectionnez le mode de stack : le lien sera généré automatiquement, avec la compression LZ-string appliquée.
 
 <CreateUrlLinkBuilder />
 
-### Compresser les invites
+<div id="compressing-prompts">
+  ### Compresser les prompts
+</div>
 
-Pour créer un lien **Ouvrir dans Replit** valide, vous devez compresser votre invite en utilisant la compression LZ-string. Voici comment :
+Pour créer un lien **Open in Replit** valide, vous devez compresser votre prompt avec l&#39;algorithme de compression LZ-string. Voici comment procéder :
 
-#### JavaScript/TypeScript
+<div id="javascripttypescript">
+  #### JavaScript/TypeScript
+</div>
 
 ```javascript theme={null}
 import LZString from 'lz-string';
@@ -159,7 +171,9 @@ const compressed = LZString.compressToEncodedURIComponent(prompt);
 const url = `https://replit.com/?stack=Design&prompt=${compressed}`;
 ```
 
-#### Python
+<div id="python">
+  #### Python
+</div>
 
 ```python theme={null}
 import lzstring
@@ -170,80 +184,99 @@ url = f"https://replit.com/?stack=Design&prompt={compressed}"
 ```
 
 <Tip>
-  Utilisez `compressToEncodedURIComponent` pour vous assurer que la chaîne
-  compressée est compatible avec les URL.
+  Utilisez `compressToEncodedURIComponent` pour vous assurer que la chaîne compressée
+  est compatible avec les URL.
 </Tip>
 
-### Exemples
+<div id="examples">
+  ### Exemples
+</div>
 
-**Canvas avec invite simple**
+**Canvas avec un prompt simple**
 
 ```
 https://replit.com/?stack=Design&prompt=AoUwTgzg9gdghgGwAQAcpgC4DMoIJZRIR4YgB0QA
 ```
 
-**Mode Build avec invite détaillée**
+**Mode Build avec un prompt détaillé**
 
 ```
 https://replit.com/?stack=Build&prompt=LIQw1gpgBCUE4HsQBMC2IAOUMBsQDt8BLfAcygBcEEcoB3ACwjmg0WQFcBjCqdfEKWYBnKFwJiWICtALIoANyLCOIHEQBe0AI6q4MuDgCe2dt16IU6DMIB0UAJL4uODsmjI4g0iABGOaHE4ZFEAMwQ4KBIiCiJpIgUIYQAaUyIImJMKQRSYfHkuGgixBGQScl8siBBUewARJKJSfCjeOhiGGFMEUKThdIFaWNQIdXxoJQg6PIKAglTUUuYWgFUHWyA&referrer=replit%20docs
 ```
 
-## Modes stack
+<div id="stack-modes">
+  ## Modes de stack
+</div>
 
-### Canvas
+<div id="canvas">
+  ### Canvas
+</div>
 
-Utilisez `stack=Design` pour ouvrir votre invite dans [Canvas](/fr/design/canvas), qui est optimisé pour :
+Utilisez `stack=Design` pour ouvrir votre prompt dans [Canvas](/fr/design/canvas), qui est optimisé pour :
 
-* La conception visuelle et le prototypage d'interface
-* L'itération rapide sur les mises en page et le style
+* La conception visuelle et le prototypage d&#39;interfaces
+* L&#39;itération rapide sur les mises en page et les styles
 * La création de maquettes de design
-* Le développement centré sur le front-end
+* Le développement axé sur le frontend
 
-### Mode Build
+<div id="build-mode">
+  ### Mode Build
+</div>
 
-Utilisez `stack=Build` pour ouvrir votre invite dans [Agent](/fr/features/agent/overview), qui est optimisé pour :
+Utilisez `stack=Build` pour ouvrir votre prompt dans [Agent](/fr/features/agent/overview), qui est optimisé pour :
 
-* Le développement d'applications full-stack
-* La logique back-end et les API
-* L'intégration de bases de données
+* Le développement d&#39;applications full-stack
+* La logique backend et les API
+* L&#39;intégration de bases de données
 * Les fonctionnalités complexes
 
-## Bonnes pratiques
+<div id="best-practices">
+  ## Bonnes pratiques
+</div>
 
-* Gardez les invites concises et centrées sur les fonctionnalités principales pour de meilleurs résultats de génération.
-* Utilisez un langage clair et descriptif qui explique ce que vous souhaitez créer.
-* Choisissez le mode `stack` approprié à votre cas d'utilisation (Design pour l'UI/UX, Build pour les applications complètes).
-* Testez vos URL compressées pour vous assurer qu'elles s'analysent correctement avant de les partager.
-* Tenez compte du niveau technique de votre audience lors de la création des invites.
+* Gardez des prompts concis et centrés sur les fonctionnalités essentielles pour obtenir les meilleurs résultats de génération.
+* Employez un langage clair et descriptif qui explique ce que vous souhaitez créer.
+* Choisissez le mode `stack` adapté à votre cas d&#39;usage (Design pour l&#39;UI/UX, Build pour des applications complètes).
+* Testez vos URL compressées avant de les partager afin de vous assurer qu&#39;elles sont interprétées correctement.
+* Tenez compte du niveau technique de votre audience lorsque vous rédigez vos prompts.
 
-### Authentification utilisateur
+<div id="user-authentication">
+  ### Authentification des utilisateurs
+</div>
 
-Quel que soit votre état d'authentification Replit, vous devrez fournir une entrée avant de créer l'application. Habituellement, cela signifie soumettre l'invite.
+Quel que soit votre état d&#39;authentification Replit, vous devrez saisir des informations avant de créer l&#39;app. Il s&#39;agit généralement d&#39;envoyer le prompt.
 
-### Gestion des erreurs
+<div id="error-handling">
+  ### Gestion des erreurs
+</div>
 
-Si l'URL est malformée ou si les paramètres sont invalides, Replit ne remplira pas l'invite. Les causes possibles incluent :
+Si l&#39;URL est mal formée ou que les paramètres sont invalides, Replit ne remplira pas le prompt. Les causes possibles sont les suivantes :
 
-* Paramètres requis manquants (`stack` ou `prompt`)
-* Valeur `stack` invalide (doit être `Design` ou `Build`)
+* Paramètres obligatoires manquants (`stack` ou `prompt`)
+* Valeur `stack` invalide (elle doit être `Design` ou `Build`)
 * Échec de la décompression du paramètre `prompt`
-* Erreurs « URL trop longue » du navigateur (bien que la compression aide à atténuer ce problème)
+* Erreurs de navigateur « URL trop longue » (même si la compression permet d&#39;en limiter le risque)
 
-### Considérations de sécurité
+<div id="security-considerations">
+  ### Considérations de sécurité
+</div>
 
 <Warning>
-  Les liens **Ouvrir dans Replit** pourraient être utilisés pour créer des applications avec un comportement non souhaité ou des vulnérabilités de sécurité. Ne cliquez que sur des liens provenant de sources fiables.
+  Les liens **Open in Replit** peuvent servir à créer des apps au comportement
+  inattendu ou présentant des failles de sécurité. Ne cliquez que sur des liens provenant de sources fiables.
 </Warning>
 
-Lors du partage de liens **Ouvrir dans Replit** :
+Lorsque vous partagez des liens **Open in Replit** :
 
-* Examinez attentivement les invites avant de les partager publiquement
-* Tenez compte des implications de sécurité des applications générées
-* Évitez d'inclure des informations sensibles dans les invites
-* Soyez transparent sur ce que le lien va créer
+* Relisez attentivement les prompts avant toute diffusion publique
+* Tenez compte des implications de sécurité des apps générées
+* Évitez d&#39;inclure des informations sensibles dans les prompts
+* Indiquez clairement ce que le lien va créer
 
-## Ressources associées
+<div id="related-resources">
+  ## Ressources associées
+</div>
 
 * [Documentation Canvas](/fr/design/canvas)
 * [Documentation Agent](/fr/features/agent/overview)
-* [Intégrations IA Replit](/fr/features/integrations/overview)
+* [Intégrations IA de Replit](/fr/features/integrations/overview)

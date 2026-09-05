@@ -1,0 +1,359 @@
+---
+title: "发布费用"
+description: "灵活的发布费用，可随应用需求扩展。采用透明的积分计费方式，按实际用量付费。"
+sidebarTitle: "发布费用"
+icon: "tag"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const BackgroundTotalCost = '~$2.03';
+
+export const BackgroundComputeCost = '~$0.03';
+
+export const ApiTotalCost = '~$4.50';
+
+export const ApiRequestsCost = '~$0.12';
+
+export const ApiComputeCost = '~$2.38';
+
+export const SmallBusinessTotalCost = '~$2.39';
+
+export const SmallBusinessRequestsCost = '~$0.03';
+
+export const SmallBusinessComputeCost = '~$0.36';
+
+export const StaticDeploymentOutboundPerGiB = '$0.05';
+
+export const DedicatedLargeVm = '$130.00';
+
+export const DedicatedMediumVm = '$50.00';
+
+export const DedicatedSmallVm = '$35.00';
+
+export const SharedMediumVm = '$15.00';
+
+export const ScheduledDeployment = '$2.00';
+
+export const SchedulerPrice = '$0.00';
+
+export const ScheduledComputeUnit = '$0.60';
+
+export const AutoscaleDeployment = '$2.00';
+
+export const AutoscaleRequests = '$0.40';
+
+export const AutoscaleComputeUnit = '$0.60';
+
+export const AutoscaleBaseFee = '$2';
+
+Replit 的发布费用可随应用需求灵活扩展。您可以选择按使用量计费，仅在应用处理请求时付费；也可以选择适合稳定工作负载、费用可预测的固定套餐。
+
+<div id="section">
+  ## 计费方式
+</div>
+
+所有发布费用都会从月度积分中扣除。只有在月度积分用尽后，才会按使用量收费。
+
+* **Starter 套餐**：包含 1 个免费发布的 App。部署将在 30 天后到期，但可以重新发布。有关详细信息，请参阅 [Starter 套餐](/zh/ko/billing/plans/starter-plan)。
+* **[Core 套餐](/zh/ko/billing/plans/replit-core)**：包含月度积分；请参阅[定价](https://replit.com/pricing)。
+* **[Pro 套餐](/zh/ko/billing/plans/replit-pro)**：提供分级月度积分；有关详细信息，请参阅 [Replit Pro](/zh/ko/billing/plans/replit-pro) 和[定价页面](https://replit.com/pricing)。
+
+<Note>
+  积分会自动抵扣所有发布费用。未使用的积分不会结转至下个月。详细了解[按使用量计费](/zh/ko/billing/about-usage-based-billing)。
+</Note>
+
+如需了解具体发布费用，请使用[交互式费用计算器](https://deployment-pricing.replit.app/)。
+
+<Frame>
+  <img src="/assets/mirror/deployments-cost-81b1956ff7d7.png" alt="按部署类型显示费用明细的交互式发布费用计算器" width="2540" height="990" data-path="images/deployments/deployments-cost.png" />
+</Frame>
+
+<div id="section-2">
+  ## 部署类型
+</div>
+
+选择最适合应用流量模式和资源需求的部署类型。
+
+<AccordionGroup>
+  <Accordion title="Autoscale 部署" icon="arrows-up-down">
+    适合流量波动较大的应用。仅在应用处理请求时收费，空闲时不收费。
+
+    **适用场景：** 流量模式不可预测的 Web 应用、API 和服务
+
+    [详细了解 Autoscale 部署](/zh/ko/features/publishing/deployment-types#autoscale)
+  </Accordion>
+
+  <Accordion title="Reserved VM 部署" icon="server">
+    **专用资源，月度成本可预测**
+
+    提供持续运行的有保障计算资源。可根据性能需求选择共享或专用 VM。
+
+    **适用场景：** 流量稳定或需要有保障资源的生产环境应用
+
+    [详细了解 Reserved VM 部署](/zh/ko/features/publishing/deployment-types#reserved-vm)
+  </Accordion>
+
+  <Accordion title="定时部署" icon="clock">
+    **以经济高效的方式运行后台任务和自动化操作**
+
+    按计划运行代码，无需维护常驻基础设施。
+
+    **适用场景：** 后台任务、数据处理和自动化任务
+
+    [详细了解定时部署](/zh/ko/features/publishing/deployment-types#scheduled)
+  </Accordion>
+
+  <Accordion title="静态部署" icon="globe">
+    **通过全球分发，以最低成本托管静态内容**
+
+    通过 CDN 发布静态网站，仅需为数据传输付费。
+
+    **适用场景：** 文档网站、作品集和单页应用
+
+    [详细了解静态部署](/zh/ko/features/publishing/deployment-types#static)
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-3">
+  ## 了解按请求计费
+</div>
+
+<Tip>
+  使用 Autoscale 部署时，只有在应用实际运行时才会产生费用。
+  如果没有人访问你的应用，就不会产生费用。
+</Tip>
+
+Autoscale 部署采用按请求计费的方式。只有在应用处理流量时才会产生费用。具体如下：
+
+1. 第一个请求到达时，**应用会启动** (如果应用处于空闲状态)
+2. 使用计算资源**处理请求**
+3. 15 分钟没有活动后，**应用会进入空闲状态**
+
+**计费时长：**即使是复杂的应用，每个请求通常也只需 1~2 秒。
+
+<div id="section-4">
+  ### 按请求计费时间线
+</div>
+
+没有人访问你的应用时，无需付费。应用有访问流量时，将根据所使用的计算资源计费。
+
+当有人访问你的应用时，流程如下：
+
+<p className="text-center"> 按请求计费时间线 </p>
+
+<div className="grid grid-cols-[80px_1fr] gap-4 items-center">
+  <div className="text-right text-sm">
+    实例
+  </div>
+
+  <div className="h-8 bg-gray-100 dark:bg-gray-800 rounded-md relative">
+    <div className="absolute top-0.5 h-7 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs text-gray-600 dark:text-gray-400" style={{ left: '13%', width: '77%' }}>
+      运行中
+    </div>
+  </div>
+
+  <div className="text-right text-sm">请求</div>
+
+  <div className="h-8 bg-gray-100 dark:bg-gray-800 rounded-md relative">
+    <div className="absolute top-0.5 h-3 rounded bg-blue-600" style={{ left: "15%", width: "12%" }} />
+
+    <div className="absolute top-0.5 h-3 rounded bg-blue-600" style={{ left: "40%", width: "12%" }} />
+
+    <div className="absolute top-4 h-3 rounded bg-blue-600" style={{ left: "46%", width: "12%" }} />
+
+    <div className="absolute top-0.5 h-3 rounded bg-blue-600" style={{ left: "70%", width: "12%" }} />
+
+    <div className="absolute top-4 h-3 rounded bg-blue-600" style={{ left: "76%", width: "12%" }} />
+  </div>
+
+  <div className="text-right text-sm">
+    计费时段
+  </div>
+
+  <div className="h-8 bg-gray-100 dark:bg-gray-800 rounded-md relative">
+    <div className="absolute top-0.5 h-7 rounded bg-green-600" style={{ left: '15%', width: '12%' }} />
+
+    <div className="absolute top-0.5 h-7 rounded bg-green-600" style={{ left: '40%', width: '18%' }} />
+
+    <div className="absolute top-0.5 h-7 rounded bg-green-600" style={{ left: '70%', width: '18%' }} />
+  </div>
+</div>
+
+<div className="grid grid-cols-[80px_1fr] gap-6 mt-2">
+  <div />
+
+  <div className="relative text-xs text-gray-500 dark:text-gray-400">
+    <span className="absolute" style={{ left: "12%" }}>
+      启动
+    </span>
+
+    <span className="absolute" style={{ left: "83%" }}>
+      停止
+    </span>
+  </div>
+</div>
+
+服务器首先启动，然后处理请求，最后进入空闲状态。你只需为处理请求期间的 CPU 和内存付费。
+
+<Note>
+  如果多个请求同时到达 (如堆叠的蓝色条所示) ，它们会共享相同的计算资源。
+
+  计费时段会延长，以涵盖所有并发请求，但不会分别对每个请求计费。你只需为服务器运行的总时长付费。
+</Note>
+
+绿色条之间的间隔表示空闲期间节省的费用。会话结束后，服务器将关闭。
+
+<div id="section-5">
+  ### 计算单元说明
+</div>
+
+计算单元用于衡量应用执行计算任务所消耗的资源：
+
+* **CPU 时间**：消耗的处理能力 (1 CPU 秒 = 18 个计算单元)
+* **内存时间**：消耗的 RAM (1 GB 秒 = 2 个计算单元)
+* **持续时间**：应用处理每个请求所需的时间
+
+<div id="section-6">
+  ## 费用明细
+</div>
+
+<AccordionGroup>
+  <Accordion title="Autoscale 部署" icon="arrows-up-down">
+    仅在应用处理请求时收费，并会根据需求自动扩缩容。
+
+    | 组件                    |                     价格 |
+    | :-------------------- | ---------------------: |
+    | **基本费用** (每月)         |     {AutoscaleBaseFee} |
+    | **计算单元** (每 100 万单元)  | {AutoscaleComputeUnit} |
+    | **请求** (每 100 万次请求)   |    {AutoscaleRequests} |
+  </Accordion>
+
+  <Accordion title="定时部署" icon="clock">
+    用于运行后台任务和定时任务。
+
+    | 组件                    |                     价格 |
+    | :-------------------- | ---------------------: |
+    | **基本费用** (每月)         |  {ScheduledDeployment} |
+    | **计算单元** (每 100 万单元)  | {ScheduledComputeUnit} |
+    | **调度器**               |       {SchedulerPrice} |
+  </Accordion>
+
+  <Accordion title="Reserved VM 部署" icon="server">
+    提供专用计算资源，月度费用可预测。
+
+    <div id="vm">
+      #### 共享 VM
+    </div>
+
+    | 配置 | 价格 (每月)  |
+    | :- | -------: |
+
+    | **0.5 vCPU / 2GB RAM** | {SharedMediumVm} |
+
+    <div id="vm-2">
+      #### 专用 VM
+    </div>
+
+    | 配置                    |            价格 (每月)  |
+    | :-------------------- | ------------------: |
+    | **1 vCPU / 4GB RAM**  |  {DedicatedSmallVm} |
+    | **2 vCPU / 8GB RAM**  | {DedicatedMediumVm} |
+    | **4 vCPU / 16GB RAM** |  {DedicatedLargeVm} |
+  </Accordion>
+
+  <Accordion title="静态部署" icon="globe">
+    通过全球 CDN 托管静态网站。
+
+    | 组件               |                               价格 |
+    | :--------------- | -------------------------------: |
+    | **托管**           |                               免费 |
+    | **数据传输** (每 GB)  | {StaticDeploymentOutboundPerGiB} |
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-7">
+  ## 按应用类型划分的费用示例
+</div>
+
+以下示例展示了不同类型应用的预估费用。
+
+<AccordionGroup>
+  <Accordion title="个人博客" icon="browser">
+    **流量：**每天 50 位访客，每人浏览 3 个页面 = 每月 4,500 次请求
+
+    | 组成部分     | 用量        |                  费用 |
+    | :------- | :-------- | ------------------: |
+    | **基础费用** | 每月        |  {AutoscaleBaseFee} |
+    | **计算单元** | 13,500 单元 |   {BlogComputeCost} |
+    | **请求**   | 4,500     |  {BlogRequestsCost} |
+    | **总计**   |           | **{BlogTotalCost}** |
+  </Accordion>
+
+  <Accordion title="小型企业网站" icon="browser">
+    **流量：**每天 500 位访客，每人浏览 5 个页面 = 每月 75,000 次请求
+
+    | 组成部分     | 用量         |                           费用 |
+    | :------- | :--------- | ---------------------------: |
+    | **基础费用** | 每月         |           {AutoscaleBaseFee} |
+    | **计算单元** | 600,000 单元 |   {SmallBusinessComputeCost} |
+    | **请求**   | 75,000     |  {SmallBusinessRequestsCost} |
+    | **总计**   |            | **{SmallBusinessTotalCost}** |
+  </Accordion>
+
+  <Accordion title="API 服务" icon="gear">
+    **流量：**每天 10,000 次 API 调用 = 每月 300,000 次请求
+
+    | 组成部分     | 用量       |                 费用 |
+    | :------- | :------- | -----------------: |
+    | **基础费用** | 每月       | {AutoscaleBaseFee} |
+    | **计算单元** | 3.96M 单元 |   {ApiComputeCost} |
+    | **请求**   | 300,000  |  {ApiRequestsCost} |
+    | **总计**   |          | **{ApiTotalCost}** |
+  </Accordion>
+
+  <Accordion title="后台处理任务" icon="clock">
+    **用量：**通过定时部署进行每日数据处理
+
+    | 组成部分     | 用量        |                        费用 |
+    | :------- | :-------- | ------------------------: |
+    | **定时部署** | 基础费用      |     {ScheduledDeployment} |
+    | **计算单元** | 50,000 单元 |   {BackgroundComputeCost} |
+    | **总计**   |           | **{BackgroundTotalCost}** |
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-8">
+  ## 费用监控与管理
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设置支出限额" icon="shield" href="/zh/ko/billing/managing-spend">
+    设置支出限额和预算，避免产生意外费用。
+  </Card>
+
+  <Card title="监控使用情况" icon="chart-bar" href="https://replit.com/usage">
+    在使用情况仪表板中跟踪实时用量和费用。
+  </Card>
+
+  <Card title="了解 AI 计费" icon="brain" href="/zh/ko/billing/ai-billing">
+    了解 [Agent](/zh/ko/features/agent/overview) 如何影响账单。
+  </Card>
+
+  <Card title="监控已发布的应用" icon="chart-line" href="/zh/ko/features/publishing/monitoring-a-deployment">
+    查看日志、跟踪性能并监控已发布应用的状态。
+  </Card>
+</CardGroup>

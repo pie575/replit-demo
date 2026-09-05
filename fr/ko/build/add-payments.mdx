@@ -1,0 +1,120 @@
+---
+title: "Ajouter des paiements"
+description: "Percevez un dépôt de garantie remboursable lors de la réservation d'un véhicule Velocity, puis facturez le solde au moment de la prise en charge."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+À l&#39;issue de cette étape, les clients de Velocity pourront réserver un véhicule en versant une caution remboursable, puis régler le solde lors de la prise en charge.
+
+Vous avez ajouté l&#39;authentification et la base de données à Velocity. Passez maintenant à une véritable activité de location. Chaque véhicule est réservé grâce à une **caution remboursable versée à la réservation**, et le **solde est facturé lors de la prise en charge**. Replit traite les paiements via Stripe — inutile d&#39;écrire le code Stripe vous-même.
+
+<div id="section">
+  ## Déterminer le montant de la caution et du solde
+</div>
+
+Fixez les montants avant de demander à Agent de lancer le build.
+
+* **Caution à la réservation :** montant fixe ou pourcentage du total ? Un montant fixe de $500 est plus simple à communiquer, tandis que 20 % varient selon le véhicule.
+* **Solde à la prise en charge :** le reste du coût de la location, facturé lorsque le client récupère le véhicule.
+* **Délai de remboursement :** jusqu&#39;à quand une annulation donne-t-elle droit au remboursement de la caution ? 48 heures est une valeur par défaut courante.
+
+Dans ce guide, Velocity prélève une caution remboursable fixe de $500 à la réservation, facture le solde à la prise en charge et rembourse intégralement toute annulation effectuée plus de 48 heures à l&#39;avance. Adaptez ces règles à votre activité.
+
+<div id="agent-stripe">
+  ## Demander à Agent d&#39;ajouter le paiement Stripe
+</div>
+
+<AiPrompt>
+  Ajoutez à Velocity des paiements de caution et de solde avec Stripe en mode test.<br />
+  Encaissez une caution remboursable de $500 lors de la réservation et enregistrez le moyen de paiement du client.<br />
+  Encaissez le solde restant sur le moyen de paiement enregistré lors de la prise en charge.<br />
+  Remboursez intégralement la caution si l&#39;annulation a lieu au moins 48 heures avant la prise en charge. Conservez-la en cas d&#39;annulation dans les 48 heures.<br />
+  Enregistrez ces données dans la base de données afin que les clients puissent consulter le statut de la caution et leur carte enregistrée dans leur réservation.<br />
+  Indiquez-moi exactement quelles clés secrètes récupérer dans Stripe et où les coller.<br />
+  Fournissez une liste de contrôle de test pour les cas de réussite de la caution, d&#39;annulation de la caution, d&#39;encaissement du solde et de remboursement après annulation.
+</AiPrompt>
+
+Agent configure Stripe, ajoute le flux de paiement de la caution et du solde, puis vous indique les clés secrètes à récupérer dans Stripe. Collez-les dans les paramètres de l&#39;application lorsqu&#39;Agent vous le demande : les clés de test doivent s&#39;y trouver, jamais dans le code.
+
+<Frame>
+  <img src="/assets/mirror/stripe-secrets-b04a3e238f51.png" alt="Panneau Secrets de Replit affichant les clés API Stripe (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET) qu'Agent demande au créateur de coller" width="1280" height="720" data-path="images/velocity/add-payments/stripe-secrets.png" />
+</Frame>
+
+<div id="section-2">
+  ## Tester l’ensemble du parcours en mode test
+</div>
+
+Stripe propose des cartes de test spéciales permettant d’effectuer des paiements réalistes sans utiliser d’argent réel : `4242 4242 4242 4242`, une date d’expiration future et n’importe quel CVC à trois chiffres.
+
+1. Connectez-vous à Velocity dans Preview et réservez un véhicule pour le samedi et le dimanche suivants.
+2. Lors du paiement, « Caution aujourd’hui : 500 $ » et « Solde à la prise en charge : 1 900 $ » (ou les montants calculés) doivent s’afficher.
+3. Payez la caution avec la carte de test `4242`. Vous devez être redirigé vers une page de confirmation indiquant que le paiement de la caution a été effectué et qu’un moyen de paiement a été enregistré pour le solde.
+4. Ouvrez la réservation dans « Mes réservations » et utilisez l’action d’administration ou de prise en charge pour facturer le solde. Vérifiez que le solde est indiqué comme payé.
+5. Effectuez une deuxième réservation et annulez-la plus de 48 heures à l’avance. La caution doit être remboursée sur la carte de test (vous pouvez le vérifier dans le tableau de bord Stripe en mode test).
+6. Effectuez une troisième réservation et annulez-la dans les 48 heures. La caution doit être conservée et cette politique doit être clairement expliquée au client.
+7. Essayez d’effectuer le paiement avec la carte de test Stripe qui simule un refus (`4000 0000 0000 0002`). La réservation ne doit pas être confirmée et le client doit voir un message d’erreur clair.
+
+Si le paiement de la caution a réussi, mais que la réservation n’est pas confirmée, informez Agent.
+
+<AiPrompt>
+  Le paiement de la caution de test Stripe pour Velocity a réussi, mais la réservation n’apparaît pas comme confirmée.<br />
+  Associez l’événement de réussite du paiement de la caution au statut de la réservation dans la base de données.<br />
+  Indiquez-moi comment le vérifier avec une autre réservation de test.
+</AiPrompt>
+
+<div id="section-3">
+  ## Quand passer aux paiements réels
+</div>
+
+Le mode test, c&#39;est pour vous. Le mode production, c&#39;est pour de vrais clients qui paient avec de l&#39;argent réel. Lorsque Velocity est prêt :
+
+1. Dans Stripe, passez du mode test au mode production et copiez votre clé secrète **de production**.
+2. Dans les paramètres de l&#39;application, remplacez la clé de test par la clé de production.
+3. Redéployez Velocity depuis le chat Agent.
+4. Ouvrez l&#39;URL publique et réservez un véhicule bon marché avec votre propre carte bancaire pour vérifier que les flux de caution et de solde fonctionnent tous les deux.
+
+Effectuez un test avec une vraie carte avant de diffuser largement l&#39;URL publique. Velocity accepte désormais de vraies réservations avec de l&#39;argent réel.
+
+<div id="section-4">
+  ## Prochaines améliorations
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Ajouter des intégrations" icon="plug" href="/fr/ko/build/add-integrations">
+    Envoyez chaque réservation dans le calendrier du client.
+  </Card>
+
+  <Card title="Ajouter un domaine personnalisé" icon="globe" href="/fr/ko/build/add-custom-domain">
+    Migrez Velocity vers une URL à votre image de marque avant de facturer vos clients.
+  </Card>
+</CardGroup>
+
+<div id="section-5">
+  ## Besoin d&#39;aide supplémentaire ?
+</div>
+
+* **La caution est bien passée, mais la réservation n&#39;est pas confirmée :** demandez à Agent de relier l&#39;événement de succès Stripe au statut de la réservation dans la base de données.
+* **Le mode test fonctionne, mais pas le mode production :** vérifiez que vous avez bien remplacé les clés de test par les clés live dans les paramètres de l&#39;application.
+* **Vous préférez un paiement intégral en une seule fois plutôt qu&#39;une caution suivie du solde :** demandez à Agent de faire passer Velocity à un paiement intégral unique au moment de la réservation.
+* **Vous souhaitez une formule d&#39;abonnement mensuel récurrent (accès mensuel à la liste des véhicules) :** Replit prend également en charge RevenueCat — demandez à Agent de l&#39;utiliser à la place de Stripe.
+
+<div id="section-6">
+  ## Documentation associée
+</div>
+
+* [Paiements Stripe](/fr/ko/features/monetization/stripe-payments)
+* [Abonnements RevenueCat](/fr/ko/features/monetization/revenuecat-subscriptions)

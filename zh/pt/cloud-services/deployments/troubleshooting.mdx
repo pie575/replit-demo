@@ -1,0 +1,161 @@
+---
+title: "排查部署问题"
+description: "了解如何解决部署应用时的常见问题。"
+---
+
+本页面介绍部署应用时可能遇到的常见问题及其解决方法。
+
+<div id="problemas-comuns-de-publicao">
+  ## 常见部署问题
+</div>
+
+<div id="seu-app-no-funciona-no-project-editor">
+  ### 您的应用无法在 Project Editor 中运行
+</div>
+
+部署前，请确认您的应用能够正常运行。在 Project Editor 顶部点击 **Run** 按钮。如果 Preview 未显示带有 `replit.dev` URL 的应用，说明您的代码存在问题，需要先修复后才能发布。
+
+<div id="seu-programa-encerra-em-vez-de-rodar-continuamente">
+  ### 您的程序退出，而不是持续运行
+</div>
+
+已部署 App 要求您的程序持续运行。如果程序执行某个函数后退出，平台会自动将其重启。请确保您的应用启动的是长期运行的进程，例如 Web 服务器。
+
+<div id="seu-servidor-no-est-ouvindo-em-0000">
+  ### 你的服务器未监听 `0.0.0.0`
+</div>
+
+如果你正在运行 Web 服务器，Deployments 可以自动检测服务器使用的端口——但前提是服务器监听 `0.0.0.0`。监听 `localhost` 或 `127.0.0.1` 则无法正常工作。
+
+<div id="sua-aplicao-tem-erros">
+  ### 您的应用出现错误
+</div>
+
+查看 **Publishing** 面板顶部的 **Logs** 标签页，查看应用输出。查找堆栈跟踪或异常信息——它们表明代码存在错误，例如变量未初始化或缺少包。
+
+<div id="seus-comandos-de-execuo-ou-build-esto-incorretos">
+  ### 运行或构建命令不正确
+</div>
+
+常见问题包括拼写错误、标志使用不当，或指定了错误的文件或目录。请在 **Publishing** 面板中检查命令并修正所有问题。
+
+<div id="seus-secrets-no-esto-configurados-para-publicao">
+  ### 您的 Secrets 尚未配置用于部署
+</div>
+
+您在 Project Editor 中定义的 Secrets 不会自动转移到已部署的应用。请在 **Publishing** 面板中添加所有生产环境 Secrets 和环境变量。缺少 Secrets 可能会导致应用在启动时因值未定义而报错。
+
+<div id="seu-replit-app-excede-o-limite-de-tamanho">
+  ### 您的 Replit App 超出大小限制
+</div>
+
+Reserved VM 和 Autoscale Deployment 支持最大 8 GB 的 Replit App，Static Deployment 支持最大 1 GB。要减小 App 大小，请删除不必要的文件，或使用外部数据存储，例如 [SQL Database](/zh/pt/features/data-and-storage/sql-database/)。
+
+<div id="sua-pgina-inicial-demora-muito-para-carregar">
+  ### 你的主页加载时间过长
+</div>
+
+在将已部署的 App 标记为进行中之前，健康检查会向你的 App 发送 HTTP 请求。如果主页响应超过五秒，检查就会超时，部署将在最后一步失败。
+
+<div id="sua-configurao-de-porta-est-incorreta">
+  ### 端口配置不正确
+</div>
+
+如果您在 [`.replit` 配置中指定了端口](/zh/pt/references/configuration/configuration)，自动端口检测将被禁用。您必须指定一个 `externalPort` 设为 `80` 的端口，才能完成提升步骤。请确认服务器正在指定的 `localPort` 上监听。
+
+<div id="seu-deployment-esttico-no-est-funcionando">
+  ### 您的静态部署无法正常运行
+</div>
+
+此问题通常是因为您指定了错误的公共目录，或您的 App 不适用于静态部署。静态部署会提供 HTML、CSS 和 JavaScript 等静态文件。
+
+如果您的 App 包含任何服务端行为，则不适合使用静态部署。请在 **Publishing** 面板中将部署类型更改为 Autoscale。
+
+<Warning>
+  已部署 App 中的文件系统不是持久性存储，每次部署时都会重置。若要持久保存数据，请使用 [SQL Database](/zh/pt/features/data-and-storage/sql-database) 等数据库。
+</Warning>
+
+<div id="problemas-de-acesso-com-urls-replitapp-e-replitdev">
+  ## 访问 `replit.app` 和 `replit.dev` URL 时遇到问题
+</div>
+
+如果你无法通过 `replit.app` 或 `replit.dev` 域名访问 App——无论是在 Preview 中还是在单独的浏览器窗口中——可能是由于网页过滤或网络限制。
+
+请尝试使用 Google DNS (`8.8.8.8`) 或 Cloudflare DNS (`1.1.1.1`) 等公共 DNS 解析器来解决这些问题。
+
+<div id="alterar-as-configuraes-de-dns">
+  ### 更改 DNS 设置
+</div>
+
+<Tabs>
+  <Tab title="Windows">
+    1. 打开**控制面板**。
+    2. 前往**网络和共享中心**。
+    3. 在左侧选择**更改适配器设置**。
+    4. 右键点击当前使用的网络连接，然后选择**属性**。
+    5. 选择**Internet 协议版本 4 (TCP/IPv4)**，然后选择**属性**。
+    6. 选择**使用下面的 DNS 服务器地址**。
+    7. 在**首选 DNS 服务器**和**备用 DNS 服务器**字段中输入公共 DNS 服务器的 IP 地址 (例如，Google DNS 的 `8.8.8.8` 或 Cloudflare DNS 的 `1.1.1.1`) 。
+    8. 选择**确定**以保存更改。
+
+    如需更详细的说明，请参阅 [Microsoft DNS 配置指南](https://support.microsoft.com/en-us/windows/change-tcp-ip-settings-bd0a07af-15f5-cd6a-363f-ca2b6f391ace)。
+  </Tab>
+
+  <Tab title="macOS">
+    1. 打开**系统偏好设置**。
+    2. 选择**网络**。
+    3. 在左侧选择当前使用的网络连接。
+    4. 在右下角选择**高级**。
+    5. 转到**DNS**标签页。
+    6. 点击**+**按钮以添加 DNS 服务器。
+    7. 输入公共 DNS 服务器的 IP 地址 (例如，Google DNS 的 `8.8.8.8` 或 Cloudflare DNS 的 `1.1.1.1`) 。
+    8. 选择**确定**，然后选择**应用**。
+
+    如需更详细的说明，请参阅 [Apple DNS 配置指南](https://support.apple.com/guide/mac-help/change-dns-settings-on-mac-mh14127/mac)。
+  </Tab>
+
+  <Tab title="Linux">
+    1. 编辑 `/etc/resolv.conf` 文件以添加公共 DNS 服务器。具体方法因发行版而异。
+    2. 添加以下行：
+
+    ```
+    nameserver 8.8.8.8
+    nameserver 1.1.1.1
+    ```
+
+    有关如何在不同发行版中配置 DNS 的更多信息，请参阅 [Debian Wiki 网络配置指南](https://wiki.debian.org/NetworkConfiguration#Defining_the_.28DNS.29_Nameservers)。
+  </Tab>
+</Tabs>
+
+<div id="limpar-o-cache-dns">
+  ### 清除 DNS 缓存
+</div>
+
+更改 DNS 设置后，请清除 DNS 缓存以使新配置生效：
+
+* **Windows**：在命令提示符中运行 `ipconfig /flushdns`
+* **macOS 和 Linux**：在终端中运行 `sudo systemctl restart NetworkManager` (具体命令可能因所用发行版而异)
+
+<Note>
+  为提高所在区域的性能和稳定性，您的 Replit Apps 的 `replit.dev` URL
+  可能会在集群迁移期间偶尔变更。迁移完成后，除非您明确请求更改位置，否则 URL
+  将在约一年内保持稳定。
+</Note>
+
+<div id="publicar-uma-aplicao-streamlit">
+  ## 部署 Streamlit 应用
+</div>
+
+Streamlit 应用支持 Replit Deployments。最快的入门方式是使用 [Streamlit 模板](https://replit.com/@replit/Streamlit?v=1)。
+
+或者，将部署的运行命令设置为：
+
+```bash theme={null}
+streamlit run --server.address 0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false main.py
+```
+
+如果您的应用使用其他入口文件，请将 `main.py` 替换为相应的文件名。
+
+***
+
+如果完成这些步骤后仍需进一步帮助，请访问 [Replit Community Hub](https://replit.com/community) 获取更多资源。

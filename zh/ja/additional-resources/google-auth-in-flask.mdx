@@ -1,0 +1,499 @@
+---
+title: "在 Python 和 Flask 中使用 Google 认证"
+description: "了解如何在 Replit 中为 Flask 应用实现 Google OAuth 认证，包括用户登录和 Google Sheets API 集成。"
+---
+
+让用户通过 Google 账号登录你的网站有以下优势：
+
+1. 无需自行实现认证方案。
+2. 可轻松获取用户的姓名和联系信息。
+3. 可使用同一组凭据访问用户的 Google 资源，例如 Sheets 和 Drive。
+
+本指南将介绍如何在 Replit 中使用 Python 和 Flask 实现这一功能。
+
+首先，我们将介绍如何设置基本的 OAuth 认证，然后说明如何使用获取的凭据访问用户的 Google 资源。
+
+<div id="oauth">
+  ## OAuth 概述
+</div>
+
+Google 认证基于 OAuth 标准。OAuth 的工作原理如下：
+
+1. 在网站的某处引导用户前往登录页面。
+2. 用户访问登录页面后，网站不会自行实现登录表单，而是将用户重定向到 Google 的登录服务进行登录。
+3. Google 的登录服务成功登录用户后，会将用户重定向回你定义的 URL (例如：`https://YOUR_DOMAIN/oauth2callback`) ，同时传递用户和登录会话的相关信息。
+4. 使用用户的登录信息获取访问令牌。它相当于访问用户个人资料、电子表格、文档等资源的通行证。
+
+<div id="oauth-2">
+  ## OAuth：直接上代码
+</div>
+
+如果你和我一样，只想先拿到能运行的代码，下面就是。不过，要让一切正常运行，你还需要在 Google Cloud Console 中进行一些配置。下一节会介绍这些内容。使用 [Flask 模板](https://replit.com/@replit/Flask?v=1) 创建一个新的 Replit App，并将以下内容输入到 `main.py` 中。代码中的注释说明了各个部分的作用：
+
+```python theme={null}
+from flask import Flask, redirect, session, url_for, request
+import google_auth_oauthlib.flow
+import json
+import os
+import requests
+
+app = Flask('app')
+# `FLASK_SECRET_KEY` 用于会话。你应创建一个随机字符串，
+# 并将其存储为 Secret。
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
+
+# `GOOGLE_APIS_OAUTH_SECRET` 包含从 Google Cloud 凭据面板下载的 JSON 文件内容。
+# 请参阅下一节。
+oauth_config = json.loads(os.environ['GOOGLE_OAUTH_SECRETS'])
+
+# 此处配置 OAuth 流程
+oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
+    oauth_config,
+    # scopes 定义身份验证后你希望代表用户访问哪些 API
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+    ]
+)
+
+# 这是登录页面的入口。它会重定向到 `authorization_url` 中的 Google 登录服务。
+# `redirect_uri` 是 Google 登录服务用来重定向回此 App 的 URI。
+@app.route('/signin')
+def signin():
+    # 我们将 URL 从 http 改写为 https，因为 Replit App 内部使用 http，
+    # 而外部通过 https 访问，redirect_uri 必须与之匹配
+    oauth_flow.redirect_uri = url_for('oauth2callback', _external=True).replace('http://', 'https://')
+    authorization_url, state = oauth_flow.authorization_url()
+    session['state'] = state
+    return redirect(authorization_url)
+
+# 这是 Google 登录服务重定向回来的端点。必须将其添加到 Google Cloud 的 API 凭据面板中的“Authorized redirect URIs”。
+# 它会调用 Google 端点来请求访问令牌，并将其存储在用户会话中。之后，可使用该访问令牌
+# 代表用户访问 API。
+@app.route('/oauth2callback')
+def oauth2callback():
+    if not session['state'] == request.args['state']:
+        return 'Invalid state parameter', 400
+    oauth_flow.fetch_token(authorization_response=request.url.replace('http:', 'https:'))
+    session['access_token'] = oauth_flow.credentials.token
+    return redirect("/")
+
+# 这是 App 的主页。若用户尚未登录，会引导其登录。
+# 若用户已登录，则显示其信息。
+@app.route('/')
+def welcome():
+    if "access_token" in session:
+        user_info = get_user_info(session["access_token"])
+        if user_info:
+            return f"""
+                Hello {user_info["given_name"]}!<br>
+                Your email address is {user_info["email"]}<br>
+                <a href="/logout">Log out</a>
+            """
+    return """
+        <h1>Hello!</h1>
+        <a href="/signin">Sign In via Google</a><br>
+    """
+
+# 使用有效的访问令牌调用 userinfo API，以获取用户信息。
+# 这是使用访问令牌代表用户访问 API 的第一个示例。
+def get_user_info(access_token):
+    response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
+       "Authorization": f"Bearer {access_token}"
+   })
+    if response.status_code == 200:
+        user_info = response.json()
+        return user_info
+    else:
+        print(f"Failed to fetch user info: {response.status_code} {response.text}")
+        return None
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+```
+
+<div id="oauth-3">
+  ## 设置 OAuth 应用/客户端
+</div>
+
+要运行上述代码，需要在 Google Cloud 中完成以下设置。
+
+1. 创建 Google Cloud 项目 (如尚未创建) 。
+2. 配置 OAuth 同意屏幕。
+3. 为应用创建 OAuth 客户端 ID。
+
+<div id="google-cloud">
+  ### 创建 Google Cloud 项目
+</div>
+
+如果您已有要用于本练习的 Google Cloud 项目，可以跳过此步骤。
+
+1. 前往 [Google Cloud Console](https://console.cloud.google.com/)。
+2. 点击 Google Cloud 徽标旁项目选择器的下拉菜单：
+
+<Frame>
+  <img src="/assets/mirror/google-project-dropdown-d64bd797ae82.png" alt="Google 项目下拉菜单" width="734" height="94" data-path="images/google-auth-in-flask/google-project-dropdown.png" />
+</Frame>
+
+3. 选择现有项目，或点击“新建项目”创建新项目。
+
+<Frame>
+  <img src="/assets/mirror/select-project-22c9b948c348.png" alt="选择项目" width="1092" height="868" data-path="images/google-auth-in-flask/select-project.png" />
+</Frame>
+
+4. 要创建新项目，请输入项目名称，然后点击“创建”。
+
+<Frame>
+  <img src="/assets/mirror/new-project-8a60880bda21.png" alt="新建项目" width="1110" height="868" data-path="images/google-auth-in-flask/new-project.png" />
+</Frame>
+
+新项目出现在弹出窗口后，点击“选择项目”，将其设为*当前项目*。
+
+<div id="oauth-4">
+  ### 配置 OAuth 同意屏幕
+</div>
+
+创建项目后，配置 OAuth 同意屏幕：
+
+1. 前往 [OAuth 同意屏幕](https://console.cloud.google.com/apis/credentials/consent)。
+
+<Frame>
+  <img src="/assets/mirror/oauth-consent-screen-8c5d7264f4ba.png" alt="OAuth 同意屏幕" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-screen.png" />
+</Frame>
+
+2. 在项目下拉菜单中，确认已选择要使用的项目。
+3. 选择“外部”，以允许拥有任意 Google 账号的用户登录应用。“内部”仅限组织内的用户使用。
+4. 点击“创建”。
+5. 输入应用名称，以及负责支持此应用的人员的电子邮件地址 (可以填写你自己的地址) 。
+
+<Frame>
+  <img src="/assets/mirror/oauth-consent-step-2-f00ee976e9fd.png" alt="OAuth 同意屏幕" width="1196" height="675" data-path="images/google-auth-in-flask/oauth-consent-step-2.png" />
+</Frame>
+
+6. 在“开发者联系信息”中输入电子邮件地址。
+
+<Frame>
+  <img src="/assets/mirror/oauth-consent-step-2-b-a2f1a259f431.png" alt="开发者联系信息" width="533" height="207" data-path="images/google-auth-in-flask/oauth-consent-step-2-b.png" />
+</Frame>
+
+7. 点击“保存并继续”。
+8. 在范围页面中，可以添加应用需要访问的 API。用于获取基本用户信息的 API 已默认授权访问。
+
+<Frame>
+  <img src="/assets/mirror/oauth-scopes-f99364e44221.png" alt="OAuth 范围" width="1093" height="647" data-path="images/google-auth-in-flask/oauth-scopes.png" />
+</Frame>
+
+暂时保持默认设置，然后点击“保存并继续”。
+9. 在“测试用户”中，需要添加将在测试阶段测试应用的用户电子邮件地址。
+
+<Frame>
+  <img src="/assets/mirror/test-users-048f029f4d9f.png" alt="测试用户" width="1050" height="641" data-path="images/google-auth-in-flask/test-users.png" />
+</Frame>
+
+点击“添加用户”。
+10. 添加一个或多个 Google 电子邮件地址，然后点击“添加”。
+
+<Frame>
+  <img src="/assets/mirror/test-users-add-43e7efabac17.png" alt="测试用户" width="1050" height="641" data-path="images/google-auth-in-flask/test-users-add.png" />
+</Frame>
+
+然后点击“保存并继续”。
+11. 查看摘要页面。你可以随时返回并编辑各个步骤。
+
+<Frame>
+  <img src="/assets/mirror/summary-54322ee205dd.png" alt="测试用户" width="735" height="328" data-path="images/google-auth-in-flask/summary.png" />
+</Frame>
+
+<div id="oauthid">
+  ### 创建应用的 OAuth 客户端 ID
+</div>
+
+这是最后一步。要让 OAuth 正常运行，您需要为应用创建 OAuth 客户端 ID。
+
+1. 前往[凭据](https://console.cloud.google.com/apis/credentials)。
+
+<Frame>
+  <img src="/assets/mirror/credentials-37967178ae47.png" alt="测试用户" width="1050" height="605" data-path="images/google-auth-in-flask/credentials.png" />
+</Frame>
+
+2. 点击“创建凭据”。
+
+<Frame>
+  <img src="/assets/mirror/create-credentials-411c8b243090.png" alt="测试用户" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials.png" />
+</Frame>
+
+选择“OAuth 客户端 ID”。
+3.  选择“Web 应用”作为应用类型，并为此客户端 ID 输入名称。
+
+<Frame>
+  <img src="/assets/mirror/create-credentials-web-53cd170ef6ff.png" alt="测试用户" width="1050" height="605" data-path="images/google-auth-in-flask/create-credentials-web.png" />
+</Frame>
+
+4. 前往 Flask Replit App。打开 Shell 并输入以下命令：`echo https://$REPLIT_DEV_DOMAIN/oauth2callback`。输出结果应类似于 `https://81309e9b-c4df-48e0-a2c2-0a8d3c0e3162-00-35ppsa0tcuv6v.infra-staging.replit.dev/oauth2callback`。复制这段文本，并将其填入表单底部“已获授权的重定向 URI”之一。
+
+<Frame>
+  <img src="/assets/mirror/authorized-redirect-uris-6a5811acd49a.png" alt="测试用户" width="800" height="271" data-path="images/google-auth-in-flask/authorized-redirect-uris.png" />
+</Frame>
+
+稍后发布应用时，请返回此处并添加另一项 `https://YOUR_APP_DOMAIN/oauth2callback`。
+
+5. 点击“创建”。
+6. 点击“下载 JSON”：
+
+<Frame>
+  <img src="/assets/mirror/secrets_json-d507ecb4ea34.png" alt="测试用户" width="573" height="607" data-path="images/google-auth-in-flask/secrets_json.png" />
+</Frame>
+
+7. 返回 Replit App 并打开 Secrets 窗格。创建一个名为 `GOOGLE_OAUTH_SECRETS` 的 Secrets，并将下载文件的内容粘贴为其值。
+
+<Frame>
+  <img src="/assets/mirror/add-secret-92f7d85d5156.png" alt="测试用户" width="1060" height="677" data-path="images/google-auth-in-flask/add-secret.png" />
+</Frame>
+
+辛苦了，恭喜您完成了！现在，您可以运行 Flask 应用，并使用测试用户的 Google 账号登录。若要让所有 Google 用户都能使用您的应用，请返回[同意页面](https://console.cloud.google.com/apis/credentials/consent)，然后点击“发布应用”。如果您需要 Sheets、Drive 等额外的 Google API，可能还需要完成验证流程。
+
+接下来，我们将介绍如何集成 Sheets 等 Google API。如果想继续深入了解，请继续阅读。
+
+<div id="google-sheets-api">
+  ## 设置 Google Sheets API
+</div>
+
+要添加 Google Sheets 等 Google API 集成，首先需要为您的应用启用 API。您可以[查看可用的 API](https://console.cloud.google.com/apis/library)。以下以 Google Sheets 为例。
+
+1. 前往 [Google Sheets API 列表页面](https://console.cloud.google.com/apis/library/sheets.googleapis.com)。
+2. 点击“启用”。
+
+就这样！Google Cloud 的这部分设置已完成。
+
+<div id="google-sheets">
+  ## Google Sheets 集成：查看代码
+</div>
+
+首先，保持原始代码中的 OAuth 流程部分不变，只需将 `"https://www.googleapis.com/auth/spreadsheets.readonly"` 添加到作用域列表中：
+
+```python theme={null}
+# 此处为 OAuth 流程配置
+oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
+    oauth_config,
+    # scopes 定义用户完成身份验证后，你希望代表用户访问哪些 API
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
+    ]
+)
+```
+
+要通过 `googleapiclient.discovery` 库访问 Google API，首先使用访问令牌创建 `Credentials` 对象，然后使用 `build` 函数创建可调用的 API 对象。对于 Sheets API，示例如下：
+
+```python theme={null}
+credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
+service = build("sheets", "v4", credentials=credentials)
+sheets_api = service.spreadsheets()
+```
+
+为了演示 Sheets API 的实际用法，我们创建了一些辅助函数：
+
+```python theme={null}
+# 获取 Google 电子表格中的所有工作表
+def get_sheets(sheets_api, spreadsheet_id) -> list[str]:
+    result = sheets_api.get(spreadsheetId=spreadsheet_id).execute()
+    return [sheet["properties"]["title"] for sheet in result["sheets"]]
+
+# 获取 Google 电子表格中指定工作表的数据
+def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
+    result = (
+        sheets_api.values()
+        .get(spreadsheetId=spreadsheet_id, range=sheet_title)
+        .execute()
+    )
+    return result["values"]
+```
+
+使用上述辅助函数，您可以按如下方式创建用于导入 Google 表格的处理端点：
+
+```python theme={null}
+@app.route("/import_spreadsheet", methods = ['POST'])
+def import_spreadsheet():
+    if 'access_token' not in session:
+        return redirect('/signin')
+    spreadsheet_id = request.form["spreadsheet_id"]
+    credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
+    service = build("sheets", "v4", credentials=credentials)
+    sheets_api = service.spreadsheets()
+    try:
+        sheets = get_sheets(sheets_api, spreadsheet_id)
+        data_by_sheets = {}
+        for sheet in sheets:
+            data = get_sheet_data(sheets_api, spreadsheet_id, sheet)
+            data_by_sheets[sheet] = data
+    except googleapiclient.errors.HttpError as e:
+        return f"upload failure"
+    dirpath = os.path.join("static", "uploads", spreadsheet_id)
+    filepath = os.path.join(dirpath, "data.json")
+    os.makedirs(dirpath, exist_ok=True)
+    with open(filepath, "w") as file:
+        json.dump(data_by_sheets, file)
+    return "upload success!"
+```
+
+完整的可运行代码如下：
+
+```python theme={null}
+from flask import Flask, redirect, session, url_for, request
+import google_auth_oauthlib.flow
+import json
+import os
+import requests
+from googleapiclient.discovery import build
+import googleapiclient.errors
+import google.oauth2.credentials
+
+app = Flask('app')
+# 会话会使用 `FLASK_SECRET_KEY`。你应创建一个随机字符串，
+# 并将其作为 Secrets 存储。
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
+
+# `GOOGLE_APIS_OAUTH_SECRET` 包含从 Google Cloud 凭据面板下载的 JSON 文件内容。
+# 请参阅下一节。
+oauth_config = json.loads(os.environ['GOOGLE_OAUTH_SECRETS'])
+
+# 这将配置 OAuth 流程
+oauth_flow = google_auth_oauthlib.flow.Flow.from_client_config(
+    oauth_config,
+    # scopes 定义身份验证后你希望代表用户访问哪些 API
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/spreadsheets.readonly"
+    ]
+)
+
+# 这是登录页面的入口。它会重定向到位于
+# `authorization_url` 的 Google 登录服务。`redirect_uri` 是 Google 登录服务用于
+# 重定向回此 App 的 URI。
+@app.route('/signin')
+def signin():
+    # We rewrite the URL from http to https because inside the Replit App http is used,
+    # but externally it's accessed via https, and the redirect_uri has to match that
+    oauth_flow.redirect_uri = url_for('oauth2callback', _external=True).replace('http://', 'https://')
+    authorization_url, state = oauth_flow.authorization_url()
+    session['state'] = state
+    return redirect(authorization_url)
+
+# 这是 Google 登录服务重定向回来的端点。必须将其添加到 Google Cloud 中 API 凭据面板的“已获授权的重定向 URI”。
+# 它会调用 Google 端点来请求
+# 访问令牌，并将其存储在用户会话中。之后，可以使用该访问令牌代表用户访问
+# API。
+@app.route('/oauth2callback')
+def oauth2callback():
+    if not session['state'] == request.args['state']:
+        return 'Invalid state parameter', 400
+    oauth_flow.fetch_token(authorization_response=request.url.replace('http:', 'https:'))
+    session['access_token'] = oauth_flow.credentials.token
+    return redirect("/")
+
+# 使用有效的访问令牌调用 userinfo API 来获取用户信息。
+# 这是第一个使用访问令牌代表用户访问 API 的示例。
+def get_user_info(access_token):
+    response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
+       "Authorization": f"Bearer {access_token}"
+   })
+    if response.status_code == 200:
+        user_info = response.json()
+        return user_info
+    else:
+        print(f"Failed to fetch user info: {response.status_code} {response.text}")
+        return None
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+# 获取 Google 电子表格中的所有工作表
+def get_sheets(sheets_api, spreadsheet_id) -> list[str]:
+    result = sheets_api.get(spreadsheetId=spreadsheet_id).execute()
+    return [sheet["properties"]["title"] for sheet in result["sheets"]]
+
+# 获取 Google 电子表格中指定工作表的数据
+def get_sheet_data(sheets_api, spreadsheet_id, sheet_title) -> list[list[str]]:
+    result = (
+        sheets_api.values()
+        .get(spreadsheetId=spreadsheet_id, range=sheet_title)
+        .execute()
+    )
+    return result["values"]
+
+# 显示一个用于导入电子表格的表单
+@app.route("/import_spreadsheet_form")
+def import_spreadsheet_form():
+    return """
+    <h3>Import Spreadsheet</h3>
+    <form action="/import_spreadsheet" method="POST">
+        <label>Spreadsheet ID</label>
+        <input type="text" name="spreadsheet_id">
+
+        <button type="submit">Import</button>
+    </form>
+    """
+
+@app.route("/import_spreadsheet", methods = ['POST'])
+def import_spreadsheet():
+    if 'access_token' not in session:
+        return redirect('/signin')
+    spreadsheet_id = request.form["spreadsheet_id"]
+    credentials = google.oauth2.credentials.Credentials(token=session['access_token'])
+    service = build("sheets", "v4", credentials=credentials)
+    sheets_api = service.spreadsheets()
+    try:
+        sheets = get_sheets(sheets_api, spreadsheet_id)
+        data_by_sheets = {}
+        for sheet in sheets:
+            data = get_sheet_data(sheets_api, spreadsheet_id, sheet)
+            data_by_sheets[sheet] = data
+    except googleapiclient.errors.HttpError as e:
+        return f"upload failure"
+    dirpath = os.path.join("static", "uploads", spreadsheet_id)
+    filepath = os.path.join(dirpath, "data.json")
+    os.makedirs(dirpath, exist_ok=True)
+    with open(filepath, "w") as file:
+        json.dump(data_by_sheets, file)
+    return "upload success! Really!"
+
+@app.route('/')
+def welcome():
+    if "access_token" in session:
+        user_info = get_user_info(session["access_token"])
+        if user_info:
+            return f"""
+            Hello {user_info["given_name"]}!<br>
+            Your email address is {user_info["email"]}<br>
+            <a href="/signin">Sign In to Google</a><br>
+            <a href="/import_spreadsheet_form">Import a Sheet</a>
+            """
+    return """
+    <h1>Welcome to Google Sheet Importer</h1>
+    <a href="/signin">Sign In to Google</a><br>
+    <a href="/import_spreadsheet_form">Import a Sheet</a>
+    """
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+发布应用时，请务必确认以下事项：
+
+1. 将生产环境的 `/oauth2callback` URI 添加到“已获授权的重定向 URI”中。
+2. 前往[同意页面](https://console.cloud.google.com/apis/credentials/consent)，然后点击“发布应用”。
+
+希望你有愉快的体验，祝你继续探索愉快。

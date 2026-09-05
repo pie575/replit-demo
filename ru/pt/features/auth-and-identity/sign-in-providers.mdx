@@ -1,0 +1,390 @@
+---
+title: "Провайдеры входа"
+description: "Настройте собственные учётные данные OAuth для входа через Google, GitHub, Apple и X в приложениях, использующих Clerk Auth."
+---
+
+Если ваше приложение использует [Clerk Auth](/ru/pt/features/auth-and-identity/clerk-auth), посетители могут входить через социальные провайдеры. Replit предоставляет готовые общие учётные данные; на этой странице описано, как подключить **собственные** учётные данные OAuth для каждого провайдера, чтобы на экране входа отображались название и оформление вашего приложения.
+
+Порядок действий одинаков для всех провайдеров: создайте приложение OAuth в консоли провайдера, скопируйте URL-адреса, которые показывает Replit, и вставьте полученные учётные данные в панель редактирования провайдера.
+
+<Note>
+  Собственные учётные данные OAuth доступны только в среде **Production**, поэтому сначала приложение необходимо [опубликовать](/ru/pt/features/publishing/overview). Откройте панель редактирования нужного провайдера в инструменте **Users &amp; Auth**: вкладка **Configure**, раздел **SSO providers**, выберите среду **Production** и нажмите **Edit** рядом с провайдером. Полное описание процесса см. в разделе [Настройка учётных данных OAuth для SSO-провайдера](/ru/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+</Note>
+
+<div id="google">
+  ## Google
+</div>
+
+В этом руководстве описано, как создать OAuth-приложение Google в Google Cloud Console. Вы получите **Client ID** и **Client Secret**, а также настроите источники JavaScript и URI перенаправления, которые требует Clerk.
+
+Что вам понадобится: доступ к [Google Cloud Console](https://console.cloud.google.com/).
+
+<div id="etapa-1-crie-um-app-oauth-do-google">
+  ### Шаг 1. Создайте приложение OAuth в Google
+</div>
+
+Перейдите в [Google Cloud Console](https://console.cloud.google.com/):
+
+<div id="crie-ou-selecione-um-projeto">
+  #### Создайте или выберите проект
+</div>
+
+1. Выберите существующий проект или создайте новый в выпадающем списке проектов
+2. Вы будете перенаправлены на панель управления проекта
+
+<div id="configure-a-tela-de-consentimento-oauth">
+  #### Настройте экран согласия OAuth
+</div>
+
+1. На левой боковой панели нажмите значок меню (≡) и выберите **APIs &amp; Services**
+2. Выберите **OAuth consent screen**
+3. Настройте экран согласия для своего приложения, указав необходимые сведения
+4. Сохраните изменения
+
+<div id="crie-credenciais-oauth">
+  #### Создайте учетные данные OAuth
+</div>
+
+1. В разделе **APIs &amp; Services** выберите **Credentials**
+2. Нажмите **Create Credentials** вверху, затем выберите **OAuth client ID**
+3. В качестве типа приложения выберите **Web application**
+4. Задайте **Authorized JavaScript origins** и **Authorized redirect URIs**, указав точные значения из раздела **Provider setup** на **панели Auth**. Добавьте все перечисленные значения — в их число входят как ваш опубликованный домен, так и любые пользовательские домены. О том, как их найти, см. [Настройка учетных данных OAuth для SSO-провайдера](/ru/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+5. Нажмите **Create**
+6. Сохраните свои **Client ID** и **Client Secret**
+
+<Warning>
+  Храните Client Secret в безопасности и никогда не добавляйте его в систему контроля версий.
+</Warning>
+
+<Warning>
+  Вход через Google не работает во встроенных браузерах и webview внутри приложений. Пользователям необходимо использовать обычный веб-браузер.
+</Warning>
+
+<div id="soluo-de-problemas">
+  ### Устранение неполадок
+</div>
+
+<div id="uri-de-redirecionamento-incompatvel-redirect-uri-mismatch">
+  #### Несовпадение URI перенаправления (Redirect URI mismatch)
+</div>
+
+* Убедитесь, что URI перенаправления в Google Cloud Console в точности совпадает со значением, указанным в разделе **Provider setup** на **панели Auth**
+* Проверьте, что нет завершающих слешей и опечаток
+* Подождите несколько минут, пока изменения настроек Google вступят в силу
+
+<div id="cliente-invlido-invalid-client">
+  #### Недействительный клиент (Invalid client)
+</div>
+
+* Убедитесь, что Client ID и Client Secret скопированы правильно
+* Проверьте, нет ли лишних пробелов
+* Убедитесь, что экран согласия OAuth настроен
+
+<div id="no-funciona-em-domnio-personalizado">
+  #### Не работает на пользовательском домене
+</div>
+
+* Добавьте записи пользовательского домена, указанные в разделе **Provider setup** на **панели Auth**, и в Authorized JavaScript origins, и в Authorized redirect URIs
+
+<div id="github">
+  ## GitHub
+</div>
+
+В этом руководстве показано, как создать OAuth-приложение GitHub в разделе Developer Settings на GitHub. Вы получите **Client ID** и **Client Secret**, которые затем нужно будет ввести на **панели Auth**.
+
+Что понадобится: [учётная запись GitHub](https://github.com).
+
+<div id="etapa-1-crie-um-app-oauth-do-github">
+  ### Шаг 1: Создайте OAuth-приложение GitHub
+</div>
+
+1. Перейдите в [Настройки разработчика GitHub](https://github.com/settings/developers)
+2. Выберите **OAuth Apps** на боковой панели
+3. Выберите **New OAuth App**
+4. Заполните данные приложения:
+
+**Application name:**
+
+Введите имя приложения.
+
+**Homepage URL** и **Authorization callback URL:**
+
+В оба поля впишите точные значения, указанные в разделе **Provider setup** на **панели Auth**. О том, где их найти, см. [Настройка учетных данных OAuth для SSO-провайдера](/ru/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+
+5. Выберите **Register application**
+
+<div id="etapa-2-gere-as-credenciais-do-cliente">
+  ### Шаг 2. Создайте учётные данные клиента
+</div>
+
+1. На странице настроек приложения вы увидите свой **Client ID** — скопируйте его
+2. Нажмите **Generate a new client secret**
+3. Сразу же скопируйте свой **Client Secret**
+
+<Warning>
+  Сохраните Client Secret в надёжном месте. После перехода с этой страницы посмотреть его снова будет нельзя. Если вы его потеряете, придётся создать новый.
+</Warning>
+
+<div id="soluo-de-problemas-2">
+  ### Устранение неполадок
+</div>
+
+<div id="uri-de-redirecionamento-incompatvel-redirect-uri-mismatch-2">
+  #### Несовпадение URI перенаправления (Redirect URI mismatch)
+</div>
+
+* Убедитесь, что Authorization callback URL в точности совпадает со значением, указанным в разделе **Provider setup** на **панели Auth**
+* Проверьте, нет ли опечаток или неверно указанного протокола
+* Без завершающих слешей
+
+<div id="cliente-invlido-invalid-client-2">
+  #### Недействительный клиент (Invalid client)
+</div>
+
+* Убедитесь, что Client ID и Client Secret скопированы правильно
+* Проверьте, что при вставке не добавились лишние пробелы
+
+<div id="no-funciona-em-domnio-personalizado-2">
+  #### Не работает на пользовательском домене
+</div>
+
+* Обновите Homepage URL и Authorization callback URL, указав значения для пользовательского домена, которые приведены в разделе **Provider setup** на **панели Auth**
+
+<div id="apple">
+  ## Apple
+</div>
+
+В этом руководстве показано, как создать Apple App ID, Services ID и Private Key, необходимые для Sign in with Apple. Вам нужно будет получить **Team ID**, **Services ID**, **Key ID** и **Private Key** и указать их на **панели Auth**.
+
+Что вам понадобится: [учётная запись Apple Developer](https://developer.apple.com/account) (требуется участие в Apple Developer Program).
+
+<div id="etapa-1-crie-um-apple-app-id">
+  ### Шаг 1. Создайте Apple App ID
+</div>
+
+1. Перейдите на [портал Apple Developer](https://developer.apple.com/account)
+2. Откройте **Certificates, IDs &amp; Profiles**, а затем **Identifiers**
+3. Выберите **App IDs** в раскрывающемся меню
+4. Нажмите значок **+**, чтобы зарегистрировать новый идентификатор
+5. Выберите **App IDs**, затем **Continue**
+6. Выберите **App**, затем **Continue**
+7. Заполните поля:
+   * **Description**: название вашего App ID
+   * **Bundle ID**: ваш уникальный идентификатор
+8. Включите **Sign In with Apple** в разделе Capabilities
+9. Нажмите **Continue**, затем **Register**
+10. **Сохраните App ID Prefix** (отображается вверху) — это и есть ваш **Team ID**
+
+<div id="etapa-2-crie-um-apple-services-id">
+  ### Шаг 2: Создайте Apple Services ID
+</div>
+
+1. На странице Identifiers выберите **Services IDs** в раскрывающемся меню
+2. Нажмите **+**, чтобы зарегистрировать новый идентификатор
+3. Выберите **Services IDs**, затем **Continue**
+4. Заполните поля:
+   * **Description**: название вашего Services ID
+   * **Identifier**: ваш уникальный идентификатор (сохраните его — это и есть ваш **Services ID**)
+5. Нажмите **Continue**, затем **Register**
+
+<div id="configure-o-services-id">
+  #### Настройте Services ID
+</div>
+
+1. Выберите только что созданный Services ID
+2. Включите **Sign In with Apple**
+3. Нажмите **Configure**
+4. Задайте значения:
+
+   * **Primary App ID**: выберите свой App ID из этапа 1
+   * **Domains and Subdomains**: скопируйте значение из раздела **Provider setup** на **панели Auth** (без префикса протокола `https://`)
+   * **Return URLs**: скопируйте значение из раздела **Provider setup** на **панели Auth**
+
+   О том, как найти эти значения, см. [Настройка учётных данных OAuth для SSO-провайдера](/ru/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+5. Нажмите **Next**, затем **Done**, затем **Continue** и **Save**
+
+<div id="etapa-3-crie-uma-apple-private-key">
+  ### Шаг 3. Создайте закрытый ключ Apple
+</div>
+
+1. На боковой панели портала Apple Developer выберите **Keys**
+2. Нажмите **+**, чтобы зарегистрировать новый ключ
+3. Введите **Key Name**
+4. Включите **Sign In with Apple**
+5. Выберите **Configure**, затем укажите свой App ID из шага 1
+6. Нажмите **Save**, затем **Continue** и **Register**
+7. **Сохраните Key ID**
+8. **Скачайте** файл закрытого ключа (.p8)
+
+<Warning>
+  Закрытый ключ можно скачать только один раз. Храните его в надёжном месте — повторно скачать его не получится.
+</Warning>
+
+<div id="etapa-4-configure-o-apple-private-email-relay">
+  ### Шаг 4. Настройте Apple Private Email Relay
+</div>
+
+Функция Hide My Email от Apple позволяет пользователям входить, не раскрывая настоящий адрес электронной почты. Чтобы отправлять письма таким пользователям, зарегистрируйте свой источник электронной почты.
+
+1. На боковой панели портала Apple Developer выберите **Services**
+2. В разделе **Sign in with Apple for Email Communication** выберите **Configure**
+3. Нажмите **+**, чтобы добавить Email Source
+4. Введите значение Email Source, указанное в разделе **Provider setup** на **панели Auth**
+5. Выберите **Next**, затем **Register**, затем **Done**
+6. Дождитесь проверки DNS (зелёный значок подтверждения)
+
+<Info>
+  В некоторых регионах (Китай, Индия) Apple ID может быть привязан к номеру телефона, а не к электронной почте. Если вашему приложению адрес электронной почты нужен для всех пользователей, вход через Sign in with Apple может не сработать для пользователей из этих регионов.
+</Info>
+
+<div id="soluo-de-problemas-3">
+  ### Устранение неполадок
+</div>
+
+<div id="cliente-invlido-invalid-client-3">
+  #### Недействительный клиент (Invalid client)
+</div>
+
+* Убедитесь, что все учётные данные введены верно
+* Проверьте, что Private Key содержит строки BEGIN и END
+* Убедитесь, что ваш Services ID настроен корректно
+
+<div id="uri-de-redirecionamento-invlida-invalid-redirect-uri">
+  #### Недопустимый URI перенаправления (Invalid redirect URI)
+</div>
+
+* Убедитесь, что Return URL в настройках Apple Services ID в точности совпадает со значением, указанным в разделе **Provider setup** на **панели Auth**
+* Убедитесь, что домен в поле Domains and Subdomains совпадает с вашим опубликованным доменом (без `https://`)
+
+<div id="email-relay-no-funciona">
+  #### Email relay не работает
+</div>
+
+* Убедитесь, что рядом с Email Source на портале Apple Developer отображается зелёный значок подтверждения
+* Дождитесь распространения DNS, если запись была добавлена недавно
+
+<div id="no-funciona-em-domnio-personalizado-3">
+  #### Не работает на пользовательском домене
+</div>
+
+* Добавьте записи пользовательского домена, указанные в разделе **Provider setup** на **панели Auth**, в поля Domains and Subdomains (без `https://`) и Return URLs
+
+<div id="recursos-adicionais">
+  ### Дополнительные ресурсы
+</div>
+
+* [Документация Apple по Sign in with Apple](https://developer.apple.com/sign-in-with-apple/)
+* [Руководство по службе Private Email Relay](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)
+
+<div id="x-twitter">
+  ## X (Twitter)
+</div>
+
+В этом руководстве описано, как создать OAuth-приложение X в X Developer Portal. Вы получите **Client ID** и **Client Secret**, которые нужно будет указать в **панели Auth**.
+
+Что понадобится: [аккаунт разработчика X](https://developer.twitter.com/) (доступен бесплатный тариф).
+
+<div id="etapa-1-configure-o-app-de-desenvolvedor-do-x">
+  ### Шаг 1. Настройте приложение разработчика X
+</div>
+
+<div id="crie-uma-conta-de-desenvolvedor-se-necessrio">
+  #### Создайте аккаунт разработчика (при необходимости)
+</div>
+
+1. Перейдите в [X Developer Portal](https://developer.twitter.com/en/portal/dashboard)
+2. Подайте заявку на аккаунт разработчика, если у вас его ещё нет
+3. Заполните заявку, описав свой сценарий использования
+
+<div id="crie-ou-selecione-um-app">
+  #### Создайте или выберите приложение
+</div>
+
+1. В X Developer Portal откройте раздел **Projects &amp; Apps**
+2. Используйте существующее приложение или выберите **Add App**
+3. Введите название приложения и выберите **Next**
+4. Выберите **App settings**
+
+<div id="etapa-2-configure-a-autenticao">
+  ### Шаг 2. Настройте аутентификацию
+</div>
+
+1. Прокрутите до раздела **User authentication settings**
+2. Выберите **Set up**
+
+**App permissions:**
+
+Выберите минимально необходимый уровень разрешений:
+
+* **Read** — требуется для доступа к профилю пользователя (минимум)
+* **Write** — для публикации от имени пользователей (необязательно)
+* **Direct Messages** — для доступа к личным сообщениям (необязательно)
+
+<Warning>
+  Разрешения должны соответствовать запрашиваемым областям доступа. Если ваше приложение запрашивает `tweet.write`, а включён только Read, аутентификация завершится ошибкой.
+</Warning>
+
+**Type of app:**
+
+Выберите **Web App, Automated App or Bot**
+
+**App info:**
+
+* **Callback URI / Redirect URL**: скопируйте значение из раздела **Provider setup** на **панели Auth**
+* **Website URL**: скопируйте значение из раздела **Provider setup** на **панели Auth**
+
+О том, как найти эти значения, читайте в статье [Настройка учётных данных OAuth для SSO-провайдера](/ru/pt/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider).
+
+3. Выберите **Save**
+4. **Сохраните свои Client ID и Client Secret**
+
+<Warning>
+  Храните Client Secret в надёжном месте. Если вы его потеряете, при создании нового старый станет недействительным.
+</Warning>
+
+<div id="soluo-de-problemas-4">
+  ### Устранение неполадок
+</div>
+
+<div id="uri-de-redirecionamento-incompatvel-redirect-uri-mismatch-3">
+  #### Несовпадение URI перенаправления (Redirect URI mismatch)
+</div>
+
+* Убедитесь, что Callback URI в точности совпадает со значением, указанным в разделе **Provider setup** на **панели Auth**
+* Проверьте, нет ли опечаток или неверно указанного протокола
+* Без слеша в конце
+
+<div id="cliente-invlido-invalid-client-4">
+  #### Недействительный клиент (Invalid client)
+</div>
+
+* Ещё раз проверьте Client ID и Client Secret
+* Убедитесь, что нет лишних пробелов
+* Убедитесь, что вы используете учётные данные OAuth 2.0 (а не OAuth 1.0a)
+
+<div id="erros-de-scopepermisso">
+  #### Ошибки областей доступа и разрешений
+</div>
+
+* Проверьте, что области доступа соответствуют разрешениям, включённым в X Developer Portal
+* Убедитесь, что как минимум включено разрешение Read
+
+<div id="app-em-modo-de-desenvolvimento">
+  #### Приложение в режиме разработки
+</div>
+
+* Приложения X изначально работают в режиме разработки с ограниченным числом пользователей
+* Для использования в продакшене может потребоваться запросить расширенный доступ
+
+<div id="no-funciona-em-domnio-personalizado-4">
+  #### Не работает на пользовательском домене
+</div>
+
+* Обновите Website URL и Callback URI, указав значения для пользовательского домена, которые показаны в разделе **Provider setup** на **панели Auth**
+
+<div id="recursos-adicionais-2">
+  ### Дополнительные ресурсы
+</div>
+
+* [Документация по X OAuth 2.0](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
+* [Области доступа (scopes) X OAuth](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)

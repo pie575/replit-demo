@@ -1,0 +1,159 @@
+---
+title: "Suivre les abonnements"
+description: "Repérez les paiements récurrents dans vos e-mails et calculez leur coût mensuel."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Ce n’est pas un connector natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Passez Gmail au crible pour repérer les e-mails d&#39;abonnement et les reçus, identifiez les paiements
+récurrents et calculez le coût mensuel dans Google Sheets. Agent extrait le fournisseur, le montant et
+la périodicité, et signale tout ce qui ressemble à un essai gratuit oublié avant qu&#39;il ne se renouvelle.
+
+<div id="ideal-para">
+  ## Idéal pour
+</div>
+
+* Les fondateurs et responsables opérationnels qui doivent connaître les dépenses mensuelles réelles liées aux outils et services.
+* Les responsables financiers et administratifs qui doivent repérer les essais gratuits oubliés avant leur renouvellement.
+
+<div id="conectores">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "Reçus et e-mails de renouvellement" },
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "Liste actualisée des abonnements et des coûts mensuels",
+},
+]}
+/>
+
+<div id="antes-de-comear">
+  ## Avant de commencer
+</div>
+
+Connectez Gmail et une feuille de calcul Google (ou demandez à l’Agent d’en créer une). Indiquez à l’Agent
+quelle boîte de réception ou quel libellé rechercher.
+
+<div id="d-o-prompt-ao-agente">
+  ## Donnez le prompt à Agent
+</div>
+
+<AiPrompt>
+  Crée une routine qui s&#39;exécute tous les lundis à 9 h. Passe en revue Gmail à
+  la recherche d&#39;e-mails d&#39;abonnement et de reçus. Identifie les paiements
+  récurrents, extrais le fournisseur, le montant et la périodicité, puis crée
+  une feuille de calcul Google qui calcule le coût mensuel. Signale tout ce qui
+  ressemble à un essai gratuit oublié.
+</AiPrompt>
+
+<div id="o-que-esperar">
+  ## À quoi vous attendre
+</div>
+
+Agent crée un tableau récapitulant les fournisseurs, les montants, la périodicité de facturation et le total
+mensuel. Vérifiez quelques lignes au hasard par rapport aux e-mails d’origine. Lors de la
+première exécution, certains fournisseurs seront ignorés s’ils ne comportent pas le terme « abonnement » dans l’objet ; ajoutez
+ces libellés et relancez l’opération. Choisissez trois fournisseurs que vous connaissez, ouvrez le
+reçu dans Gmail et confirmez le montant et la périodicité avant de vous fier au total mensuel.
+
+<div id="adapte-ao-seu-caso">
+  ## Adaptez à votre cas
+</div>
+
+<AiPrompt>
+  Regroupez les abonnements par catégorie (outils de développement, Design,
+  IA, personnel) et mettez en évidence ceux qui dépassent $[montant] par mois.
+</AiPrompt>
+
+<AiPrompt>
+  Envoyez un rappel sur Slack 3 jours avant tout renouvellement annuel supérieur à
+  $[montant].
+</AiPrompt>
+
+<div id="soluo-de-problemas">
+  ## Dépannage
+</div>
+
+* **La feuille de calcul ne contient pas certains abonnements que vous connaissez :** indiquez à Agent quel libellé ou quelle recherche Gmail utiliser, et incluez les fournisseurs qui ne mentionnent pas « abonnement » dans l’objet. Vérifiez ponctuellement quelques lignes par rapport aux e-mails d’origine.
+* **Les montants ou la périodicité semblent incorrects :** les reçus affichent souvent des taxes, des crédits ou une devise différente. Demandez à Agent de conserver le montant de la ligne et la période de facturation indiqués dans l’e-mail, et de signaler les lignes qu’il a déduites.
+* **Le même fournisseur apparaît deux fois :** demandez à Agent de fusionner les entrées par nom de fournisseur et de conserver le reçu le plus récent, puis de recalculer le total mensuel.
+
+<div id="relacionados">
+  ## Ressources associées
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Se remettre à jour après une absence" href="/fr/pt/use-cases/catch-up-while-away">
+    Le même connecteur Gmail, pour les fondateurs et les équipes opérationnelles de retour de congé.
+  </Card>
+
+  <Card title="Créer un tableau de bord d'API en temps réel" href="/fr/pt/use-cases/live-api-dashboard">
+    Un panneau en temps réel plutôt qu&#39;un tableau hebdomadaire.
+  </Card>
+</CardGroup>

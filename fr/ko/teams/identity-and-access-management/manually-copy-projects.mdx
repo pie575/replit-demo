@@ -1,0 +1,291 @@
+---
+title: "Copier manuellement un projet vers un autre espace de travail"
+description: "Copiez directement une application en production vers un autre espace de travail ou compte : copiez le code, configurez une nouvelle application, redirigez les utilisateurs vers celle-ci avec un temps d’arrêt minimal et découvrez comment revenir en arrière"
+sidebarTitle: "Copie manuelle de projet"
+icon: "copy"
+---
+
+Ce guide explique comment copier directement une application vers un autre espace de travail ou compte. Vous copierez le code, configurerez la nouvelle application, copierez les données, puis redirigerez les utilisateurs vers celle-ci.
+
+Aucun élément n’est déplacé ni supprimé. L’ancien projet reste à son emplacement d’origine et les deux copies ne sont pas synchronisées. Une fois l’opération terminée, vous pouvez choisir de conserver ou de supprimer l’ancien projet.
+
+<Note>
+  Vous recherchez la fonctionnalité intégrée de transfert en un clic ? Consultez [Transférer une application vers Teams](/fr/ko/teams/identity-and-access-management/transfer-app-to-teams). Utilisez ce guide si cette option n’est pas disponible ou si vous devez copier une application d’un compte à un autre.
+</Note>
+
+<div id="section">
+  ## Avant de commencer
+</div>
+
+Vous aurez besoin des éléments suivants :
+
+* D’un accès à l’ancien projet et au nouvel espace de travail ou compte
+* D’environ une heure de temps ininterrompu pour la migration finale. Les étapes précédentes peuvent être réalisées sur plusieurs jours.
+* Si votre application possède une adresse web personnalisée, d’un accès à l’endroit où ce domaine est géré
+
+Deux éléments ne sont pas copiés automatiquement et demandent le plus de temps : la **base de données** et l’**adresse web**. Ce guide couvre les deux.
+
+<Note>
+  Si l’administrateur de l’espace de travail a activé l’[interdiction d’exporter le code source](/fr/ko/teams/enterprise-privacy-settings#ban-source-code-export), vous ne pouvez pas télécharger le projet sous forme d’archive zip. Consultez l’administrateur de l’espace de travail avant de commencer : il pourra confirmer si la copie manuelle est autorisée et vous indiquer comment déplacer le code et la base de données.
+</Note>
+
+<div id="section-2">
+  ## Planifier une période d’indisponibilité
+</div>
+
+Imaginez que vous ouvrez un deuxième magasin et fermez le premier. Il y a un court laps de temps pendant lequel l’ancien magasin est fermé et le nouveau n’est pas encore ouvert. Pendant ce temps, personne ne peut utiliser votre application.
+
+**Combien de temps mon application sera-t-elle indisponible ?** Généralement, entre 15 et 60 minutes. Cela dépend de la quantité de données stockées dans votre base de données et de la rapidité avec laquelle votre adresse web est mise à jour.
+
+**Puis-je perdre des données ?** Uniquement si quelqu’un ajoute des données à votre ancienne application après la copie de la base de données. Pour éviter cela, mettez l’ancienne application hors ligne *avant* d’effectuer la copie finale. Ce guide suit cet ordre.
+
+**Puis-je revenir en arrière ?** Oui. Votre ancien projet n’est pas supprimé. En cas de problème, republiez simplement votre ancienne application et elle fonctionnera exactement comme avant.
+
+**Quand dois-je le faire ?** Choisissez un moment où peu de personnes utilisent votre application. Si possible, prévenez vos utilisateurs à l’avance.
+
+<div id="1">
+  ## Étape 1 : Copier le code dans un nouveau projet
+</div>
+
+Choisissez une méthode. Votre ancienne application continuera de fonctionner pendant cette étape. Les deux méthodes transfèrent votre code. GitHub transfère toujours l’historique des commits, tandis qu’un fichier zip ne le transfère que s’il contient le dossier `.git` :
+
+|                              | Utiliser GitHub                                                   | Utiliser un fichier zip                                                                                                                            |
+| ---------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fichiers de code**         | Uniquement les fichiers commités et poussés                       | Tout ce qui se trouve sur le disque, y compris les modifications non commités                                                                      |
+| **Historique des commits**   | L’historique complet du dépôt distant                             | L’historique complet si le dossier `.git` est inclus dans le zip. Aucun historique si vous excluez `.git` pour rester sous la limite d’importation |
+| **Dossiers de dépendances**  | Suit `.gitignore`                                                 | Exclus (`node_modules`, `.venv`, `build`, etc.) ; réinstallés lors de l’importation                                                                |
+| **Prérequis**                | Un compte GitHub connecté à vos deux comptes Replit               | Aucun                                                                                                                                              |
+| **Synchronisation continue** | Les deux copies peuvent pousser et récupérer depuis le même dépôt | Aucune — instantané unique                                                                                                                         |
+| **À privilégier si**         | Vous souhaitez sauvegarder le projet à long terme avec Git        | Vous souhaitez effectuer une copie rapide et ponctuelle                                                                                            |
+
+<div id="github">
+  ### Utiliser GitHub
+</div>
+
+<Steps>
+  <Step title="Envoyer l’ancien projet sur GitHub">
+    Dans l’ancien projet, ouvrez la [fenêtre Git](/fr/ko/features/workspace-tools/git-interface), connectez-le à un dépôt GitHub, puis effectuez un commit et poussez vos modifications. Utilisez un dépôt privé, sauf si vous souhaitez rendre votre code public.
+  </Step>
+
+  <Step title="Accorder l’accès au nouveau compte">
+    Si le nouvel espace de travail appartient à un autre compte Replit, le compte GitHub associé doit pouvoir accéder au dépôt. Pour les dépôts privés, ajoutez ce compte GitHub comme collaborateur ou utilisez une organisation GitHub partagée.
+  </Step>
+
+  <Step title="Importer dans le nouvel espace de travail">
+    Connectez-vous au nouveau compte, ouvrez [replit.com/import](https://replit.com/import), puis sélectionnez **GitHub**, connectez votre compte GitHub et sélectionnez le dépôt. Pour résoudre les problèmes, consultez [Importer depuis des fournisseurs](/fr/ko/build/import-from-providers).
+  </Step>
+
+  <Step title="Vérifier la copie">
+    Ouvrez le nouveau projet et vérifiez que les fichiers et l’historique des commits sont présents. Replit installe les dépendances et configure la commande d’exécution pendant l’importation.
+  </Step>
+</Steps>
+
+<Warning>
+  GitHub ne récupère que les éléments que vous avez commités et poussés. Les fichiers correspondant à `.gitignore` et les modifications non commitées restent sur place. Ne commitez jamais de secrets ni de dumps de base de données dans un dépôt.
+</Warning>
+
+<div id="zip">
+  ### Utiliser un fichier zip
+</div>
+
+<Steps>
+  <Step title="Télécharger le projet d’origine">
+    Dans le projet d’origine, ouvrez le menu à trois points en haut de l’arborescence des fichiers, puis sélectionnez **Télécharger au format zip**.
+
+    Si le téléchargement réussit et que le fichier fait moins de 200 Mo, passez à l’étape suivante.
+
+    Le téléchargement de fichiers zip de plus de 200 Mo peut également réussir. Toutefois, [l’importation de ZIP](/fr/ko/build/import-from-providers#limitations) refuse les fichiers dépassant 200 Mo. Replit ne peut donc pas les utiliser pour créer un nouveau projet. Si le téléchargement échoue ou si le zip dépasse 200 Mo, créez un fichier plus petit :
+
+    1. Dans le projet d’origine, ouvrez l’outil **Shell**.
+
+    2. Collez la commande suivante et appuyez sur Entrée. Cette commande crée un fichier nommé `project.zip` et exclut les dossiers que Replit peut recréer automatiquement :
+
+       ```bash theme={null}
+       zip -r project.zip . -x ".cache/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+    3. Vérifiez la taille. Collez la commande suivante et appuyez sur Entrée. Cette commande affiche la taille en Mo, par exemple `150M` pour 150 Mo :
+
+       ```bash theme={null}
+       du -h project.zip
+       ```
+
+    4. Si la taille dépasse 200 Mo, réduisez le fichier en excluant l’historique des modifications. Collez les deux lignes et appuyez sur Entrée :
+
+       ```bash theme={null}
+       rm project.zip
+       zip -r project.zip . -x ".cache/*" ".local/*" ".git/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+       Excluez `.local` et `.git` uniquement si vous devez réduire le zip à moins de 200 Mo. Cela ne supprime pas ces deux dossiers du projet d’origine. Toutefois, un zip sans `.git` n’inclut pas l’historique des commits du projet. Si vous devez conserver l’historique, utilisez la méthode GitHub.
+
+    5. Dans l’arborescence des fichiers, recherchez `project.zip`, ouvrez le menu à trois points à côté, puis sélectionnez **Télécharger**.
+
+    Le dossier `.cache` stocke l’état interne de Replit, y compris des valeurs de secrets mises en cache. Excluez toujours ce dossier des fichiers zip que vous créez vous-même. Si votre projet contient d’autres dossiers générés volumineux, ajoutez-les à la liste d’exclusion.
+  </Step>
+
+  <Step title="Importer dans le nouvel espace de travail">
+    Connectez-vous au nouveau compte, ouvrez [replit.com/import](https://replit.com/import), puis sélectionnez **ZIP** et téléversez le fichier.
+  </Step>
+
+  <Step title="Vérifier la copie">
+    Ouvrez le nouveau projet et vérifiez que les fichiers sont présents. Si le zip contient le dossier `.git`, l’historique des commits est également transféré. Si vous avez utilisé la commande permettant de créer une archive plus petite, le nouveau projet démarre sans historique des commits. Replit réinstalle les dépendances exclues lors de l’importation.
+  </Step>
+</Steps>
+
+<div id="2">
+  ## Étape 2 : Configurer la nouvelle app
+</div>
+
+L&#39;ancienne app est toujours en cours d&#39;exécution. À cette étape, configurez entièrement la nouvelle app avec une *copie de test* de vos données afin de pouvoir effectuer rapidement la transition finale par la suite.
+
+<Steps>
+  <Step title="Ajouter des Secrets">
+    Les valeurs Secrets (clés API, mots de passe) ne quittent pas l&#39;ancien projet. Ouvrez l&#39;outil [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets) dans les deux projets et copiez chaque élément manuellement. Incluez également les Secrets de déploiement.
+  </Step>
+
+  <Step title="Reconnecter les connecteurs et autres services">
+    Dans **Outils → Connecteurs** du nouveau projet, reconnectez chaque intégration. Pour App Storage, les collaborateurs et les autres éléments, consultez [Recréer les éléments qui ne sont pas copiés automatiquement](#re-create-what-doesnt-copy-over).
+  </Step>
+
+  <Step title="Publier la nouvelle app">
+    [Publiez](/fr/ko/features/publishing/overview) le nouveau projet. Il disposera de sa propre adresse web `replit.app` et de sa propre base de données de production vide. Ne connectez pas encore de domaine personnalisé.
+  </Step>
+
+  <Step>
+    Suivez la section [Copier la base de données](#copy-the-database) ci-dessous en utilisant la base de données de **production** du nouveau projet comme destination. Vous disposerez ainsi de données réelles à tester. À l&#39;étape 3, vous remplacerez cette copie par les données les plus récentes.
+  </Step>
+
+  <Step>
+    Ouvrez la nouvelle app à son adresse `replit.app` et utilisez-la comme un utilisateur. Corrigez les problèmes avant de passer à l&#39;étape suivante. Les utilisateurs ne sont pas encore affectés.
+  </Step>
+</Steps>
+
+<div id="3">
+  ## Étape 3 : basculer les utilisateurs vers la nouvelle app
+</div>
+
+C&#39;est à ce moment que survient l&#39;interruption de service. Enchaînez les opérations d&#39;une traite.
+
+<Steps>
+  <Step title="Mettre l'ancienne app hors ligne">
+    Dans l&#39;ancien projet, ouvrez l&#39;outil **Publishing** et sélectionnez **Unpublish**. Votre app est désormais hors ligne. À partir de cet instant, plus personne ne peut ajouter de nouvelles données : la copie que vous créerez ensuite contiendra donc l&#39;intégralité des données.
+  </Step>
+
+  <Step title="Copier la base de données une dernière fois">
+    Suivez la section [Copier la base de données](#copy-the-database) ci-dessous, en prenant la base de données de **production** du nouveau projet comme cible. Cette copie contient toutes les données les plus récentes.
+  </Step>
+
+  <Step title="Rediriger l'adresse web vers la nouvelle app">
+    Si votre app utilise un domaine personnalisé : dans l&#39;ancien projet, ouvrez **Publishing → Domains** et déconnectez le domaine. Dans le nouveau projet, ouvrez **Publishing → Domains** et [connectez-le](/fr/ko/features/publishing/custom-domains#connect-a-domain-you-already-own). Mettez à jour les enregistrements chez votre fournisseur de domaine (par exemple GoDaddy ou Namecheap) lorsque Replit vous le demande.
+
+    La nouvelle adresse peut mettre de quelques minutes à quelques heures avant d&#39;être effective pour tous les utilisateurs. Entre-temps, certains visiteurs peuvent rencontrer des erreurs.
+
+    Si votre app utilise uniquement une adresse `replit.app`, communiquez plutôt la nouvelle adresse à vos utilisateurs.
+  </Step>
+
+  <Step title="Vérifier que la nouvelle app fonctionne">
+    Ouvrez l&#39;adresse web et vérifiez que la nouvelle app se charge avec vos données. Votre app est de nouveau en ligne.
+  </Step>
+</Steps>
+
+<div id="section-3">
+  ## Copier une base de données
+</div>
+
+La copie du code n’affecte pas votre base de données. Utilisez les outils PostgreSQL `pg_dump` et `pg_restore` pour copier vos données. Ces deux outils sont disponibles dans le Shell des deux projets. Consultez cette section pour les étapes 2 et 3. Les commandes sont identiques à chaque fois ; seule la *cible* change.
+
+<Warning>
+  Les données enregistrées après l’exécution de `pg_dump` ne sont pas incluses dans la copie. Lors de la copie finale de l’étape 3, mettez d’abord l’ancienne application hors ligne.
+</Warning>
+
+<Steps>
+  <Step title="Exporter les données depuis l’ancien projet">
+    Dans l’ancien projet, ouvrez l’outil **Shell**. Collez la commande suivante et appuyez sur Entrée. Cette commande crée un fichier nommé `backup.dump` dans l’arborescence des fichiers :
+
+    ```bash theme={null}
+    pg_dump -Fc "$DATABASE_URL" --no-owner --no-privileges -f backup.dump
+    ```
+
+    Cette commande exporte la base de données de **développement**. Vos données réelles se trouvent généralement dans la base de données de **production**. Pour exporter la base de données de production :
+
+    1. Ouvrez l’outil **Database**, sélectionnez la base de données de production, puis ouvrez **paramètres**.
+    2. Copiez la chaîne de connexion.
+    3. Dans la commande ci-dessus, remplacez `"$DATABASE_URL"` par la chaîne de connexion, en conservant les guillemets.
+
+    Si vous ne la trouvez pas, consultez les [détails de connexion](/fr/ko/features/data-and-storage/connection-details).
+  </Step>
+
+  <Step title="Déplacer le fichier de sauvegarde vers le nouveau projet">
+    Dans l’arborescence des fichiers de l’ancien projet, sélectionnez le menu à trois points à côté de `backup.dump`, puis téléchargez-le. Téléversez-le ensuite dans le nouveau projet à l’aide de l’option **Téléverser des fichiers** de l’arborescence des fichiers.
+
+    Si vous avez copié votre code avec GitHub, ne validez pas le fichier de sauvegarde. Déplacez-le séparément afin que les données ne restent pas dans le dépôt.
+  </Step>
+
+  <Step title="Importer les données dans le nouveau projet">
+    Dans le nouveau projet, ouvrez l’outil **Shell**. Collez la commande suivante et appuyez sur Entrée :
+
+    ```bash theme={null}
+    pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+    ```
+
+    Telle quelle, cette commande importe les données dans la base de données de **développement** du nouveau projet. C’est ce dont vous avez besoin à l’étape 2.
+
+    Pour la copie finale de l’étape 3, vous aurez plutôt besoin de la base de données de **production**. Dans le nouveau projet, ouvrez l’outil **Database**, sélectionnez la base de données de production, puis ouvrez **paramètres**. Copiez la chaîne de connexion et utilisez-la à la place de `"$DATABASE_URL"`.
+
+    Cette commande supprime les objets correspondants de la base de données cible, puis charge les données. Si elle se termine sans afficher de sortie, l’opération a réussi.
+  </Step>
+</Steps>
+
+<Note>
+  Si `pg_restore` échoue en raison d’erreurs liées aux rôles ou aux stratégies, votre base de données utilise des rôles PostgreSQL personnalisés qui n’existent pas encore dans le nouveau projet. Si vous avez besoin d’aide, [contactez l’assistance](https://replit.com/support).
+</Note>
+
+<Note>
+  Si le nouveau projet utilise une [ancienne base de données de développement Neon](/fr/ko/features/data-and-storage/development-and-production#legacy-development-database), le flux de publication propose **Définir la base de données de production avec les données de développement actuelles**. Cette option copie le contenu de la base de données de développement au moment de la publication. Cela convient pour les tests, mais lors de la transition finale, utilisez les étapes ci-dessus pour récupérer les données les plus récentes.
+</Note>
+
+<div id="section-4">
+  ## Recréer les éléments qui ne sont pas copiés automatiquement
+</div>
+
+Le reste de la configuration du projet est stocké en dehors du système de fichiers. Recréez chaque élément dans le nouveau projet :
+
+| Élément                       | Ce qu&#39;il faut faire                                                                                                                                                                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Secrets**                   | Les valeurs des Secrets ne quittent jamais l&#39;ancien projet. Ajoutez-les de nouveau dans l&#39;outil [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets) du nouveau projet, y compris les secrets de déploiement.                                                             |
+| **Secrets de compte**         | [Connectez-les](/fr/ko/core-concepts/project-editor/app-setup/secrets#manage-account-secrets) dans le nouveau projet. Si celui-ci appartient à un autre compte, ajoutez-les d&#39;abord à ce compte.                                                                                          |
+| **App Storage**               | Les buckets ne sont pas déplacés. Au sein d&#39;un même compte, [ajoutez le bucket existant](/fr/ko/features/data-and-storage/object-storage#bucket-access-management). D&#39;un compte à l&#39;autre, téléchargez les objets puis téléversez-les dans un nouveau bucket.                     |
+| **Connecteurs**               | Reconnectez chaque intégration depuis **Outils → Connecteurs** dans le nouveau projet. Consultez l&#39;[aperçu des intégrations](/fr/ko/features/integrations/overview).                                                                                                                      |
+| **Déploiements**              | La copie n&#39;est pas publiée. [Publiez-la](/fr/ko/features/publishing/overview) depuis le nouvel espace de travail, comme à l&#39;[étape 2](#step-2-set-up-the-new-app).                                                                                                                           |
+| **Domaines personnalisés**    | Retirez le domaine de l&#39;ancien déploiement, associez-le au nouveau, puis mettez à jour les enregistrements DNS. Voir l&#39;[étape 3](#step-3-switch-your-users-to-the-new-app).                                                                                                        |
+| **Collaborateurs**            | Invitez de nouveau les collaborateurs dans le nouvel espace de travail et définissez leurs [autorisations d&#39;accès](/fr/ko/teams/identity-and-access-management/groups-and-permissions).                                                                                                          |
+| **Historique de l&#39;Agent** | Les conversations avec l&#39;Agent et les restaurations de [checkpoints](/fr/ko/features/version-control/checkpoints-and-rollbacks) restent dans l&#39;ancien projet. Les commits de checkpoints suivent l&#39;historique Git, mais vous ne pourrez pas revenir à ces points depuis la copie. |
+
+<div id="section-5">
+  ## En cas de problème
+</div>
+
+Votre ancien projet existe toujours. Pour y revenir :
+
+1. Dans l&#39;ancien projet, ouvrez l&#39;outil **Publishing** et sélectionnez **Publish**.
+2. Si vous avez transféré un domaine personnalisé, transférez-le à nouveau de la même manière.
+
+L&#39;application redémarre avec les données qu&#39;elle contenait au moment de sa mise hors ligne. Rien n&#39;est perdu.
+
+<div id="section-6">
+  ## Nettoyage
+</div>
+
+Attendez environ une semaine pour vous assurer que votre nouvelle application fonctionne correctement. Ensuite :
+
+* Supprimez `backup.dump` des deux projets et de votre appareil. Chaque copie contient une exportation complète des données.
+* Si vous le souhaitez, supprimez l’ancien projet.
+
+<div id="section-7">
+  ## Ressources associées
+</div>
+
+* [Transférer une application vers Teams](/fr/ko/teams/identity-and-access-management/transfer-app-to-teams) : fonctionnalité intégrée permettant de déplacer des projets vers un espace de travail Teams ou d’un espace de travail Teams à un autre
+* [Importer depuis des fournisseurs](/fr/ko/build/import-from-providers) : toutes les sources d’importation prises en charge
+* [Modifier une application publiée utilisant une base de données partagée](/fr/ko/features/data-and-storage/shared-database-migration) : autres solutions aux problèmes liés à `pg_dump` et `pg_restore`

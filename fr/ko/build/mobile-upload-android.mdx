@@ -1,0 +1,97 @@
+---
+title: "Importer une application dans la Play Console"
+description: "Créez une version de production et importez-la manuellement dans la Google Play Console."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const androidReleasePrompt = "Crée une version de production de PixelGames pour Google Play.";
+
+Une fois importée, votre application apparaît dans la Play Console. Google ne peut pas voir le travail effectué avant cette étape,
+et les étapes suivantes, comme les tests internes ou la soumission à l&#39;examen, ne peuvent commencer qu&#39;une fois l&#39;importation terminée.
+
+Vous avez d&#39;abord besoin d&#39;un [compte Play Console](/fr/build/mobile-google-account).
+
+<div id="section">
+  ## Contenu du build
+</div>
+
+Un **build** est une copie installable de votre app. Il s&#39;agit du même type de
+fichier que vous téléchargez depuis Google Play, mais qui n&#39;a pas encore été publié. Expo Go exécute votre code dans une app de prévisualisation publique,
+tandis qu&#39;un build exécute votre app de façon autonome. Des fonctionnalités telles que les notifications push ou les paiements intégrés ne fonctionnent que dans ce cas.
+
+Les builds Android sont des fichiers `.aab` (Android App Bundle), le format exigé par Google Play.
+
+<div id="section-2">
+  ## Créer une build
+</div>
+
+<AiPrompt>
+  {androidReleasePrompt}
+</AiPrompt>
+
+Agent lance une build de production sur les serveurs d’Expo et, une fois celle-ci prête (généralement après 10~15 minutes), fournit un lien de téléchargement. Vous pouvez également la consulter dans la section **Builds** du tableau de bord Expo.
+
+<div id="section-3">
+  ## Importer
+</div>
+
+<Steps>
+  <Step title="Télécharger le fichier .aab">
+    Ouvrez le lien de build fourni par Agent et téléchargez le fichier `.aab`.
+
+    <Frame caption="Lien de téléchargement fourni par Agent pour le build .aab finalisé.">
+      <img src="/assets/mirror/download-aab-file-37eb1c14cbd2.png" alt="Message du chat Agent contenant un lien de téléchargement vers le fichier .aab finalisé" data-path="images/pixelgames/mobile/download-aab-file.png" width="449" height="206" data-path="images/pixelgames/mobile/download-aab-file.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Créer une application dans Play Console">
+    Si ce n’est pas déjà fait, sélectionnez **Create app** dans Play Console, puis indiquez le nom, la langue par défaut et s’il s’agit d’une application ou d’un jeu.
+  </Step>
+
+  <Step title="Créer une version">
+    Sélectionnez un canal (commencez par **Internal testing**), puis sélectionnez **Create new release**.
+  </Step>
+
+  <Step title="Importer le fichier .aab">
+    Déposez le fichier dans la version : Play Console le traitera. Une fois le traitement terminé, le build pourra être attribué à des testeurs ou promu en production.
+  </Step>
+</Steps>
+
+<div id="section-4">
+  ## Résolution des problèmes
+</div>
+
+* **Play Console refuse l&#39;importation :** le code de version doit augmenter à chaque importation. Demandez à Agent
+  d&#39;augmenter ce numéro, puis relancez le build.
+* **Le build reste bloqué pendant la compilation :** les builds sont placés en file d&#39;attente et prennent généralement 10~15 minutes. Vérifiez **Builds** dans le tableau de bord Expo avant de conclure
+  qu&#39;il y a un problème.
+* **L&#39;invite « Signature de l&#39;application » s&#39;affiche lors du premier import :** laissez Google gérer la clé de signature. C&#39;est
+  le réglage par défaut, ce qui signifie que Google pourra signer à nouveau les futurs imports à votre place.
+
+<div id="section-5">
+  ## Étapes suivantes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Tester avec Internal Testing" icon="flask" href="/fr/build/mobile-internal-testing">
+    Commencez par mettre le build que vous avez importé entre les mains de vrais testeurs.
+  </Card>
+
+  <Card title="Soumettre au Play Store" icon="paper-plane" href="/fr/build/mobile-publish-android">
+    Complétez votre fiche et soumettez-la à l&#39;examen.
+  </Card>
+</CardGroup>

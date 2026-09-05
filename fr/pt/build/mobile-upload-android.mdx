@@ -1,0 +1,104 @@
+---
+title: "Publiez votre app sur la Play Console"
+description: "Créez une version de production et envoyez-la manuellement sur la Google Play Console."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const androidReleasePrompt = "Créez une version de production de PixelGames pour Google Play.";
+
+L’envoi place votre app dans la Play Console. Rien avant cette étape n’est visible par Google,
+et rien après, comme les tests internes ou l’envoi pour examen, ne fonctionne tant que cela n’est pas fait.
+
+Vous aurez d’abord besoin d’un [compte Play Console](/fr/build/mobile-google-account).
+
+<div id="o-que-enviado">
+  ## Ce qui est envoyé
+</div>
+
+Un **build** est une copie réelle et installable de votre app, le même type de fichier que
+vous obtiendriez depuis Google Play, à ceci près qu&#39;il n&#39;a pas encore été publié. Expo Go exécute votre code
+au sein d&#39;une app d&#39;aperçu partagée, tandis qu&#39;un build constitue votre app à part entière : c&#39;est pourquoi
+des fonctionnalités comme les notifications push et les achats intégrés ne fonctionnent que dans ce cas.
+
+Les builds Android sont des fichiers `.aab` (Android App Bundle), le format attendu par
+Google Play.
+
+<div id="construa-o-build">
+  ## Lancez le build
+</div>
+
+<AiPrompt>
+  {androidReleasePrompt}
+</AiPrompt>
+
+L&#39;Agent exécute un build de production sur les serveurs Expo et fournit un lien de téléchargement
+une fois celui-ci prêt, généralement en 10 à 15 minutes. Vous pouvez également le retrouver dans votre
+panneau Expo, sous **Builds**.
+
+<div id="envie-o-build">
+  ## Envoyez le build
+</div>
+
+<Steps>
+  <Step title="Téléchargez le fichier .aab">
+    Ouvrez le lien du build fourni par Agent et téléchargez le `.aab`.
+
+    <Frame caption="Lien de téléchargement fourni par Agent pour le build .aab finalisé.">
+      <img src="/assets/mirror/download-aab-file-37eb1c14cbd2.png" alt="Message de chat d'Agent contenant un lien de téléchargement vers le fichier .aab finalisé" data-path="images/pixelgames/mobile/download-aab-file.png" width="449" height="206" data-path="images/pixelgames/mobile/download-aab-file.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Créez l'app dans la Play Console">
+    Si ce n&#39;est pas déjà fait, sélectionnez **Create app** dans la Play Console, puis renseignez le nom, la
+    langue par défaut et s&#39;il s&#39;agit d&#39;une app ou d&#39;un jeu.
+  </Step>
+
+  <Step title="Créez une release">
+    Choisissez une piste, **Internal testing** pour commencer, puis sélectionnez **Create new
+    release**.
+  </Step>
+
+  <Step title="Envoyez le .aab">
+    Déposez le fichier dans la release : la Play Console se charge du traitement. Une fois celui-ci terminé, le build est
+    prêt à être attribué à des testeurs ou promu en Production.
+  </Step>
+</Steps>
+
+<div id="soluo-de-problemas">
+  ## Résolution des problèmes
+</div>
+
+* **La Play Console rejette l&#39;envoi :** le code de version doit être incrémenté à chaque envoi. Demandez
+  à Agent de l&#39;incrémenter et de relancer le build.
+* **Build bloqué à la compilation :** les builds sont mis en file d&#39;attente et prennent généralement 10 à 15 minutes.
+  Consultez votre panneau Expo dans **Builds** avant de conclure à un problème.
+* **Invite « App signing » au premier envoi :** laissez Google gérer la clé de
+  signature : c&#39;est l&#39;option par défaut, et cela permet à Google de resigner vos futurs envois à votre place.
+
+<div id="o-que-vem-a-seguir">
+  ## Étapes suivantes
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Tester avec Internal Testing" icon="flask" href="/fr/build/mobile-internal-testing">
+    Distribuez d’abord le build envoyé à de vrais testeurs.
+  </Card>
+
+  <Card title="Envoyer sur le Play Store" icon="paper-plane" href="/fr/build/mobile-publish-android">
+    Finalisez la fiche de l’application et soumettez-la à l’examen.
+  </Card>
+</CardGroup>

@@ -1,0 +1,104 @@
+---
+title: "部署与发布"
+description: "解答有关发布的常见问题，包括排查发布失败、查看日志、修复运行时错误、重新部署和更改区域等。"
+---
+
+本文涵盖发布和部署相关内容。有关分步排查，请参阅[部署故障排除](/zh/ko/build/troubleshooting)；有关部署类型和监控，请参阅[Autoscale 部署](/zh/ko/features/publishing/deployment-types#autoscale)和[部署监控](/zh/ko/features/publishing/monitoring-a-deployment)。
+
+<AccordionGroup>
+  <Accordion title="在“正在创建 Autoscale 服务”阶段发布失败。如何调试？">
+    大多数 Autoscale 发布失败问题都可以通过查看部署日志来解决：
+
+    1. 打开 **发布**，找到失败的部署。
+    2. 点击旁边的三点菜单，打开日志。
+    3. 复制日志输出，打开新的 Agent 聊天并粘贴，然后询问出了什么问题以及该如何修复。
+
+    如果已设置 Run 命令但仍显示 `No run command configured` 错误，请打开部署设置，取消关联 Run 命令后重新添加，然后保存并再次发布。请参阅[部署问题排查](/zh/ko/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="发布成功了，但应用显示 Internal Server Error。这是怎么回事？">
+    如果发布成功，但线上应用返回 500 错误，说明问题出在应用代码，而非 Replit 基础设施：
+
+    1. 打开**发布**并查看日志，然后复制完整的错误信息。
+    2. 新建一个 Agent 聊天，粘贴日志并询问错误原因。
+    3. 应用修复后再次发布。
+
+    如果 Agent 未能找到问题，请打开**发布 → 历史记录**，找到最后一个正常运行的版本并重新部署。请参阅[部署故障排除](/zh/ko/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="构建或迁移期间，部署卡住了。该怎么办？">
+    1. 使用 `Cmd+K` (Mac) 或 `Ctrl+K` (Windows) 打开命令面板，搜索并选择 **Restart compute**。
+    2. 打开 **发布**，然后选择 **发布** 以开始新的部署。
+    3. 如果再次失败，请通过三点菜单打开失败部署的日志，复制构建日志并粘贴到新的 Agent 聊天中进行诊断。
+
+    如果部署仍然卡住，请附上完整的构建日志[联系 Replit 支持团队](https://replit.com/support)。另请参阅[部署问题排查](/zh/ko/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="应用已上线，但运行缓慢或出现超时。我该检查什么？">
+    1. 在部署日志中查看是否有反复出现的超时或内存不足消息。
+    2. 检查部署资源是否达到 CPU 或内存上限。请参阅[部署监控](/zh/ko/features/publishing/monitoring-a-deployment)。
+    3. 新建一个 Agent 聊天，粘贴最近的日志，让 Agent 帮你找出瓶颈所在。
+
+    常见原因包括：数据库查询缺少索引、阻塞式同步操作以及内存泄漏。对于 [Autoscale 部署](/zh/ko/features/publishing/deployment-types#autoscale)，缩容至零之后的第一个请求可能需要几秒钟，这属于正常的冷启动。
+  </Accordion>
+
+  <Accordion title="部署历史记录中显示有构建失败。如何排查问题？">
+    打开**发布 → 日志**，选择失败的部署，然后查看构建日志。找到第一个标记为 `ERROR` 或 `FAILED` 的行。这通常就是根本原因，后续各行只是由此引发的结果。将该部分复制到新的 Agent 聊天中进行诊断。大多数构建失败是由缺少依赖项、运行命令错误或数据库迁移失败导致的。请参阅[部署监控](/zh/ko/features/publishing/monitoring-a-deployment)。
+  </Accordion>
+
+  <Accordion title="应用在编辑器预览中运行正常，但发布后却无法运行。这是为什么？">
+    几乎总是环境间的配置差异导致的。请检查以下内容：
+
+    * 确认开发环境 [Secrets](/zh/ko/core-concepts/project-editor/app-setup/secrets) 面板中的所有密钥也已设置为部署密钥。二者属于不同环境。
+    * 确认 `DATABASE_URL` 指向生产数据库，而不是开发数据库。
+    * 确认没有硬编码的 `localhost` 或 `127.0.0.1` 引用。请改用相对路径或基于环境的 URL。
+
+    然后查看部署日志，检查生产环境特有的错误。请参阅[部署故障排除](/zh/ko/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="Autoscale 部署反复重启。SIGTERM 或退出代码 1 表示什么？">
+    [Autoscale 部署](/zh/ko/features/publishing/deployment-types#autoscale)在设计上就会定期重启。日志中的 `SIGTERM` 表示进程已正常停止，属于正常现象。`Exit code 1` 则表示进程自身发生了崩溃，若要查看实际错误，请检查它前面的那一行。
+
+    如果重启频繁到影响用户，请排查未处理的 Promise 拒绝、内存不足错误，以及导致启动失败的缺失环境变量。
+  </Accordion>
+
+  <Accordion title="更新环境变量后，为什么已发布的应用中没有生效？">
+    Replit 将开发环境与生产环境的 Secrets 分开存储，修改其中一处不会同步更新另一处。[开发 Secrets](/zh/ko/core-concepts/project-editor/app-setup/secrets) 面板仅在编辑器中可用，而已发布的应用读取的是部署 Secrets。
+
+    若要更新线上应用中的变量，请在部署 Secrets 中设置该变量，然后打开**发布**并选择**发布**，将其重新推送到线上。新值会在新部署启动时生效。请参阅[部署问题排查](/zh/ko/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="如何在不修改代码的情况下触发重新部署？">
+    打开**发布**并选择**发布**。即使没有任何更改，Replit 也会构建并发布当前代码。这在更新密钥后、数据库恢复运行后，或需要应用依赖项更新时非常有用。
+
+    如果应用没有响应，而完整重新部署又代价太大，可以按 `Cmd+K` (Mac) 或 `Ctrl+K` (Windows) 打开命令面板，搜索并选择 **Restart compute**。
+  </Accordion>
+
+  <Accordion title="发布后可以更改应用的部署区域吗？">
+    不可以。应用发布后，无法直接更改发布地区。要迁移应用，请先创建 Remix，然后在新地区发布该 Remix。请参阅[项目地区](/zh/ko/features/publishing/project-geography)。
+
+    数据库地区同样无法直接更改。Remix 应用可能会获得不同的 `.replit.app` 子域名，因此，如果你需要稳定的 URL，请先连接[自定义域名](/zh/ko/features/publishing/custom-domains)，然后重新添加部署密钥。
+  </Accordion>
+
+  <Accordion title="为什么 PCI 或安全扫描会将已发布应用中的 GAESA Cookie 标记出来？">
+    Google 的服务基础架构会向已发布的 Replit App 添加 `GAESA` (Google App Engine 会话亲和性) Cookie，以便将请求路由到正确的实例。该值是不透明的路由标识符，不包含敏感数据或与应用相关的数据。
+
+    部分安全扫描器会将 `GAESA` 标记为问题，因为它未设置 `Secure` 或 `HttpOnly` 属性。此 Cookie 并非由 App 创建，且无法在已发布的 App 中更改或禁用。
+
+    如果 PCI 合规检查或安全扫描报告了此 Cookie，请向扫描服务提供商申诉，说明这是误报 (false positive) 。请提供 Cookie 名称，并说明 Google 的基础架构会为请求路由设置此 Cookie。已发布的 App 无法读取、更改或禁用此 Cookie，且它不包含敏感数据。
+
+    您需自行负责所构建 App 的合规性。请参阅[共同责任模型](/zh/ko/features/security/shared-responsibility-model)。如果扫描服务提供商需要更多信息，请[联系 Replit 支持团队](https://replit.com/support)。
+  </Accordion>
+
+  <Accordion title="如何将应用下线或取消发布？">
+    打开 **Publishing**，选择关闭部署的选项，然后确认。应用将下线，不再产生部署费用。项目文件、代码和数据库不会被删除，仅停止运行中的部署。与该部署关联的自定义域名会被解除绑定，重新发布时请重新添加。
+
+    如果你担心费用，[Autoscale 部署](/zh/ko/features/publishing/deployment-types#autoscale)会在没有流量时自动缩容至零，因此你可能无需关闭它。
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## 还需要帮助？
+</div>
+
+如果在这里找不到部署相关问题的答案，请[联系 Replit 支持团队](https://replit.com/support)。

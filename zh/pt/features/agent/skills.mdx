@@ -1,0 +1,79 @@
+---
+title: "Agent skills"
+description: "使用 Agent skills 跨会话保留模式、约定和解决方案。"
+---
+
+<Frame>
+  <img src="/assets/mirror/agent-customization-skill-picker-4643f3a453c7.png" alt="通过 + 按钮打开的 skill 选择器，顶部显示 workspace skill 分组，其下方为 Replit skills" width="1668" height="1170" data-path="images/replitai/agent-customization-skill-picker.png" />
+</Frame>
+
+<div id="o-que-uma-skill">
+  ## 什么是 skill？
+</div>
+
+skill 其实就是一个文件夹。文件夹中有一个名为 `SKILL.md` 的文件，里面写着 Agent 需要遵循的指令，此外还可以放入任何你希望它参考的辅助文件。skills 存放在项目的 `/.agents/skills` 目录下，并遵循 [Agent Skills 规范](https://agentskills.io/specification)——一项可在不同智能体之间通用的开放标准。
+
+Agent 可以看到每个已安装 skill 的名称和描述，但只有在与当前任务相关时才会加载完整内容。因此，skills 对上下文的占用非常小：你可以安装很多 skills，而不会影响 Agent 回复的质量。
+
+<div id="skills-pr-definidas">
+  ## 预置 skills
+</div>
+
+Replit 内置了一批预置 skills，可在 Chat 的 **Use a skill** 选择器以及新建项目的起点选择器中使用。这些 skills 无需安装即可在所有项目中使用。如需查看完整目录、合作伙伴 skills 以及安装方法，请参阅 [skills 目录](/zh/pt/features/agent/skills-directory)。
+
+要添加预置 skill，请在 Chat 输入框中打开 **Use a skill** 选择器并选择一个 skill，或直接让 Agent 加载该 skill。
+
+<Frame>
+  <img src="/assets/mirror/use-a-skill-picker-335f5e785923.png" alt="Chat 中显示预置 skills 的 Use a skill 选择器" width="570" height="422" data-path="images/replitai/use-a-skill-picker.png" />
+</Frame>
+
+<div id="escopo-da-skill">
+  ## skill 的作用范围
+</div>
+
+skills 可以在不同层级设置作用范围：
+
+| 作用范围            | 可用性                  | 存放位置                                                                           |
+| --------------- | -------------------- | ------------------------------------------------------------------------------ |
+| **项目级**         | 仅在单个项目中可用            | 随项目文件一同纳入版本控制，位于 `/.agents/skills`                                             |
+| **workspace 级** | 对你 workspace 中的所有人可用 | 在 Workspace Settings 中集中管理                                                     |
+| **Enterprise**  | 全公司统一标准              | 包含在[自定义模板](/zh/pt/teams/custom-templates)和[设计系统](/zh/pt/teams/custom-design-system)中 |
+
+关于 workspace 级 skills，请参阅 [Agent Customization](/zh/pt/features/agent/agent-customization)，了解如何为你的团队配置 workspace skills 和自定义指令。
+
+<div id="como-o-agent-carrega-skills">
+  ## Agent 如何加载 skills
+</div>
+
+Agent 会在每次 Chat 中读取已安装的每个 skill 的元数据 (名称和描述) 。只有当 Agent 判断某个 skill 与当前任务相关时，才会加载其完整内容。这样一来，在真正需要之前，skills 的内容不会占用上下文窗口。
+
+已安装的 skills 会保留在你的项目中，跨 Agent 会话持续有效，也可以提交到版本控制，以便与团队共享。
+
+<div id="trabalhando-com-outras-ferramentas-de-codificao-com-ia">
+  ## 与其他 AI 编程工具协同使用
+</div>
+
+<Accordion title="从其他 AI 编程工具导入 skills">
+  如果你同时使用多种 AI 编程工具，[rulesync](https://github.com/dyoshikawa/rulesync) 支持 Replit，可以帮你保持配置一致。
+
+  你可以从其他 AI 编程助手导入 skills：
+
+  ```bash theme={null}
+  npx rulesync init
+  npx rulesync import --targets claudecode --features skills
+  npx rulesync generate --targets replit --features skills
+  ```
+
+  这样，你只需维护一套 skills，即可在不同的开发环境中通用。
+</Accordion>
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+* [Agent Customization](/zh/pt/features/agent/agent-customization) — 在整个 workspace 中提供 skills 和自定义指令
+* [Skills directory](/zh/pt/features/agent/skills-directory) — 探索由 Replit 及合作伙伴打造的 skills
+* [Use Agent Skills](/zh/pt/build/use-agent-skills) — 在 Chat 中使用 skills 或将其安装到项目中的实用指南
+* [Agent skills](/zh/pt/learn/agent-skills) — 何时以及如何高效地使用 skills
+* [Agent Skills specification](https://agentskills.io/specification) — 编写 skills 的开放标准
+* **Enterprise**：在面向贵组织的[自定义模板](/zh/pt/teams/custom-templates)和[设计系统](/zh/pt/teams/custom-design-system)中加入 skills

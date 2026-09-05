@@ -1,0 +1,109 @@
+---
+title: "连接详情"
+description: "查找数据库连接字符串，了解凭据如何得到安全保护，并连接外部工具。"
+---
+
+应用通过由 Replit 管理的凭据连接到数据库。你可以在 **Database** 工具中选择数据库，然后打开 **设置** 选项卡查看。在此选项卡中，你可以查看连接字符串、存储空间使用量和高级连接详情。
+
+<Frame>
+  <img src="/assets/mirror/connection-details-settings-4fc18c5dc574.png" alt="显示 DATABASE_URL 连接字符串、存储空间使用量和高级连接详情的数据库设置选项卡" width="1440" height="900" data-path="images/databases/connection-details-settings.png" />
+</Frame>
+
+<div id="section">
+  ## 环境变量
+</div>
+
+你可以使用以下环境变量连接到开发数据库。
+
+* `DATABASE_URL`：连接数据库并进行身份验证的方式
+
+应用会自动使用该变量。由于 `DATABASE_URL` 仅适用于当前应用，其他应用 (包括你自己的其他应用或外部数据库查看器) 都无法访问该开发数据库。即使该变量泄露，他人也无法借此访问或修改你的数据库。
+
+<Info>
+  如果你的开发数据库仍在使用[旧版 Neon 基础设施](/zh/ko/features/data-and-storage/development-and-production#legacy-development-database)，则还可以使用 `PGHOST`、`PGUSER`、`PGPASSWORD`、`PGDATABASE`、`PGPORT` 等额外变量。托管在 Replit 当前基础设施上的数据库**不会**提供这些变量，请改用 `DATABASE_URL`。
+</Info>
+
+<Warning>
+  如果你仍在使用旧版 Neon 开发数据库，请勿分享 `DATABASE_URL`。它包含数据库凭据，任何人都可以借此访问和修改你的数据库。切勿将其粘贴到公开场合或支持工单中。
+</Warning>
+
+<div id="section-2">
+  ## 连接外部工具
+</div>
+
+使用生产数据库 **设置** 选项卡中提供的连接字符串，你可以从任何兼容 PostgreSQL 的 SQL 客户端连接到**生产**数据库。
+
+<div id="section-3">
+  ## 安全
+</div>
+
+使用 Agent 添加数据库集成时，还会一并添加具备内置安全功能的 ORM (对象关系映射器) ，由它处理所有数据库通信。
+
+* **模式校验**：确保数据符合预期格式
+* **数据净化 (Sanitization)&#x20;**：自动清理构建者的输入，防止 SQL 注入攻击
+
+<div id="section-4">
+  ## 重新生成生产数据库凭据
+</div>
+
+如果生产环境连接字符串已泄露，请在 **Database** 工具中重新生成凭据。此操作会为 Neon 生产数据库创建新密码。现有的生产环境连接字符串将立即失效。
+
+满足以下所有条件时，您可以重新生成凭据：
+
+* 应用使用 Neon 生产数据库。
+* 您是应用所有者，或所属工作区的管理员。
+* 您通过网页浏览器使用 Replit。
+* 当前没有正在进行的部署。
+* 如果应用已有线上部署，最新构建必须已成功完成，且使用 [Autoscale 或 Reserved VM](/zh/ko/features/publishing/deployment-types)。
+
+<Warning>
+  此操作无法撤销。现有连接字符串将立即失效。如果应用已有线上部署，
+  在重新部署期间，应用可能会暂时不可用。
+</Warning>
+
+<div id="section-5">
+  ### 重新生成凭据
+</div>
+
+1. 在 Tools 面板中选择 **Database**。
+
+2. 选择 **Production Database**，然后打开 **设置** 标签页。
+
+   <Frame>
+     <img src="/assets/mirror/database-regenerate-credentials-settings-827c7718a25f.webp" alt="生产数据库的设置标签页，显示连接字符串、存储空间使用量，以及包含重新生成凭据选项的 Advanced 区域" width="2314" height="1608" data-path="images/databases/database-regenerate-credentials-settings.webp" />
+   </Frame>
+
+3. 在 **Advanced** 中展开 **重新生成凭据** 行。
+
+4. 选择 **重新生成凭据** 按钮。
+
+   <Frame>
+     <img src="/assets/mirror/database-regenerate-credentials-button-ab9631f21b85.webp" alt="Advanced 区域中已展开的重新生成凭据行及重新生成凭据按钮" width="2206" height="1876" data-path="images/databases/database-regenerate-credentials-button.webp" />
+   </Frame>
+
+5. 在确认对话框中选择 **重新生成凭据** 进行确认。
+
+   <Frame>
+     <img src="/assets/mirror/database-regenerate-credentials-dialog-2477fc96f82b.webp" alt="重新生成凭据确认对话框，警告此操作无法撤销，且现有连接字符串将立即失效" width="1364" height="638" data-path="images/databases/database-regenerate-credentials-dialog.webp" />
+   </Frame>
+
+6. 选择 **Refresh** 以加载新的连接字符串。
+
+7. 如果你的应用有线上部署，请打开 **Publishing** 并检查重新部署状态。
+
+8. 替换所有已复制到外部工具或自定义集成中的连接字符串。
+
+<div id="section-6">
+  ### 会发生哪些变化
+</div>
+
+重新生成凭据后，生产数据库会生成新密码。连接字符串中只有密码部分会变化，主机、数据库名称和角色保持不变。
+
+对于受支持的线上部署，Replit 会使用更新后的连接字符串重新部署最近一次成功的构建。
+
+<div id="section-7">
+  ## 后续步骤
+</div>
+
+* [处理数据](/zh/ko/features/data-and-storage/work-with-your-data)：无需离开 Replit 即可浏览和查询数据。
+* [开发环境与生产环境](/zh/ko/features/data-and-storage/development-and-production)：了解这两个数据库有何区别。

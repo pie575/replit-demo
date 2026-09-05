@@ -1,0 +1,154 @@
+---
+title: "Ports"
+description: "Découvrez comment configurer et gérer les ports réseau dans votre App Replit."
+---
+
+Comme Replit exécute vos projets dans le cloud, les ports fonctionnent différemment dans Replit que sur votre ordinateur local. (Si vous souhaitez une explication plus simple de ce que sont les ports TCP, [commencez ici](https://www.reddit.com/r/explainlikeimfive/comments/1t9s5a/eli5_what_are_ports_ex_tcp_port/).)
+
+Sur un ordinateur, il n&#39;y a qu&#39;une seule couche de gestion des ports : vos programmes définissent un port sur lequel ils écoutent et, lorsque du trafic provenant d&#39;Internet atteint ce port sur votre ordinateur, il est acheminé vers le processus approprié.
+
+<Frame>
+  <img src="/assets/mirror/computer-2bc67ea92696.png" alt="ordinateur" width="1323" height="786" data-path="images/ports/computer.png" />
+</Frame>
+
+La partie `0.0.0.0` correspond à l&#39;adresse, ou hôte. Si un processus écoute sur `0.0.0.0`, cela signifie qu&#39;il écoute sur chaque interface réseau. Ainsi, si un autre ordinateur sur Internet envoie une requête à l&#39;adresse IP de votre ordinateur, il pourra y accéder. Écouter sur 0.0.0.0 signifie donc que ces processus sont accessibles depuis Internet public, à condition que votre ordinateur soit connecté.
+
+La plupart des frameworks de programmation *n&#39;*écoutent *pas* sur `0.0.0.0` pendant le développement, car vous ne souhaitez pas nécessairement exposer votre travail au public pour des raisons de confidentialité et de sécurité. Ils écoutent plutôt sur une autre adresse : `127.0.0.1`, également appelée `localhost`. Cela signifie que seul cet ordinateur peut envoyer des requêtes à ce port.
+
+<Frame>
+  <img src="/assets/mirror/computer-localhost-564f03349bfb.png" alt="Les ports localhost ne sont visibles que sur l'ordinateur qui les héberge." width="1467" height="786" data-path="images/ports/computer-localhost.png" />
+</Frame>
+
+Dans Replit, pour qu&#39;un processus en cours d&#39;exécution soit accessible dans l&#39;aperçu web ou via une requête externe, un **port externe** doit lui être attribué. En effet, le « port interne » normalement utilisé par les processus n&#39;est visible qu&#39;au sein de l&#39;environnement cloud isolé fourni par Replit. Ce port interne doit être associé à un port accessible depuis l&#39;extérieur afin d&#39;acheminer le trafic vers vos programmes. Même si le processus écoute sur une adresse habituellement accessible au public, telle que 0.0.0.0, il doit tout de même être associé à un port externe.
+
+<Frame>
+  <img src="/assets/mirror/replit-de4de1b9386f.png" alt="Les ports externes acheminent le trafic vers les ports internes sur lesquels les programmes écoutent." width="1641" height="870" data-path="images/ports/replit.png" />
+</Frame>
+
+Replit associe les ports externes à des ports internes spécifiques. Par exemple, dans le diagramme ci-dessus, le port externe `:80` est associé au port interne `:3000`. Cela signifie que tout trafic reçu par l&#39;App Replit sur le port 80 est dirigé vers le port interne 3000.
+
+Cette configuration est définie dans la section [[ports]] du fichier de configuration .replit.
+
+Par défaut, Replit associe le premier port que vous ouvrez au port externe par défaut 80, ce qui rend ce processus accessible sur le domaine sans préciser de port (par exemple, customdomain.com/ au lieu de customdomain.com:3000/). Les ports internes supplémentaires ouverts sont associés à d&#39;autres ports externes disponibles (consultez la liste complète ci-dessous).
+
+<div id="visualizao">
+  ## Prévisualisation
+</div>
+
+Dans l’outil Preview, vous pouvez modifier le port externe affiché dans l’aperçu web en cliquant sur le domaine et en sélectionnant un autre port. Vous pouvez également ouvrir l’outil réseau à l’aide de l’icône d’« engrenage » pour obtenir plus de détails.
+
+<Frame>
+  <img src="/assets/mirror/webview_dropdown-f953862d9654.png" alt="Cliquez sur le domaine dans l’aperçu web pour choisir le port à afficher." width="862" height="534" data-path="images/ports/webview_dropdown.png" />
+</Frame>
+
+<div id="porta-padro">
+  ## Port par défaut
+</div>
+
+Le port :80 est le port par défaut du trafic HTTP. Le trafic HTTP envoyé au domaine racine est donc automatiquement acheminé vers le port 80. C&#39;est pourquoi le numéro de port n&#39;apparaît pas dans l&#39;URL pour le port 80. Les ports autres que `:80` apparaissent dans le chemin du domaine (par exemple, customdomain.com:4200/). (Replit fournit TLS par défaut. Techniquement, le trafic passera donc par le port 443, qui est le port par défaut pour HTTPS. Dans la pratique, vous pouvez les considérer comme interchangeables.)
+
+<div id="ferramenta-de-rede">
+  ## Outil réseau
+</div>
+
+Pour en savoir plus sur la configuration des ports et du réseau, vous pouvez ouvrir l&#39;outil réseau. Il affiche l&#39;état des ports ouverts dans votre Replit App, les ports externes auxquels ils sont associés, et vous permet d&#39;ajouter ou de supprimer des configurations.
+
+<Frame>
+  <img src="/assets/mirror/networking_tool-647f3928cd38.png" alt="L'outil réseau affiche la configuration de vos ports." width="1412" height="558" data-path="images/ports/networking_tool.png" />
+</Frame>
+
+<div id="publicao">
+  ## Publication
+</div>
+
+Les déploiements Autoscale et Reserved VM ne prennent en charge l’exposition que d’un seul port externe, et le port interne correspondant ne peut pas utiliser `localhost`. Si vous exposez plusieurs ports ou un seul port sur localhost, l’application publiée échouera. Pour vous assurer que vos déploiements Autoscale fonctionnent comme prévu, supprimez toutes les entrées `externalPort` de votre configuration, *à l’exception* de celle du service avec lequel vous souhaitez interagir depuis Internet.
+
+<div id="depurao">
+  ## Débogage
+</div>
+
+Une cause fréquente de dysfonctionnement est que, même si la configuration du port semble correcte, le programme écoute en réalité sur un autre port. Par exemple, si votre configuration est :
+
+```
+[[ports]]
+internalPort = 3000
+externalPort = 80
+```
+
+Le trafic Internet destiné au port 80 sera alors redirigé vers le port interne 3000. Toutefois, si votre programme n’écoute pas sur le port 3000, mais sur un autre port (comme 8080), il semblera qu’aucun trafic n’arrive. Cela peut se produire si vous modifiez le port dans le code sans modifier le port correspondant dans la configuration, ou si vous copiez-collez la configuration d’un projet dans un autre.
+
+<Frame>
+  <img src="/assets/mirror/replit-wrong_port-cbef0be60e43.png" alt="Les programmes peuvent modifier les ports sur lesquels ils écoutent." width="1641" height="870" data-path="images/ports/replit-wrong_port.png" />
+</Frame>
+
+Chaque framework écoute sur un port par défaut différent : par exemple, Flask utilise le port 5000, React le port 3000 et Laravel le port 8000. Assurez-vous que le bon port est configuré !
+
+<div id="preferncias">
+  ## Préférences
+</div>
+
+Replit associe automatiquement les ports ouverts de votre Replit App à des ports externes disponibles et enregistre cette association dans le fichier de configuration .replit.
+
+Cependant, ce n’est pas le cas par défaut pour les ports internes ouverts sur localhost, car les services qui s’exécutent généralement sur localhost partent du principe qu’ils ne seront accessibles que depuis le même ordinateur que le processus en cours d’exécution (les ports localhost ne sont visibles que par l’ordinateur qui exécute le processus). Cela signifie que ces services ne sont souvent pas aussi sécurisés que ceux conçus pour être accessibles depuis l’Internet public.
+
+Vous pouvez toujours modifier ce comportement en définissant l’option de configuration `exposeLocalhost` sur `true` pour le port que vous souhaitez exposer.
+
+Si vous souhaitez *toujours* exposer les ports localhost par défaut, vous pouvez définir l’option « transfert automatique de ports » dans l’outil Configurações do Usuário sur « Tous les ports ».
+
+Si vous ne souhaitez *jamais* créer de configuration pour les ports ouverts et préférez contrôler manuellement la configuration des ports de tous vos Replit Apps, vous pouvez définir cette option sur « jamais ».
+
+<div id="portas-suportadas">
+  ## Ports pris en charge
+</div>
+
+L’App Replit définira le port 80 comme port externe par défaut lors de l’ouverture du premier port. Une App Replit peut exposer les ports 3000, 3001, 3002, 3003, 4200, 5000, 5173, 6000, 6800, 8000, 8008, 8080 et 8081 comme ports externes supplémentaires.
+
+Les ports 22 et 8283 ne peuvent pas être redirigés, car ils sont utilisés en interne.
+
+<div id="configurao-ports-do-replit">
+  ## Configuration `[[ports]]` de .replit
+</div>
+
+Type : `{localPort, externalPort, exposeLocalhost}`
+
+La configuration `[[ports]]` vous permet de définir le port HTTP à exposer pour la sortie web. Par défaut, tout port HTTP exposé sur l’hôte 0.0.0.0 sera accessible comme sortie web de votre Replit App.
+
+Vous pouvez servir des ports supplémentaires sans remplacer le port par défaut en ajoutant une nouvelle entrée [[ports]] au fichier .replit. Vous devez spécifier les entrées localPort et externalPort. Vous pouvez ajouter plusieurs ports supplémentaires en ajoutant plusieurs entrées [[ports]] au fichier .replit, comme indiqué ci-dessous.
+
+<div id="localport">
+  ### localPort
+</div>
+
+Détermine le port local que Replit associera à un port externe.
+
+<div id="externalport">
+  ### externalPort
+</div>
+
+Détermine le port local à exposer publiquement.
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+```
+
+Si vous ne souhaitez *jamais* exposer un port spécifique, vous pouvez conserver la configuration `localPort`, mais ne pas ajouter d’`externalPort` :
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+```
+
+<div id="exposelocalhost">
+  ### exposeLocalhost
+</div>
+
+Indique si un port interne utilisant `localhost` peut être associé à un port externe. Peut être `true`, `false` ou null.
+
+```toml theme={null}
+[[ports]]
+localPort = 3000
+externalPort = 80
+exposeLocalhost = true
+```

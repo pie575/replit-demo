@@ -1,0 +1,166 @@
+---
+title: "Frame"
+description: "Frame 类型、各 Frame 的操作栏，以及 Canvas 上的 Build 和 Focus 操作。"
+sidebarTitle: "Frame"
+icon: "square-dashed"
+---
+
+Canvas 上的每个区块都是一个 **frame**。你可以选择、拖动 frame 并对其执行操作。本页介绍 frame 类型、选中 frame 时显示的操作栏，以及可通过该操作栏使用的功能：Build 和 Focus。
+
+<Frame>
+  <img src="/assets/mirror/canvas-overview-d32e8d2ab073.png" alt="Canvas 上排列着三个 frame：一个网站（Scroll Hero）、一个 APEX X1 Design System，以及一个 APEX X1 超级跑车的 Design 模型；底部有浮动工具栏（Chat、Draw、Edit、Generate）" width="2000" height="1255" data-path="images/replitai/canvas-overview.png" />
+</Frame>
+
+<div id="tipos-de-frame">
+  ## frame 类型
+</div>
+
+两种主要类型是**构建产物** (由 App 支持的实时界面) 和 **Designs** (设计稿) 。frame 左上角的标题会显示其类型。
+
+| 类型     | 标题标签                     | 基于            | 是否可像实时 App 一样交互？ | 是否可转换为真正的 App？                                    |
+| ------ | ------------------------ | ------------- | ---------------- | ------------------------------------------------- |
+| 构建产物   | **Website**、**Slides** 等 | 正在运行的构建产物     | 是                | 本身就是 App。                                         |
+| 移动构建产物 | **Mobile app**           | 正在运行的构建产物     | 是 (在模拟器中)        | 本身就是 App。                                         |
+| Design | **Design**               | 静态 / 交互式设计稿   | 仅限交互式 frame      | 是——通过各 frame 的 **Build…** 菜单。请参阅 [Build](#build)。 |
+| 图像     | **Image**                | 生成的 PNG / JPG | 否                | 否——可将其用作参考。                                       |
+| 视频     | **Video**                | 生成的视频         | 否                | 否。                                                |
+| 矢量图形   | **Graphic**              | 生成的 SVG       | 否                | 否——可将其嵌入真正的 App 中。                                |
+
+<Note>
+  Design frame 是显示为静态图像还是交互式原型，取决于 **Interactive frames** 功能。启用后，Design frame 会像真实页面一样响应点击和表单输入；否则，它们会被渲染为可供你迭代的快照，无法点击。
+</Note>
+
+<div id="visualize-em-diferentes-dispositivos">
+  ## 在不同设备上预览
+</div>
+
+查看设计在不同屏幕尺寸下的效果。例如，您可以让 Agent 显示移动端、平板或桌面端版本，如“显示此页面的移动端版本”，它会按相应尺寸渲染一个 frame：
+
+* **移动端**：390 × 844
+* **平板**：768 × 1024
+* **桌面端**：1280 × 720
+
+<div id="barra-de-aes-por-frame">
+  ## 每个 frame 的操作栏
+</div>
+
+选择 frame 后会显示操作栏。可用操作取决于 frame 的类型。
+
+<div id="frames-de-artifact-e-design">
+  ### Artifact 和 Design 画框
+</div>
+
+对于 Artifact 画框 (Website、Slides 等) 和 Design 画框，操作栏位于画框顶部。
+
+<Frame caption="Design 画框的操作栏：Build…、Focus 和更多选项。">
+  <img src="/assets/mirror/canvas-frame-action-bar-86f90fdd1375.png" alt="Canvas 中选中了一个 APEX X1 Design 画框，顶部显示该画框的操作栏，包含类型标签、Build、Focus 和更多选项；该画框作为芯片附加在 Chat 的提示词输入框中" width="2000" height="1290" data-path="images/replitai/canvas-frame-action-bar.png" />
+</Frame>
+
+操作栏在较窄的宽度下会折叠为图标，随着画框变宽则会显示标签。完整操作栏从左到右依次为：
+
+| 操作      | 功能                                                                                                                          |
+| ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 导出      | 将画框下载为 PNG。请参阅 [将画框导出为 PNG](/zh/pt/design/canvas#export-a-frame-as-png)。                                                       |
+| Build…  | 打开一个菜单，列出项目中的所有 Artifact。选择一个即可将设计应用到该 Artifact，或选择 **Build this design** 创建新的 Artifact。仅适用于 Design 画框。请参阅 [Build](#build)。 |
+| Focus   | 进入聚焦模式，将画框展开为主视图。                                                                                                           |
+| 更多 (…)  | 提供其他画框操作。复制、重复、重新排序和导出也可通过画框的[右键菜单](/zh/pt/design/canvas#right-click-menu)执行。                                                  |
+
+应用画框 (Website、Slides、移动应用) 会显示 Focus 和更多选项；Design 画框则会在其前添加 Build…。要基于选中的画框探索新的设计方向，请查看其[建议](/zh/pt/design/explore-suggestions)。
+
+选择画框后，它还会作为快照附加到发送给 Agent 的下一条 Chat 消息中——请参阅 [Canvas 上有哪些内容](/zh/pt/design/canvas#what-lives-on-the-canvas)。
+
+<Note>
+  操作栏会遵循**只读模式**。当 Canvas 在后台任务上下文中被锁定时，用于迭代的操作会被隐藏，只保留 Focus。
+</Note>
+
+<div id="frames-de-mdia">
+  ### 媒体 frame
+</div>
+
+Image、Video 和 Vector graphic frame 的上方会显示一个小型浮动操作栏。这三种类型都支持：
+
+* **替换媒体**：上传新文件来替换 frame 中的内容，同时保留其在 Canvas 中的位置和大小。
+* **下载**：将媒体文件保存到计算机。
+* **alt 文本**：添加替代文本以提升无障碍体验，并让 Agent 在引用该 frame 时获得更多上下文。
+
+<Frame caption="视频 frame 的操作栏：替换媒体、下载和 alt 文本。">
+  <img src="/assets/mirror/canvas-frame-video-actions-905585560e90.png" alt="Canvas 中一个已选中的蓝色超级跑车视频 frame，上方显示浮动操作栏，包含替换媒体、下载（工具提示显示“下载原始文件”）和 alt 文本控件。" width="2000" height="1252" data-path="images/replitai/canvas-frame-video-actions.png" />
+</Frame>
+
+图像 frame 还提供两个额外控件：
+
+* **裁剪**：直接在 Canvas 中裁剪图像。
+* **生成视频**：根据图像生成视频片段。
+
+<Frame caption="图像 frame 的操作栏增加了裁剪和生成视频。">
+  <img src="/assets/mirror/canvas-frame-image-actions-aae1378db7e3.png" alt="Canvas 中一个已选中的黄色超级跑车图像 frame，上方显示浮动操作栏，包含替换媒体、裁剪、下载、alt 文本和生成视频控件。" width="1600" height="1002" data-path="images/replitai/canvas-frame-image-actions.png" />
+</Frame>
+
+<div id="explore-novas-direes">
+  ## 探索新的设计方向
+</div>
+
+选择一个 frame 后，旁边会显示[建议](/zh/pt/design/explore-suggestions)：基于当前内容的一键设计方向，例如不同的布局、全新的风格，或你的设计可能需要的页面。每条建议都会作为新的 frame 生成在源 frame 旁边，因此原始内容保持不变，你可以进行比较。
+
+<Frame>
+  <img src="/assets/mirror/ambient-iq-0989ea31bce7.png" alt="选中的网站 frame 显示 APEX X1 超级跑车的主视觉区域，旁边的“建议的下一步”面板提供“探索不同方案”、“尝试不同布局”、“探索不同风格”和“给我惊喜”等建议选项" width="2000" height="1254" data-path="images/design/replit-design/ambient-iq.png" />
+</Frame>
+
+<div id="build">
+  ## Build
+</div>
+
+在选定的 Design frame 中，**Build…** 菜单可将设计转换为真正可运行的应用。该菜单还可将设计应用到现有 Artifact。
+
+<Frame>
+  <img src="/assets/mirror/canvas-build-menu-f06b8b8b455f.png" alt="在选定的 Design frame（APEX X1 Exact Replica）中打开的 Build 菜单，标题为“构建或应用你的设计”，显示“构建此设计”（可创建新的产物）和“应用到现有创作”，其中列出了项目的 APEX X1 Design System 及其网站 Scroll Hero" width="2000" height="1153" data-path="images/replitai/canvas-build-menu.png" />
+</Frame>
+
+<div id="build-this-design">
+  ### Build this design
+</div>
+
+在菜单中选择 **Build this design**，即可基于所选的 Design frame 创建新的 Artifact。新 Artifact 会添加到项目的产物列表中，并成为可实际运行的 App。Build 需要 Core 或 Pro。
+
+<div id="apply-to-an-existing-artifact">
+  ### 应用到现有 Artifact
+</div>
+
+Build 菜单会列出项目中的所有 Artifact。选择其中一个，即可将所选 Design 的更改应用到该 Artifact——Agent 会重写 Artifact 的代码，使其与设计相匹配，同时将 Canvas 中的 Design frame 保留作为参考。
+
+<div id="modo-de-foco">
+  ## 焦点模式
+</div>
+
+焦点模式让你可以在 Design 中以原始尺寸编辑选定的 frame。
+
+<Steps>
+  <Step title="为 frame 选择 Focus">
+    选择一个 frame，然后在其操作栏中选择 **Focus**。
+
+    <Frame caption="选定 frame 的操作栏中的 Focus 操作。">
+      <img src="/assets/mirror/focus-before-0c9ced9218d9.png" alt="Canvas 中选定的 Design frame，frame 操作栏中的 Focus 操作处于高亮状态。" width="2000" height="1254" data-path="images/design/replit-design/focus-before.png" />
+    </Frame>
+  </Step>
+
+  <Step title="以原始尺寸编辑">
+    frame 会填满视图，让你能够专注编辑，无需查看 Canvas 的其余部分。
+
+    <Frame caption="焦点模式">
+      <img src="/assets/mirror/focus-mode-24da418577ae.png" alt="焦点模式下，Design frame 填满视图，Canvas 顶部显示 Exit focus 按钮。" width="2000" height="1254" data-path="images/design/replit-design/focus-mode.png" />
+    </Frame>
+  </Step>
+
+  <Step title="返回 Canvas">
+    选择 Canvas 顶部的 **Exit focus**，即可返回 Canvas。
+  </Step>
+</Steps>
+
+<div id="pginas-relacionadas">
+  ## 相关页面
+</div>
+
+* [Canvas](/zh/pt/design/canvas) — 概览与界面结构。
+* [Toolbar](/zh/pt/design/toolbar) — 浮动工具栏；Generate 可新建 frame。
+* [Elements](/zh/pt/design/elements) — frame 中的各个独立元素。
+* [Visual Editor](/zh/pt/design/visual-editor) — 编辑当前聚焦的 frame 中的元素。

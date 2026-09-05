@@ -1,0 +1,717 @@
+---
+title: "Нативные мобильные приложения"
+description: "Узнайте, как создавать нативные мобильные приложения с помощью Agent, тестировать их на смартфоне и отправлять на проверку App Review перед публикацией в App Store."
+---
+
+export const MobileArchitectureDiagram = () => {
+  if (typeof document !== 'undefined' && !document.getElementById('mobile-arch-styles-v3')) {
+    const style = document.createElement('style');
+    style.id = 'mobile-arch-styles-v3';
+    style.textContent = `
+      .mobile-arch-v3 {
+        --arch-bg: var(--replit-docs-bg, #F6F6F4);
+        --arch-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --arch-border: var(--replit-docs-border, #DEDAD5);
+        --arch-text: var(--replit-docs-text, #1D1D1D);
+        --arch-muted: var(--replit-docs-text-subtle, #858585);
+        --arch-accent: #F26522;
+        --arch-accent-soft: #FEF3EE;
+      }
+      
+      .dark .mobile-arch-v3,
+      html.dark .mobile-arch-v3,
+      [data-theme="dark"] .mobile-arch-v3 {
+        --arch-bg: var(--replit-docs-bg, #1E1E1F);
+        --arch-surface: var(--replit-docs-bg-elevated, #222223);
+        --arch-border: var(--replit-docs-border, #39393D);
+        --arch-text: var(--replit-docs-text, #F5F5F5);
+        --arch-muted: var(--replit-docs-text-subtle, #8E8F97);
+        --arch-accent: #F26522;
+        --arch-accent-soft: #1F1A17;
+      }
+
+      .arch-panel {
+        transition: all 0.25s ease;
+      }
+      .arch-panel:hover {
+        border-color: var(--arch-accent) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const serverItems = [{
+    label: 'Database',
+    detail: 'PostgreSQL for structured data'
+  }, {
+    label: 'Object Storage',
+    detail: 'Files, images, and media'
+  }, {
+    label: 'Secrets',
+    detail: 'API keys stored securely'
+  }, {
+    label: 'API routes',
+    detail: 'Server-side logic and endpoints'
+  }];
+  const clientItems = [{
+    label: 'Native UI',
+    detail: 'Real iOS and Android components'
+  }, {
+    label: 'Local state',
+    detail: 'Fast, offline-capable data'
+  }, {
+    label: 'Device APIs',
+    detail: 'Camera, location, notifications'
+  }, {
+    label: 'Live reload',
+    detail: 'Instant preview via Expo Go'
+  }];
+  return <div className="mobile-arch-v3" style={{
+    padding: '24px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-bg)'
+  }}>
+      {}
+      <div style={{
+    marginBottom: '20px'
+  }}>
+        <div style={{
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--arch-text)'
+  }}>
+          Architecture
+        </div>
+        <div style={{
+    fontSize: '14px',
+    color: 'var(--arch-muted)',
+    marginTop: '4px'
+  }}>
+          Your server runs on Replit. The app runs natively on devices.
+        </div>
+      </div>
+
+      {}
+      <div style={{
+    display: 'flex',
+    alignItems: 'stretch',
+    gap: '16px'
+  }}>
+        
+        {}
+        <div className="arch-panel" style={{
+    flex: 1,
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-surface)'
+  }}>
+          <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-accent)',
+    fontWeight: '600',
+    marginBottom: '6px'
+  }}>
+            Replit Cloud
+          </div>
+          <div style={{
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--arch-text)',
+    marginBottom: '16px'
+  }}>
+            Server
+          </div>
+          
+          <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  }}>
+            {serverItems.map(item => <div key={item.label}>
+                <div style={{
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--arch-text)'
+  }}>
+                  {item.label}
+                </div>
+                <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-muted)',
+    marginTop: '2px'
+  }}>
+                  {item.detail}
+                </div>
+              </div>)}
+          </div>
+        </div>
+
+        {}
+        <div className="arch-panel" style={{
+    flex: 1,
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid var(--arch-border)',
+    background: 'var(--arch-surface)'
+  }}>
+          <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-accent)',
+    fontWeight: '600',
+    marginBottom: '6px'
+  }}>
+            User device
+          </div>
+          <div style={{
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--arch-text)',
+    marginBottom: '16px'
+  }}>
+            Native app
+          </div>
+          
+          <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  }}>
+            {clientItems.map(item => <div key={item.label}>
+                <div style={{
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--arch-text)'
+  }}>
+                  {item.label}
+                </div>
+                <div style={{
+    fontSize: '13px',
+    color: 'var(--arch-muted)',
+    marginTop: '2px'
+  }}>
+                  {item.detail}
+                </div>
+              </div>)}
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+export const MobileStackDiagram = () => {
+  if (typeof document !== 'undefined' && !document.getElementById('mobile-stack-styles-v3')) {
+    const style = document.createElement('style');
+    style.id = 'mobile-stack-styles-v3';
+    style.textContent = `
+      .mobile-stack-v3 {
+        --stack-bg: var(--replit-docs-bg, #F6F6F4);
+        --stack-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --stack-border: var(--replit-docs-border, #DEDAD5);
+        --stack-text: var(--replit-docs-text, #1D1D1D);
+        --stack-muted: var(--replit-docs-text-subtle, #858585);
+        --stack-accent: #F26522;
+        --stack-accent-soft: #FEF3EE;
+      }
+      
+      .dark .mobile-stack-v3,
+      html.dark .mobile-stack-v3,
+      [data-theme="dark"] .mobile-stack-v3 {
+        --stack-bg: var(--replit-docs-bg, #1E1E1F);
+        --stack-surface: var(--replit-docs-bg-elevated, #222223);
+        --stack-border: var(--replit-docs-border, #39393D);
+        --stack-text: var(--replit-docs-text, #F5F5F5);
+        --stack-muted: var(--replit-docs-text-subtle, #8E8F97);
+        --stack-accent: #F26522;
+        --stack-accent-soft: #1F1A17;
+      }
+
+      .stack-layer {
+        transition: all 0.25s ease;
+        cursor: pointer;
+      }
+      .stack-layer:hover,
+      .stack-layer.active {
+        background: var(--stack-accent-soft) !important;
+        border-color: var(--stack-accent) !important;
+      }
+      .stack-layer .layer-detail {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+        margin-top: 0;
+      }
+      .stack-layer.active .layer-detail {
+        max-height: 80px;
+        opacity: 1;
+        margin-top: 8px;
+      }
+      
+      .platform-item {
+        transition: all 0.2s ease;
+      }
+      .platform-item:hover {
+        border-color: var(--stack-accent) !important;
+        background: var(--stack-accent-soft) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleLayerClick = e => {
+    const layer = e.currentTarget;
+    const allLayers = document.querySelectorAll('.stack-layer');
+    const wasActive = layer.classList.contains('active');
+    allLayers.forEach(l => l.classList.remove('active'));
+    if (!wasActive) {
+      layer.classList.add('active');
+    }
+  };
+  const runAnimation = () => {
+    const btn = document.getElementById('stack-animate-btn');
+    if (!btn || btn.dataset.running === 'true') return;
+    btn.dataset.running = 'true';
+    btn.textContent = 'Running...';
+    btn.style.opacity = '0.6';
+    const layers = document.querySelectorAll('.stack-layer');
+    const platforms = document.getElementById('stack-platforms-container');
+    let step = 0;
+    const totalSteps = layers.length + 1;
+    const animate = () => {
+      layers.forEach(l => l.classList.remove('active'));
+      if (platforms) platforms.style.borderColor = 'var(--stack-border)';
+      if (step < layers.length) {
+        layers[step].classList.add('active');
+        step++;
+        setTimeout(animate, 4000);
+      } else if (step === layers.length) {
+        if (platforms) platforms.style.borderColor = 'var(--stack-accent)';
+        step++;
+        setTimeout(animate, 4000);
+      } else {
+        layers.forEach(l => l.classList.remove('active'));
+        if (platforms) platforms.style.borderColor = 'var(--stack-border)';
+        btn.dataset.running = 'false';
+        btn.textContent = 'See the flow';
+        btn.style.opacity = '1';
+      }
+    };
+    animate();
+  };
+  const layers = [{
+    title: 'Replit Agent',
+    summary: 'Builds your app from a prompt',
+    detail: 'Describe what you want in natural language. Agent writes TypeScript code, configures dependencies, and sets up your project.',
+    verb: 'writes'
+  }, {
+    title: 'Your code',
+    summary: 'TypeScript + React components',
+    detail: 'Your app is standard React code that you own and can customize. No vendor lock-in.',
+    verb: 'using'
+  }, {
+    title: 'Expo',
+    summary: 'Development framework',
+    detail: 'Expo simplifies React Native development with managed builds, over-the-air updates, and easy access to device APIs.',
+    verb: 'simplifies'
+  }, {
+    title: 'React Native',
+    summary: 'Cross-platform UI',
+    detail: 'React Native compiles your JavaScript to real native code, not a web view. True native performance.',
+    verb: 'compiles to'
+  }];
+  const platforms = ['iOS', 'Android', 'Web'];
+  return <div className="mobile-stack-v3" style={{
+    padding: '24px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-bg)'
+  }}>
+      {}
+      <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '20px'
+  }}>
+        <div>
+          <div style={{
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--stack-text)'
+  }}>
+            Technology stack
+          </div>
+          <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    marginTop: '4px'
+  }}>
+            Tap any layer to learn more
+          </div>
+        </div>
+        <button id="stack-animate-btn" onClick={runAnimation} data-running="false" style={{
+    padding: '8px 14px',
+    fontSize: '13px',
+    color: 'var(--stack-accent)',
+    background: 'transparent',
+    border: '1px solid var(--stack-accent)',
+    borderRadius: '4px',
+    cursor: 'pointer'
+  }}>
+          See the flow
+        </button>
+      </div>
+
+      {}
+      <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  }}>
+        {layers.map(layer => <div key={layer.title}>
+            <div className="stack-layer" onClick={handleLayerClick} style={{
+    padding: '16px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-surface)'
+  }}>
+              <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }}>
+                <div>
+                  <div style={{
+    fontSize: '16px',
+    fontWeight: '500',
+    color: 'var(--stack-text)'
+  }}>
+                    {layer.title}
+                  </div>
+                  <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    marginTop: '4px'
+  }}>
+                    {layer.summary}
+                  </div>
+                </div>
+                <div style={{
+    fontSize: '14px',
+    color: 'var(--stack-accent)',
+    fontWeight: '500'
+  }}>
+                  {layer.verb}
+                </div>
+              </div>
+              <div className="layer-detail" style={{
+    fontSize: '14px',
+    color: 'var(--stack-muted)',
+    lineHeight: '1.5'
+  }}>
+                {layer.detail}
+              </div>
+            </div>
+          </div>)}
+      </div>
+
+      {}
+      <div id="stack-platforms-container" style={{
+    display: 'flex',
+    gap: '12px',
+    padding: '12px',
+    marginTop: '8px',
+    borderRadius: '8px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-surface)',
+    transition: 'border-color 0.25s ease'
+  }}>
+        {platforms.map(platform => <div key={platform} className="platform-item" style={{
+    flex: 1,
+    padding: '12px',
+    borderRadius: '6px',
+    border: '1px solid var(--stack-border)',
+    background: 'var(--stack-bg)',
+    textAlign: 'center',
+    fontSize: '15px',
+    fontWeight: '500',
+    color: 'var(--stack-text)'
+  }}>
+            {platform}
+          </div>)}
+      </div>
+    </div>;
+};
+
+<Frame>
+  <img src="/assets/mirror/mobile-screen-e5685fc26793.png" alt="Мобильное приложение запущено в режиме предпросмотра в редакторе проекта Replit; на устройстве отображаются панель предпросмотра и QR-код" width="1440" height="900" data-path="images/native-mobile-apps/mobile-screen.png" />
+</Frame>
+
+Создавайте приложения для iOS и Android с помощью Agent, просматривайте их на смартфоне и готовьте сборки в пошаговом режиме.
+
+<Note>
+  Для создания или предпросмотра нативных приложений для iOS используйте редактор проекта на [replit.com](https://replit.com). Работа с нативными мобильными приложениями также доступна в приложении Replit для Android, если эта функция поддерживается.
+</Note>
+
+<div id="section">
+  ## Начало работы
+</div>
+
+Создать рабочее мобильное приложение можно всего за несколько шагов:
+
+<Steps>
+  <Step title="Создайте мобильное приложение">
+    Опишите идею приложения на главной странице Replit и выберите тип приложения **Мобильное приложение**.
+
+    <Frame>
+      <img src="/assets/mirror/prompt-5cb144699b45.png" alt="Промпт на главной странице Replit с выбранным типом «Мобильное приложение»" width="1440" height="900" data-path="images/native-mobile-apps/prompt.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Протестируйте приложение">
+    Во время разработки мобильное приложение можно просматривать в режиме предпросмотра двумя способами:
+
+    * **В редакторе проекта**: в селекторе устройств на панели предпросмотра выберите **Симулятор iOS** или **Эмулятор Android**. Реальный симулятор транслируется в редактор проекта, поэтому вы можете управлять им касаниями, не выходя из Replit. Xcode и Android Studio не требуются.
+    * **На реальном устройстве с Expo Go**: установите [Expo Go](https://expo.dev/go) на iPhone или Android-устройство. На панели предпросмотра в редакторе проекта выберите **Открыть в Expo Go** и отсканируйте QR-код.
+
+    <Frame>
+      <img src="/assets/mirror/workspace-dda0f81e6b83.png" alt="Редактор проекта Replit с предпросмотром приложения и вариантами предпросмотра на мобильном устройстве" width="1440" height="900" data-path="images/native-mobile-apps/workspace.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Дорабатывайте приложение с Agent">
+    Попросите Agent добавить функции, подключить источники данных или интегрировать сервисы. По мере доработки продолжайте тестировать приложение в симуляторе или на смартфоне.
+  </Step>
+</Steps>
+
+<Tip>
+  **Симулятор iOS** и **Эмулятор Android** в редакторе проекта отображают нативную версию приложения с платформенно-специфичными стилями и большинством нативных компонентов. Для функций, зависящих от реального оборудования, например тактильной отдачи, камеры, push-уведомлений и геолокации, тестируйте приложение на реальном устройстве с помощью Expo Go.
+</Tip>
+
+<div id="section-2">
+  ## Предпросмотр в симуляторе или эмуляторе
+</div>
+
+С помощью Expo в Replit можно запускать и тестировать мобильные приложения на смартфоне. Кроме того, Replit транслирует настоящий **симулятор iOS** или **эмулятор Android** прямо в панель предпросмотра. Изменения, внесённые с помощью Agent, автоматически применяются в симуляторе благодаря горячей перезагрузке и работают так же, как на реальном устройстве.
+
+<Note>
+  Предпросмотр в симуляторе iOS и эмуляторе Android доступен разработчикам на тарифах Core, Pro и Enterprise. Только для мобильных приложений: в проектах, предназначенных только для веба, этот параметр не отображается.
+</Note>
+
+<div id="section-3">
+  ### Как открыть симулятор
+</div>
+
+<Steps>
+  <Step title="Откройте мобильный проект">
+    Откройте проект с мобильным артефактом.
+  </Step>
+
+  <Step title="Выберите устройство">
+    В селекторе устройств на верхней панели предпросмотра выберите **симулятор iOS** или **эмулятор Android**. Вместо веб-предпросмотра откроется симулятор.
+  </Step>
+
+  <Step title="Пользуйтесь как настоящим устройством">
+    С помощью мыши и клавиатуры можно нажимать, смахивать, вводить текст и перемещаться по приложению. Чтобы перезагрузить приложение без перезапуска симулятора, выберите **Restart** на панели инструментов.
+  </Step>
+</Steps>
+
+<Tip>
+  Симуляторы работают в облаке и транслируются в браузер, поэтому ничего не нужно скачивать или настраивать. Файлы проекта хранятся в Replit.
+</Tip>
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/ios-emulator-9013ff1b602f.mp4" />
+</Frame>
+
+<div id="section-4">
+  ### Поддержка браузеров
+</div>
+
+* **Chrome**, **Safari** и браузеры на базе Chromium полностью поддерживаются.
+* **Firefox** не поддерживается. При открытии Replit в Firefox параметры iOS и Android будут недоступны и появится примечание «Firefox не поддерживается». Это связано с ограничениями технологии потоковой передачи, используемой для работы симуляторов.
+
+<div id="expo-go">
+  ### Использование Expo Go
+</div>
+
+Если вам нужно протестировать функции, работающие только на реальном устройстве, или поделиться предпросмотром с людьми без доступа к компьютеру, используйте Expo Go на физическом устройстве:
+
+* Камеру, микрофон, тактильную отдачу и другие нативные датчики
+* Push-уведомления
+* Фактическое местоположение по GPS
+* Возможность поделиться предпросмотром разрабатываемого приложения с коллегами, тестировщиками и инвесторами
+
+Чтобы собрать App в Expo Go, откройте проект на [replit.com](https://replit.com), выберите **Открыть в Expo Go** на панели предпросмотра редактора проекта и отсканируйте QR-код в приложении [Expo Go](https://expo.dev/go) на смартфоне.
+
+<div id="section-5">
+  ### Полноэкранный симулятор
+</div>
+
+На карточке мобильного артефакта выберите **Дополнительные действия** → **Открыть в симуляторе iOS** или **Открыть в эмуляторе Android**, чтобы открыть симулятор в отдельной вкладке с большей областью просмотра.
+
+<div id="section-6">
+  ## Зачем создавать мобильное приложение?
+</div>
+
+Создавайте мобильное приложение, если вам нужно следующее:
+
+* **Нативный интерфейс**: высокая производительность, плавное взаимодействие и UI, соответствующий платформе.
+* **Функции устройства**: камера, push-уведомления, геолокация и многое другое.
+* **Распространение через App Store**: публикация в магазине приложений, где пользователи смогут находить и устанавливать ваше приложение после проверки Apple.
+
+<div id="section-7">
+  ## Основные возможности
+</div>
+
+* **Создание с помощью ИИ**: опишите приложение, и Agent создаст каркас работающего мобильного приложения.
+* **Предпросмотр в редакторе проекта**: тестируйте приложение в симуляторе iOS или эмуляторе Android, не покидая Replit, либо просматривайте его на смартфоне через Expo Go.
+* **Полный стек по умолчанию**: по мере роста приложения добавляйте серверные маршруты, базу данных, App Storage, коннекторы и ИИ-интеграции.
+* **Упрощённая публикация**: подготавливайте сборки для TestFlight и отправки в App Store без необходимости управлять локальной цепочкой инструментов iOS.
+
+<div id="section-8">
+  ## Рабочий процесс разработки
+</div>
+
+Есть три этапа доступа к App, каждый из которых предназначен для разных пользователей и задач:
+
+| Этап           | Кто может получить доступ | Способ доступа                                     | Лучше всего подходит для                                              |
+| -------------- | ------------------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| **Разработка** | Вы                        | Симулятор редактора проекта или QR-код для Expo Go | Разработки и доработки                                                |
+| **Деплой**     | Тестировщики с Expo Go    | Публичный URL с QR-кодом                           | Предпросмотров в процессе разработки, прототипирования и демонстраций |
+| **App Store**  | Все                       | Загрузка из App Store после App Review             | Релиза в продакшен                                                    |
+
+**Разработка**: после запуска App вы можете просмотреть его в **симуляторе iOS** или **эмуляторе Android** в редакторе проекта либо отсканировать QR-код на панели предпросмотра, чтобы открыть его в Expo Go на смартфоне.
+
+**Деплой**: нажмите **Публикация**, и Replit создаст публичный URL с QR-кодом для Expo Go. Это идеально подходит для предпросмотров в процессе разработки и прототипирования: до отправки в App Store вы можете показать App инвесторам, собрать отзывы или протестировать его вместе с друзьями.
+
+**App Store**: после отправки App в App Store пользователи смогут скачать и установить его из App Store после проверки Apple. Для этого требуется аккаунт Apple Developer.
+
+<div id="section-9">
+  ## Обзор публикации
+</div>
+
+При подготовке релиза для iOS процесс обычно выглядит так:
+
+* Опубликуйте приложение из редактора проекта
+* Отправьте сборку в TestFlight
+* Переведите сборку из TestFlight в App Store через App Store Connect
+
+<Note>
+  Для отправки сборок в TestFlight и App Store требуется участие в программе Apple Developer Program.
+</Note>
+
+Полное пошаговое руководство см. в [руководстве по созданию и запуску мобильного приложения](/ru/ja/build/mobile-app).
+
+<div id="section-10">
+  ## Где создавать нативные мобильные приложения
+</div>
+
+Среда Replit работает в облаке, а не на локальном компьютере. Для создания нативных мобильных приложений используйте редактор проекта на [replit.com](https://replit.com). Весь рабочий процесс — от создания каркаса приложения с помощью Agent и предпросмотра в Expo Go до тестирования в симуляторах и эмуляторах, сборки для TestFlight и отправки в App Store — выполняется в редакторе проекта.
+
+Работа с нативными мобильными приложениями также доступна в поддерживаемом [приложении Replit для Android](/ru/ja/features/platforms/mobile-app). Если вы используете приложение Replit для iOS, откройте проект на [replit.com](https://replit.com), чтобы создавать, просматривать, собирать и отправлять нативные мобильные приложения.
+
+<div id="section-11">
+  ## Как устроены технологии
+</div>
+
+Мобильные приложения строятся на стеке взаимосвязанных технологий. В этом разделе рассказывается, что обеспечивает работу приложения и как взаимодействуют его компоненты.
+
+<div id="section-12">
+  ### Технологический стек
+</div>
+
+<MobileStackDiagram />
+
+* **React Native** — фреймворк с открытым исходным кодом, позволяющий использовать единую кодовую базу для iOS, Android и Web. Он рендерит нативные UI-компоненты платформы, а не использует веб-просмотр.
+* **Expo** упрощает разработку на React Native, предоставляя инструменты для сборки, управления нативными модулями и предпросмотра, включая Expo Go.
+* **Expo Go** — бесплатное приложение для смартфона. Оно позволяет осуществлять предпросмотр приложения в процессе разработки на реальном устройстве без сборки полноценного нативного бинарного файла.
+
+При запуске приложения бандлер Metro компилирует код и отправляет его на устройство. Первая сборка занимает больше времени из-за отсутствия кэша. Последующие сборки выполняются быстрее.
+
+<div id="section-13">
+  ### Архитектура: сервер и клиент
+</div>
+
+При предпросмотре мобильного приложения или подготовке к его распространению вы имеете дело с двумя компонентами:
+
+1. **Сервер**: работает в облаке Replit. Он обрабатывает базы данных, маршруты API, ИИ-интеграции и серверную логику.
+2. **Клиентское приложение**: работает на смартфоне пользователя. Во время разработки его можно просматривать в Expo Go, а после проверки оно распространяется через магазины приложений как нативное приложение.
+
+<MobileArchitectureDiagram />
+
+Такое разделение обеспечивает гибкость. Вы можете выполнять сложную логику на сервере (с доступом к базе данных, Object Storage и коннектору в Replit), сохраняя клиентское приложение лёгким. В процессе разработки думайте о том, что должно происходить на смартфоне, а что — в облаке.
+
+<div id="section-14">
+  ## Что следует учесть
+</div>
+
+* **Требования к публикации**：Apple устанавливает требования для TestFlight и App Store и проверяет iOS-приложения перед распространением.
+* **Публикация для Android**：Вы можете создавать кроссплатформенные приложения для iOS и Android. Публикация в Google Play пока не поддерживается в пошаговом процессе, но её можно выполнить вручную.
+* **Нативные изменения**：Изменения значка приложения, разрешений и других нативных компонентов обычно требуют новой сборки для магазина.
+
+<div id="section-15">
+  ## Устранение неполадок
+</div>
+
+Если при разработке мобильного приложения возникают проблемы, ознакомьтесь с разделом [«Устранение неполадок мобильных приложений»](/ru/ja/features/troubleshooting/mobile-app), где описаны распространённые проблемы и способы их решения.
+
+<div id="section-16">
+  ## Следующие шаги
+</div>
+
+* Узнайте, как работает Agent: [Agent](/ru/ja/features/agent/overview)
+* Изучите интеграции: [Интеграции](/ru/ja/features/integrations/overview)
+* Используйте Replit на мобильных устройствах: [Мобильное приложение Replit](/ru/ja/features/platforms/mobile-app)
+* Подробнее об Expo: [Expo](https://expo.dev/)
+* Управляйте TestFlight и заявками: [App Store Connect](https://appstoreconnect.apple.com/)
+
+<div id="section-17">
+  ## Часто задаваемые вопросы
+</div>
+
+<AccordionGroup>
+  <Accordion title="Что такое Expo?">
+    Agent использует Expo для создания мобильных App в Replit. Это платформа с открытым исходным кодом и набор инструментов для создания, запуска и деплоя кроссплатформенных нативных App с помощью React Native. Подробнее см. [https://expo.dev](https://expo.devをご覧ください。)
+  </Accordion>
+
+  <Accordion title="Что такое React Native?">
+    React Native — это фреймворк Meta с открытым исходным кодом для создания нативных приложений для iOS и Android с помощью React и JavaScript или TypeScript. Он рендерит нативные UI-компоненты платформы, а не веб-просмотр, поэтому приложения выглядят и работают как нативные.
+  </Accordion>
+
+  <Accordion title="Что такое Expo Go?">
+    Expo Go — бесплатное приложение, которое можно установить на смартфон из App Store или Google Play. Оно позволяет просматривать мобильное приложение в процессе разработки без сборки полноценного нативного бинарного файла. Отсканируйте QR-код в редакторе проекта, и Expo Go загрузит код приложения и выполнит Build.
+  </Accordion>
+
+  <Accordion title="В чём разница между Expo Go и dev-сборками?">
+    **Expo Go** — готовое приложение для запуска кода. Его можно быстро настроить, но оно поддерживает только модули, входящие в Expo SDK.
+
+    **Dev Build** — это настраиваемая нативная сборка, в которую можно включить любые нативные модули. Она требует дополнительной настройки (EAS Build или локально в Xcode/Android Studio), но обеспечивает большую гибкость.
+
+    Replit использует Expo Go для предпросмотра во время разработки. Если вам нужны нативные модули, не поддерживаемые Expo Go, возможно, вам стоит рассмотреть Dev Build, следуя [документации Expo](https://docs.expo.dev/develop/development-builds/introduction/).
+  </Accordion>
+
+  <Accordion title="Чем это отличается от веб-App с адаптивным дизайном?">
+    Адаптивное веб-приложение — это веб-сайт, который изменяет раскладку под размер экрана в браузере. React Native-приложение — это нативное приложение, установленное на устройстве: оно использует API платформы (камеру, тактильную обратную связь, push-уведомления), обеспечивает более широкий доступ к аппаратным возможностям и офлайн-функциям и распространяется через магазины приложений. Адаптивный веб подходит для широкого охвата и использования без установки, а нативное приложение — когда нужны функции устройства, высокая производительность или распространение через App Store.
+  </Accordion>
+
+  <Accordion title="Нужны ли Mac или Xcode?">
+    Нет. Replit и Expo управляют процессом сборки в облаке.
+  </Accordion>
+
+  <Accordion title="Можно ли просмотреть предварительную версию без аккаунта Apple Developer?">
+    Да. Предпросмотреть приложение можно в симуляторе iOS в редакторе проекта или в Expo Go на смартфоне. Аккаунт Apple Developer понадобится только для подготовки к отправке приложения в TestFlight или App Store.
+  </Accordion>
+
+  <Accordion title="Поддерживает ли Replit Android?">
+    Да. Вы можете создавать кроссплатформенные приложения для iOS и Android на основе единой кодовой базы. Предварительно просматривать их на Android-устройстве можно с помощью эмулятора Android в редакторе проекта или Expo Go. Публикация в Google Play выполняется вручную.
+  </Accordion>
+
+  <Accordion title="Что будет с серверами и базами данных?">
+    Используйте встроенные в Replit PostgreSQL, Object Storage, Connector и ИИ-интеграции — дополнительная инфраструктура не требуется. Сервер работает в Replit, а мобильное приложение подключается к нему.
+  </Accordion>
+
+  <Accordion title="Где следует тестировать: в симуляторе редактора проекта или на реальном устройстве?">
+    Используйте оба варианта в зависимости от ситуации. **Симулятор iOS** и **эмулятор Android** в редакторе проекта отображают нативные версии App и подходят для большинства повседневных тестов: проверки раскладки, навигации, нативных компонентов и стилизации под платформу. Если нужно протестировать функции, зависящие от реального оборудования, например камеру, тактильную отдачу, push-уведомления или GPS-геолокацию, используйте **Expo Go** на физическом устройстве.
+  </Accordion>
+</AccordionGroup>

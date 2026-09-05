@@ -1,0 +1,78 @@
+---
+title: "将现有应用迁移至 Clerk Auth"
+description: "将使用自有身份验证的现有应用迁移至 Clerk Auth，同时保留用户账户和历史数据的最佳实践。"
+---
+
+如果你的应用已有可用的身份验证系统和真实用户数据库，切换到 [Clerk Auth](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth) **不仅是代码层面的改动**，更是一次数据迁移。如果没有周全的计划，`users` 表中的每条现有记录都会与 Clerk 无法关联：新账户会在首次登录时创建，却无法与历史数据对应，老用户回访时则会发现自己似乎“丢失”了账户。
+
+实际上，你只需要做好两件事。
+
+<Note>
+  本页面面向已运行采用自有身份验证的应用的开发者。如果你要创建新应用，请参阅 [Clerk Auth 概览](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth)——无需迁移。
+</Note>
+
+<div id="1-importe-seus-usurios-existentes-para-o-clerk">
+  ## 1. 将现有用户导入 Clerk
+</div>
+
+在启用 Clerk Auth *之前*，App 中的每位活跃用户都必须已作为 Clerk 用户存在。每次导入至少需要包含：
+
+* **电子邮件** (必填)
+* **可用的个人资料元数据**：姓名、验证状态，以及你希望在 Auth 控制台中显示的其他信息
+* **密码哈希**：用户现有的密码哈希
+* **哈希算法**：该哈希的算法/格式，必须与 Clerk 要求的格式完全一致
+
+哈希算法是最容易出错的部分。Clerk 只接受一组特定的密码哈希格式，且每种格式都有对应的字符串标识符 (`bcrypt`、`scrypt_firebase`、`argon2i`、`pbkdf2_sha256` 等) 。请参阅 [Clerk 创建用户 API 参考](https://clerk.com/docs/reference/backend/user/create-user)，查看完整列表以及每种格式所需的确切摘要格式。
+
+这一步所需的不只是一个单行 prompt。负责迁移的 Agent 需要**深入了解当前代码中密码的哈希处理方式**——使用了哪个库、哪些参数 (成本因子、salt 布局、pepper 等) ，以及这些内容如何映射到 Clerk 支持的某种算法。一个措辞得当的 prompt 如下所示：
+
+```
+阅读我现有的身份验证代码，准确识别密码的哈希处理方式
+（库、算法、参数以及存储值的格式化方式）。
+然后，编写一个一次性导入脚本，针对我 users 表中的每个用户，
+调用 Clerk 后端 API，并提供电子邮件、个人资料元数据、采用
+相应 Clerk 算法所期望的准确格式的密码摘要，以及正确的 `passwordHasher` 值。
+在执行之前，请告诉我你选择了哪种 Clerk 算法及其原因。
+```
+
+如果您的哈希方案无法明确对应 Clerk 支持的任何算法，导入的用户将无法使用现有密码登录。此时，请在不提供摘要的情况下导入这些用户，并在迁移过程中发送密码重置邮件。
+
+<div id="2-resolva-usurios-clerk-de-volta-para-seus-ids-de-usurio-existentes">
+  ## 2. 将 Clerk 用户映射回其原有用户 ID
+</div>
+
+导入的用户登录后，每个已验证的请求都会携带 Clerk 身份。你的服务器需要将该身份映射回 `users` 表中的对应记录——否则，Clerk 用户 ID 将无法匹配现有的任何外键 (`orders.user_id`、`documents.owner_id` 等) ，历史数据就会看似丢失。
+
+Replit 托管的 Clerk 可简化这一过程：当你导入用户时，将其原有 ID 作为 Clerk 用户的 `externalId`，该值会自动写入会话声明中的 `sessionClaims.userId`。你的中间件只需优先使用该值，而非 Clerk 的原始用户 ID：
+
+```ts theme={null}
+import { getAuth } from "@clerk/express";
+
+const requireAuth = (req: any, res: any, next: any) => {
+  const auth = getAuth(req);
+  const userId = auth?.sessionClaims?.userId || auth?.userId;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  req.userId = userId;
+  next();
+};
+```
+
+采用此模式：
+
+* **已导入用户**通过 `sessionClaims.userId` 映射到其现有的 `users.id`，所有历史数据仍会保持关联。
+* **新用户** (迁移后注册且没有 `externalId` 的用户) 则使用 `auth.userId`，即其 Clerk 用户 ID。请将 Clerk 用户 ID 用作这些新记录的主键，或者在首次登录时创建记录并将其关联回去。
+
+<div id="isso">
+  ## 就这些
+</div>
+
+其余工作——让旧身份验证系统继续并行运行、使用真实账户进行测试、在迁移后监控是否创建了重复用户、停用旧系统——都属于常规迁移操作，并非 Clerk Auth 特有。
+
+<div id="recursos-adicionais">
+  ## 更多资源
+</div>
+
+* [Clerk Auth 概览](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth) — 了解 Clerk Auth 在 Replit 中的工作原理
+* [Clerk：创建用户 API](https://clerk.com/docs/reference/backend/user/create-user) — 支持的密码哈希算法和摘要格式

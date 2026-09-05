@@ -1,0 +1,320 @@
+---
+title: "App Storage Python SDK"
+description: "了解如何使用官方 Python SDK 管理 Replit App Storage 中的文件。"
+---
+
+本参考指南介绍 `replit-object-storage-python` 包中的 `Client` 类，并提供各类方法的代码示例。
+
+<div id="client">
+  ## Client
+</div>
+
+`Client` 类用于管理与 Replit App Storage 的交互，提供了对存储桶中的对象执行各类操作的方法。
+
+若要从 `replit.object_storage` 包中导入该类，请在 Python 代码中添加以下代码行：
+
+```python theme={null}
+from replit.object_storage import Client
+```
+
+使用以下代码创建一个与 Replit App Storage 交互的 `Client` 实例：
+
+```python theme={null}
+client = Client()
+```
+
+<Tip>
+  如果你的应用使用多个存储桶，请为每个存储桶创建一个 `Client` 实例。
+</Tip>
+
+<div id="__init__">
+  ### **init**
+</div>
+
+`init` 方法用于初始化 Client 类的实例。
+
+```python theme={null}
+def __init__(bucket_id: Optional[str] = None)
+```
+
+**参数**：
+
+* `bucket_id` (Optional[str])：该客户端管理的存储桶 ID。若省略，Client 将使用与 Replit App 或 Deployment 关联的默认存储桶。
+
+<div id="copy">
+  ### copy
+</div>
+
+`copy` 方法用于在同一个存储桶内复制对象。如果目标位置已存在对象，则会覆盖原有对象。
+
+```python theme={null}
+def copy(object_name: str, dest_object_name: str) -> None
+```
+
+**参数**：
+
+* `object_name` (str) - 源对象的完整路径。
+* `dest_object_name` (str) - 目标对象的完整路径。
+
+**抛出**：
+
+* `ObjectNotFoundError` - 表示指定路径下不存在源对象。
+
+<div id="delete">
+  ### delete
+</div>
+
+`delete` 方法用于从 App Storage 中永久删除文件。
+
+```python theme={null}
+def delete(object_name: str, ignore_not_found: bool = False) -> None
+```
+
+**参数**：
+
+* `object_name` (str) - 要删除的对象名称。
+* `ignore_not_found` (bool) - 为 `True` 时，若对象不存在则不报错。
+
+**抛出**：
+
+* `ObjectNotFoundError` - 表示该对象不存在。
+
+<div id="download_as_bytes">
+  ### download_as_bytes
+</div>
+
+`download_as_bytes` 方法以 `bytes` 形式获取文件内容。
+
+```python theme={null}
+def download_as_bytes(object_name: str) -> bytes
+```
+
+**参数**：
+
+* `object_name` (str) - 要下载的对象名称。
+
+**返回值**：
+
+* `bytes` - 对象内容的原始字节表示。
+
+**抛出异常**：
+
+* `ObjectNotFoundError` - 表示该对象不存在。
+
+<div id="download_as_text">
+  ### download_as_text
+</div>
+
+`download_as_text` 方法将文件内容以 `str` 类型下载。
+
+```python theme={null}
+def download_as_text(object_name: str) -> str
+```
+
+**参数**：
+
+* `object_name` (str) - 要获取的源对象名称。
+
+**返回**：
+
+* str：以 UTF-8 编码字符串形式返回的对象内容。
+
+**抛出**：
+
+* `ObjectNotFoundError` - 表示该对象不存在。
+
+<div id="download_to_filename">
+  ### download_to_filename
+</div>
+
+将对象的内容下载到本地磁盘上的文件中。
+
+```python theme={null}
+def download_to_filename(object_name: str, dest_filename: str) -> None
+```
+
+**参数**：
+
+* `object_name` (str) - App Storage 中要下载的源对象名称。
+* `dest_filename` (str) - 本地磁盘上的目标文件名。
+
+**抛出异常**：
+
+* `ObjectNotFoundError` - 表示该对象不存在。
+
+<div id="exists">
+  ### exists
+</div>
+
+`exists` 方法用于检查对象是否存在。
+
+```python theme={null}
+def exists(object_name: str) -> bool
+```
+
+**参数**：
+
+* `object_name` (str) - 要检查是否存在的对象名称。
+
+**返回**：
+
+* `bool`：如果对象存在则返回 `True`，否则返回 False。
+
+<div id="list">
+  ### list
+</div>
+
+`list` 方法用于列出存储桶中的对象。
+
+```python theme={null}
+def list(end_offset: Optional[str] = None,
+         match_glob: Optional[str] = None,
+         max_results: Optional[int] = None,
+         prefix: Optional[str] = None,
+         start_offset: Optional[str] = None) -> List[Object]
+```
+
+**参数**：
+
+* `end_offset`(Optional[str]) - 过滤结果，仅返回名称按字典序排在 `end_offset` 之前的对象。如果同时设置了 `start_offset`，则列出的对象
+  名称介于 `start_offset` (含) 和 `end_offset` (不含) 之间。
+* `match_glob` (Optional[str]) - 使用 glob 模式过滤结果。例如：&quot;foo*bar&quot; 可匹配 &quot;footbar&quot;、&quot;foo baz bar&quot; 和 &quot;foobar&quot;。
+* `max_results` (Optional[int]) - 响应中返回的最大结果数。
+* `prefix` (Optional[str]) - 过滤结果，仅返回名称带有指定前缀的对象。
+* `start_offset` (Optional[str]) - 过滤结果，仅返回名称按字典序等于或排在 `start_offset` 之后的对象。
+  当设置了 `end_offset` 时，列出的对象名称介于 `start_offset` (含) 和 `end_offset` (不含) 之间。
+
+**返回**：
+
+* `List`(Object)：与所提供查询参数匹配的对象列表。
+
+<div id="upload_from_filename">
+  ### upload_from_filename
+</div>
+
+使用 `upload_from_filename()` 将本地磁盘上的源文件作为对象上传到 App Storage。
+
+```python theme={null}
+def upload_from_filename(dest_object_name: str, src_filename: str) -> None
+```
+
+**参数**：
+
+* `dest_object_name`(str) - 上传后的文件名。
+* `src_filename`(str) - 要上传的源文件。
+
+<div id="upload_from_bytes">
+  ### upload_from_bytes
+</div>
+
+`upload_from_bytes` 方法根据 `bytes` 数据上传对象。
+
+```python theme={null}
+def upload_from_bytes(dest_object_name: str, src_data: bytes) -> None
+```
+
+**参数**：
+
+* `dest_object_name`(str) - 要上传的对象名称。
+* `src_data`(str) - 要上传的 `bytes` 数据。
+
+<div id="upload_from_text">
+  ### upload_from_text
+</div>
+
+`upload_from_text` 方法可从字符串上传对象。
+
+```python theme={null}
+def upload_from_text(dest_object_name: str, src_data: Union[bytes, str]) -> None
+```
+
+**参数**：
+
+* `dest_object_name`(str) - 要上传的对象名称。
+* `src_data`(str)- 要上传的文本数据。
+
+<div id="tipos-de-exceo">
+  ### 异常类型
+</div>
+
+* 使用 `Client` 与 Replit App Storage 交互时，任何方法都可能返回以下错误之一：
+
+  * `BucketNotFoundError`：表示所配置的存储桶名称与 App Storage 中的任何存储桶都不匹配。
+
+  * `DefaultBucketError`：表示缺少默认存储桶配置。
+
+  * `ForbiddenError`：表示访问该存储桶的权限不足。
+
+  * `TooManyRequestsError`：表示因请求过多，操作受到速率限制。
+
+  * `UnauthorizedError`：表示授权限制了对该操作的访问。
+
+<div id="exemplos-de-mtodos-de-classe">
+  ## 类方法示例
+</div>
+
+以下各节提供了使用 Replit App Storage SDK 管理对象的代码示例。
+
+<div id="recuperar-um-arquivo-como-texto">
+  ### 以文本形式获取文件
+</div>
+
+```python theme={null}
+client.download_as_text("file.json")
+```
+
+<div id="recuperar-bytes-brutos-de-um-arquivo">
+  ### 获取文件的原始字节
+</div>
+
+```python theme={null}
+client.download_as_bytes("file.png")
+```
+
+<div id="fazer-download-de-um-arquivo-para-o-sistema-de-arquivos-local">
+  ### 将文件下载到本地文件系统
+</div>
+
+```python theme={null}
+client.download_to_filename("file.json", dest_filename)
+```
+
+<div id="listar-objetos-no-bucket">
+  ### 列出存储桶中的对象
+</div>
+
+```python theme={null}
+client.list()
+```
+
+<div id="fazer-upload-de-um-arquivo-a-partir-de-texto">
+  ### 从文本上传文件
+</div>
+
+```python theme={null}
+client.upload_from_text("file.json", data)
+```
+
+<div id="fazer-upload-de-um-arquivo-como-bytes">
+  ### 以字节形式上传文件
+</div>
+
+```python theme={null}
+client.upload_from_bytes("file.png", data)
+```
+
+<div id="fazer-upload-de-objetos-a-partir-do-sistema-de-arquivos">
+  ### 从文件系统上传对象
+</div>
+
+```python theme={null}
+client.upload_from_filename("file.json", src_filename)
+```
+
+<div id="excluir-um-objeto-do-bucket">
+  ### 从存储桶中删除对象
+</div>
+
+```python theme={null}
+client.delete("file.json")
+```

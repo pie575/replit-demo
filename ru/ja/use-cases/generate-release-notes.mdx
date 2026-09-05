@@ -1,0 +1,151 @@
+---
+title: "Создание заметок о выпуске"
+description: "Каждую неделю превращайте изменения в GitHub и Linear в действительно читаемые заметки о выпуске."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent запросит ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Каждую неделю получаем изменения из GitHub и Linear, формируем клиентские
+примечания к выпуску, сгруппированные по новым функциям, улучшениям и исправлениям, и публикуем их в Notion. Пропускаем внутренние задачи и помечаем изменения,
+которые могут быть обратно несовместимыми, чтобы команды продукта и поддержки, а также клиенты регулярно получали одну и ту же
+информацию.
+
+<div id="section">
+  ## Оптимальное применение
+</div>
+
+* Продакт-менеджеры, которым нужна еженедельная история изменений без привязки к тегам версий.
+* Специалисты по продуктовому маркетингу и поддержке, которым нужна та же информация, что и клиентам.
+
+<div id="section-2">
+  ## Коннекторы
+</div>
+
+<Connectors
+  items={[
+{ id: "github", name: "GitHub", why: "Слитые пул-реквесты и теги" },
+{ id: "linear", name: "Linear", why: "Задачи и заголовки для клиентов" },
+{ id: "notion", name: "Notion", why: "Опубликованные заметки" },
+]}
+/>
+
+<div id="section-3">
+  ## Перед началом работы
+</div>
+
+Укажите для Agent целевой репозиторий и команду Linear. Подключите Notion для
+страницы публикации. Укажите день недели для еженедельного запуска.
+
+<div id="section-4">
+  ## Инструкции для Agent
+</div>
+
+<AiPrompt>
+  Создай рутину, которая запускается каждый понедельник в 9:00. Получай из GitHub и Linear сведения об изменениях за прошлую неделю,
+  формируй клиентские примечания к выпуску, сгруппированные по новым функциям, улучшениям и исправлениям, и публикуй их в Notion.
+  Пропускай задачи, предназначенные только для внутреннего использования. Помечай всё, что выглядит как обратно несовместимое изменение.
+</AiPrompt>
+
+<div id="section-5">
+  ## Чего ожидать
+</div>
+
+Agent создаёт заметки за прошлую неделю на основе пул-реквестов и задач, а затем оформляет страницу в Notion. Перед отправкой
+клиентам отредактируйте текст. Пропустите всё, что относится к внутренней работе, а обратно несовместимые изменения
+разместите в начале. Перед публикацией сверьте страницу с пул-реквестами, объединёнными на прошлой неделе.
+
+<div id="section-6">
+  ## Настройте под свои нужды
+</div>
+
+<AiPrompt>
+  Создайте две версии: для клиентов и для внутренней истории изменений. Храните их на одной странице Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Добавьте в канал #ship публикацию в Slack со ссылкой на страницу Notion и тремя ключевыми моментами.
+</AiPrompt>
+
+<div id="section-7">
+  ## Устранение неполадок
+</div>
+
+* **В заметки попадает внутренняя работа:** укажите Agent правильный репозиторий и команду Linear, а затем попросите его пропускать задачи, не предназначенные для клиентов.
+* **Обратно несовместимые изменения остались незамеченными:** объясните Agent, что для вас считается «критическим» (вход, выставление счетов, обязательные миграции и т. д.), и попросите помечать такие пункты и размещать их в начале.
+* **Указана неверная страница Notion:** предоставьте ссылку на нужную страницу или базу данных и укажите, следует ли перезаписывать заметки прошлой недели или создавать новую страницу при каждом запуске.
+
+<div id="section-8">
+  ## Дополнительные материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Поиск кандидатов" href="/ru/ja/use-cases/source-candidates">
+    Используйте тот же коннектор GitHub для подбора персонала, а не для развёртывания.
+  </Card>
+
+  <Card title="Анализ отзывов клиентов" href="/ru/ja/use-cases/analyze-customer-feedback">
+    Для продакт-менеджеров, которые также проверяют тикеты в Notion.
+  </Card>
+</CardGroup>

@@ -1,0 +1,104 @@
+---
+title: "Déploiement et publication"
+description: "Réponses aux questions courantes sur la publication : débogage des échecs, lecture des journaux, correction des erreurs d’exécution, redéploiement, changement de région, etc."
+---
+
+Cette réponse couvre la publication et le déploiement. Pour résoudre les problèmes étape par étape, consultez [Résolution des problèmes de déploiement](/fr/ko/build/troubleshooting). Pour en savoir plus sur les types de déploiement et le Monitoring, consultez [Déploiements Autoscale](/fr/ko/features/publishing/deployment-types#autoscale) et [Monitoring des déploiements](/fr/ko/features/publishing/monitoring-a-deployment).
+
+<AccordionGroup>
+  <Accordion title="La publication échoue lors de la création du service Autoscale. Comment déboguer ce problème ?">
+    La plupart des échecs de publication Autoscale peuvent être corrigés en consultant les journaux de déploiement :
+
+    1. Ouvrez **Publier** et repérez le déploiement qui a échoué.
+    2. Sélectionnez le menu à trois points situé à côté pour ouvrir les journaux.
+    3. Copiez la sortie des journaux, ouvrez un nouveau chat Agent, collez-la et demandez ce qui n&#39;a pas fonctionné et comment le corriger.
+
+    Si l&#39;erreur `No run command configured` s&#39;affiche alors que vous avez bien configuré une Run command, ouvrez les paramètres de déploiement, dissociez puis rajoutez la Run command, enregistrez et publiez de nouveau. Consultez [Résolution des problèmes de déploiement](/fr/ko/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="La publication a réussi, mais l’application affiche une erreur interne du serveur. Quel est le problème ?">
+    Si la publication réussit mais que votre application en ligne renvoie une erreur 500, le problème vient du code de l&#39;application et non de l&#39;infrastructure Replit :
+
+    1. Ouvrez **Publier**, consultez les journaux, puis copiez le texte complet de l&#39;erreur.
+    2. Ouvrez un nouveau chat Agent, collez-y les journaux et demandez quelle est la cause de l&#39;erreur.
+    3. Appliquez le correctif, puis republiez.
+
+    Si l&#39;Agent ne trouve pas le problème, ouvrez **Publier → Historique**, repérez la dernière version fonctionnelle et redéployez-la. Consultez [Résolution des problèmes de déploiement](/fr/ko/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon déploiement est bloqué pendant la création ou la migration. Que dois-je faire ?">
+    1. Ouvrez la palette de commandes avec `Cmd+K` (Mac) ou `Ctrl+K` (Windows), puis recherchez et sélectionnez **Restart compute**.
+    2. Ouvrez **Publier**, puis sélectionnez **Publier** pour lancer un nouveau déploiement.
+    3. Si l’échec se reproduit, ouvrez les journaux du déploiement ayant échoué depuis le menu à trois points, copiez les journaux de build et collez-les dans une nouvelle discussion Agent à des fins de diagnostic.
+
+    Si votre déploiement reste bloqué, [contactez l’assistance Replit](https://replit.com/support) en joignant l’intégralité des journaux de build. Consultez [Résolution des problèmes de déploiement](/fr/ko/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="L’application est en ligne, mais elle est lente ou génère des erreurs de délai d’expiration. Que dois-je vérifier ?">
+    1. Recherchez dans les journaux de déploiement les messages récurrents de dépassement de délai ou de mémoire insuffisante.
+    2. Vérifiez les ressources du déploiement au regard des limites de processeur ou de mémoire. Consultez [Monitoring d&#39;un déploiement](/fr/ko/features/publishing/monitoring-a-deployment).
+    3. Ouvrez un nouveau chat Agent et collez-y les journaux récents en demandant à Agent d&#39;identifier les goulots d&#39;étranglement.
+
+    Parmi les causes courantes figurent les requêtes de base de données sans index, les opérations synchrones bloquantes et les fuites de mémoire. Dans le cas des [déploiements Autoscale](/fr/ko/features/publishing/deployment-types#autoscale), la première requête après une mise à l&#39;échelle à zéro peut prendre quelques secondes : il s&#39;agit d&#39;un démarrage à froid normal.
+  </Accordion>
+
+  <Accordion title="Des builds ayant échoué apparaissent dans l’historique des déploiements. Comment déterminer ce qui ne va pas ?">
+    Ouvrez **Publishing → Historique**, sélectionnez le déploiement en échec, puis consultez les journaux de build. Repérez la première ligne marquée `ERROR` ou `FAILED` : c&#39;est généralement la cause première, les lignes suivantes n&#39;en étant que les conséquences. Copiez cette section dans un nouveau chat Agent pour établir un diagnostic. La plupart des échecs de build proviennent de dépendances manquantes, d&#39;une commande d&#39;exécution incorrecte ou d&#39;une migration de base de données ayant échoué. Consultez [Monitoring d&#39;un déploiement](/fr/ko/features/publishing/monitoring-a-deployment).
+  </Accordion>
+
+  <Accordion title="L’application fonctionne dans l’aperçu de l’éditeur, mais plus une fois publiée. Pourquoi ?">
+    Il s&#39;agit presque toujours d&#39;une différence de configuration entre les environnements. Vérifiez les points suivants :
+
+    * Assurez-vous que toutes les clés du panneau [Secrets](/fr/ko/core-concepts/project-editor/app-setup/secrets) de développement sont également définies dans les secrets de déploiement. Il s&#39;agit d&#39;environnements distincts.
+    * Vérifiez que `DATABASE_URL` pointe vers la base de données de production et non vers celle de développement.
+    * Assurez-vous qu&#39;il n&#39;y a aucune référence codée en dur à `localhost` ou `127.0.0.1`. Utilisez plutôt des chemins relatifs ou des URL basées sur l&#39;environnement.
+
+    Consultez ensuite les journaux de déploiement pour repérer les erreurs propres à la production. Voir [Résolution des problèmes de déploiement](/fr/ko/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Mon déploiement Autoscale ne cesse de redémarrer. Que signifient SIGTERM ou le code de sortie 1 ?">
+    Le [déploiement Autoscale](/fr/ko/features/publishing/deployment-types#autoscale) redémarre régulièrement par conception. La présence de `SIGTERM` dans les journaux indique que le processus s&#39;est arrêté normalement. C&#39;est normal. `Exit code 1` indique que le processus a planté de lui-même. Pour identifier l&#39;erreur réelle, consultez la ligne juste avant.
+
+    Si les redémarrages sont assez fréquents pour affecter les utilisateurs, recherchez des rejets de promesses non gérés, des erreurs de mémoire insuffisante ou des variables d&#39;environnement manquantes entraînant l&#39;échec du démarrage.
+  </Accordion>
+
+  <Accordion title="J’ai mis à jour les variables d’environnement, mais les modifications ne sont pas répercutées dans mon application publiée. Pourquoi ?">
+    Replit conserve les secrets de développement et de production dans des espaces de stockage distincts : modifier l’un ne met pas à jour l’autre. Le panneau [Secrets de développement](/fr/ko/core-concepts/project-editor/app-setup/secrets) est disponible uniquement dans l’éditeur, tandis que les applications publiées utilisent les secrets de déploiement.
+
+    Pour mettre à jour une variable dans une application en ligne, définissez-la dans les secrets de déploiement, puis ouvrez **Publier** et sélectionnez **Publier** pour la republier. La nouvelle valeur est appliquée au démarrage d’un nouveau déploiement. Consultez [Résoudre les problèmes de déploiement](/fr/ko/build/troubleshooting).
+  </Accordion>
+
+  <Accordion title="Comment déclencher un redéploiement sans modifier le code ?">
+    Ouvrez **Publier**, puis sélectionnez **Publier**. Même en l’absence de modifications, Replit génère et publie le code actuel. Cette option est utile après la mise à jour de secrets, la réactivation d’une base de données ou l’application de mises à jour de dépendances.
+
+    Si l’application ne répond pas et qu’un redéploiement complet est trop contraignant, ouvrez la palette de commandes avec `Cmd+K` (Mac) ou `Ctrl+K` (Windows), puis recherchez et sélectionnez **Restart compute**.
+  </Accordion>
+
+  <Accordion title="Puis-je modifier la région de déploiement de mon application après sa publication ?">
+    Non. Une fois l&#39;application publiée, la région de publication ne peut plus être modifiée directement. Pour déplacer une application, remixez-la puis publiez le remix dans la nouvelle région. Consultez [Région du projet](/fr/ko/features/publishing/project-geography).
+
+    La région de la base de données ne peut pas non plus être modifiée directement. Une application remixée peut recevoir un sous-domaine `.replit.app` différent : si vous avez besoin d&#39;une URL stable, connectez d&#39;abord un [domaine personnalisé](/fr/ko/features/publishing/custom-domains), puis ajoutez de nouveau les secrets de déploiement.
+  </Accordion>
+
+  <Accordion title="Pourquoi les analyses PCI ou les analyses de sécurité signalent-elles le cookie GAESA dans les applications publiées ?">
+    L’infrastructure de diffusion de Google ajoute un cookie `GAESA` (affinité de session Google App Engine) aux Apps Replit publiées afin d’acheminer les requêtes vers l’instance appropriée. Cette valeur est un identifiant de routage opaque et ne contient aucune donnée sensible ni liée à l’application.
+
+    Certains scanners de sécurité signalent `GAESA`, car il ne définit pas les attributs `Secure` ou `HttpOnly`. Votre App ne crée pas ce cookie, et il est impossible de le modifier ou de le désactiver dans les Apps publiées.
+
+    Si ce cookie est signalé lors d’un contrôle de conformité PCI ou d’une analyse de sécurité, contestez ce résultat auprès du fournisseur du scanner en le qualifiant de faux positif. Indiquez le nom du cookie et expliquez que l’infrastructure de Google le définit pour le routage des requêtes. Les Apps publiées ne peuvent ni lire, ni modifier, ni désactiver ce cookie, qui ne contient pas de données sensibles.
+
+    Vous êtes responsable de la conformité des Apps que vous créez vous-même. Consultez le [modèle de responsabilité partagée](/fr/ko/features/security/shared-responsibility-model). Si le fournisseur du scanner a besoin de plus d’informations, [contactez l’assistance Replit](https://replit.com/support).
+  </Accordion>
+
+  <Accordion title="Comment mettre une application hors ligne ou annuler sa publication ?">
+    Ouvrez **Publishing**, sélectionnez l&#39;option d&#39;arrêt du deployment, puis confirmez. L&#39;application passe hors ligne et les frais de deployment cessent d&#39;être facturés. Les fichiers du projet, le code et les bases de données ne sont pas supprimés : seul le deployment en ligne est arrêté. Les domaines personnalisés associés à ce deployment sont dissociés : pensez à les rajouter lors de la republication.
+
+    Si les coûts vous préoccupent, sachez que les [deployments Autoscale](/fr/ko/features/publishing/deployment-types#autoscale) descendent à zéro en l&#39;absence de trafic : il n&#39;est donc pas forcément nécessaire de les arrêter.
+  </Accordion>
+</AccordionGroup>
+
+<div id="section">
+  ## Besoin d’aide supplémentaire ?
+</div>
+
+Si vous ne trouvez pas la réponse à votre question sur les déploiements, [contactez l’assistance Replit](https://replit.com/support).

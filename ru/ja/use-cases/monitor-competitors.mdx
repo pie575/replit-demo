@@ -1,0 +1,152 @@
+---
+title: "Отслеживание конкурентов"
+description: "Выявляйте изменения цен и функций, поддерживая страницу конкурентной аналитики в актуальном состоянии."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent попросит указать ваш ключ API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Отслеживайте страницы конкурентов с ценами, журналами изменений и описанием функций. При появлении важных изменений кратко опишите их, уведомите команду в Slack и поддерживайте страницу конкурентной аналитики в Notion в актуальном состоянии. Прежде чем сообщать об этом отделу продаж, подтвердите изменения на самом сайте.
+
+<div id="section">
+  ## Кому подойдёт
+</div>
+
+* Продакт-менеджерам, которым всегда нужны актуальные страницы конкурентов.
+* Аккаунт-менеджерам, которые хотят узнавать об изменениях цен до срыва сделки.
+
+<div id="section-2">
+  ## Коннекторы
+</div>
+
+<Connectors
+  items={[
+{
+id: "slack",
+name: "Slack",
+why: "Уведомления о важных изменениях",
+},
+{ id: "notion", name: "Notion", why: "Страница конкурентной аналитики" },
+]}
+/>
+
+<div id="section-3">
+  ## Перед началом
+</div>
+
+Сообщите Agent список конкурентов и страницы, за которыми нужно следить (цены, журнал изменений, функции). Подключите Slack и Notion.
+
+<div id="agent">
+  ## Промпт для Agent
+</div>
+
+<AiPrompt>
+  Создай рутину, которая запускается каждое утро в 8:00. Отслеживай этих
+  конкурентов: [список URL]. Выявляй изменения в ценах и функциях, кратко
+  описывай, что изменилось, отправляй уведомление в Slack, если изменение
+  важное, и поддерживай страницу конкурентной аналитики в Notion в актуальном
+  состоянии.
+</AiPrompt>
+
+<div id="section-4">
+  ## Чего ожидать
+</div>
+
+Agent сравнивает каждую страницу с её предыдущей версией, составляет краткое описание изменений и обновляет Notion. Прежде чем сообщать об этом отделу продаж, проверьте изменения на самом сайте. В первые дни после обновления страницы будет много несущественных изменений, поэтому укажите, что считать важным. Получив уведомление в Slack, откройте фактический URL и самостоятельно проверьте изменения, прежде чем пересылать уведомление.
+
+<div id="section-5">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Отправляйте уведомления в Slack только при изменении цен или пакетов. Все остальные
+  изменения на страницах записывайте в Notion без уведомлений.
+</AiPrompt>
+
+<AiPrompt>
+  При изменении цены создайте в Notion бриф для отдела продаж из 5 строк: что
+  изменилось, кого это затронет и сравнение с нашей компанией.
+</AiPrompt>
+
+<div id="section-6">
+  ## Устранение неполадок
+</div>
+
+* **Каждое обновление выглядит как изменение цены:** Укажите Agent страницы для мониторинга (цены, журнал изменений, функции) и то, что считаете важным. Прежде чем сообщать об этом отделу продаж, проверьте изменения на самом сайте.
+* **Уведомления вообще не приходят:** Возможно, Agent не может получить доступ к странице или список конкурентов слишком узкий. Укажите полный URL и попросите Agent сообщать, если ему не удастся загрузить страницу.
+* **Notion превратился в набор разрозненных заметок:** Укажите Agent единую страницу конкурентной аналитики в Notion и попросите обновлять её, а не создавать новую каждое утро.
+
+<div id="section-7">
+  ## Связанные материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Отслеживание упоминаний бренда" href="/ru/ja/use-cases/monitor-brand-mentions">
+    Используйте ту же интеграцию со Slack и Notion не только для мониторинга сайтов конкурентов, но и для отслеживания того, что говорят люди.
+  </Card>
+
+  <Card title="Создание еженедельных отчётов по продажам" href="/ru/ja/use-cases/weekly-pipeline-report">
+    Для аккаунт-менеджеров и руководителей отдела продаж, которые хотят отслеживать динамику воронки продаж.
+  </Card>
+</CardGroup>

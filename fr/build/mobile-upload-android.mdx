@@ -1,6 +1,8 @@
 ---
-title: "Téléverser votre application dans Play Console"
-description: "Créez une version de production et téléversez-la manuellement dans Google Play Console."
+title: "Téléverser votre app sur la Play Console"
+description: "Créez une version de production et téléversez-la manuellement sur la Google Play Console."
+sidebarTitle: "Téléverser votre app"
+icon: "cloud-arrow-up"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,72 +20,85 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-export const androidReleasePrompt = "Build a production release of PixelGames for Google Play.";
+export const androidReleasePrompt = "Crée une version de production de PixelGames pour Google Play.";
 
-Le téléversement place votre application dans Play Console. Rien avant cette étape n'est visible par Google, et rien après, ni les tests internes ni la soumission pour examen, ne fonctionne avant que ce soit fait.
+Le téléversement intègre votre app à Play Console. Avant cette étape, rien n&#39;est visible par Google,
+et après, ni les tests internes ni la soumission pour examen ne fonctionneront tant qu&#39;il n&#39;aura pas été effectué.
 
-Vous aurez d'abord besoin d'un [compte Play Console](/build/mobile-google-account).
+Vous aurez d&#39;abord besoin d&#39;un [compte Play Console](/fr/build/mobile-google-account).
 
-## Ce qui est téléversé
+<div id="what-gets-uploaded">
+  ## Ce qui est téléversé
+</div>
 
-Un **build** est une copie réelle et installable de votre application, le même type de fichier que vous obtiendriez depuis Google Play, sauf qu'elle n'est pas encore publiée. Expo Go exécute votre code dans une application de preview partagée, un build correspond à votre application seule, c'est pourquoi des fonctionnalités comme les notifications push et les achats intégrés ne fonctionnent qu'ici.
+Un **build** est une copie installable de votre app, semblable au fichier que vous obtiendriez depuis
+Google Play, mais qui n’est pas encore publiée. Expo Go exécute votre code dans une app d’aperçu
+partagée ; un build est votre app autonome. C’est pourquoi des fonctionnalités telles que les notifications push et
+les achats intégrés ne fonctionnent que dans un build.
 
 Les builds Android sont des fichiers `.aab` (Android App Bundle), le format attendu par Google Play.
 
-## Créez-le
+<div id="build-it">
+  ## Créez-la
+</div>
 
 <AiPrompt>
   {androidReleasePrompt}
 </AiPrompt>
 
-Agent lance un build de production sur les serveurs Expo et vous donne un lien de téléchargement une fois prêt, généralement en 10 à 15 minutes. Vous le retrouverez aussi dans votre tableau de bord Expo sous **Builds**.
+Agent lance un build de production sur les serveurs d’Expo et vous fournit un lien de téléchargement lorsqu’il est
+prêt, généralement en 10 à 15 minutes. Vous pouvez également le trouver dans votre dashboard Expo, sous
+**Builds**.
 
-## Téléversez-le
+<div id="upload-it">
+  ## Téléversez-le
+</div>
 
 <Steps>
   <Step title="Téléchargez le fichier .aab">
-    Ouvrez le lien de build fourni par Agent et téléchargez le `.aab`.
+    Ouvrez le lien de build fourni par Agent et téléchargez le fichier `.aab`.
 
-    <Frame caption="Le lien de téléchargement d'Agent pour le build .aab terminé.">
-      <img src="/assets/mirror/download-aab-file-37eb1c14cbd2.png" alt="Message du chat Agent avec un lien de téléchargement vers le fichier .aab terminé" data-path="images/pixelgames/mobile/download-aab-file.png" width="449" height="206" data-path="images/pixelgames/mobile/download-aab-file.png" />
+    <Frame caption="Lien de téléchargement d’Agent pour le build .aab généré.">
+      <img src="/assets/mirror/download-aab-file-37eb1c14cbd2.png" alt="Message du chat Agent avec un lien de téléchargement vers le build .aab généré" data-path="images/pixelgames/mobile/download-aab-file.png" width="449" height="206" data-path="images/pixelgames/mobile/download-aab-file.png" />
     </Frame>
   </Step>
 
-  <Step title="Créez l'application dans Play Console">
-    Si vous ne l'avez pas déjà fait, sélectionnez **Create app** dans Play Console et renseignez
-    le nom, la langue par défaut, et s'il s'agit d'une application ou d'un jeu.
+  <Step title="Créez l’application dans Play Console">
+    Si ce n’est pas déjà fait, sélectionnez **Create app** dans Play Console et renseignez le nom,
+    la langue par défaut et indiquez s’il s’agit d’une application ou d’un jeu.
   </Step>
 
-  <Step title="Créez une release">
-    Choisissez une piste, **Internal testing** pour commencer, puis sélectionnez **Create new
-    release**.
+  <Step title="Créez une version">
+    Choisissez un canal, **Internal testing** pour commencer, puis sélectionnez **Create new release**.
   </Step>
 
-  <Step title="Téléversez le .aab">
-    Déposez le fichier dans la release, et Play Console le traite. Une fois terminé, le build
-    est prêt à être assigné à des testeurs ou promu en production.
+  <Step title="Téléversez le fichier .aab">
+    Déposez le fichier dans la version et Play Console le traite. Une fois le traitement terminé, la
+    build peut être attribuée à des testeurs ou promue en production.
   </Step>
 </Steps>
 
-## Dépannage
+<div id="troubleshooting">
+  ## Résolution des problèmes
+</div>
 
-* **Play Console refuse le téléversement :** le code de version doit augmenter à chaque
-  téléversement. Demandez à Agent de l'incrémenter et de reconstruire.
-* **Le build reste bloqué en compilation :** les builds sont mis en file d'attente et prennent
-  généralement 10 à 15 minutes. Vérifiez votre tableau de bord Expo sous **Builds** avant de
-  penser qu'il y a un problème.
-* **Invite « App signing » au premier téléversement :** laissez Google gérer la clé de
-  signature, c'est le comportement par défaut et cela signifie que Google peut re-signer vos
-  futurs téléversements pour vous.
+* **Play Console refuse le téléversement :** le code de version doit augmenter à chaque téléversement.
+  Demandez à Agent de l’incrémenter et de relancer le build.
+* **Le build reste bloqué lors de la compilation :** les builds sont mis en file d’attente et prennent généralement 10 à 15 minutes. Consultez
+  votre dashboard Expo dans la section **Builds** avant de conclure à un problème.
+* **Invite « App signing » lors du premier téléversement :** laissez Google gérer la clé de signature ; c’est
+  l’option par défaut, qui permet à Google de signer à nouveau vos futurs téléversements.
 
-## Prochaines étapes
+<div id="whats-next">
+  ## Prochaines étapes
+</div>
 
 <CardGroup cols={2}>
-  <Card title="Tester en Internal Testing" icon="flask" href="/build/mobile-internal-testing">
-    Confiez d'abord le build téléversé à de vrais testeurs.
+  <Card title="Tester en interne" icon="flask" href="/fr/build/mobile-internal-testing">
+    Faites d’abord tester la build téléversée par de vrais testeurs.
   </Card>
 
-  <Card title="Soumettre au Play Store" icon="paper-plane" href="/build/mobile-publish-android">
-    Terminez la fiche et envoyez-la pour examen.
+  <Card title="Soumettre au Play Store" icon="paper-plane" href="/fr/build/mobile-publish-android">
+    Finalisez la fiche et soumettez-la à validation.
   </Card>
 </CardGroup>

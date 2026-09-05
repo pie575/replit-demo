@@ -1,0 +1,210 @@
+---
+title: "导入并部署现有项目"
+description: "将现有代码导入 Replit，使其能在 Preview 中运行，添加所需配置，部署并验证公开 URL。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+⏰ *预计用时：10 分钟*
+
+如果你已有代码、从其他工具导出的项目或 ZIP 文件，并想继续在 Replit 中开发，请参考本指南。
+
+导入只是第一步。真正的目标是让项目运行起来，明确需要哪些配置，部署项目，并确认公开版本能正常运行。
+
+<div id="o-que-voc-vai-conquistar">
+  ## 您将获得的成果
+</div>
+
+完成本指南后，您将：
+
+* 将一个现有项目导入 Replit。
+* 获得 Agent 对框架、依赖项、命令和缺失配置的总结。
+* 拥有一个可正常运行的 Preview。
+* 在正确的位置添加所需的 Secret 或环境变量。
+* 获得一个已发布的 URL，并以首次访问者的身份进行测试。
+
+<div id="o-que-voc-vai-aprender">
+  ## 你将学到什么
+</div>
+
+你将了解如何：
+
+* 在更改项目行为前，让 Agent 检查已导入的项目。
+* 识别运行命令、构建命令、依赖项、端口和 Secrets。
+* 按最小改动原则修复配置问题。
+* 在部署前通过 Preview 测试应用。
+* 在部署后验证已部署应用。
+
+<div id="para-quem-este-guia">
+  ## 本指南适用对象
+</div>
+
+如果你要导入以下内容，请使用本指南：
+
+* GitHub 仓库。
+* Figma、Bolt、Lovable、Base44、Vercel 项目或 ZIP 文件。
+* 他人已开始编写的代码。
+* 想继续使用 Agent 开发的旧项目。
+
+如需了解不同来源的具体导入步骤，请参阅[从 GitHub 导入](/zh/pt/build/import-from-github)或[导入概览](/zh/pt/references/workspace/import)。
+
+<div id="importar-o-projeto">
+  ## 导入项目
+</div>
+
+打开 [replit.com/import](https://replit.com/import)，选择来源并按照导入流程操作。
+
+项目在 Replit 中打开后，不要急着添加新功能。先让 Agent 检查导入的内容。
+
+<AiPrompt>
+  检查这个导入的项目，帮我了解如何在 Replit 中运行它。<br />
+  识别所用框架、依赖项、运行命令、构建命令、所需环境变量、端口以及可能的配置问题。<br />
+  暂时不要更改应用的行为。<br />
+  给我一份让 Preview 正常运行的最简清单。
+</AiPrompt>
+
+导入的项目通常需要进行配置，因为本地配置值、私有凭证和部署配置不一定会从原始环境中迁移过来。
+
+<div id="fazer-o-preview-funcionar">
+  ## 让 Preview 正常运行
+</div>
+
+发布前，Preview 必须能够正常运行。
+
+如果 App 无法启动，请让 Agent 按顺序排查并修复配置问题，而不是重写 App。
+
+<AiPrompt>
+  帮我在 Preview 中启动这个导入的 App。<br />
+  检查依赖是否已安装、运行命令、构建命令、端口、主机绑定以及缺失的 Secrets。<br />
+  先修复影响最小的问题，并说明我该如何测试结果。
+</AiPrompt>
+
+请检查：
+
+* 依赖是否已成功安装。
+* 运行命令是否能启动 App。
+* App 是否监听预期的端口。
+* Preview 是否能正常打开，而不会显示空白页或错误页面。
+* App 的核心流程是否正常运行。
+
+如果 Agent 在 App 运行前建议更改其行为，请让它暂停，仅专注于配置。
+
+<div id="adicionar-secrets-e-configuraes-ausentes">
+  ## 添加缺失的 Secrets 和配置
+</div>
+
+Secret 值不会从 GitHub 或大多数外部来源导入。请通过 [Secrets](/zh/pt/core-concepts/project-editor/app-setup/secrets) 添加 API 密钥、令牌、数据库 URL 和提供商凭证，不要将其写入代码。
+
+请 Agent 识别缺失的值，但不要凭空编造。
+
+<AiPrompt>
+  列出此 App 所需的环境变量和 Secrets。<br />
+  对每一项，说明其用途、Preview 是否需要它，以及应从哪里获取该值。<br />
+  不要在代码中创建占位 Secret。
+</AiPrompt>
+
+如果 App 使用自定义运行或构建命令，请参阅与 [Workflows](/zh/pt/references/workspace/workflows) 和 [配置](/zh/pt/references/configuration/configuration)相关的 App 配置文档。
+
+<div id="testar-antes-de-publicar">
+  ## 部署前测试
+</div>
+
+打开 Preview，以首次访问的访客身份测试导入的应用。
+
+检查：
+
+* 首页能正常加载。
+* 主导航正常工作。
+* 如果应用使用表单、按钮、登录、结账流程、上传或 API 调用，这些功能均能正常工作。
+* 刷新页面不会导致应用失效。
+* 重启应用后仍能正常运行。
+* 日志中没有隐藏的错误。
+
+如果出现问题，请向 Agent 描述症状。
+
+<AiPrompt>
+  Preview 可以加载，但提交预约表单时出现以下错误：[粘贴错误]。<br />
+  找出导致此问题的最小配置或代码问题。<br />
+  说明修复方法，并告诉我如何验证表单之后能正常工作。
+</AiPrompt>
+
+<div id="publicar-e-verificar">
+  ## 部署并验证
+</div>
+
+仅在 Preview 正常运行后再进行部署。
+
+如果应用需要，请在部署面板中添加生产环境的 Secrets 和环境变量。Preview 中使用的值不一定会自动用于已部署应用。
+
+部署后：
+
+* 在新标签页中打开公共 URL。
+* 执行你在 Preview 中测试过的相同核心流程。
+* 验证登录回调、API 调用、支付重定向和数据库访问等仅限生产环境的功能。
+* 如果访客会使用手机，请确认应用在移动设备上仍能正常运行。
+
+如果部署失败，请参阅[排查部署问题](/zh/pt/build/troubleshooting)。
+
+<div id="voc-terminou-quando">
+  ## 完成标准
+</div>
+
+* 项目已成功导入。
+* Agent 已识别所需的框架、命令、端口、依赖项和 Secrets。
+* Preview 已启动，且核心流程运行正常。
+* 所需的 Secrets 已存储在代码之外。
+* App 已成功部署。
+* 在新标签页中测试时，公共 URL 可正常访问。
+
+<div id="melhorias-a-seguir">
+  ## 后续优化
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加数据库" icon="database" href="/zh/pt/build/add-database">
+    持久存储导入应用的数据。
+  </Card>
+
+  <Card title="添加登录功能" icon="user-lock" href="/zh/pt/build/add-login">
+    保护私密页面和用户专属数据。
+  </Card>
+
+  <Card title="添加集成" icon="plug" href="/zh/pt/build/add-integrations">
+    重新连接 API、CRM、电子邮件、分析工具或外部服务。
+  </Card>
+
+  <Card title="添加自定义域名" icon="globe" href="/zh/pt/build/add-custom-domain">
+    为已部署应用设置带有您品牌的 URL。
+  </Card>
+</CardGroup>
+
+<div id="precisa-de-mais-ajuda">
+  ## 需要更多帮助？
+</div>
+
+* **导入成功但 App 无法运行：**检查依赖项、运行命令、端口以及缺失的环境变量。
+* **Preview 能正常运行但部署失败：**检查生产环境的 Secrets、数据库访问权限、主机绑定和端口配置。
+* **上传的文件在部署后消失：**请使用数据库或存储服务来存储持久数据。
+* **Agent 想要重写 App：**让它先专注于配置，并保留现有行为。
+
+<div id="relacionado">
+  ## 相关内容
+</div>
+
+* [导入](/zh/pt/references/workspace/import)
+* [Secrets](/zh/pt/core-concepts/project-editor/app-setup/secrets)
+* [Workflows](/zh/pt/references/workspace/workflows)
+* [部署问题排查](/zh/pt/build/troubleshooting)

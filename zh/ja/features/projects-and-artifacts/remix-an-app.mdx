@@ -1,0 +1,233 @@
+---
+title: "Remix App"
+description: "了解如何创建已发布的 Replit App 或模板的个人副本，并在工作区中探索、自定义和构建。"
+---
+
+export const RemixButton = ({replUrl = "https://replit.com/@sarahxli/Digital-Piano-Keys?v=1", label = "Remix this app", count = null}) => {
+  if (typeof document !== 'undefined' && !document.getElementById('remix-button-styles')) {
+    const style = document.createElement('style');
+    style.id = 'remix-button-styles';
+    style.textContent = `
+      /* Button container */
+      .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --btn-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --btn-text: var(--replit-docs-text, #1D1D1D);
+        --btn-border: var(--replit-docs-border, #DEDAD5);
+        --transition-duration: 120ms;
+        display: flex;
+        justify-content: center;
+      }
+
+      .dark .remix-btn-container,
+      html.dark .remix-btn-container,
+      [data-theme="dark"] .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-elevated, #222223);
+        --btn-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --btn-text: var(--replit-docs-text, #F5F5F5);
+        --btn-border: var(--replit-docs-border, #39393D);
+      }
+
+      /* Button base styles - matching template page exactly */
+      .remix-btn {
+        /* Layout */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        max-width: 400px;
+        min-width: 200px;
+        height: 36px;
+        padding: 0 16px;
+        gap: 8px;
+
+        /* Typography */
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5;
+        text-decoration: none;
+        white-space: nowrap;
+
+        /* Visual */
+        border-radius: 8px;
+        border: none;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        box-shadow: inset 0 0 0 1px var(--btn-border);
+
+        /* Interaction */
+        cursor: pointer;
+        user-select: none;
+        transition-property: background-color;
+        transition-duration: var(--transition-duration);
+        transition-timing-function: ease-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      /* Content (icon + label) - centered */
+      .remix-btn-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      /* Hover state */
+      @media (hover: hover) {
+        .remix-btn:hover {
+          background: var(--btn-bg-hover);
+        }
+      }
+
+      /* Active/pressed state */
+      .remix-btn:active {
+        background: var(--btn-bg-hover);
+        transform: scale(0.99);
+      }
+
+      /* Focus visible state */
+      .remix-btn:focus-visible {
+        outline: 2px solid #0079F2;
+        outline-offset: 2px;
+      }
+
+      /* Icon styles */
+      .remix-btn svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Label styles */
+      .remix-btn span {
+        font-weight: 600;
+      }
+
+      /* Animation */
+      @keyframes remix-btn-fade-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .remix-btn-container {
+        animation: remix-btn-fade-in 300ms ease-out;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleClick = e => {
+    e.preventDefault();
+    const url = replUrl.includes('replit.com') ? replUrl : `https://replit.com${replUrl}`;
+    window.open(url, '_blank');
+  };
+  const RemixIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMin">
+      <path d="M17.47 13.47a.75.75 0 0 1 1.06 0l4 4a.745.745 0 0 1 .118.16c.016.027.032.054.044.083.007.016.01.032.016.049a.744.744 0 0 1 .042.238.743.743 0 0 1-.037.223c-.007.02-.012.042-.02.062a.748.748 0 0 1-.163.245l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H15.95a4.753 4.753 0 0 1-3.886-2.09l-.351-.442a.75.75 0 0 1 1.172-.936l.36.45.04.055a3.251 3.251 0 0 0 2.68 1.463h4.224l-2.72-2.72a.75.75 0 0 1 0-1.06ZM17.47 1.47a.75.75 0 0 1 1.06 0l4 4a.756.756 0 0 1 .162.816.749.749 0 0 1-.162.244l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H16.02a3.25 3.25 0 0 0-2.674 1.372l-5.44 8.58a4.75 4.75 0 0 1-3.934 2.047L2 18.75a.75.75 0 0 1 0-1.5h1.979a3.25 3.25 0 0 0 2.673-1.373l5.442-8.578.02-.03a4.751 4.751 0 0 1 3.913-2.018l4.162-.001-2.72-2.72a.75.75 0 0 1 0-1.06ZM3.972 5.25a4.75 4.75 0 0 1 4.27 2.612.751.751 0 0 1-1.34.675 3.252 3.252 0 0 0-2.698-1.781l-.226-.006H2a.75.75 0 0 1 0-1.5h1.972Z" />
+    </svg>;
+  return <div className="remix-btn-container" style={{
+    margin: '16px 0'
+  }}>
+      <button onClick={handleClick} className="remix-btn" type="button" tabIndex={0}>
+        <RemixIcon />
+        <span>{label}</span>
+      </button>
+    </div>;
+};
+
+使用 Remix，您可以基于社区创建的现有 App 开始构建。这比从零开始构建更快，也是通过可运行的代码学习的绝佳方式。
+
+<Tip>
+  初次使用 Replit？不妨尝试[构建您的第一个 App](/zh/ja/build/your-first-app)，了解 Agent 如何从零开始构建 App。
+</Tip>
+
+<div id="section">
+  ## 什么是 Remix
+</div>
+
+**Remix** 是基于你当前有权访问的应用创建的新 Replit App。对已发布的应用或模板进行 Remix 后，你会获得自己的副本，可在此基础上逐步修改和完善。你在 Remix 中所做的更改不会影响原始应用。
+
+Remix 会明确注明原始应用：页面会显示指向原始应用的 **Remixed from** 链接，原始应用的构建提示词也会显示在封面页面上。
+
+<div id="section-2">
+  ## Remix 包含哪些内容
+</div>
+
+Remix 是一个可完全正常运行的副本，与原始 App 完全分离。
+
+* **所有文件和设置**都会被复制，因此 App 的运行方式与原始 App 完全相同。
+* **原始 App 的检查点历史记录**也会一并保留，并标记为原始 App 的历史记录。你可以随时回滚到这些检查点，但生成这些检查点的对话仍会保留在原始 App 中。
+* **全新的 Agent**。Remix 会从新的 Agent 开始，不会继承聊天记录。
+* **仅复制密钥名称，不复制值**。如果 App 使用密钥 (例如 API 密钥) ，Remix 中会列出这些密钥，让你知道需要输入什么，但其值将为空。只有 Remix 自己的 App 时，密钥值才会被复制。
+* **新的数据库**。Remix 不会连接到原始 App 的数据库。如果原始 App 有数据库，你可以使用 **Copy data from original App** 选项复制数据本身，但所做的更改不会影响原始 App。
+* 对于使用 Replit Auth 的 App，**新的登录设置**。
+
+不会被复制的内容包括：部署、域名和连接器设置，需要你在自己的副本中单独配置。此外，Remix 初始为非公开状态，因此在你选择发布之前，不会共享任何内容。
+
+<div id="section-3">
+  ## 如何 Remix 应用
+</div>
+
+<Steps>
+  <Step title="打开应用的封面页面">
+    在[社区](https://replit.com/community/all)等位置找到你想要 Remix 的应用。封面页面会显示实时预览和分享选项。
+  </Step>
+
+  <Step title="Remix 应用">
+    选择 **Remix this App**，开始创建自己的版本。
+  </Step>
+
+  <Step title="填写应用详情">
+    在 **Remix App** 对话框中，为副本填写名称和可选说明，然后选择 **Remix App**。你可以稍后编辑这些信息。
+
+    <Frame>
+      <img src="/assets/mirror/quickstart_remix_dialog-39c49a3d7bb7.png" alt="显示应用名称、说明和隐私设置的 Remix App 对话框" width="1222" height="1202" data-path="images/getting-started/quickstart_remix_dialog.png" />
+    </Frame>
+  </Step>
+
+  <Step title="探索你的副本">
+    副本会在工作区中打开并自动启动。切换到 **Preview** 标签页，即可查看应用的运行效果。
+  </Step>
+</Steps>
+
+<div id="section-4">
+  ## 亲自试试
+</div>
+
+让我们试着 Remix [从模板开始](/zh/ja/design/start-from-a-template)中介绍的 **Supercar showcase** 模板。
+
+<Frame>
+  <img src="/assets/mirror/supercar-showcase-0dac55fd5243.webp" alt="Supercar showcase 模板封面：深色着陆页以一辆银色超级跑车为主视觉图片" width="1920" height="1080" data-path="images/design/replit-design/templates/supercar-showcase.webp" />
+</Frame>
+
+<RemixButton replUrl="https://replit.com/t/replit-gallery/repls/Apex-01/view" label="Remix 此 App" />
+
+<div id="section-5">
+  ## 在 Remix 的基础上继续构建
+</div>
+
+在工作区中打开 Remix 后，可使用 Agent 进行修改和扩展。在 **Agent** 标签页中输入提示词，描述您想添加的功能。
+
+要撤销 Agent 所做的更改，请在更改后创建的检查点中选择 **Rollback to here**。有关详细信息，请参阅[检查点和回滚](/zh/ja/features/version-control/checkpoints-and-rollbacks)。
+
+<div id="section-6">
+  ## 选择 Remix 还是从提示词开始构建？
+</div>
+
+这两种方式最终都能让你拥有自己的应用，并由 Agent 帮助你持续完善。不同之处在于起点。
+
+|             | Remix            | 从提示词开始构建          |
+| ----------- | ------------- | ----------------- |
+| 起点          | 原样复制的可运行应用    | Agent 根据你的描述创建的应用 |
+| 初始结果        | 立即获得，与原应用完全相同 | 耗时更长，每次生成的结果都不同   |
+| Agent 的初始操作 | 等待你的指示        | 根据你的提示词进行规划和构建    |
+
+如果已经有一个应用接近你的需求，就 Remix 它。这样无需从零开始，Agent 的第一步就能基于一个实际可运行的应用。如果找不到与你的想法相似的应用，就从提示词开始构建。
+
+<div id="section-7">
+  ## 下一步
+</div>
+
+* **探索更多 Remix 项目**：浏览[社区](https://replit.com/community/all)，寻找可供 Remix 和学习的 App
+* **从零开始构建**：使用 Agent [创建自己的 App](/zh/ja/build/your-first-app)，比较两种体验
+* **发布供他人 Remix**：分享改进后的版本，让其他人能在此基础上继续构建

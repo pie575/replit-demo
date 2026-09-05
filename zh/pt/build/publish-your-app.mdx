@@ -1,0 +1,244 @@
+---
+title: "发布你的 App"
+description: "选择发布设置，发布你的 App，验证生产版本，并在上线后持续监控。"
+---
+
+export const PublishingPlanAvailability = () => <Note>
+    所有套餐均提供 Publishing 功能。Starter 包含 {FreeDeployments}
+    个已发布的 App，30 天后到期，但可重新发布。Core 和
+    Pro 提供更多发布选项。有关当前限额，请参阅[部署
+    定价](/billing/deployment-pricing)和 [Starter
+    套餐](/billing/plans/starter-plan)。
+  </Note>;
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+你可能已经在 **Preview** 中构建并测试了自己的应用，现在想让其他人也能使用它。预览 URL 是临时的，仅用于开发——不适合作为公开分发的链接。打开它时，页面上会出现一条横幅，引导你通过发布来安全地分享应用。
+
+<Frame>
+  <img src="/assets/mirror/00-development-preview-banner-938d35d8ae00.jpg" alt="Gather 的开发预览，横幅说明该 URL 是临时的，并链接到「发布你的应用」以便安全分享" width="1280" height="720" data-path="images/publish-gather/00-development-preview-banner.jpg" />
+</Frame>
+
+发布会创建一个**生产环境 deployment**：即应用的稳定、可分享版本，运行在专属 URL 上。开发预览用于构建和测试，生产环境 deployment 才是访问者实际使用的版本。两者相互独立，因此你可以继续开发而不影响线上应用，直到再次发布为止。
+
+发布远不只是把预览公开。Replit 会打包应用、预配所需资源、检查此次发布，并将域名路由到生成的 deployment。
+
+<YouTubeEmbed videoId="ski8_MUYO4M" title="在 Replit 上发布你的应用" />
+
+<div id="before-you-publish">
+  ## 发布前
+</div>
+
+在点击横幅提示或打开 **Publish** 之前，请先用 Preview 测试主要的用户流程，检查布局在你所支持的各种屏幕尺寸下的显示效果，并修复 Agent 报告的所有错误。发布后，当前版本将对其他人可见，因此请避免在 App 中包含 Secrets 或私密测试数据。
+
+<div id="publish-your-app">
+  ## 发布你的应用
+</div>
+
+<Steps>
+  <Step title="打开发布对话框">
+    在开发预览横幅中选择 **Publish your app**，即可返回发布流程。你也可以自行打开 project，在 Build 或 Design 中工作时，选择 Project Editor 右上角的 **Publish**。
+
+    <Tip>
+      你也可以在提示框中对 Agent 说：`Publish this app.` Agent 可以准备好此次发布，或引导你完成所需的确认操作。
+    </Tip>
+  </Step>
+
+  <Step title="选择域名和访问设置">
+    **域名**是访问者用来访问你的 deployment 的地址。检查生成的 `.replit.app` 域名，如有需要可更改其中可用的名称。然后选择**访问级别**，它决定谁可以打开该应用：
+
+    * **Public**：任何拥有链接的人都能访问应用。
+    * **Password protected**：要求访问者输入共享密码。
+    * **Workspace only**：仅限你的 workspace 成员访问。
+    * **Invite only**：仅限你指定的人员或群组访问。
+
+    有关各选项的详细信息，请参阅[应用访问](/zh/features/publishing/private-deployments)。
+
+    你还可以启用反馈组件，让访问者能够在已发布的应用中直接发送反馈。
+
+    <Frame>
+      <img src="/assets/mirror/01-publish-settings-733fb21c48f5.jpg" alt="Gather 的 Publish 对话框，显示生成的域名、公开访问设置、反馈组件、安全审查和 Publish 按钮" width="1280" height="720" data-path="images/publish-gather/01-publish-settings.jpg" />
+    </Frame>
+
+    <PublishingPlanAvailability />
+  </Step>
+
+  <Step title="审查安全性并发布">
+    选择 **Review security**，在上线前检查此次发布。域名、访问和安全设置都就绪后，选择 **Publish**。
+
+    Replit 会预配 deployment、运行安全检查、构建并打包应用，然后将该版本推送上线。预配即准备所需的云资源；构建和打包会将 project 转换为可用于生产的软件包；推送上线则让该软件包成为线上版本。在这些阶段完成之前，请保持 project 处于打开状态。
+
+    <Frame>
+      <img src="/assets/mirror/02-publishing-progress-1eda9fe3099f.jpg" alt="Gather project 在发布启动后显示发布进行中" width="1280" height="720" data-path="images/publish-gather/02-publishing-progress.jpg" />
+    </Frame>
+  </Step>
+
+  <Step title="打开并验证线上应用">
+    发布完成后，Replit 会显示 deployment 状态和公开 URL。打开该 URL 并测试线上应用 (而不只是开发预览) ，确认其页面和最重要的操作均按预期运行。
+
+    <Frame>
+      <img src="/assets/mirror/03-published-project-673907839521.jpg" alt="Gather project 发布后，显示生产状态成功和线上 URL" width="1280" height="720" data-path="images/publish-gather/03-published-project.jpg" />
+    </Frame>
+
+    <Frame>
+      <img src="/assets/mirror/04-live-site-c16b8b42d58a.jpg" alt="已发布的 Gather 工作坊发现应用，在其公开 replit.app URL 上打开" width="1280" height="720" data-path="images/publish-gather/04-live-site.jpg" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="understand-the-published-project">
+  ## 了解已发布的 project
+</div>
+
+发布后，project 由两个相关部分组成：一个是你继续构建的可编辑 project，另一个是当前面向访问者提供服务的生产环境 deployment。打开 **Tools** 即可查看和管理该生产环境。
+
+**Publishing** 面板是 deployment 的总览，会显示最新一次发布是否成功、哪些人可以访问、在哪里运行、采用何种托管方式、可以使用哪些资源，以及有哪些域名指向它。
+
+**deployment 类型**决定 Replit 以何种方式运行应用。**Autoscale** 会随流量变化启动更多机器；**Reserved VM** 会保持一台机器持续可用；**Static** 用于托管无需后端运行的文件；**Scheduled** 则按预定时间运行程序。可参见 [Deployment 类型](/zh/features/publishing/deployment-types) 进行对比。
+
+**Machine power** 指每个实例可用的 CPU 和内存，最大机器数量则限制了 Autoscale 的扩展上限。参见[机器配置](/zh/features/publishing/machine-configuration)。资源越多，承载能力越强，用量费用也越高。
+
+**Deployment 地理位置**决定应用运行所在的区域，选择离多数访问者更近的区域可以降低延迟。参见 [Project 地理位置](/zh/features/publishing/project-geography)。
+
+根据应用和套餐的不同，**Adjust settings** 或 **Manage** 中会提供这些设置项，以及生产环境 Secrets 和相关的 deployment 选项。
+
+这些生产环境控制项都是可选的。分享一个常规应用并不需要修改它们，而且某些改动可能会影响可用性或用量费用。
+
+<Frame>
+  <img src="/assets/mirror/07-resource-settings-0ecee90f1279.jpg" alt="Gather 的 Autoscale 机器配置，显示 machine power、CPU 与内存、最大机器数量以及预估计算用量" width="1280" height="720" data-path="images/publish-gather/07-resource-settings.jpg" />
+</Frame>
+
+<div id="monitor-the-release">
+  ### 监控发布
+</div>
+
+**监控**回答的是一个生产环境的问题：*应用是否健康，响应是否正常？* 在 **Tools** 面板中展开 **Replit Cloud**，打开 **Monitoring**。其中会显示请求量、HTTP 状态、响应时长、CPU 使用率和内存使用率。状态码可以反映失败的请求，响应时长则可以看出响应是否缓慢。CPU 和内存图表有助于发现资源瓶颈。新发布的版本在线上应用收到流量之前，可能几乎没有数据。完整介绍请参阅[监控应用](/zh/features/publishing/monitoring-a-deployment)。
+
+<Frame>
+  <img src="/assets/mirror/05-monitoring-2da17ab4d843.jpg" alt="Gather 的监控面板，显示应用请求指标以及基础设施的 CPU 和内存图表" width="1280" height="720" data-path="images/publish-gather/05-monitoring.jpg" />
+</Frame>
+
+<div id="review-traffic-and-growth">
+  ### 查看流量与增长
+</div>
+
+**Growth** 回答的是另一个问题：*用户能否找到并使用这个 App？* 在 **Tools** 面板中的 **Replit Cloud** 下打开 **Growth**。基础指标包括访客数、热门页面、引荐来源、国家/地区、浏览器和设备，可以看出受众从哪里来、哪些内容更能吸引关注。[SEO 评分](/zh/features/publishing/seo-rating)衡量已发布页面对搜索引擎的适配程度。使用付费方案的用户还可以借助 [SEO Agent](/zh/features/publishing/seo-agent) 扫描并找出可改进之处。已发布的 App 产生流量后，分析数据才会逐步显示。
+
+<Frame>
+  <img src="/assets/mirror/06-growth-analytics-5355db7c4d65.jpg" alt="Gather 的 Growth 面板，显示已发布 App 的 SEO 状态和基础访客分析" width="1280" height="720" data-path="images/publish-gather/06-growth-analytics.jpg" />
+</Frame>
+
+<div id="update-your-published-app">
+  ## 更新已发布的应用
+</div>
+
+在 Project Editor 中所做的更改不会自动替换线上的正式版本。这种分离让你可以在不影响访客的前提下准备并测试更改。先在 **Preview** 中测试，确认无误后选择 **Republish**。重新发布会在同一 URL 上创建新的生产版本，因此无需向访客发送新链接。
+
+重新发布后，请再次打开公开 URL，确认更改是否生效。如果发布失败，可通过发布状态和日志定位出错的环节，然后再重试。
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<section className="chat-mkt chat-workflow-grid has-visuals catalog-three-up">
+  <a className="chat-example has-visual" href="/zh/build/add-custom-domain">
+    <div className="chat-use-case-visual palette-blush">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="globe" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="globe" size={19} />
+    </span>
+
+    <div className="chat-card-title">添加自定义域名</div>
+    <p>使用你自己的域名，而不是 `.replit.app`。</p>
+    <div className="chat-card-link">继续 →</div>
+  </a>
+
+  <a className="chat-example has-visual" href="/zh/learn/projects-and-artifacts/replit-deployments">
+    <div className="chat-use-case-visual palette-stone">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="server" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="server" size={19} />
+    </span>
+
+    <div className="chat-card-title">deployment 类型</div>
+    <p>比较 Autoscale、Reserved VM、Static 和 Scheduled 这几种 deployment。</p>
+    <div className="chat-card-link">比较 deployment →</div>
+  </a>
+
+  <a className="chat-example has-visual" href="/zh/build/troubleshooting">
+    <div className="chat-use-case-visual palette-ink">
+      <div className="chat-use-case-window">
+        <i />
+
+        <i />
+
+        <i />
+
+        <b />
+
+        <b />
+
+        <b />
+      </div>
+
+      <em>
+        <Icon icon="triangle-exclamation" size={24} />
+      </em>
+    </div>
+
+    <span>
+      <Icon icon="triangle-exclamation" size={19} />
+    </span>
+
+    <div className="chat-card-title">排查 Publishing 问题</div>
+    <p>了解常见的 Publishing 问题及其解决办法。</p>
+    <div className="chat-card-link">开始排查 →</div>
+  </a>
+</section>

@@ -1,0 +1,154 @@
+---
+title: "Créer un pitch deck pour les investisseurs"
+description: "Générez une présentation de 10 à 12 diapositives pour les investisseurs à partir de votre site, de Google Drive et de vos feuilles de calcul financières."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Il ne s’agit pas d’un connecteur natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+À partir de votre site web, des fichiers de marque dans Google Drive et des données financières dans Google Sheets, créez avec Replit Slides un pitch deck destiné aux investisseurs (10 à 12 diapositives) : problème, produit, marché, traction, équipe et demande de financement. Agent récupère le récit et les éléments à l’appui sur le site, l’identité visuelle dans Google Drive et les chiffres (revenus, taux de consommation, autonomie de trésorerie, économie unitaire, prévisions) dans Sheets.
+
+<div id="section">
+  ## À qui s’adresse cette fonctionnalité ?
+</div>
+
+* Les fondateurs qui souhaitent créer un pitch deck pour les investisseurs à partir d’un site en ligne et d’un Sheet financier.
+* Les personnes en pleine levée de fonds qui suivent déjà leurs indicateurs dans Google Sheets.
+
+<div id="section-2">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "Logos, couleurs, présentation de référence (facultatif)",
+},
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "Données financières : revenus, taux de consommation, autonomie de trésorerie, prévisions",
+},
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Préparez un site actif, des fichiers de marque dans Google Drive et un Sheet comportant des lignes ou des onglets intitulés « revenus », « taux de consommation », « autonomie de trésorerie » et « prévisions ». Connectez Google Drive et Sheets. Indiquez à Agent le tour de financement (pré-amorçage, amorçage, série A) et vos besoins en matière de levée de fonds.
+
+<div id="agent">
+  ## Prompt pour Agent
+</div>
+
+<AiPrompt>
+  À partir de ce site web[URL], des fichiers de marque dans Google Drive et des
+  données financières de ce Google Sheet[lien], générez un pitch deck de 10 à 12 diapositives
+  pour des investisseurs dans Replit Slides. Incluez le problème, la solution, le produit, le marché, la
+  traction, le modèle économique, les données financières, l&#39;équipe et la demande de financement.
+  Utilisez uniquement les chiffres indiqués dans le Sheet. Signalez les éléments qui
+  nécessitent une source.
+</AiPrompt>
+
+<div id="section-4">
+  ## À quoi vous attendre
+</div>
+
+Agent transforme le site en présentation, intègre les chiffres du Sheet dans les diapositives sur la traction et les finances, puis crée le pitch deck dans Replit Slides. Avant de l’envoyer aux investisseurs, vérifiez tous les chiffres avec le Sheet. Parcourez l’ensemble du pitch deck dans l’aperçu, comparez les diapositives financières aux onglets du Sheet et assurez-vous que chaque affirmation est étayée par le site ou le Sheet.
+
+<div id="section-5">
+  ## Personnalisez selon vos besoins
+</div>
+
+<AiPrompt>
+  Ajoutez une diapositive financière à partir de Sheet, incluant les revenus et le taux de consommation des 12 derniers mois, ainsi que des prévisions sur 18 mois. Indiquez clairement le nom de l’onglet source sur la diapositive.
+</AiPrompt>
+
+<AiPrompt>
+  Modifiez ce pitch deck pour l’aligner sur la [présentation de référence]. Conservez la mise en page, la typographie, les couleurs et la structure des sections. Ne modifiez pas les chiffres approuvés dans Sheet et signalez ceux qui ne correspondent pas.
+</AiPrompt>
+
+<div id="section-6">
+  ## Dépannage
+</div>
+
+* **Les chiffres ne correspondent pas à ceux du Sheet :** Les lignes et onglets libellés sont importants. Nommez les onglets consacrés aux revenus, au taux de consommation, à l’autonomie de trésorerie et aux prévisions, puis indiquez à Agent de n’utiliser que les chiffres qui y figurent. Signalez les éléments nécessitant une source.
+* **L’identité visuelle de la marque ne correspond pas :** Connectez Google Drive et indiquez le logo et les couleurs. Si vous disposez d’un pitch deck de référence, demandez à Agent d’adapter la mise en page et les polices sans modifier les chiffres approuvés.
+
+<div id="section-7">
+  ## Voir aussi
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Concevoir une page de destination" href="/fr/ja/use-cases/design-landing-page">
+    Pour les fondateurs qui ont également besoin d&#39;une page de liste d&#39;attente utilisant les mêmes fichiers de marque dans Google Drive.
+  </Card>
+
+  <Card title="Créer des icônes et des bannières pour les réseaux sociaux" href="/fr/ja/use-cases/create-social-kit">
+    Utilisez les mêmes fichiers de marque dans Google Drive pour tous les réseaux.
+  </Card>
+</CardGroup>

@@ -1,0 +1,259 @@
+---
+title: "Добавление платежей через RevenueCat"
+description: "Используйте RevenueCat, чтобы взимать с пользователей плату за контент в App."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const subscriptionPrompt = "Добавь ежемесячную подписку для PixelGames, открывающую Snake, Racer и Pinball.";
+export const paywallPrompt = "Покажи четыре доступные для разблокировки игры в виде обложек на пейволе PixelGames.";
+
+<div id="revenuecat">
+  ## Что такое RevenueCat
+</div>
+
+В PixelGames игры Snake, Racer и Pinball отмечены как «Скоро». С помощью RevenueCat вы можете
+продавать в приложении подписки, открывающие доступ к ним, без прямой интеграции с платёжными системами
+Apple и Google. Просто попросите Agent добавить подписки и подключить RevenueCat — остальное Agent сделает сам.
+
+<Warning>
+  Apple и Google требуют использовать собственные системы встроенных покупок для такого цифрового контента и обе
+  взимают комиссию с части выручки от продаж. Обойти это требование с помощью внешних ссылок на оплату нельзя.
+</Warning>
+
+<div id="section">
+  ## Перед началом
+</div>
+
+* Проект Replit, настроенный для мобильного приложения.
+* Учётная запись RevenueCat. Понадобятся только адрес электронной почты и пароль — банковский счёт пока не нужен.
+
+<div id="section-2">
+  ## Начало работы
+</div>
+
+<Steps>
+  <Step title="Попросите Agent добавить подписку">
+    <AiPrompt>
+      {subscriptionPrompt}
+    </AiPrompt>
+  </Step>
+
+  <Step title="Подключите учётную запись RevenueCat">
+    Когда Agent предложит подключить RevenueCat, выберите **Connect RevenueCat**.
+
+    <Frame caption="Replit предлагает подключить RevenueCat после обнаружения этой функции.">
+      <img src="/assets/mirror/revenuecat-36ef7466a2e7.png" alt="Модальное окно Connect RevenueCat в Replit" data-path="images/pixelgames/mobile/revenuecat.png" width="964" height="297" data-path="images/pixelgames/mobile/revenuecat.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Авторизуйте Replit">
+    На странице авторизации RevenueCat предоставьте разрешение **Read &amp; Write**.
+  </Step>
+
+  <Step title="Agent настроит подписку">
+    Agent создаст проект RevenueCat, настроит продукты и права, а затем подключит к приложению
+    процесс оплаты.
+  </Step>
+</Steps>
+
+<div id="section-3">
+  ## Тестирование подписок
+</div>
+
+В превью Replit используется тестовый режим RevenueCat. При тестировании покупок в Expo Go появляется диалоговое окно тестовой покупки без списания реальных средств. После одобрения Apple приложения для App Store при реальных покупках будут списываться реальные деньги, поэтому перед отправкой ещё раз проверьте цены.
+
+<Frame caption="Пейвол PixelGames и диалоговое окно тестовой покупки в Expo Go.">
+  <img src="/assets/mirror/paywall-7b66dd10c595.png" alt="Экран пейвола PixelGames рядом с диалоговым окном тестовой покупки RevenueCat" data-path="images/pixelgames/mobile/paywall.png" width="2274" height="1470" data-path="images/pixelgames/mobile/paywall.png" />
+</Frame>
+
+Показанное выше диалоговое окно тестовой покупки — не то, что увидят ваши игроки. Expo Go — общедоступное приложение для просмотра всех проектов Expo, поэтому оно не может определить фактический идентификатор RevenueCat вашего приложения и вместо этого показывает стандартный сценарий тестирования. Когда будет готова финальная сборка или приложение будет опубликовано, пейвол будет уникальным экраном RevenueCat, который загружается удалённо, а не жёстко закодирован в приложении.
+
+<div id="section-4">
+  ## Настройка пейвола
+</div>
+
+Пейвол загружается удалённо, поэтому вы можете изменить его дизайн двумя способами без новой сборки.
+
+**Попросите Agent**
+
+<AiPrompt>
+  {paywallPrompt}
+</AiPrompt>
+
+**Или отредактируйте вручную**
+
+<Steps>
+  <Step title="Откройте редактор пейвола">
+    В панели управления RevenueCat перейдите в раздел **Paywalls** и создайте или отредактируйте пейвол в визуальном редакторе: выберите цвета,
+    фоновое изображение, текст заголовка, стиль кнопок и другие элементы, соответствующие оформлению вашего приложения.
+
+    <Frame caption="Визуальный редактор пейволов RevenueCat.">
+      <img src="/assets/mirror/customize-paywall-86e04fd14d95.png" alt="Редактор пейволов RevenueCat с макетом и свойствами премиум-пейвола PixelGames" data-path="images/pixelgames/mobile/customize-paywall.png" width="1920" height="991" data-path="images/pixelgames/mobile/customize-paywall.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Подключите к предложению">
+    Подключите пейвол к текущему предложению.
+  </Step>
+
+  <Step title="Изменения применяются удалённо">
+    Новый дизайн появится при следующем открытии пейвола — как в TestFlight, так и после публикации. Обновление в App Store
+    не требуется.
+  </Step>
+</Steps>
+
+<Frame caption="Настроенный пейвол в TestFlight с настоящим системным подтверждением покупки.">
+  <img src="/assets/mirror/paywall-testflight-4949e275cd87.png" alt="Пейвол PixelGames в TestFlight рядом с настоящим системным окном подтверждения покупки" data-path="images/pixelgames/mobile/paywall-testflight.png" width="2274" height="1470" data-path="images/pixelgames/mobile/paywall-testflight.png" />
+</Frame>
+
+Именно это увидят игроки. Вместо тестового диалогового окна Expo Go отображается настоящее подтверждение покупки,
+а вместо стандартного макета — настроенный дизайн.
+
+<div id="app-store-connect">
+  ## Синхронизация с App Store Connect
+</div>
+
+Синхронизация позволяет создавать и изменять встроенные подписки и продукты непосредственно в RevenueCat или Replit Agent.
+
+Перед подключением App Store Connect необходимо выполнить три действия.
+
+* **Регистрация**: если вы ещё этого не сделали, зарегистрируйтесь в Apple Developer Program. За участие взимается ежегодная плата.
+* **Отправка**: если вы ещё этого не сделали, отправьте App в App Store. См. [Загрузка App](/ru/build/mobile-upload-ios).
+  Для синхронизации продуктов RevenueCat требуется запись App.
+* **Подключение**: подключите банковский счёт и **подпишите** соглашение Apple Paid Apps Agreement. Оба действия выполняются в App
+  Store Connect. Без этого Apple не сможет обрабатывать выплаты.
+
+<Steps>
+  <Step title="Начните синхронизацию в Replit">
+    В Replit откройте **Publishing → Manage** и нажмите **Sync RevenueCat to App Store Connect**.
+    Эта кнопка появится после отправки App в TestFlight.
+
+    <Frame caption="Запуск синхронизации на панели Publishing в Replit.">
+      <img src="/assets/mirror/rev-co-step1-e86c72c18850.png" alt="Панель Publishing в Replit с открытой вкладкой Manage и кнопкой Sync RevenueCat to App Store Connect" data-path="images/pixelgames/mobile/rev-co-step1.png" width="997" height="420" data-path="images/pixelgames/mobile/rev-co-step1.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Откройте страницу App Store Connect API">
+    Перейдите в **Users and Access → Integrations → App Store Connect API**
+    ([открыть напрямую](https://appstoreconnect.apple.com/access/integrations/api)) и нажмите
+    **+**, чтобы добавить новый ключ.
+
+    <Frame caption="Переход к ключу App Store Connect API.">
+      <img src="/assets/mirror/rev-co-step2-642a879843a1.png" alt="Страница Users and Access в App Store Connect: вкладка Integrations и раздел App Store Connect API" data-path="images/pixelgames/mobile/rev-co-step2.png" width="1466" height="657" data-path="images/pixelgames/mobile/rev-co-step2.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Создание ключа">
+    Укажите имя (например, &quot;RevenueCat&quot;), выберите **App Manager** в поле **Access**, затем
+    нажмите **Generate**.
+
+    <Frame caption="Создание API-ключа App Store Connect для RevenueCat.">
+      <img src="/assets/mirror/rev-co-step3-dcfbd73aafd8.png" alt="Модальное окно Generate API Key с полем имени и выбранным уровнем доступа App Manager" data-path="images/pixelgames/mobile/rev-co-step3.png" width="1453" height="436" data-path="images/pixelgames/mobile/rev-co-step3.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Копирование данных ключа">
+    Скопируйте **Key ID** и скачайте файл ключа.
+
+    <Frame caption="Копирование Key ID и скачивание API-ключа App Store Connect.">
+      <img src="/assets/mirror/rev-co-step4-24337a1cd6db.png" alt="Список API-ключей App Store Connect с новым ключом RevenueCat и кнопками Copy и Download" data-path="images/pixelgames/mobile/rev-co-step4.png" width="1522" height="695" data-path="images/pixelgames/mobile/rev-co-step4.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Добавить в Replit">
+    Вернитесь к модальному окну синхронизации Replit (шаг 1 из 2), загрузите файл ключа, вставьте **Key ID** и **Issuer
+    ID**, затем нажмите **Continue**.
+
+    <Frame caption="Ввод API-ключа App Store Connect в Replit.">
+      <img src="/assets/mirror/rev-co-step5-73640bd1925f.png" alt="Шаг 1 из 2 в модальном окне Replit: загрузка API-ключа App Store Connect и вставка его данных" data-path="images/pixelgames/mobile/rev-co-step5.png" width="995" height="591" data-path="images/pixelgames/mobile/rev-co-step5.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Аналогичным образом настройте и ключ In-App Purchase">
+    В том же разделе App Store Connect откройте вкладку **In-App Purchase**
+    ([открыть напрямую](https://appstoreconnect.apple.com/access/integrations/api/subs)), создайте ещё один ключ и скопируйте его данные.
+
+    <Frame caption="Создание и копирование ключа API In-App Purchase.">
+      <img src="/assets/mirror/rev-co-step6-aed01868e734.png" alt="Список ключей In-App Purchase в App Store Connect с действиями Download и Copy" data-path="images/pixelgames/mobile/rev-co-step6.png" width="1547" height="593" data-path="images/pixelgames/mobile/rev-co-step6.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Добавить в Replit">
+    Вернитесь к модальному окну синхронизации Replit (шаг 2 из 2), загрузите этот файл ключа, вставьте **Key ID** и **Issuer
+    ID**, затем нажмите **Continue**.
+
+    <Frame caption="Ввод ключа In-App Purchase API в Replit.">
+      <img src="/assets/mirror/rev-co-step7-26d78bff7cc4.png" alt="Шаг 2 из 2 в модальном окне Replit: загрузка ключа In-App Purchase API и вставка его данных" data-path="images/pixelgames/mobile/rev-co-step7.png" width="997" height="591" data-path="images/pixelgames/mobile/rev-co-step7.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Проверить и синхронизировать">
+    После синхронизации вы в любой момент можете вручную изменить цены продуктов в той же панели **Publishing → Manage** в Replit.
+
+    <Frame caption="Проверьте продукты перед синхронизацией с App Store Connect.">
+      <img src="/assets/mirror/rev-co-step8-a790ee2b52ee.png" alt="Экран Products to Sync в Replit с премиальной ежемесячной подпиской, готовой к синхронизации" data-path="images/pixelgames/mobile/rev-co-step8.png" width="996" height="550" data-path="images/pixelgames/mobile/rev-co-step8.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+<div id="section-5">
+  ## Устранение неполадок
+</div>
+
+* **Покупка проходит успешно, но ничего не разблокируется:** убедитесь, что право доступа RevenueCat правильно
+  сопоставлено с ID продукта.
+* **Работает при тестировании, но не работает после публикации:** убедитесь, что продукт синхронизирован с App Store Connect
+  и вы приняли соглашение Apple Paid Apps Agreement.
+
+<div id="section-6">
+  ## Часто задаваемые вопросы
+</div>
+
+<AccordionGroup>
+  <Accordion title="Нужен ли банковский счёт для использования RevenueCat?">
+    Нет. Для создания учётной записи нужны только адрес электронной почты и пароль. Банковский счёт подключается
+    отдельно через Apple или Google, когда вы будете готовы получать выплаты.
+  </Accordion>
+
+  <Accordion title="Взимается ли плата за тестовые покупки?">
+    Нет. В предпросмотре Replit используется тестовый режим RevenueCat, поэтому покупки симулируются.
+    Реальная плата начнёт взиматься только после того, как Apple одобрит приложение для App Store.
+  </Accordion>
+
+  <Accordion title="Что можно настроить с помощью RevenueCat?">
+    Цены, права доступа и сам платёжный экран. Попросите Agent внести любые изменения — он обновит и настройки RevenueCat,
+    и код приложения.
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-7">
+  ## Следующие шаги
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Собирайте отзывы и оценки" icon="star" href="/ru/ko/build/mobile-collect-reviews">
+    Попросите довольных игроков оставить оценку PixelGames.
+  </Card>
+</CardGroup>
+
+<div id="section-8">
+  ## Связанные материалы
+</div>
+
+* [Сохранение изображений в мобильном приложении](/ru/ko/build/mobile-store-images)
+* [Публикация в App Store](/ru/build/mobile-publish-ios)
+* [Публикация в Google Play](/ru/build/mobile-publish-android)

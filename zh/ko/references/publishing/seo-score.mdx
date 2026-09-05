@@ -1,0 +1,149 @@
+---
+title: "SEO 评分"
+description: "使用 Replit 的 SEO 评分和 Agent 衡量并改善已发布应用的搜索引擎优化。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+在 Replit 上发布 Web 应用后，系统会自动对线上 URL 运行搜索引擎优化 (SEO) 审计，并在发布工具中显示 0~100 分的 SEO 评分。如果评分还有提升空间，只需一键即可将具体问题交给智能体，几秒内完成修复。
+
+对大多数构建者来说，整个工作流是这样的：发布应用、查看评分，然后让智能体&quot;优化 SEO&quot;。本页将介绍其背后的运作机制，以及如何充分利用这一功能。
+
+<div id="seo">
+  ## 什么是 SEO，为什么它很重要
+</div>
+
+搜索引擎优化 (SEO) 是指以便于 Google 等搜索引擎发现、理解并为网站排名的方式来搭建网站。做好 SEO 意味着，无需投放付费广告，用户在搜索时也能看到你的应用。
+
+影响 SEO 效果的关键因素主要有几个：清晰的页面标题和描述、语义化 HTML、快速的加载速度、适配移动端的布局、图片的描述性 alt 文本，以及便于抓取的网站结构。搜索引擎更青睐人和机器都易于读懂的网站。
+
+如果你要上线着陆页、营销网站、博客、目录站，或任何看重搜索曝光的项目，SEO 是早期最值得投入的方式之一。
+
+<div id="replit-seo">
+  ## Replit 如何夯实 SEO 基础
+</div>
+
+Replit 已为你打理好大量 SEO 基础工作，让你专注于内容和产品：
+
+* **快速且全球分布的托管**：Replit 部署会在针对速度优化的基础设施上运行你的应用，你还可以通过[发布地区](/zh/ko/features/publishing/publishing-geography)选择应用的运行位置。
+* **默认启用 HTTPS**：所有已发布的应用都会获得由 Replit 管理的 TLS 证书，而这是搜索引擎的基础排名信号之一。
+* **自定义域名**：绑定你自己的域名，建立信任与品牌权威。请参阅[自定义域名](/zh/ko/features/publishing/custom-domains)。
+* **面向内容站点的静态部署**：对于营销页面、博客和文档，[静态部署](/zh/ko/features/publishing/static-deployments)会提供预渲染的 HTML，便于搜索引擎抓取。
+* **Agent 编写兼顾 SEO 的代码**：Agent 构建页面时，会默认生成语义化 HTML、无障碍标记和元标签，正是 SEO 工具所检查的内容。
+* **SEO 评分功能**：发布后的自动审计让你随时掌握现状，还可以一键让 Agent 修复发现的问题。
+
+<div id="seo-2">
+  ## SEO 评分功能
+</div>
+
+发布成功后，Replit 会对部署的 URL 运行 Lighthouse 审计并保存结果。发布工具中会显示应用的整体 SEO 评分。
+
+<Frame caption="发布工具中的 SEO 评分徽章">
+  <img src="/assets/mirror/seo-score-11a7aeef17ef.png" alt="发布工具中的 SEO 评分徽章，显示评分、彩色状态标签以及“使用 Agent 优化 SEO”按钮" width="688" height="332" data-path="images/deployments/seo-score/seo-score.png" />
+</Frame>
+
+<div id="section">
+  ### 查找方法
+</div>
+
+打开已发布应用的 **发布** 工具。SEO 分数会与其他构建详情一起显示在部署概览中。将鼠标悬停在分数上，即可查看 Lighthouse 针对各个页面标记出的具体改进事项。
+
+<div id="section-2">
+  ### 如何解读分数
+</div>
+
+Replit 使用 Lighthouse 的标准阈值：
+
+| 分数     | 状态   | 含义                          |
+| :----- | :--- | :-------------------------- |
+| 90–100 | 良好   | 应用符合 SEO 最佳实践。进行重大更改后请继续复查。 |
+| 50–89  | 需要改进 | 存在一些问题，限制了搜索引擎理解应用的能力。      |
+| 0–49   | 较差   | 缺少关键的 SEO 基础要素。修复通常只需几分钟。   |
+
+如果应用包含多个页面，徽章会显示 Replit 抓取的所有 URL 中**最低**的分数，因此表现最差的页面会优先呈现，而不会被平均值掩盖。
+
+<div id="section-3">
+  ### 评分计算时机
+</div>
+
+审计会在成功发布后自动运行。评分通常在部署启动后 1~2 分钟内完成，结果返回后，发布工具会刷新徽章。
+
+<div id="section-4">
+  ### 支持的部署类型
+</div>
+
+对于搜索引擎可以抓取其 URL 的面向公网的部署，系统会计算 SEO 分数：
+
+* [自动扩缩部署](/zh/ko/features/publishing/autoscale-deployments)
+* [Reserved VM 部署](/zh/ko/features/publishing/reserved-vm-deployments)
+* [静态部署](/zh/ko/features/publishing/static-deployments)
+
+计划任务部署和私有部署不处理公网流量，因此不会生成 SEO 分数。
+
+<div id="seo-3">
+  ## 使用智能体优化 SEO
+</div>
+
+如果 SEO 分数低于 90，分数旁边会显示**使用智能体优化 SEO**按钮。点击该按钮后，Lighthouse 检查过的所有 URL 的具体待办项会连同修复说明一起发送到新的智能体对话中。
+
+<Tip>
+  你也可以完全跳过这个按钮。打开智能体，直接说 **“优化 SEO”** —— 智能体会获取最新的 Lighthouse 结果并着手处理。
+</Tip>
+
+智能体完成修改后，请重新发布你的应用。系统会针对新构建重新计算 SEO 分数，徽章也会自动更新。
+
+智能体通常会应用的修复包括：
+
+* 添加或重写缺失或过于笼统的 `<title>` 标签，让每个页面都有独特且具描述性的标题
+* 为所有页面添加元描述
+* 为图片添加具描述性的 `alt` 文本
+* 在 `<html>` 元素上设置 `lang` 属性
+* 确保链接文本清晰可辨 (不使用“点击这里”或空锚文本)
+* 添加 `robots.txt` 和 `sitemap.xml`
+* 添加用于移动端渲染的 viewport 元标签
+* 改善未通过无障碍检查的文本的颜色对比度
+* 添加 Open Graph 和 Twitter 卡片元标签，让应用链接在社交平台上呈现良好的预览效果
+
+<div id="replit-seo-2">
+  ## 在 Replit 中构建 SEO 优化网站的最佳实践
+</div>
+
+无论是让 Agent 处理还是自行编写，以下是在使用 Replit 构建的应用中影响最大的关键事项：
+
+* **为每个页面提供唯一的标题和元描述。** 标题应少于 60 个字符，描述长度建议控制在约 150~160 个字符。
+* **使用语义化 HTML。** 使用 `<main>`、`<header>`、`<nav>`、`<footer>` 组织页面布局。每个页面只使用一次 `<h1>`，并按顺序使用标题层级。
+* **为所有图片添加 alt 文本。** 描述图片展示的内容，而不只是图片本身是什么。
+* **创建 `sitemap.xml` 和 `robots.txt`。** 请 Agent 创建这两个文件，以便搜索引擎了解应抓取哪些内容。
+* **添加 Open Graph 和 Twitter 卡片标签。** 控制应用在社交媒体上分享时的显示效果。
+* **使用自定义域名。** 品牌域名有助于赢得访客和搜索引擎的信任。请参阅[自定义域名](/zh/ko/features/publishing/custom-domains)。
+* **选择正确的部署类型。** 对于内容丰富的网站，[静态部署](/zh/ko/features/publishing/static-deployments)可提供预渲染的 HTML，供搜索引擎立即解析。
+* **添加结构化数据。** JSON-LD 标记可帮助搜索引擎为产品、文章、FAQ 和活动显示富媒体搜索结果。
+* **保持应用快速响应。** 优化图片，避免阻塞渲染的脚本，并利用 Replit 的托管服务降低响应时间。
+
+一次性完成其中大部分内容的简单方法：
+
+<AiPrompt>
+  审核我的网站是否符合 SEO 最佳实践，并应用相应修复。添加网站地图、robots.txt、Open Graph 标签，以及适用情况下的结构化数据，并确保所有页面都具有唯一的标题和元描述。
+</AiPrompt>
+
+<div id="section-5">
+  ## 后续步骤
+</div>
+
+* [自定义域名](/zh/ko/features/publishing/custom-domains) — 为已发布的应用绑定你自己的域名。
+* [静态部署](/zh/ko/features/publishing/static-deployments) — 最适合内容丰富、注重 SEO 的站点的部署类型。
+* [发布地理位置](/zh/ko/features/publishing/publishing-geography) — 选择应用的运行位置，让目标用户获得更低的响应延迟。
+* [Agent](/zh/ko/features/agent/overview) — 详细了解如何在应用中与 Agent 协作。

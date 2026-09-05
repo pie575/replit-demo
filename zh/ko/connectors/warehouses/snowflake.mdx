@@ -1,0 +1,265 @@
+---
+title: "Snowflake 连接器"
+description: "配置 Snowflake 连接器，使用 Replit Agent 构建数据驱动型应用。"
+sidebarTitle: "Snowflake"
+icon: "snowflake"
+---
+
+<Info>
+  Snowflake 连接器仅适用于 **企业版**。
+</Info>
+
+通过数据仓库连接器，Replit Agent 可以查询组织的数据仓库。借助 Snowflake 连接器，构建者无需具备 SQL 专业知识，即可使用自然语言创建控制面板、报表工具和数据应用。
+
+设置是一个一次性流程，需要 Snowflake 管理员和 Replit 工作区管理员共同完成。配置完成后，所有组织成员都可以登录并开始基于 Snowflake 数据进行构建。
+
+本指南将引导您完成整个设置流程。涉及三种角色：
+
+1. **Snowflake 账户管理员** — 在 Snowflake 中创建 OAuth 集成
+2. **Replit 工作区管理员** — 在 Replit 中配置连接器
+3. **构建者** — 登录并开始构建
+
+<div id="snowflake-oauth">
+  ## 在 Snowflake 中创建 OAuth 集成
+</div>
+
+Snowflake 账户管理员需创建 OAuth 安全集成，以便 Replit 能够向 Snowflake 进行身份验证。
+
+<div id="section">
+  ### 前提条件
+</div>
+
+* Snowflake 的 `ACCOUNTADMIN` 角色
+* 在 Snowflake 工作表中执行 SQL 的权限
+
+<div id="section-2">
+  ### 运行配置脚本
+</div>
+
+<Steps>
+  <Step title="登录 Snowflake">
+    打开 Snowflake 账户，并确认当前使用的是 `ACCOUNTADMIN` 角色。可在右上角的角色下拉菜单中查看。
+  </Step>
+
+  <Step title="打开 SQL 工作表">
+    在左侧边栏中点击**工作表**，然后新建一个工作表。
+  </Step>
+
+  <Step title="运行 OAuth 集成脚本">
+    复制、粘贴并运行以下 SQL 脚本：
+
+    ```sql 创建 OAuth 集成 theme={null}
+    -- 如果已有集成，则将其删除
+    DROP INTEGRATION IF EXISTS REPLIT_OAUTH;
+
+    -- 为 Replit 创建 OAuth 集成
+    CREATE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    <Warning>
+      重定向 URI 必须严格为 `https://replit.com/connectors/oauth/callback`。使用其他值会导致身份验证期间出现 404 错误。
+    </Warning>
+
+    <Note>
+      设置 `BLOCKED_ROLES_LIST = ()` 可确保没有角色被禁止使用该集成。如果未进行此设置，连接时可能会出现“无效的同意请求”或“角色被阻止”错误。
+    </Note>
+  </Step>
+
+  <Step title="获取 OAuth 凭据">
+    运行以下查询以获取客户端 ID 和客户端密钥：
+
+    ```sql 获取 OAuth 凭据 theme={null}
+    -- 查看集成详细信息
+    DESCRIBE INTEGRATION REPLIT_OAUTH;
+
+    -- 获取客户端 ID 和密钥
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+
+    从输出中复制**客户端 ID**和**客户端密钥**。下一步需要使用它们。
+  </Step>
+</Steps>
+
+<div id="replit">
+  ## 在 Replit 中配置连接器
+</div>
+
+Replit 工作区管理员需要将 Snowflake 凭据添加到 Replit。配置完成后，组织中的所有成员都可以登录。
+
+<Note>
+  此操作需要企业版及管理员访问权限。
+</Note>
+
+<Steps>
+  <Step title="打开集成">
+    前往组织设置，然后选择**集成**选项卡。
+  </Step>
+
+  <Step title="添加 Snowflake 连接器">
+    点击**添加新连接器**，然后选择 **Snowflake**。
+  </Step>
+
+  <Step title="输入凭据">
+    输入上一步中的**客户端 ID**和**客户端密钥**。
+  </Step>
+
+  <Step title="设置范围">
+    将连接器范围设置为 `refresh_token`。
+
+    <Warning>
+      仅使用 `refresh_token` 范围。使用其他范围 (例如 `session:role-any` 或 `session:role:PUBLIC`) 可能会导致“无效范围”错误。
+    </Warning>
+  </Step>
+
+  <Step title="保存">
+    点击**保存**以激活连接器。
+  </Step>
+</Steps>
+
+<div id="snowflake">
+  ## 登录 Snowflake
+</div>
+
+所有有权访问连接器的组织成员都可以登录。使用 Agent 前，请先在**集成**页面登录，以确认连接正常。
+
+<Steps>
+  <Step title="查找 Snowflake 连接器">
+    在 Replit 中，前往**集成**。在**连接器**下找到 **Snowflake**。
+  </Step>
+
+  <Step title="点击登录">
+    在 Snowflake 连接器中点击**登录**。
+  </Step>
+
+  <Step title="输入 Snowflake 账户 ID">
+    OAuth 提示词会要求你输入 Snowflake 账户 ID。
+
+    要查找账户 ID，请查看 Snowflake URL：
+
+    ```
+    https://app.snowflake.com/myorg/myaccount
+    ```
+
+    用连字符连接 `app.snowflake.com/` 后面的两个部分：
+
+    ```
+    myorg-myaccount
+    ```
+
+    <Note>
+      URL 中两个部分之间使用 `/`，但账户 ID 中使用 `-`。
+    </Note>
+  </Step>
+
+  <Step title="身份验证">
+    Snowflake 会将你重定向到登录页面。输入 Snowflake 凭据以完成 OAuth 流程。
+  </Step>
+</Steps>
+
+<div id="snowflake-2">
+  ## 开始使用 Snowflake 数据进行构建
+</div>
+
+连接后，您可以通过以下两种方式配合 Agent 使用 Snowflake 连接器：
+
+* **斜杠命令** — 在提示词中输入 `/snowflake` 来使用连接器
+* **自然语言** — 直接要求 Agent 使用 Snowflake 数据
+
+以下是一些提示词示例：
+
+```
+请使用我的 Snowflake 数据创建一个控制面板。用柱状图展示各地区的总销售额，
+用折线图展示各季度的趋势，并用表格列出排名前 10 的客户。
+采用简洁现代的深色主题。
+```
+
+Agent 会编写并运行针对 Snowflake 数据的 SQL 查询，以构建可正常运行的应用。
+
+<div id="section-3">
+  ## 故障排查
+</div>
+
+<AccordionGroup>
+  <Accordion title="无效的同意请求或角色被阻止错误">
+    Snowflake 集成可能默认阻止某些角色。
+
+    确认集成是否使用 `BLOCKED_ROLES_LIST = ()` 创建。如果创建时未使用此设置，请运行以下命令：
+
+    ```sql 修改被阻止的角色 theme={null}
+    CREATE OR REPLACE SECURITY INTEGRATION REPLIT_OAUTH
+      TYPE = OAUTH
+      ENABLED = TRUE
+      OAUTH_CLIENT = CUSTOM
+      OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+      OAUTH_REDIRECT_URI = 'https://replit.com/connectors/oauth/callback'
+      OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+      OAUTH_REFRESH_TOKEN_VALIDITY = 7776000
+      OAUTH_ALLOW_NON_TLS_REDIRECT_URI = FALSE
+      BLOCKED_ROLES_LIST = ()
+      COMMENT = 'OAuth integration for Replit connector';
+    ```
+
+    如果错误仍然存在，请确认默认角色未被阻止：
+
+    ```sql 设置默认角色 theme={null}
+    ALTER USER "YOUR_USERNAME" SET DEFAULT_ROLE = 'PUBLIC';
+    ```
+  </Accordion>
+
+  <Accordion title="身份验证时出现 404 错误">
+    确认 Snowflake 集成的重定向 URI 与以下内容完全一致：
+
+    ```
+    https://replit.com/connectors/oauth/callback
+    ```
+
+    任何不匹配都可能导致 OAuth 流程中出现 404 错误。
+  </Accordion>
+
+  <Accordion title="无效的范围错误">
+    确认 Replit 的连接器范围仅设置为 `refresh_token`。请移除其他范围，例如 `session:role-any` 或 `session:role:PUBLIC`。
+  </Accordion>
+
+  <Accordion title="连接失败错误">
+    确认 Replit 的客户端 ID 和客户端密钥与 Snowflake 生成的值一致。运行以下命令进行确认：
+
+    ```sql 验证凭据 theme={null}
+    WITH secrets AS (
+      SELECT PARSE_JSON(
+        SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
+      ) as creds
+    )
+    SELECT
+      creds:OAUTH_CLIENT_ID::STRING as CLIENT_ID,
+      creds:OAUTH_CLIENT_SECRET::STRING as CLIENT_SECRET
+    FROM secrets;
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<div id="section-4">
+  ## 相关文档
+</div>
+
+* [数据仓库连接器概览](/zh/ko/connectors/warehouses/overview) — 支持的所有数据仓库连接器概览
+* [连接 Databricks](/zh/ko/connectors/warehouses/databricks) — 分步配置 Databricks
+* [管理连接器](/zh/ko/replitai/managing-connectors) — 管理和配置连接器
+* [Snowflake — 为自定义客户端配置 OAuth](https://docs.snowflake.com/en/user-guide/oauth-custom) — Snowflake OAuth 文档

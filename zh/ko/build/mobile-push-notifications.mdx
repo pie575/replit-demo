@@ -1,0 +1,92 @@
+---
+title: "发送推送通知"
+description: "让玩家及时了解 PixelGames 上的新游戏和好友动态。"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pushNotificationPrompt = "当好友在 PixelGames 中打破玩家的最高分时，通知该玩家。";
+
+<AiPrompt>
+  {pushNotificationPrompt}
+</AiPrompt>
+
+<Frame caption="锁屏上收到的 PixelGames 通知。">
+  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="手机锁屏上显示的 PixelGames 推送通知" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
+</Frame>
+
+Android 可以直接在 Expo Go 中测试。iOS 则需要先将应用
+[上传并安装到 TestFlight](/zh/build/mobile-testflight)。Apple 要求应用必须先在 Apple 完成注册才能接收通知，
+即使只是用于测试也不例外。
+
+<Steps>
+  <Step title="请求权限">
+    iOS 和 Android 都会在首次发送通知前弹出一次提示。如果玩家拒绝，那么在他们到
+    设置中重新启用之前，都不会收到通知。
+  </Step>
+
+  <Step title="注册设备">
+    Agent 会注册已登录玩家的推送令牌，让 PixelGames 知道该向哪台设备发送通知。
+  </Step>
+
+  <Step title="发送">
+    当好友超过该玩家的最高分时，就会触发通知。
+  </Step>
+</Steps>
+
+<div id="section">
+  ## 测试
+</div>
+
+1. 出现提示时，请允许通知权限。在获得授权之前，PixelGames 无法发送任何内容，而且该提示只会
+   出现一次。
+2. 与其让 Agent 发一条一次性的测试通知，不如用第二个账号真实触发一次条件，比如超过好友的最高分。
+   这样才能验证从保存分数、确定通知对象到实际发送的完整链路是否走通，而不只是确认权限是否
+   已授予。
+3. 确认通知能出现在锁屏上，然后点击它，看 PixelGames 是否会打开。点击这一步可以验证通知不仅
+   能显示出来，返回应用的路径也确实可用。
+
+请在真机上完成这项测试，模拟器收不到通知。设置方法请参阅
+[使用 Expo Go 测试](/zh/build/mobile-preview-testing)。
+
+<div id="section-2">
+  ## 故障排查
+</div>
+
+* **iOS 上完全收不到通知：** 请确认你是在 [TestFlight](/zh/build/mobile-testflight) 中进行测试。
+  Expo Go 在 iOS 上无法接收推送。
+* **玩家已授权，但什么都收不到：** 请检查令牌是否确实保存到了对应账户下。
+  当登录与通知设置分两步进行时，这一步很容易被遗漏。
+
+<div id="section-3">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="添加触感反馈" icon="wave-square" href="/zh/ko/build/mobile-haptics">
+    为通知搭配触感反馈的轻触效果。
+  </Card>
+
+  <Card title="在移动应用中存储图片" icon="image" href="/zh/ko/build/mobile-store-images">
+    将头像照片保存到 App Storage。
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ## 相关内容
+</div>
+
+* [提交到 App Store](/zh/build/mobile-publish-ios)

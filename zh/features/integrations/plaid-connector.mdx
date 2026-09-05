@@ -1,0 +1,195 @@
+---
+title: "连接 Plaid"
+description: "设置 Plaid connector，让开发者能够使用 Agent 构建应用，通过 Plaid Link 连接金融账户以获取余额、交易和投资数据。"
+sidebarTitle: "Plaid"
+icon: "building-columns"
+---
+
+export const WistiaEmbed = ({videoId, title = "Wistia 视频", playerColor = "FF0000", controlsVisibleOnLoad = false}) => {
+  if (!videoId) {
+    return null;
+  }
+  const url = "https://fast.wistia.net/embed/iframe/" + videoId + "?seo=false&playerColor=" + playerColor + "&controlsVisibleOnLoad=" + controlsVisibleOnLoad;
+  return <Frame>
+      <iframe src={url} title={title} allow="autoplay; fullscreen" allowFullScreen></iframe>
+    </Frame>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+<Info>
+  Plaid connector 仅在 Replit 付费方案中提供，且需要[团队 workspace](/zh/features/collaboration/team-workspaces#create-a-team-workspace)。
+</Info>
+
+<WistiaEmbed videoId="fcqtulftwk" title="了解它是如何用 Replit 和 Plaid 构建的" />
+
+Plaid 将应用与金融机构连接起来。借助 Plaid connector，构建者可以创建使用账户余额、交易和投资数据的应用 (具体取决于所连接机构支持的数据) 。
+
+设置分为两步。先由 workspace 管理员在 Replit 中配置一次 Plaid 凭据，之后每位使用你的应用的用户再通过 Plaid Link 连接各自的金融账户。Plaid 访问令牌按用户分别授权并安全存储，因此你的应用无需直接处理 Plaid Secrets 即可使用金融数据。
+
+<div id="what-you-can-build">
+  ## 你可以构建什么
+</div>
+
+使用 Plaid connector 可以构建这类应用：
+
+* 个人理财仪表板
+* 预算与支出分类工具
+* 交易查询与分析应用
+* 针对受支持投资账户的投资组合追踪器
+* 能总结消费习惯的理财助手
+
+<div id="prerequisites">
+  ## 前置条件
+</div>
+
+在 Replit 中配置 Plaid 之前，你需要准备：
+
+* 一个[团队 workspace](/zh/features/collaboration/team-workspaces#create-a-team-workspace)——Plaid 在团队级别进行配置
+* 一个 [Plaid 账户](https://dashboard.plaid.com/signup)
+* 从 [Plaid 控制台](https://dashboard.plaid.com/developers/keys)获取的 Plaid **Client ID**
+* 对应目标环境的 Plaid **Secret**
+* 确定使用 Plaid 的 `sandbox` 还是 `production`
+
+使用 Plaid 提供的示例机构和凭证进行测试时，请选择 `sandbox`；当你的应用已准备好连接真实金融账户时，请选择 `production`。
+
+<div id="configure-the-plaid-connector-in-replit">
+  ## 在 Replit 中配置 Plaid connector
+</div>
+
+由 workspace 管理员将 Plaid 凭据添加到 Replit。connector 配置完成后，构建者即可在 Agent 中使用 Plaid 数据。
+
+<Steps>
+  <Step title="打开 集成">
+    在 Replit 中打开 workspace 或应用设置，然后选择 **集成**。
+
+    <Frame>
+      <img src="/assets/mirror/integrations-panel-9c9a11a93f25.png" alt="Avenger 团队的 Workspace 集成面板，显示 Replit 托管的集成和 Connectors 部分，右上角高亮显示 Add new connector 按钮" width="1440" height="900" data-path="images/replitai/plaid-connector/integrations-panel.png" />
+    </Frame>
+  </Step>
+
+  <Step title="添加 Plaid connector">
+    选择 **Add new connector**，然后选择 **Plaid**。
+
+    <Frame>
+      <img src="/assets/mirror/plaid-connector-search-1283aace7d36.png" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-search.png" />
+    </Frame>
+  </Step>
+
+  <Step title="选择环境">
+    选择 `sandbox` 或 `production`，所选环境必须与你要使用的 Plaid Secret 一致。
+  </Step>
+
+  <Step title="输入 Plaid 凭据">
+    从 Plaid 控制台复制并粘贴你的 **Client ID** 和 **Secret**。
+  </Step>
+
+  <Step title="设置客户端名称">
+    输入要在 Plaid Link 中显示的应用名称。该字段已预填为 `My Plaid App`，请将其替换为你希望用户看到的名称。名称请控制在 30 个字符以内，以便 Plaid 正常显示。
+  </Step>
+
+  <Step title="保存 connector">
+    选择 **Configure** 保存 connector。Replit 会安全存储这些凭据，并在构建者连接 Plaid 账户时使用。
+
+    <Frame>
+      <img src="/assets/mirror/plaid-config-dialog-6f2537e3be30.png" alt="Enable Plaid 配置对话框，包含 Environment、Client Id、Client Secret 和 Client Name 字段，以及用于保存的 Configure 按钮" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-config-dialog.png" />
+    </Frame>
+  </Step>
+</Steps>
+
+如需之后修改配置，请在 集成 面板中打开 **Manage connectors**，然后选择 Plaid 旁边的 **Manage**。
+
+<Frame>
+  <img src="/assets/mirror/plaid-connector-manage-89e796daff17.png" alt="Plaid connector 的 Manage 面板，显示已保存的 Environment、Client Id、Client Secret 和 Client Name，以及用于保存更改的 Update 按钮" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-connector-manage.png" />
+</Frame>
+
+有关组织级别的 connector 管理，请参阅[管理你的 connector](/zh/replitai/managing-connectors)。
+
+<div id="sign-in-with-plaid-link">
+  ## 使用 Plaid Link 登录
+</div>
+
+Plaid 使用 [Plaid Link](https://plaid.com/docs/link/)，而非标准的 OAuth 重定向。要启动该流程，请在 Connectors 表格中找到 Plaid 并选择 **Sign in**。Replit 会先显示一个简短的授权确认界面以确认此次连接，然后打开 Plaid Link。
+
+<Frame>
+  <img src="/assets/mirror/connect-plaid-consent-ea05ebe1a916.png" alt="连接 Plaid 的授权对话框，显示 Replit 与 Plaid 的徽标、关于连接 Plaid、数据使用以及权限可撤销的三条说明要点，以及一个“Continue to Plaid”按钮" width="1440" height="900" data-path="images/replitai/plaid-connector/connect-plaid-consent.png" />
+</Frame>
+
+随后，Plaid Link 会打开一个嵌入式流程，每个人在其中选择自己的金融机构并完成该机构的身份验证。
+
+<Frame>
+  <img src="/assets/mirror/plaid-link-picker-2e241c8e1271.png" alt="标题为“Select your institution”的 Plaid Link 机构选择器，包含搜索输入框以及主要美国银行的徽标，如 Chase、Bank of America、Wells Fargo、Citibank、US Bank、Capital One、PNC、USAA、American Express、TD、Regions 和 Navy Federal，底部有 Sandbox 模式横幅" width="1440" height="900" data-path="images/replitai/plaid-connector/plaid-link-picker.png" />
+</Frame>
+
+每个人各自关联自己的账户。Replit 会为该用户的连接保存由此生成的 Plaid 访问令牌，并在 Agent 或你的应用请求 Plaid 数据时使用它。
+
+<div id="start-building-with-plaid-data">
+  ## 开始使用 Plaid 数据构建
+</div>
+
+连接 Plaid 后，让 Agent 基于已连接的金融数据进行构建。例如：
+
+<AiPrompt>
+  构建一个个人理财仪表板，让用户通过 Plaid Link 连接银行账户。显示账户余额、按类别划分的月度支出，以及最近金额最大的五笔交易。
+</AiPrompt>
+
+<AiPrompt>
+  创建一个预算应用，让每位用户通过 Plaid Link 连接账户。导入交易记录，按商户和类别分组，并显示本月是否已超出预算。
+</AiPrompt>
+
+<AiPrompt>
+  构建一个投资组合追踪工具，让用户通过 Plaid Link 连接受支持的投资账户。在有数据的情况下，显示持仓、账户余额以及随时间的变化情况。
+</AiPrompt>
+
+Plaid 数据的可用性取决于所连接的金融机构，以及你的 Plaid 账户已启用的 Plaid 产品。
+
+<div id="troubleshooting">
+  ## 故障排查
+</div>
+
+<AccordionGroup>
+  <Accordion title="Plaid 未出现在 Integrations 中">
+    Plaid 需要付费方案。如果你已订阅付费套餐但仍未看到 Plaid，请刷新页面，并确认当前处于正确的 workspace 中。
+
+    如果设置过程中显示 **This feature requires an enterprise plan**，请刷新页面，并确认你使用的是正确的 workspace。
+
+    如果 Plaid 仍未出现，请联系 Replit 支持团队，以便他们检查你的 workspace 配置。
+  </Accordion>
+
+  <Accordion title="Plaid Link 显示 This Application 而不是我的应用名称">
+    如果配置的客户端名称缺失或过长，Plaid 可能会显示 **This Application**。请编辑 Plaid connector 配置，使用不超过 30 个字符的应用名称。
+  </Accordion>
+
+  <Accordion title="连接显示为已断开">
+    如果金融机构要求账户持有人重新登录、凭据发生变更或权限被撤销，Plaid 连接可能会断开。
+
+    请在 Integrations 或 Connectors 面板中重新连接 Plaid，打开 Plaid Link 以恢复访问权限。
+  </Accordion>
+
+  <Accordion title="沙盒数据与生产数据不一致">
+    Plaid 沙盒环境与生产环境使用不同的凭据和令牌。请确认 connector 所处的环境与你输入的 Plaid Secret 以及正在测试的金融账户类型相匹配。
+  </Accordion>
+</AccordionGroup>
+
+<div id="related-documentation">
+  ## 相关文档
+</div>
+
+* [Agent 集成](/zh/features/integrations/overview) — 概览：Replit 托管的集成、Connectors、外部集成以及 Agent 服务
+* [管理你的 connector](/zh/replitai/managing-connectors) — 为你的 workspace 配置和管理 connector
+* [Plaid 文档](https://plaid.com/docs/) — Plaid API、Link 及产品文档
+* [Plaid 控制台](https://dashboard.plaid.com/developers/keys) — 查找你的 Plaid Client ID 和 Secrets
+* [Replit x Plaid](https://replit.com/partners/plaid) — 合作伙伴页面，提供演示与设置资源

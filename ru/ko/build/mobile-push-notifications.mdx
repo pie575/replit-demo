@@ -1,0 +1,93 @@
+---
+title: "Отправка push-уведомлений"
+description: "Сообщайте игрокам PixelGames о новых играх и активности друзей."
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pushNotificationPrompt = "Уведомляйте игрока, когда друг побьёт его рекорд в PixelGames.";
+
+<AiPrompt>
+  {pushNotificationPrompt}
+</AiPrompt>
+
+<Frame caption="Уведомление PixelGames на экране блокировки.">
+  <img src="/assets/mirror/notification-355d05b72c60.gif" alt="Push-уведомление PixelGames на экране блокировки телефона" data-path="images/pixelgames/mobile/notification.gif" width="1516" height="726" data-path="images/pixelgames/mobile/notification.gif" />
+</Frame>
+
+Android можно тестировать сразу в Expo Go. Для iOS сначала нужно
+[загрузить и установить приложение через TestFlight](/ru/build/mobile-testflight). Apple требует,
+чтобы приложение было зарегистрировано в Apple до получения уведомлений, даже для тестирования.
+
+<Steps>
+  <Step title="Запросите разрешение">
+    На iOS и Android перед первым уведомлением один раз отображается запрос разрешения. Если игрок откажется,
+    уведомления не будут приходить, пока он снова не включит их в Settings.
+  </Step>
+
+  <Step title="Зарегистрируйте устройство">
+    Agent регистрирует push-токен авторизованного игрока, чтобы PixelGames знал, на какие устройства
+    отправлять уведомления.
+  </Step>
+
+  <Step title="Отправьте уведомление">
+    Уведомление отправляется, когда друг превзойдёт лучший результат игрока.
+  </Step>
+</Steps>
+
+<div id="section">
+  ## Тестирование
+</div>
+
+1. Когда появится запрос, разрешите отправку уведомлений. Пока разрешение не будет предоставлено, PixelGames не сможет ничего
+   отправлять, а запрос появится только один раз.
+2. Вместо того чтобы просить Agent отправить разовое тестовое уведомление, воспроизведите реальное условие — например,
+   превзойдите лучший результат друга со второй учётной записи. Так вы проверите весь процесс: сохранение
+   результата, определение получателя уведомления и его отправку. Это позволит проверить не только наличие разрешения.
+3. Убедитесь, что уведомление появляется на экране блокировки, затем нажмите на него и проверьте, открывается ли PixelGames. Так вы
+   убедитесь, что уведомление не только отображается, но и действительно возвращает вас в приложение.
+
+Выполняйте эти действия на реальном телефоне. Уведомления не приходят в симуляторы. Инструкции по настройке см. в разделе
+[Тестирование с Expo Go](/ru/build/mobile-preview-testing).
+
+<div id="section-2">
+  ## Устранение неполадок
+</div>
+
+* **На iOS уведомления вообще не приходят:** убедитесь, что вы тестируете приложение через
+  [TestFlight](/ru/build/mobile-testflight). Expo Go не поддерживает push-уведомления на iOS.
+* **Пользователь предоставил разрешение, но ничего не получает:** убедитесь, что токен действительно сохранён для этой учётной записи.
+  Это распространённое упущение, когда вход и настройка уведомлений выполняются по отдельности.
+
+<div id="section-3">
+  ## Следующие шаги
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Добавление тактильной обратной связи" icon="wave-square" href="/ru/ko/build/mobile-haptics">
+    Добавьте тактильную обратную связь к уведомлениям.
+  </Card>
+
+  <Card title="Сохранение изображений в мобильном приложении" icon="image" href="/ru/ko/build/mobile-store-images">
+    Сохраняйте фото профиля в App Storage.
+  </Card>
+</CardGroup>
+
+<div id="section-4">
+  ## Связанные материалы
+</div>
+
+* [Публикация в App Store](/ru/build/mobile-publish-ios)

@@ -1,0 +1,374 @@
+---
+title: "Clerk Auth"
+description: "了解 Clerk Auth 如何为您的 Replit 应用提供专属身份验证系统，支持自定义品牌、独立用户账户和 SSO 提供方。"
+---
+
+Clerk Auth 基于 [Clerk](https://clerk.com)，为您的应用提供专属的身份验证系统。与使用 Replit 登录系统并创建 Replit 账户的 [Replit Auth](/zh/pt/core-concepts/project-editor/auth-and-security/authentication) 不同，Clerk Auth 会为您的应用配置一个**独立的 Clerk 租户**。您的应用用户直接在应用中创建账户，而不是 Replit 账户；您可以完全掌控品牌、登录方式和注册体验。
+
+<Frame>
+  <video autoPlay muted loop playsInline src="/assets/mirror/auth-vid-e89aaccd245e.mp4" />
+</Frame>
+
+<Note>
+  **Clerk Auth 与 Replit Auth** — 使用 **Clerk Auth** (本页面) 时，您的应用将拥有专属的身份验证租户，品牌可完全自定义，用户账户也独立于 Replit。使用 **[Replit Auth](/zh/pt/core-concepts/project-editor/auth-and-security/authentication)** 时，用户使用 Replit 账户登录，并会看到带有 Replit 品牌的登录页面。如果您希望在登录体验中使用自己的品牌，或需要独立于 Replit 的用户账户，请选择 Clerk Auth。
+</Note>
+
+<div id="clerk-auth-vs-replit-auth-em-resumo">
+  ## Clerk Auth 与 Replit Auth 对比概览
+</div>
+
+|            | Clerk Auth                      | Replit Auth                 |
+| ---------- | ------------------------------- | --------------------------- |
+| **用户账户**   | 用户在你的 App 中创建账户 (无需 Replit 账户)  | 用户使用 Replit 账户登录            |
+| **品牌**     | 可完全自定义——App 名称、图标和颜色            | 带有 Replit 品牌的登录页面           |
+| **SSO 凭据** | 可为每个模型提供方使用自己的 OAuth 凭据         | 使用 Replit 共享的 OAuth 应用      |
+| **环境**     | 独立的开发和生产环境                      | 单一环境                        |
+| **推荐计划**   | 不与 Replit 推荐计划集成                | 注册用户会计入 Replit 推荐计划         |
+| **最适合**    | 需要自定义品牌的 App、专业或商业产品            | 希望快速完成设置且可接受 Replit 品牌的 App |
+
+<div id="primeiros-passos">
+  ## 快速开始
+</div>
+
+若要为你的 App 添加 Clerk Auth，请在给 Agent 的 prompt 中说明：
+
+```
+帮我创建一个 App，功能是[你的应用创意]，并且需要包含 Clerk Auth。
+```
+
+Agent 会全部搞定——创建 Clerk 租户、存储凭证、配置路由以及添加中间件。你无需 Clerk 账户，也不用做任何手动配置。
+
+<div id="como-o-clerk-auth-funciona-com-o-replit">
+  ## Clerk Auth 如何与 Replit 协同工作
+</div>
+
+当 Agent 为你的 app 配置 Clerk Auth 时，它会：
+
+1. **创建专用的 Clerk 租户** —— 你的 app 会获得独立的 Clerk 应用，并拥有彼此隔离的开发环境和生产环境
+2. **预配凭据** —— API 密钥和 secrets 以环境变量的形式存储
+3. **配置代理** —— 身份验证在你已发布的域名上无缝运行
+4. **设置登录和注册路由** —— 将预构建的 Clerk React 组件添加到你的 app 中
+5. **添加服务端中间件** —— 使用 Clerk 的 Express 中间件保护你的 API 路由
+
+<Note>
+  你无需创建 Clerk 账户，也不必管理任何基础设施，一切都由 Replit 自动处理。
+</Note>
+
+<div id="capacidades">
+  ## 功能
+</div>
+
+<div id="o-que-suportado">
+  ### 支持哪些功能
+</div>
+
+Clerk Auth 为你的 App 提供：
+
+* **独立的用户账户** —— 你的 App 用户不是 Replit 用户；他们只存在于你 App 的 Clerk 租户中
+* **完全自定义的登录页面** —— 登录页和注册页的 App 名称、徽标、配色、字体和文案均在你的 App 代码中配置
+* **自定义品牌的 SSO** —— 为各个提供商提供你自己的 OAuth 凭据，让提供商的 OAuth 授权页显示你 App 的名称和品牌，而非通用的默认内容
+* **邮箱密码认证** —— 内置注册与登录，并支持邮箱验证
+* **社交登录 (SSO)&#x20;**&#x20;—— 让用户使用 Google、GitHub、Apple 或 X (Twitter) 登录
+* **用户管理** —— 通过 Auth 面板查看、搜索和管理用户
+* **会话管理** —— 自动管理安全的会话 token
+* **开发和生产环境** —— 上线前先在开发环境中测试认证
+
+<Note>
+  Clerk Auth 的大部分配置都可以在 Project Editor 的 **Auth** 工具中完成 —— 无需 Clerk 账户，也无需到 Clerk 控制台中操作。
+</Note>
+
+<div id="o-que-no-suportado">
+  ### 尚不支持的功能
+</div>
+
+以下功能目前在 Clerk Auth 中尚不可用 (相较于你自行配置的外部 Clerk 应用) 。完整对比请参阅[此常见问题](#how-does-clerk-auth-compare-to-external-clerk)。
+
+* **手机号登录** —— 基于短信的登录与验证
+* **MFA 支持** —— 面向终端用户的多因素认证
+* **完整的 SSO 提供方覆盖** —— 目前仅支持 Google、GitHub、Apple 和 X
+* **组织租户** —— Clerk 的组织与团队成员管理功能
+
+<div id="ambientes-de-desenvolvimento-e-produo">
+  ## 开发环境与生产环境
+</div>
+
+每个启用 Clerk Auth 的 App 都会获得两个完全独立的 Clerk 环境：**开发**环境用于支撑你在构建过程中使用的开发／Preview App，**生产**环境则用于支撑已发布的 App。这两个环境在设计上就是彼此隔离的——各自拥有独立的 API 密钥和独立的用户存储。
+
+<div id="chaves-de-api-separadas">
+  ### 独立的 API 密钥
+</div>
+
+每个环境都有各自的可发布密钥 (publishable key) 和私密密钥 (secret key) 。暴露给 App 的密钥会根据 App 运行在开发环境还是生产环境自动切换：
+
+* 在你的 workspace 中，Secrets `CLERK_PUBLISHABLE_KEY` 和 `CLERK_SECRET_KEY` 存放的是指向开发环境的**测试密钥** (`pk_test...` 和 `sk_test...`) 。
+
+<Frame>
+  <img src="/assets/mirror/clerk-check-dev-keys-5a23f6b7dd0c.png" alt="Workspace 中的 Secrets 工具显示 CLERK_SECRET_KEY 和 CLERK_PUBLISHABLE_KEY，前缀为 sk_test_ 和 pk_test_" width="1946" height="402" data-path="images/workspace/auth/clerk-check-dev-keys.png" />
+</Frame>
+
+* 当你发布 App 时，已发布的部署会使用指向生产环境的**正式密钥** (`pk_live...` 和 `sk_live...`) 运行。若要查看前缀，请打开 **Publishing → Overview → Adjust settings**，并检查 `CLERK_PUBLISHABLE_KEY` 和 `CLERK_SECRET_KEY`。
+
+<Frame>
+  <img src="/assets/mirror/clerk-check-prod-keys-acccd7f68da1.png" alt="Publishing Overview 显示生产环境 App 的 Secrets，其中 CLERK_SECRET_KEY 和 CLERK_PUBLISHABLE_KEY 使用 sk_live_ 和 pk_live_ 前缀" width="1924" height="1664" data-path="images/workspace/auth/clerk-check-prod-keys.png" />
+</Frame>
+
+<Note>
+  切换环境时你无需做任何操作——Replit 会自动管理开发环境和生产环境的密钥。只需专心开发、测试并发布，其余的都已为你准备好。
+</Note>
+
+<Warning>
+  请不要用正式密钥替换测试密钥，不要在 Secrets 面板中编辑它们，也不要在 Clerk 控制台中手动配置任何内容。这样做会破坏开发环境与生产环境之间的自动切换，且 Replit 托管的 Clerk Auth 不支持此类操作。
+</Warning>
+
+<div id="armazenamentos-de-usurios-separados">
+  ### 独立的用户存储
+</div>
+
+每个环境都有独立的用户存储。在开发环境中注册的账户**不会**存在于生产环境中，反之亦然：
+
+* 用户在开发/预览 App 中测试时注册，其账户只会创建在开发环境的存储中。
+* 用户在已发布的 App 中注册，其账户只会创建在生产环境的存储中。
+* 会话、用户元数据以及与 Clerk `userId` 关联的任何数据，也都仅限于创建该账户的环境。
+
+这是预期行为。要查看各环境中的用户，请在 Workspace 中打开 **Auth 面板**，然后使用 **Users** 标签页中的环境切换按钮，在开发环境和生产环境之间切换。
+
+<Note>
+  开发环境用于试验和构建；生产环境则为 App 的真实在线用户提供服务。这两个环境经过刻意隔离，因此在开发环境中创建的账户和数据不会出现在生产环境中。
+</Note>
+
+<div id="gerenciando-usurios">
+  ## 管理用户
+</div>
+
+Project Editor 中的 **Auth 面板**可让你全面查看已认证的用户。由于 Clerk Auth 会为你的 app 创建独立的用户存储，这里列出的用户是你 app 中的账户，而非 Replit 账户。
+
+<Frame>
+  <img src="/assets/mirror/clerk-users-4940ed365605.png" alt="Clerk Auth 用户标签页，在 Auth 面板中显示已认证用户" width="2136" height="794" data-path="images/workspace/auth/clerk-users.png" />
+</Frame>
+
+在 **Users** 标签页中，你可以：
+
+* **查看所有用户**，包括电子邮件、姓名、上次登录时间和账户创建日期等详细信息
+* **搜索和筛选**，快速找到特定用户
+* **封禁或解封用户**，控制对你 app 的访问权限
+* **按不同条件排序用户**
+* **切换环境** —— 在开发环境和生产环境之间切换，分别管理各自的用户
+
+<div id="personalizando-sua-pgina-de-login">
+  ## 自定义登录页面
+</div>
+
+登录页和注册页的品牌外观——应用名称、logo、颜色、字体和文案——是在 App 的代码中配置的，而不是在 Auth 面板中。如需修改，可以这样向 Agent 提出：
+
+```
+更新我的登录页面：使用 [您的 App 名称] 作为标题，添加 [描述您的徽标]，并使其与我的网站配色相匹配。
+```
+
+在底层，这由传递给 `<ClerkProvider>` 的 `appearance` 和 `localization` 属性以及应用 `public/` 目录中的徽标文件控制。Agent 会让它们与应用主题的其余部分保持同步。
+
+<Note>
+  **Google、Apple、GitHub 或 X 的授权确认页面** (用户点击“使用 Google 登录”等按钮后出现的页面) 上显示的应用名称是独立的——它来自在该身份提供方处注册的 OAuth 应用，**不会**因为你编辑登录页面代码而改变。若要修改，请为该身份提供方配置[自定义 OAuth 凭据](#configuring-oauth-credentials-for-an-sso-provider)。
+</Note>
+
+<div id="configurando-provedores-de-login">
+  ## 配置登录身份提供方
+</div>
+
+Clerk Auth 支持将 Google、GitHub、Apple 和 X 用作社交登录身份提供方。在 Auth 面板的 **Configure** 标签页中，您可以控制哪些身份提供方显示在登录页面上，以及在生产环境中，每个身份提供方是使用 Replit 管理的 OAuth 凭据，还是使用您自己的自定义凭据实现品牌化登录。
+
+<Frame>
+  <img src="/assets/mirror/clerk-configure-60169c473d64.png" alt="Configure 标签页，侧边栏中显示 SSO 身份提供方，已选择 Production，身份提供方列表显示启用开关和 Edit 操作" width="923" height="378" data-path="images/workspace/auth/clerk-configure.png" />
+</Frame>
+
+打开 **Configure** 标签页。在侧边栏的 **SSO providers** 下，选择 **Development** 或 **Production** — **Development** 用于 Workspace 中的开发/Preview 应用；**Production** 用于已发布的应用。每个环境在主面板中都有各自的列表。您可以：
+
+* **启用或禁用身份提供方** — 使用开关控制身份提供方是否显示在登录页面上。已禁用的身份提供方不会向用户显示。
+* **配置自定义 OAuth 凭据 (仅限 Production)&#x20;**&#x20;— 请参阅下方的[为 SSO 身份提供方配置 OAuth 凭据](#configuring-oauth-credentials-for-an-sso-provider)。
+
+<div id="configurando-credenciais-oauth-para-um-provedor-sso">
+  ### 为 SSO 身份提供方配置 OAuth 凭据
+</div>
+
+默认情况下，身份提供方使用 **Replit 托管的凭据**——登录可直接使用，但 OAuth 授权页面显示的是 Replit 的品牌标识。切换为 **Custom credentials**，即可使用你在身份提供方开发者控制台中创建的 OAuth 客户端，让授权页面显示你自己应用的名称和品牌标识。
+
+1. 在 Project Editor 中打开 **Auth 面板**。进入 **Configure** 选项卡，在侧边栏的 **SSO providers** 下选择 **Production**。
+
+<Frame>
+  <img src="/assets/mirror/clerk-configure-60169c473d64.png" width="923" height="378" data-path="images/workspace/auth/clerk-configure.png" />
+</Frame>
+
+2. 选择要配置的身份提供方旁边的 **Edit** 图标。系统默认选中 **Replit-managed credentials**。
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-default-credentials-525090775408.png" alt="身份提供方编辑面板，显示 Replit 托管的凭据与自定义凭据两个选项" width="1468" height="960" data-path="images/workspace/auth/clerk-sso-default-credentials.png" />
+</Frame>
+
+3. 选择 **Custom credentials**。面板会展开，显示凭据字段以及 **Provider setup** 检查清单，其中列出你需要在身份提供方一侧注册的值。
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-custom-credentials-f24112a5cf07.png" alt="自定义凭据面板，显示客户端 ID 和 OAuth secret 字段，以及包含重定向回调 URL 和 JavaScript 来源的身份提供方配置检查清单" width="1468" height="2246" data-path="images/workspace/auth/clerk-sso-custom-credentials.png" />
+</Frame>
+
+4. 按照说明完成配置。说明中包含指向相关控制台和帮助文档的直达链接。你也可以在[更多资源](#additional-resources)中找到对应身份提供方的帮助文档。
+5. 填写所有必需的凭据值。
+6. 在身份提供方的开发者控制台中，将 **Provider setup** 检查清单中列出的每一项注册到该身份提供方的开发者门户。使用复制图标逐个精确复制每个值，完成一项勾选一项，或在全部完成后选择 **Mark all as done**。
+7. 选择 **Save changes**。
+
+<div id="verificando-novamente-a-configurao-aps-alteraes-de-domnio">
+  ### 更改域名后重新检查配置
+</div>
+
+与域名相关的操作——例如绑定新的外部域名或[通过 Replit 购买域名](/zh/pt/cloud-services/deployments/domain-purchasing)——可能会更改应用的重定向回调 URL 和 JavaScript 来源。发生这种情况时，使用自定义凭据配置的身份提供方可能需要在其开发者控制台中登记这些新值。
+
+更改域名后，返回 **Configure** 标签页。配置提醒会以警告图标的形式显示在该标签页、侧边栏以及 **SSO providers** 列表中各身份提供方的旁边。身份提供方旁显示警告图标和 **setup steps remaining**，表示你的 **Provider setup** 检查清单中有新的待完成项目。
+
+<Frame>
+  <img src="/assets/mirror/clerk-sso-setup-reminders-a5b092846006.png" alt="Configure 标签页和侧边栏显示配置警告，SSO 身份提供方列表中某个身份提供方旁边在更改域名后显示警告图标和“setup steps remaining”" width="923" height="378" data-path="images/workspace/auth/clerk-sso-setup-reminders.png" />
+</Frame>
+
+打开身份提供方的编辑面板，复制 **Provider setup** 中更新后的值，在身份提供方的开发者控制台中登记这些值，然后选择 **Mark all as done**。
+
+<div id="configurao-de-domnio-para-verificao-de-e-mail">
+  ## 邮箱验证的域名配置
+</div>
+
+如果你的 App 支持**邮箱和密码注册**，Clerk 会向每位新用户的收件箱发送一个验证码。为邮件投递配置域名后，可以确保这些验证码从你的 App 域名发出，而不会被延迟或被垃圾邮件过滤器拦截。
+
+<div id="quando-voc-precisa-dessa-configurao">
+  ### 何时需要此配置
+</div>
+
+只有当你的 App 绑定了**由其他服务商管理的外部域名**时 (例如你在 Cloudflare、GoDaddy、Namecheap 等平台注册的域名) ，才需要配置 DNS 记录。
+
+如果你的 App 使用以下域名对外提供服务，则无需任何配置：
+
+* `.replit.app` 子域名
+* [通过 Replit 购买](/zh/pt/cloud-services/deployments/domain-purchasing)的域名
+
+这两种情况下，Replit 都会为你管理 DNS 记录。
+
+<div id="adicionar-registros-dns-para-envio-de-e-mail">
+  ### 添加用于发送邮件的 DNS 记录
+</div>
+
+要让你的 app 能够使用外部域名发送验证邮件，请在你的域名服务商处添加一组 DNS 记录。
+
+1. 在 Project Editor 中，打开 **Publishing**。
+2. 选择 **Domains**。
+3. 找到已关联的外部域名，然后选择 **Manage**。
+4. 在 **Authentication DNS setup required** 下，复制 Replit 显示的 CNAME 记录——这些正是 Clerk 从你的域名发送验证邮件所需的记录。
+5. 登录你的 DNS 服务商 (Cloudflare、GoDaddy、Namecheap 等) ，并完全按照显示的内容逐条添加记录。
+
+<Frame>
+  <img src="/assets/mirror/clerk-domain-8797ea9f41fc.png" alt="域名管理面板，显示“需要进行身份验证 DNS 配置”部分以及用于 Clerk 邮件投递的 CNAME 记录" width="1156" height="1524" data-path="images/workspace/auth/clerk-domain.png" />
+</Frame>
+
+DNS 更改最长可能需要 48 小时才能生效。记录生效后，邮箱与密码注册流程会自动通过你的域名发送验证码——无需在 Auth 面板中做任何额外操作。
+
+<div id="soluo-de-problemas">
+  ### 问题排查
+</div>
+
+* **收不到验证邮件** —— 请确认每条记录都与 Manage 面板中显示的内容完全一致,包括某些 DNS 提供商要求的末尾点号。同时请检查收件人的垃圾邮件文件夹。
+* **记录仍未被检测到** —— 请等待 DNS 生效(最长 48 小时),然后重新查看 Manage 面板,确认是否仍有记录被标记为缺失。
+
+<div id="melhores-prticas-de-segurana">
+  ## 安全最佳实践
+</div>
+
+* **始终在服务器端验证** —— 在 API 路由中校验身份验证，而不能只依赖用户界面
+* **使用环境变量** —— 切勿将密钥或 Secrets 硬编码到代码中
+* **代理中间件务必放在最前** —— 在 Express 应用中，Clerk 代理必须挂载在请求体解析器之前
+* **不要将首页重定向到登录页** —— 让落地页对未通过身份验证的访客保持可访问
+
+<div id="faq">
+  ## 常见问题
+</div>
+
+<div id="preciso-de-uma-conta-clerk-para-usar-o-clerk-auth">
+  ### 使用 Clerk Auth 需要 Clerk 账户吗？
+</div>
+
+不需要。当 Agent 为你的 App 配置时，Clerk Auth 背后的 Clerk 租户会由 Replit 自动创建和管理——你无需注册 Clerk，也不必自行管理任何 Clerk 基础设施。
+
+<div id="posso-acessar-o-painel-do-clerk-para-a-instncia-clerk-gerenciada-pela-replit">
+  ### 我可以访问 Replit 托管的 Clerk 实例的 Clerk 控制台吗？
+</div>
+
+不可以。Replit 托管的 Clerk 实例不会在 Clerk 控制台中开放。请通过 Project Editor 中的 **Auth** 工具进行管理——在这里你可以配置身份提供方、查看用户，并在开发环境和生产环境之间切换。
+
+<div id="minha-chave-publicvel-do-clerk-comea-com-pk_test-como-fao-para-mudar-para-uma-chave-ao-vivo">
+  ### 我的 Clerk 可发布密钥以 `pk_test` 开头。如何切换为正式密钥？
+</div>
+
+无需切换。你在 workspace 的 Secrets 面板中看到的 `pk_test...` 和 `sk_test...` 密钥属于应用的 Clerk **开发**环境，仅在构建阶段使用。发布应用后，部署会自动使用生产环境的 `pk_live...` 和 `sk_live...` 密钥运行。若要确认，请在 Workspace 中打开 **Publishing → Overview → Adjust settings**，查看已发布应用的 `CLERK_PUBLISHABLE_KEY` 值——它会以 `pk_live` 开头。请勿手动修改这些密钥。详细说明请参阅[开发环境与生产环境](#development-and-production-environments)。
+
+<div id="por-que-no-consigo-fazer-login-no-meu-app-publicado-com-a-conta-que-criei-durante-o-desenvolvimento">
+  ### 为什么我无法用开发过程中创建的账户登录已发布的 App？
+</div>
+
+Clerk Auth 的**开发**环境和**生产**环境各自拥有独立的用户存储。你在开发/预览 App 中创建的账户仅存在于开发环境，发布时不会被复制到生产环境——你需要在已发布的 App 中重新注册。与 Clerk `userId` 关联的任何数据同样如此。在 Workspace 中打开 **Auth 面板**，使用 **Users** 标签页中的环境切换按钮即可查看各环境中的用户。详情请参阅[独立的用户存储](#separate-user-stores)。
+
+<div id="o-clerk-auth-gratuito">
+  ### Clerk Auth 是否免费？
+</div>
+
+Clerk Auth 目前免费。未来可能会推出按使用量计费的定价方式，与 Replit 上其他按使用量计费的服务保持一致。未来如有任何费用，都会通过您现有的 Replit 账单收取——无需单独使用 Clerk 的账单或付款方式。
+
+<div id="o-clerk-auth-tem-limite-de-mau-como-os-planos-externos-do-clerk">
+  ### Clerk Auth 是否像 Clerk 外部方案一样设有 MAU 限制？
+</div>
+
+不是。Clerk Auth 不设月活跃用户数 (MAU) 限制；Clerk 外部方案则会按等级限制 MAU 数量。
+
+<div id="como-o-clerk-auth-se-compara-ao-clerk-externo">
+  ### Clerk Auth 与外部 Clerk 相比如何？
+</div>
+
+Clerk Auth 使用的由 Replit 管理的 Clerk 租户，与您在自己 Clerk 账户中创建的 Clerk 应用 (**外部 Clerk**) 相比有一些差异。下表列出了两者目前的不同之处。这反映了 Clerk Auth 的当前状态，支持的功能将持续完善。
+
+|                 | Clerk Auth                        | 外部 Clerk        |
+| --------------- | --------------------------------- | --------------- |
+| **配置**          | 由 Replit 自动预配                     | 自行配置            |
+| **Clerk 租户所有权** | 由 Replit 管理，归您的 App 所有            | 归您的 Clerk 账户所有  |
+| **定价模式**        | 目前免费 (未来计划采用按量付费)                 | 订阅 + 按量付费       |
+| **计费**          | 通过 Replit 计费 (目前免费)               | 通过您的 Clerk 账户计费 |
+| **MAU 限制**      | 无限制                               | 因套餐而异           |
+| **代理和域名配置**     | replit.app 和购买的域名可自动配置；已绑定域名需手动配置 | 手动              |
+| **SSO 提供方**     | 支持部分提供商：Google、Apple、GitHub、X     | 支持更多提供商         |
+| **用户管理界面**      | Project Editor 中的 Auth 工具         | Clerk 应用控制面板    |
+| **SMS**         | 不支持                               | 支持              |
+| **MFA**         | 不支持                               | 支持              |
+| **组织租户**        | 不支持                               | 支持              |
+
+<div id="quais-configuraes-comuns-do-clerk-auth-preciso-fazer-manualmente">
+  ### 我需要手动完成哪些常见的 Clerk Auth 配置？
+</div>
+
+Clerk Auth 的大部分配置都会自动完成，但有些设置需要你在 **Auth** 工具之外手动操作：
+
+* **SSO 身份提供方的自定义 OAuth 凭据** — 如果你希望身份提供方的同意页面显示你的 App 名称和品牌 (而非 Replit 的默认信息) ，请在身份提供方的开发者控制台中注册 OAuth App，然后将凭据粘贴回 Auth 面板。请参阅[为 SSO 身份提供方配置 OAuth 凭据](#configuring-oauth-credentials-for-an-sso-provider)。
+* **外部域名电子邮件验证的 DNS 记录** — 如果你的 App 绑定了由其他提供方管理的外部域名，则需要添加 DNS 记录，以便通过你的域名发送验证电子邮件。请参阅[电子邮件验证的域名设置](#domain-setup-for-email-verification)。
+
+<div id="posso-trazer-meu-prprio-app-clerk-em-vez-de-usar-o-gerenciado-pela-replit">
+  ### 我可以使用自己的 Clerk 应用，而不使用 Replit 托管的应用吗？
+</div>
+
+可以。如果你的应用已配置由 Replit 托管的 Clerk 应用，请先将其删除，再连接自己的外部 Clerk 应用：
+
+1. 在 Project Editor 中打开 **Auth** 面板。
+2. 转到 **Configure** 选项卡。
+3. 滚动到页面底部，点击 **Delete Clerk app**。
+
+删除 Clerk 应用会移除由 Replit 托管的 Clerk 租户，并释放与其关联的所有域名。之后，你就可以连接自己的 Clerk 应用并复用这些域名。如果你的应用尚未配置由 Replit 托管的 Clerk 应用，可以跳过此步骤，直接集成外部 Clerk 应用。
+
+<div id="recursos-adicionais">
+  ## 其他资源
+</div>
+
+* [将现有 App 迁移到 Clerk Auth](/zh/pt/core-concepts/project-editor/auth-and-security/clerk-auth-migration) — 在不影响账户延续性的前提下，将包含现有用户数据的 App 迁移到 Clerk Auth 的最佳实践
+* [配置 Google SSO](/zh/pt/replit-workspace/whitelabel-auth/google) — 配置自定义 Google OAuth 凭据
+* [配置 GitHub SSO](/zh/pt/replit-workspace/whitelabel-auth/github) — 配置自定义 GitHub OAuth 凭据
+* [配置 Apple SSO](/zh/pt/replit-workspace/whitelabel-auth/apple) — 配置 Apple Sign In 凭据
+* [配置 X (Twitter) SSO](/zh/pt/replit-workspace/whitelabel-auth/twitter-x) — 配置自定义 X OAuth 凭据
+* [Clerk 文档](https://clerk.com/docs) — 供集成外部 Clerk App 的开发者参考

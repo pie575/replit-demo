@@ -1,0 +1,362 @@
+---
+title: "使用 Notion 搭建网站"
+description: "了解如何借助 Replit Agent 搭建以 Notion 作为内容管理系统（CMS）的网站。"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+<div id="crie-um-blog-com-notion-usando-o-replit-agent">
+  ## 使用 Replit Agent 搭建 Notion 博客
+</div>
+
+Notion 是整理信息的强大工具，用作内容管理系统 (CMS) 同样出色。将 Notion 与 Replit 集成后，你可以直接在 Notion 工作区中管理网站内容——比如博客文章、作品集条目或产品列表。
+
+在 [Replit Agent](/zh/pt/features/agent/overview) 的支持下，Replit 会负责编码、托管和部署，让你快速从想法走向已部署的应用。写好提示词是引导 Agent 的关键；完整指南请参阅[使用 Replit AI 高效提示](/zh/pt/learn/effective-prompting)和[如何高效进行 vibe coding](/zh/pt/learn/build-with-agent)。
+
+<YouTubeEmbed videoId="AOYqTONf07o" title="以 Notion 作为 CMS，vibe coding 一个个性化网站" />
+
+本教程将带你搭建一个极简博客，从 Notion 表格中读取文章。你将：
+
+* 使用 Replit Agent 生成初始应用
+* 将你的 Replit 应用连接到 Notion 数据库
+* 学习如何引导 AI，并运用有效的提示词技巧排查常见问题
+* 部署你的博客，让全世界看到
+
+<Frame caption="最终成果：一个使用 Notion 的极简博客">
+  <img src="/assets/mirror/final-app-0a4ae75ee231.png" alt="最终 Notion 博客应用的截图，采用极简设计" width="3840" height="2160" data-path="images/tutorials/notion-cms/final-app.png" />
+</Frame>
+
+本教程大体上会跟随上面的视频，但补充了更多上下文和步骤，帮助你理解整个流程。
+
+<div id="pr-requisitos">
+  ## 前提条件
+</div>
+
+要学习本教程，您需要：
+
+* 一个 Replit 账户
+* 一个 Notion 账户
+* 熟悉 Replit Agent 的基本操作。如果您刚开始使用 Agent，请参阅 [Replit Agent 文档](/zh/pt/features/agent/overview)。
+
+<div id="etapa-1-prepare-seu-banco-de-dados-no-notion">
+  ## 第 1 步：准备你的 Notion 数据库
+</div>
+
+在为 Agent 编写提示词之前，先在 Notion 中配置好内容源。这需要你像规划一款产品那样，按流程梳理博客的需求。
+
+<Steps>
+  <Step title="在 Notion 中创建集成">
+    1. 在 Notion 中，进入 **设置与成员** (通常位于左上角侧边栏) 。
+    2. 导航到 **连接** (以前称为&quot;集成&quot;) 。
+    3. 选择 **开发或管理集成**。
+    4. 选择 **+ 新建集成**。
+
+    <Frame caption="在 Notion 中创建新集成">
+      <img src="/assets/mirror/new-integration-1-dcb1779aa5d5.png" alt="Notion 开发者门户，显示新建集成按钮" width="3794" height="2168" data-path="images/tutorials/notion-cms/new-integration-1.png" />
+    </Frame>
+
+    5. 为集成命名 (例如&quot;我的 Replit 博客集成&quot;) 。
+    6. 将其关联到 Notion 中目标工作区。
+
+    <Frame caption="配置你的 Notion 集成">
+      <img src="/assets/mirror/new-integration-2-95484e5e5ce5.png" alt="Notion 集成配置界面，包含名称和工作区选择" width="3796" height="2168" data-path="images/tutorials/notion-cms/new-integration-2.png" />
+    </Frame>
+
+    7. 在&quot;集成类型&quot;中，选择 **内部集成**。
+    8. 选择 **提交**。
+    9. 复制 **内部集成密钥** (token) 并妥善保存，它就是你的 Notion API 密钥。
+
+    <Frame caption="获取你的集成密钥">
+      <img src="/assets/mirror/new-integration-3-6ddc518a34f7.png" alt="Notion 集成密钥页面，显示集成 token" width="3796" height="2168" data-path="images/tutorials/notion-cms/new-integration-3.png" />
+    </Frame>
+
+    10. 在 **功能** 下，确保已启用&quot;读取内容&quot;。本教程只需读取权限即可。若日后需要向 Notion 写入数据，再启用&quot;插入内容&quot;和&quot;更新内容&quot;。
+
+    <Info>
+      建议为每个项目单独创建集成，以便精细化管理权限。这是一项安全最佳实践。
+    </Info>
+
+    更多详细说明，请参阅 [Notion 关于创建集成的官方文档](https://developers.notion.com/docs/create-a-notion-integration)。
+
+    你也可以通过 [notion.so/my-integrations](https://notion.so/my-integrations) 直接访问 Notion 集成面板。
+  </Step>
+
+  <Step title="在 Notion 中创建包含数据库的页面">
+    1. 在 Notion 中为博客内容新建一个页面。
+    2. 在该页面中，添加一个新的 **表格** 数据库。
+    3. 为表格命名 (例如：&quot;博客文章&quot;) 。
+    4. 为文章设置各列。请先**明确**这些列，因为很快你就需要将它们告诉 Agent：
+       * `Title` (文本，默认标题属性)
+       * `Body` (文本，用于文章正文)
+       * `Slug` (文本，用于 URL 友好标识符)
+       * `PublishedDate` (日期，或使用 &quot;创建时间&quot; / &quot;最后编辑时间&quot;)
+       * `ReadingTime` (文本或数字，例如：&quot;阅读需 5 分钟&quot;)
+       * `Description` (文本，用于预览的简短摘要)
+
+    <Frame caption="博客文章的 Notion 数据库配置示例">
+      <img src="/assets/mirror/blog-posts-8e330155e945.png" alt="已为博客文章配置列的 Notion 数据库" width="3840" height="2160" data-path="images/tutorials/notion-cms/blog-posts.png" />
+    </Frame>
+
+    5. 添加一些示例文章。你可以使用 Notion 的 AI 功能来帮助生成内容！
+  </Step>
+
+  <Step title="将集成连接到页面">
+    1. 打开包含你的数据库的 Notion 页面。
+    2. 点击右上角的 **•••** (三点) 菜单。
+
+    <Frame caption="在 Notion 中打开集成菜单">
+      <img src="/assets/mirror/add-integration-89d788bbd7b7.png" alt="Notion 连接菜单，展示如何将集成添加到页面" width="3840" height="2160" data-path="images/tutorials/notion-cms/add-integration.png" />
+    </Frame>
+
+    3. 选择 **+ 添加连接**。
+    4. 搜索并选择你创建的集成 (例如&quot;我的 Replit 博客集成&quot;) 。
+
+    <Frame caption="将集成添加到你的 Notion 页面">
+      <img src="/assets/mirror/add-integration-menu-f6b013e70a48.png" alt="Notion 页面展示用于添加集成的三点菜单" width="3840" height="2160" data-path="images/tutorials/notion-cms/add-integration-menu.png" />
+    </Frame>
+
+    5. 确认连接。这样 Replit 便可通过集成 token 访问该页面及其数据库。
+  </Step>
+</Steps>
+
+<div id="etapa-2-crie-prompts-para-o-replit-agent">
+  ## 第 2 步：为 Replit Agent 编写提示词
+</div>
+
+配置好 Notion 后，接下来让 Replit Agent 搭建博客的基础。**先规划，再写提示词**：清晰的功能梗概能让提示词更聚焦。
+
+<Steps>
+  <Step title="打开 Replit Agent">
+    进入 Replit 首页并打开 **Agent**。
+  </Step>
+
+  <Step title="编写你的提示词">
+    给 Agent 一个详细的提示词。表述要**简洁**，但对需求、限制和期望结果要**具体**。示例如下：
+
+    ```text theme={null}
+    帮我用 Notion 作为 CMS 创建一个极简博客。
+    博客应从一个 Notion 页面获取文章。
+    该 Notion 页面中的表格包含以下列：Title、Body、Slug、PublishedDate、ReadingTime、Description。
+    如果 Slug 列为空，你应根据文章标题生成一个 slug。
+    博客主题设为黑底白字。保持极简风格。
+    文章应列在首页，点击某篇文章应跳转到显示该文章完整内容的页面。
+    ```
+
+    <Tip>
+      想了解更多编写高效提示词的技巧，请参阅我们的指南[使用 Replit AI 进行高效提示](/zh/pt/learn/effective-prompting)。
+      你还可以提供一个网址让 Agent 抓取，直接**展示**你想要的初始样式或内容思路 (例如你的个人作品集) ，只需补充一句：`抓取 [URL] 的内容作为初始设计灵感和占位文本。`
+    </Tip>
+
+    Agent 会生成一份计划。请仔细查看，确认符合你的预期后再批准。这是 AI 辅助构建过程中的第一个**checkpoint**。
+  </Step>
+
+  <Step title="查看初始预览">
+    随后 Agent 会生成可视化预览。检查基本布局和样式的方向是否正确，细节调整可以稍后再做。
+  </Step>
+</Steps>
+
+<div id="etapa-3-conecte-o-replit-ao-notion-com-secrets">
+  ## 第 3 步：使用 Secrets 将 Replit 连接到 Notion
+</div>
+
+Agent 可能需要你的 Notion 集成凭据来获取数据。
+
+<Steps>
+  <Step title="在 Replit 中添加 Secrets">
+    通常，你需要：
+
+    1. `NOTION_API_KEY`：你在第 1 步中创建的内部集成 Secret。
+    2. `NOTION_DATABASE_ID`：你的 Notion 数据库 ID。
+
+    **如何查找 Notion 数据库 ID：**
+
+    * 在浏览器中打开包含数据库的 Notion 页面。
+    * URL 可能是 `https://www.notion.so/你的工作区/页面标题-页面ID?v=数据库视图ID`。如果数据库是页面的主要内容，`页面ID` 通常就是数据库 ID。
+    * **更可靠的方法**：点击数据库视图中的 **•••** 菜单，选择 **复制视图链接**，然后粘贴链接。链接 `https://www.notion.so/你的工作区/数据库ID?v=数据库视图ID` 中，`?v=` 前的部分即为 `数据库ID`。
+
+    前往项目编辑器中的 **Secrets** 工具 (🔒 图标) ，并添加以下信息：
+
+    * 键：`NOTION_API_KEY`，值：`[你的_Notion_集成_Secret]`
+    * 键：`NOTION_DATABASE_ID`，值：`[你的_Notion_数据库_ID]`
+
+    <Frame caption="将 Notion secrets 添加到 Replit">
+      <img src="/assets/mirror/add-secrets-0cf2e788b372.png" alt="Replit 的 Secrets 工具，已添加 Notion API 密钥和数据库 ID" width="3840" height="2160" data-path="images/tutorials/notion-cms/add-secrets.png" />
+    </Frame>
+
+    Agent 应会自动使用这些 secrets 并尝试连接。应用可能会重启。
+  </Step>
+</Steps>
+
+<div id="etapa-4-depurando-e-refinando-com-o-agent">
+  ## 第 4 步：使用 Agent 调试和完善
+</div>
+
+使用 AI 进行构建是一个迭代过程，出现错误或不完善之处是正常的。此时，有效引导 AI——通常称为“vibe coding”——至关重要。想深入了解这项技能，请参阅我们的教程：[如何有效进行 vibe coding](/zh/pt/learn/build-with-agent)。每个调试步骤只提供相关信息，以便**掌控上下文**。
+
+<Tip>
+  请保持项目编辑器中的**控制台**处于打开状态。它会提供有价值的错误信息和日志。
+</Tip>
+
+<Frame caption="使用 Replit 控制台调试 Notion 应用">
+  <img src="/assets/mirror/console-debug-1371ef15d9b5.png" alt="Replit 控制台显示调试 Notion 集成时的错误信息" width="3840" height="2160" data-path="images/tutorials/notion-cms/console-debug.png" />
+</Frame>
+
+以下是一些常见场景，以及如何通过**系统化调试**来应对：
+
+<div id="cenrio-1-falha-ao-carregar-posts-ou-erros-de-propriedade">
+  ### 场景 1：“无法加载文章”或出现属性错误
+</div>
+
+<div id="sintoma">
+  #### 症状
+</div>
+
+应用可以运行，但不会显示文章。控制台中可能出现“找不到名为 ID created&#95;time 的排序属性”或其他列不匹配的错误。
+
+<div id="causa">
+  #### 原因
+</div>
+
+Agent 可能会假定存在某些列名或属性名 (例如用于排序的 `created_time`) ，但这些名称在你的 Notion 数据库中并不存在，或者名称不同。
+
+<div id="soluo-de-problemas">
+  #### 问题排查
+</div>
+
+1. **检查 Notion 数据库**：确认数据库中的列名与 Agent 的预期或你的 prompt 完全一致。如果 Agent 查找的是 `created_time`，而你的列名是 `PublishedDate`，就会不匹配。
+2. **把错误信息交给 Agent (调试原则)&#x20;**：从控制台复制*原样*的错误信息，如果你已定位到相关代码片段，请**选中**它们。把这些有针对性的上下文提供给 Agent：
+   ```text theme={null}
+   获取文章时出现错误。控制台显示："Could not find sort property with name or ID created_time"。
+   我的 Notion 数据库使用的是 'PublishedDate'。请用它来排序/查询。以下是 `services/notion.js` 中可疑的代码：[代码片段]
+   ```
+3. **反复迭代 (实验原则)&#x20;**：如果 Agent 的修复无效，就补充更多细节。&quot;文章仍然无法加载，错误依旧。请展示获取/排序 Notion 文章的代码。&quot; 如果你为了应急而在 Notion 中加了一列 `created_time`，之后可以让 Agent：&quot;移除对 &#39;created&#95;time&#39; 的依赖，改用 &#39;PublishedDate&#39;。&quot; 记得用 Agent 的 **checkpoint** 保存可正常运行的状态。
+
+<div id="cenrio-2-exibio-ou-formatao-incorreta-de-dados">
+  ### 场景 2：数据展示或格式不正确
+</div>
+
+<div id="sintoma-2">
+  #### 症状
+</div>
+
+数据能显示出来，但不正确 (例如：首页显示的阅读时长有误，而文章页面却是正确的；Markdown 渲染异常) 。
+
+<div id="soluo-de-problemas-2">
+  #### 故障排除
+</div>
+
+1. **具体说明 (具体性原则)&#x20;**：清楚描述问题及其发生位置：
+   ```text theme={null}
+   首页上的文章阅读时长不正确，但单篇文章页面上的阅读时长是正确的。
+   此外，请在首页的每篇文章摘要中显示“PublishedDate”。
+   ```
+2. **Markdown 问题 (演示原则)&#x20;**：如果 Notion 的 Markdown“Body”渲染不正确 (例如出现多余空格或格式错误) ：
+   * 检查 Notion 中的原始内容；其中的格式可能会引入不易察觉的字符。
+   * 向 Agent 清楚说明问题。你甚至可以**演示**一个示例：
+     ```text theme={null}
+     Markdown 渲染问题：在文章 X 中，像“'**这段文字**'”这样的粗体文本显示为“' ** 这段文字 **'”，且未能正确渲染。请确保 Markdown 解析能处理这些情况，或移除空白字符。粗体的正确渲染示例：**这是粗体**。
+     ```
+   * 使用已验证的 Markdown 进行测试 (例如将 ChatGPT 的内容粘贴到 Notion 中) ，有助于确定问题出在源数据还是渲染逻辑。
+
+<div id="fluxo-geral-de-depurao">
+  ### 通用调试流程
+</div>
+
+1. **观察**：注意错误或异常行为。
+2. **高层提示词 (简化)&#x20;**：向 Agent 清楚地描述问题。
+3. **检查控制台/DevTools (调试)&#x20;**：查看详细的错误信息。
+4. **迭代并提供上下文 (选择、演示)&#x20;**：如果 Agent 未能修复问题，请提供更多上下文 (错误信息、相关代码、你的目标、已尝试的方法) 。
+5. **逐步修改 (Checkpoint)&#x20;**：让 Agent 每次只修复一个问题。使用 Agent 中的 **Checkpoints** 保存进度。
+6. **回退**：如果提示词让情况变得更糟，请回退到可用的 **Checkpoint**，再尝试其他方法。
+
+<Note>
+  不妨检查一下 Agent 生成的代码。即使不熟悉该语言，你通常也能发现逻辑问题或理解数据流，从而帮助你编写更好的提示词。`notionService.js` 等文件通常用于处理 Notion API 调用。
+</Note>
+
+<div id="etapa-5-melhorias-adicionais">
+  ## 第 5 步：进一步优化
+</div>
+
+主要功能运行正常后，请 Agent 添加更多功能。使用积极、直接的语言 (**指令**原则) 。以下是一些思路：
+
+<AccordionGroup>
+  <Accordion title="实现缓存和预取">
+    请 Agent：“为打造极速网站，实现 Notion 文章的缓存和预取。”
+    这能减少对 Notion API 的调用，加快页面加载速度。
+  </Accordion>
+
+  <Accordion title="优化样式">
+    请 Agent：“为首页的博客文章链接添加悬停效果。”或“优化文章排版以提升可读性。”
+    细微的视觉调整能显著改善用户体验。你可以向 Agent **展示**你喜欢的样式示例。
+  </Accordion>
+
+  <Accordion title="配置数据更新策略">
+    考虑应多久从 Notion 获取一次新数据。对于简单博客，在页面加载时或服务器重启时获取数据可能就足够了。
+    对于动态内容，请 Agent：“探索每小时自动更新 Notion 文章的方案。”这可能涉及后台轮询 (会增加复杂性，但能让内容保持最新) 。
+  </Accordion>
+</AccordionGroup>
+
+<div id="etapa-6-publique-seu-site">
+  ## 第 6 步：发布你的网站
+</div>
+
+对网站满意了吗？是时候分享出去了！
+
+1. 在项目编辑器右上角选择**发布**。
+2. 检查部署设置 (项目名称、层级) 。更多详情请参阅[部署](/zh/pt/learn/projects-and-artifacts/replit-deployments)。
+3. 选择**发布**。
+
+<Frame caption="使用 Notion 发布你的网站">
+  <img src="/assets/mirror/deploy-13a5233cd675.png" alt="Replit 部署界面，展示如何使用 Notion 发布你的网站" width="3840" height="2160" data-path="images/tutorials/notion-cms/deploy.png" />
+</Frame>
+
+Replit 会构建、打包并将你的应用发布到一个公开 URL 上。
+
+<div id="o-que-voc-aprendeu">
+  ## 您学到了什么
+</div>
+
+通过本教程，您学会了：
+
+* 将 Notion 配置为带有集成和结构化数据库的 CMS
+* 创建提示词，让 Replit Agent 构建连接 Notion 的 Web 应用，并运用**规划、规范和简化**等原则
+* 使用 Replit Secrets 安全地管理 API 密钥
+* 运用**提供上下文、展示示例和使用 checkpoint**等技巧，迭代调试和优化 AI 生成的应用
+* 在 Replit 上发布基于 Notion 的网站
+
+有关 checkpoint 和回滚的详细信息，请参阅 [Checkpoints 和回滚](/zh/pt/features/version-control/checkpoints-and-rollbacks)。
+
+与 Replit Agent 这类 AI 协作构建应用是一个协作过程。流程化思维、清晰的指令和系统化调试，是快速将想法变为现实的关键。
+
+<div id="prximos-passos">
+  ## 后续步骤
+</div>
+
+继续用 Notion 完善你的网站：
+
+<AccordionGroup>
+  <Accordion title="尝试不同的内容类型">
+    试着从 Notion 添加多样化的内容：图片库、嵌入视频或分类条目。
+  </Accordion>
+
+  <Accordion title="善用 Notion 的高级功能">
+    探索 Notion 的公式、汇总和关联功能，构建复杂的数据结构。与 Agent 协作，将这些丰富的数据呈现在你的 Replit 网站上。
+  </Accordion>
+
+  <Accordion title="与其他 Replit 集成搭配使用">
+    将 Notion 数据与其他 [Replit AI](/zh/pt/build/welcome) 工具或 [Agent 集成](/zh/pt/features/integrations/overview) 结合，让你的应用更上一层楼。例如，用 Replit Auth 保护私密内容，或用 OpenAI 在应用中根据 Notion 数据生成 AI 摘要。
+  </Accordion>
+</AccordionGroup>
+
+祝你创作愉快！期待看到你的作品。

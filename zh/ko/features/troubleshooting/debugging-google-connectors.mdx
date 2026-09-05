@@ -1,0 +1,160 @@
+---
+title: "解决 Google Connectors 中的 \"This app is blocked\" 错误"
+description: "解决在 Replit 中连接 Google Drive、Docs、Sheets、Calendar 和 Gmail 连接器时出现的“This app is blocked”错误。"
+---
+
+<div id="section">
+  ## 概述
+</div>
+
+如果您通过 [Connectors](/zh/ko/features/integrations/overview#connectors) 连接 Google Workspace 服务 (Drive、Docs、Sheets、Calendar、Gmail) 时看到 **&quot;This app is blocked&quot;** 错误消息，通常是因为组织的 Google Workspace 中 Google OAuth 设置配置有误。
+
+本指南将指导您解决此问题，以便将 Google 服务连接到 Replit App。
+
+<Frame>
+  <img src="/assets/mirror/app-is-blocked-837b32f44f72.png" alt="显示“This app is blocked”消息并阻止 OAuth 访问的 Google 错误对话框" width="1279" height="502" data-path="images/replitai/debugging-google-connectors/app-is-blocked.png" />
+</Frame>
+
+<Warning>
+  以下步骤仅适用于 **Google Workspace** 账号 (由组织管理的账号) 。如果您使用通过 `@gmail.com` 地址连接的个人 Google 账号，且 Replit 连接器被阻止，您无法自行更改 OAuth 政策——请联系 Google Workspace 管理员或改用其他账号。
+</Warning>
+
+<div id="section-2">
+  ## 故障排查步骤
+</div>
+
+<div id="1">
+  ### 第 1 步：尝试使用无痕模式
+</div>
+
+浏览器扩展程序或缓存的数据可能会干扰 OAuth 流程。使用无痕模式可以避免这些问题。
+
+<Steps>
+  <Step title="打开无痕模式">
+    在浏览器中打开一个新的 **无痕** (Chrome) 或 **隐私浏览** (Firefox/Safari) 窗口。
+  </Step>
+
+  <Step title="登录 Replit">
+    前往 [replit.com](https://replit.com) 并登录你的 Replit 账户。
+  </Step>
+
+  <Step title="再次尝试连接">
+    在 Project Editor 中打开应用，前往侧边栏中的 **Connectors**，然后再次尝试连接 Google 服务。
+  </Step>
+</Steps>
+
+如果错误仍然出现，请继续执行第 2 步。
+
+<div id="2-google-workspace-oauth">
+  ### 第 2 步：检查 Google Workspace 的 OAuth 设置
+</div>
+
+<Note>
+  此步骤需要访问组织的 **Google 管理控制台**。如果没有管理员权限，请联系 IT 团队。
+</Note>
+
+<Steps>
+  <Step title="打开 Google 管理控制台">
+    登录组织的 [Google 管理控制台](https://admin.google.com)。
+  </Step>
+
+  <Step title="确认用户是否存在">
+    前往 **Users** 部分，确认尝试连接 Replit 的账户是否在列表中。
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-users-c21d8fd43f71.png" alt="Google 管理控制台中显示用户账户的 Users 部分" width="1104" height="596" data-path="images/replitai/debugging-google-connectors/google-workspace-users.png" />
+    </Frame>
+  </Step>
+
+  <Step title="前往 API Controls">
+    前往 **Security &gt; Access and data control &gt; API controls**。
+
+    <Frame>
+      <img src="/assets/mirror/google-workspace-api-controls-b811709315cf.png" alt="显示 Security > API Controls 路径的 Google 管理控制台" data-og-width="1140" width="1140" data-og-height="631" height="631" data-path="images/replitai/debugging-google-connectors/google-workspace-api-controls.png" data-optimize="true" data-opv="3" srcset="/assets/mirror/google-workspace-api-controls-a27d4577aee8.png 280w, /assets/mirror/google-workspace-api-controls-d681943c082d.png 560w, /assets/mirror/google-workspace-api-controls-8f1b1659e60a.png 840w, /assets/mirror/google-workspace-api-controls-795bc698b885.png 1100w, /assets/mirror/google-workspace-api-controls-c122b9eb493f.png 1650w, /assets/mirror/google-workspace-api-controls-2415c93b4f41.png 2500w" />
+    </Frame>
+  </Step>
+
+  <Step title="打开第三方应用访问权限">
+    选择 **Manage third-party app access**。
+
+    <Frame>
+      <img src="/assets/mirror/third-party-app-access-eb5c94107497.png" alt="Google 管理控制台的 API controls 页面，其中 Manage third-party app access 按钮已突出显示" width="1686" height="468" data-path="images/replitai/debugging-google-connectors/third-party-app-access.png" />
+    </Frame>
+  </Step>
+
+  <Step title="检查 OAuth 访问权限">
+    确认已为 Google Workspace 用户启用 OAuth 访问权限。如果访问受到限制，请授予必要权限，以便 Replit 完成 OAuth 流程。
+  </Step>
+</Steps>
+
+如果连接仍然失败，请继续执行第 3 步。
+
+<div id="3-replit-oauth">
+  ### 第 3 步：将 Replit 添加为受信任的 OAuth 客户端
+</div>
+
+如果您的组织默认限制第三方应用的访问权限，需要将 Replit 明确设为受信任的应用。
+
+<Steps>
+  <Step title="打开 Google 管理控制台">
+    登录您组织的 [Google 管理控制台](https://admin.google.com)。
+  </Step>
+
+  <Step title="前往 API Controls">
+    前往 **Security &gt; Access and data control &gt; API controls**。
+  </Step>
+
+  <Step title="打开第三方应用访问权限">
+    在 **App access control** 下，选择 **Manage third-party app access**。
+  </Step>
+
+  <Step title="添加新应用">
+    选择 **Add app**，然后从下拉菜单中选择 **OAuth App Name or Client ID**。
+  </Step>
+
+  <Step title="搜索 Replit">
+    输入 Replit 的 Client ID。
+
+    ```
+    1012035106355-2dhot2e6o0malvog2ofss7akj2nsp8nq.apps.googleusercontent.com
+    ```
+
+    选择 **Search**。当搜索结果中显示 Replit App 时，选择它。
+  </Step>
+
+  <Step title="设置访问级别">
+    将访问级别设为 **Trusted**。
+  </Step>
+
+  <Step title="保存">
+    选择 **Save**。
+  </Step>
+</Steps>
+
+<Tip>
+  Google Workspace 政策变更可能需要几分钟才能生效。保存后，等待约 5~10 分钟，然后再次尝试在 Replit 中连接 Google 服务。
+</Tip>
+
+<div id="section-3">
+  ## 仍然被阻止吗？
+</div>
+
+如果您已完成全部三个步骤，但错误仍然存在：
+
+* **再次检查组织单位 (OU)**：Google Workspace 政策可能仅适用于特定 OU。请确认 OAuth 和受信任应用设置已应用于尝试连接的用户所属的 OU。
+* **查看 Google Workspace 通知**：在管理控制台中查看 **Reporting &gt; Audit and investigation &gt; OAuth log events**，检查是否有与 Replit 相关的被拒请求。
+* **联系 Replit 支持团队**：如果问题不在 Google Workspace 端，请联系 [Replit 支持团队](https://replit.com/support)。
+
+<div id="section-4">
+  ## 相关文档
+</div>
+
+* [Connectors 概览](/zh/ko/features/integrations/overview) -- 了解包括 Google Workspace 连接器在内的所有集成类型。
+* [管理连接器](/zh/ko/replitai/managing-connectors) -- 工作区和组织连接器的管理员设置
+* [Google Workspace 管理员帮助：控制第三方应用访问权限](https://support.google.com/a/answer/7281227) -- Google 提供的 OAuth 应用访问权限管理官方指南
+
+***
+
+<Note>
+  特别感谢 [Element451](https://element451.com) 团队编写了本文所依据的[解决此错误的原始指南](https://help.element451.com/en/articles/9999308-resolving-this-app-is-blocked-error-for-google-drive-connectors)。
+</Note>

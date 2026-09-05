@@ -1,0 +1,171 @@
+---
+title: "Rechercher des candidats"
+description: "Trouvez sur GitHub des ingénieurs correspondant à la description du poste, ignorez ceux qui sont déjà dans Ashby et rédigez des brouillons de messages de prise de contact."
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Il ne s’agit pas d’un connector natif. Agent vous demandera votre clé API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Ashby examine déjà les candidatures entrantes. Ce workflow est destiné au recrutement proactif :
+il lit les descriptions de poste dans Drive, trouve des ingénieurs correspondants sur GitHub, ignore les personnes déjà
+présentes dans Ashby et rédige les brouillons de messages de prise de contact que vous enverrez. Agent
+enregistre les nouvelles personnes comme sourcées, avec une brève explication de leur adéquation et un brouillon à l’intention du
+candidat. Vous les examinez et les envoyez. Ne prenez pas de décisions de recrutement uniquement sur cette base.
+
+<div id="section">
+  ## Idéal dans les cas suivants
+</div>
+
+* Les recruteurs techniques ayant besoin d&#39;une liste de profils sourcés lorsque le volume de candidatures entrantes est trop faible.
+* Les responsables du recrutement ayant besoin d&#39;ingénieurs identifiés sur GitHub sans passer toute la journée à chercher.
+
+<div id="section-2">
+  ## Connecteurs
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "Descriptions de poste et critères requis",
+},
+{
+id: "github",
+name: "GitHub",
+why: "Dépôts publics, historique des contributions et profil",
+},
+{
+id: "ashby",
+name: "Ashby",
+why: "Ignorer les candidats existants et enregistrer les profils sourcés",
+},
+]}
+/>
+
+<div id="section-3">
+  ## Avant de commencer
+</div>
+
+Préparez une description de poste distinguant les critères requis des critères
+souhaitables. Connectez Drive, GitHub et Ashby. Indiquez la région, le niveau d’ancienneté et le nombre de personnes recherché. Ne prenez pas de
+décisions de recrutement sur cette seule base.
+
+<div id="agent">
+  ## Demander à Agent
+</div>
+
+<AiPrompt>
+  Créez une routine qui s’exécute chaque lundi à 9 h. À partir de cette description de poste [lien Drive
+  ou texte collé], trouvez sur GitHub 30 ingénieurs répondant aux
+  critères requis. Ignorez les personnes déjà présentes dans Ashby. Pour chaque personne, rédigez
+  une justification de trois lignes et un court brouillon de prise de contact. N’envoyez
+  rien. Ajoutez les nouvelles personnes à Ashby avec les notes et brouillons dans leur fiche candidat, en indiquant le statut « sourcé ».
+</AiPrompt>
+
+<div id="section-4">
+  ## Résultats attendus
+</div>
+
+Agent lit la description de poste, effectue une recherche sur GitHub, ignore les personnes déjà présentes dans
+Ashby et renvoie une liste restreinte avec des brouillons. Vous les examinez et les envoyez.
+Les premiers résultats peuvent comporter beaucoup de bruit. Vérifiez-les, puis ajustez les critères requis.
+Ouvrez trois profils GitHub de la liste pour vérifier qu’ils correspondent aux critères requis et, avant
+d’envoyer quoi que ce soit, assurez-vous que ces personnes ne figurent pas déjà dans Ashby.
+
+<div id="section-5">
+  ## Adapter à mes besoins
+</div>
+
+<AiPrompt>
+  Incluez uniquement les personnes ayant effectué des commits récents dans [langage/type de dépôt] et disposant d&#39;au moins [n] ans d&#39;expérience pertinente.
+  Excluez toute personne qui semble être un client actuel ou travailler pour un concurrent.
+</AiPrompt>
+
+<AiPrompt>
+  Réécrivez le message de prospection dans mon style en vous inspirant de ces exemples [coller].
+  Limitez-le à 80 mots. Ne mentionnez pas qu&#39;il a été rédigé par un agent.
+</AiPrompt>
+
+<div id="section-6">
+  ## Résolution des problèmes
+</div>
+
+* **La présélection contient trop de bruit :** après avoir examiné les premiers résultats, ajustez les critères requis et souhaitables. Demandez des commits récents dans certains langages ou types de dépôts, et excluez les personnes qui semblent être des clients actuels ou des employés de concurrents.
+* **Des personnes déjà présentes dans Ashby continuent d’apparaître :** vérifiez qu’Ashby est connecté au bon espace de travail et qu’Agent effectue la correspondance à partir de l’adresse e-mail ou du nom d’utilisateur GitHub, et pas uniquement du nom affiché.
+* **Des messages de prospection ont été envoyés :** ce workflow ne doit créer que des brouillons. Si un message a été envoyé, arrêtez la routine et indiquez à Agent de ne jamais envoyer d’e-mail ou de message aux candidats.
+
+<div id="section-7">
+  ## Documents associés
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Générer des notes de version" href="/fr/ko/use-cases/generate-release-notes">
+    Utilisez le même connecteur GitHub pour le contenu déjà publié par votre équipe.
+  </Card>
+
+  <Card title="Créer un pitch deck pour les investisseurs" href="/fr/ko/use-cases/pitch-deck-from-website">
+    Utilisez le même connecteur Google Drive pour les responsables du recrutement qui assurent également la promotion de l’entreprise.
+  </Card>
+</CardGroup>
