@@ -1,52 +1,58 @@
 ---
-title: "Snowflake 커넥터"
-description: "Replit Agent로 데이터 기반 애플리케이션을 구축하기 위한 Snowflake 커넥터를 설정하세요."
+title: "Snowflake Connectors"
+description: "Snowflake connector를 설정하고 Replit Agent로 데이터 기반 애플리케이션을 구축하세요."
 sidebarTitle: "Snowflake"
 icon: "snowflake"
 ---
 
 <Info>
-  Snowflake 커넥터는 **Enterprise** 플랜에서만 사용 가능합니다.
+  Snowflake connector는 **Enterprise** plan에서만 사용할 수 있습니다.
 </Info>
 
-웨어하우스 커넥터를 사용하면 Replit Agent가 조직의 데이터 웨어하우스를 쿼리할 수 있습니다. Snowflake 커넥터를 사용하면 빌더는 자연어를 사용하여 대시보드, 보고 도구 및 데이터 애플리케이션을 만들 수 있으며 SQL 전문 지식이 필요하지 않습니다.
+Warehouse Connectors를 사용하면 Replit Agent가 조직의 데이터 웨어하우스를 쿼리할 수 있습니다. Snowflake connector를 사용하면 builder는 SQL 전문 지식 없이도 자연어만으로 대시보드, 리포팅 도구, 데이터 애플리케이션을 만들 수 있습니다.
 
-설정은 Snowflake 관리자와 Replit 워크스페이스 관리자가 필요한 일회성 프로세스입니다. 구성이 완료되면 모든 조직 구성원이 로그인하여 Snowflake 데이터로 구축을 시작할 수 있습니다.
+설정은 Snowflake 관리자와 Replit workspace admin이 함께 진행하는 일회성 작업입니다. 구성이 완료되면 조직의 모든 구성원이 로그인해 Snowflake 데이터로 바로 빌드를 시작할 수 있습니다.
 
-이 가이드는 전체 설정을 안내합니다. 세 가지 역할이 관여합니다:
+이 가이드에서는 전체 설정 과정을 안내합니다. 다음 세 가지 역할이 참여합니다.
 
-1. **Snowflake 계정 관리자** — Snowflake에서 OAuth 통합을 만듭니다
-2. **Replit 워크스페이스 관리자** — Replit에서 커넥터를 구성합니다
-3. **빌더** — 로그인하고 구축을 시작합니다
+1. **Snowflake Account Admin** — Snowflake에서 OAuth 통합을 생성합니다
+2. **Replit Workspace Admin** — Replit에서 connector를 구성합니다
+3. **Builder** — 로그인 후 빌드를 시작합니다
 
-## Snowflake에서 OAuth 통합 만들기
+<div id="create-the-oauth-integration-in-snowflake">
+  ## Snowflake에서 OAuth integration 생성
+</div>
 
-Snowflake 계정 관리자는 Replit이 Snowflake로 인증할 수 있게 하는 OAuth 보안 통합을 만듭니다.
+Snowflake Account Admin은 Replit이 Snowflake에 인증할 수 있도록 OAuth Security Integration을 생성합니다.
 
-### 사전 요구 사항
+<div id="prerequisites">
+  ### 사전 준비 사항
+</div>
 
 * Snowflake의 `ACCOUNTADMIN` 역할
-* Snowflake 워크시트에서 SQL을 실행할 수 있는 접근 권한
+* Snowflake 워크시트에서 SQL을 실행할 수 있는 권한
 
-### 설정 스크립트 실행
+<div id="run-the-setup-script">
+  ### 설정 스크립트 실행
+</div>
 
 <Steps>
   <Step title="Snowflake에 로그인">
-    Snowflake 계정을 열고 `ACCOUNTADMIN` 역할을 사용하고 있는지 확인합니다. 오른쪽 상단의 역할 드롭다운에서 확인할 수 있습니다.
+    Snowflake 계정을 열고 `ACCOUNTADMIN` 역할을 사용 중인지 확인하세요. 오른쪽 상단의 역할 드롭다운에서 확인할 수 있습니다.
   </Step>
 
   <Step title="SQL 워크시트 열기">
-    왼쪽 사이드바에서 **워크시트**를 클릭하고 새 워크시트를 만듭니다.
+    왼쪽 사이드바에서 **Worksheets**를 클릭하고 새 워크시트를 만드세요.
   </Step>
 
   <Step title="OAuth 통합 스크립트 실행">
-    다음 SQL 스크립트를 복사하여 붙여넣고 실행합니다:
+    다음 SQL 스크립트를 복사해 붙여넣고 실행하세요:
 
-    ```sql OAuth 통합 만들기 theme={null}
-    -- 기존 통합이 있는 경우 삭제
+    ```sql Create OAuth integration theme={null}
+    -- 기존 통합이 있으면 삭제
     DROP INTEGRATION IF EXISTS REPLIT_OAUTH;
 
-    -- Replit용 OAuth 통합 만들기
+    -- Replit용 OAuth 통합 생성
     CREATE SECURITY INTEGRATION REPLIT_OAUTH
       TYPE = OAUTH
       ENABLED = TRUE
@@ -61,22 +67,22 @@ Snowflake 계정 관리자는 Replit이 Snowflake로 인증할 수 있게 하는
     ```
 
     <Warning>
-      리디렉션 URI는 정확히 `https://replit.com/connectors/oauth/callback`이어야 합니다. 다른 값을 사용하면 인증 중에 404 오류가 발생합니다.
+      리디렉션 URI는 반드시 `https://replit.com/connectors/oauth/callback`이어야 합니다. 다른 값을 입력하면 authentication 과정에서 404 오류가 발생합니다.
     </Warning>
 
     <Note>
-      `BLOCKED_ROLES_LIST = ()`를 설정하면 통합 사용이 차단된 역할이 없도록 보장합니다. 이 설정이 없으면 연결 시 "잘못된 동의 요청" 또는 "역할 차단" 오류가 발생할 수 있습니다.
+      `BLOCKED_ROLES_LIST = ()`로 설정하면 어떤 역할도 통합 사용이 차단되지 않습니다. 이 설정을 빠뜨리면 연결할 때 &quot;invalid consent request&quot; 또는 &quot;role blocked&quot; 오류가 발생할 수 있습니다.
     </Note>
   </Step>
 
   <Step title="OAuth 자격 증명 가져오기">
-    다음 쿼리를 실행하여 클라이언트 ID와 클라이언트 시크릿을 가져옵니다:
+    다음 쿼리를 실행해 Client ID와 Client Secret을 확인하세요:
 
-    ```sql OAuth 자격 증명 가져오기 theme={null}
+    ```sql Get OAuth credentials theme={null}
     -- 통합 세부 정보 보기
     DESCRIBE INTEGRATION REPLIT_OAUTH;
 
-    -- 클라이언트 ID 및 시크릿 가져오기
+    -- Client ID와 Secret 가져오기
     WITH secrets AS (
       SELECT PARSE_JSON(
         SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
@@ -88,61 +94,65 @@ Snowflake 계정 관리자는 Replit이 Snowflake로 인증할 수 있게 하는
     FROM secrets;
     ```
 
-    출력에서 **클라이언트 ID**와 **클라이언트 시크릿**을 복사합니다. 다음 단계에서 필요합니다.
+    출력된 결과에서 **Client ID**와 **Client Secret**을 복사하세요. 다음 단계에서 필요합니다.
   </Step>
 </Steps>
 
-## Replit에서 커넥터 구성
+<div id="configure-the-connector-in-replit">
+  ## Replit에서 connector 구성
+</div>
 
-Replit 워크스페이스 관리자가 Replit에 Snowflake 자격 증명을 추가합니다. 구성이 완료되면 조직의 모든 사람이 로그인할 수 있습니다.
+Replit Workspace admin이 Snowflake 자격 증명을 Replit에 추가합니다. 구성을 마치면 조직의 모든 구성원이 로그인할 수 있습니다.
 
 <Note>
-  이 단계에는 관리자 접근이 있는 Enterprise 플랜이 필요합니다.
+  이 단계는 관리자 권한이 있는 Enterprise plan에서만 수행할 수 있습니다.
 </Note>
 
 <Steps>
-  <Step title="통합 열기">
-    조직 설정으로 이동하여 **통합** 탭을 선택합니다.
+  <Step title="Integrations 열기">
+    조직 설정으로 이동한 후 **Integrations** tab을 선택합니다.
   </Step>
 
-  <Step title="Snowflake 커넥터 추가">
-    **새 커넥터 추가**를 클릭하고 **Snowflake**를 선택합니다.
+  <Step title="Snowflake connector 추가">
+    **Add New Connector**를 클릭한 후 **Snowflake**를 선택합니다.
   </Step>
 
   <Step title="자격 증명 입력">
-    이전 단계의 **클라이언트 ID**와 **클라이언트 시크릿**을 입력합니다.
+    이전 단계에서 확인한 **Client ID**와 **Client Secret**을 입력합니다.
   </Step>
 
-  <Step title="범위 설정">
-    커넥터 범위를 `refresh_token`으로 설정합니다.
+  <Step title="scope 설정">
+    connector의 scope를 `refresh_token`으로 설정합니다.
 
     <Warning>
-      `refresh_token` 범위만 사용하세요. `session:role-any` 또는 `session:role:PUBLIC`과 같은 다른 범위는 "잘못된 범위" 오류를 일으킬 수 있습니다.
+      `refresh_token` scope만 사용하세요. `session:role-any`나 `session:role:PUBLIC` 같은 다른 scope를 사용하면 &quot;invalid scope&quot; 오류가 발생할 수 있습니다.
     </Warning>
   </Step>
 
   <Step title="저장">
-    **저장**을 클릭하여 커넥터를 활성화합니다.
+    **Save**를 클릭해 connector를 활성화합니다.
   </Step>
 </Steps>
 
-## Snowflake에 로그인
+<div id="sign-in-to-snowflake">
+  ## Snowflake에 로그인
+</div>
 
-커넥터에 접근 권한이 있는 모든 조직 구성원이 로그인할 수 있습니다. Agent와 함께 사용하기 전에 **통합** 페이지에서 먼저 로그인하여 연결을 확인하세요.
+connector에 접근할 수 있는 조직 구성원은 누구나 로그인할 수 있습니다. Agent와 함께 사용하기 전에 먼저 **Integrations** 페이지에서 로그인해 연결 상태를 확인하세요.
 
 <Steps>
-  <Step title="Snowflake 커넥터 찾기">
-    Replit에서 **통합**으로 이동합니다. **커넥터** 아래에서 **Snowflake**를 찾습니다.
+  <Step title="Snowflake connector 찾기">
+    Replit에서 **Integrations**로 이동합니다. **Connectors** 아래에서 **Snowflake**를 찾습니다.
   </Step>
 
-  <Step title="로그인 클릭">
-    Snowflake 커넥터에서 **로그인**을 클릭합니다.
+  <Step title="Sign In 클릭">
+    Snowflake connector에서 **Sign In**을 클릭합니다.
   </Step>
 
-  <Step title="Snowflake 계정 ID 입력">
-    OAuth 프롬프트에서 Snowflake 계정 ID를 요청합니다.
+  <Step title="Snowflake Account ID 입력">
+    OAuth prompt에 Snowflake Account ID를 입력하라는 요청이 표시됩니다.
 
-    계정 ID를 찾으려면 Snowflake URL을 확인하세요:
+    Account ID는 Snowflake URL에서 확인할 수 있습니다:
 
     ```
     https://app.snowflake.com/myorg/myaccount
@@ -155,41 +165,45 @@ Replit 워크스페이스 관리자가 Replit에 Snowflake 자격 증명을 추�
     ```
 
     <Note>
-      URL에서는 두 부분 사이에 `/`를 사용하지만, 계정 ID에서는 `-`를 사용합니다.
+      URL에서는 두 부분 사이에 `/`를 사용하지만, Account ID에서는 `-`를 사용합니다.
     </Note>
   </Step>
 
   <Step title="인증">
-    Snowflake가 로그인 페이지로 리디렉션합니다. Snowflake 자격 증명을 입력하여 OAuth 흐름을 완료합니다.
+    Snowflake가 login 페이지로 이동시킵니다. Snowflake 자격 증명을 입력해 OAuth flow를 완료하세요.
   </Step>
 </Steps>
 
-## Snowflake 데이터로 구축 시작
+<div id="start-building-with-your-snowflake-data">
+  ## Snowflake 데이터로 빌드 시작하기
+</div>
 
-연결 후 두 가지 방법으로 Agent와 함께 Snowflake 커넥터를 사용할 수 있습니다:
+연결을 마치면 Snowflake connector를 Agent와 함께 다음 두 가지 방식으로 사용할 수 있습니다.
 
-* **슬래시 명령** — 프롬프트에 `/snowflake`를 입력하여 커넥터 사용
-* **자연어** — Agent에게 Snowflake 데이터를 직접 사용하도록 요청
+* **슬래시 명령어** — prompt에 `/snowflake`를 입력해 connector를 사용합니다
+* **자연어** — Agent에게 Snowflake 데이터를 바로 사용하도록 요청합니다
 
-다음은 예시 프롬프트입니다:
+다음은 prompt 예시입니다.
 
 ```
-내 Snowflake 데이터를 사용하여 대시보드를 만들어 주세요. 지역별 총 매출을
-막대 차트로, 분기별 트렌드 라인으로, 상위 10개 고객의 테이블로 표시해 주세요.
-다크 테마, 깔끔하고 모던하게.
+내 Snowflake 데이터를 사용해서 대시보드를 만들어 줘. 지역별 총 매출은
+막대 차트로, 분기별 추세선, 그리고 상위 10개 고객 표를 보여 줘.
+다크 테마로 깔끔하고 모던하게.
 ```
 
-Agent는 Snowflake 데이터에 대한 SQL 쿼리를 작성하고 실행하여 작동하는 애플리케이션을 구축합니다.
+Agent가 Snowflake 데이터를 대상으로 SQL 쿼리를 작성 및 실행하여 실제로 작동하는 애플리케이션을 만듭니다.
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
 <AccordionGroup>
   <Accordion title="잘못된 동의 요청 또는 역할 차단 오류">
-    Snowflake 통합에 기본적으로 차단된 역할이 있을 수 있습니다.
+    Snowflake 통합에서 역할이 기본적으로 차단되어 있을 수 있습니다.
 
-    통합이 `BLOCKED_ROLES_LIST = ()`로 만들어졌는지 확인합니다. 이 설정 없이 이미 만든 경우 다음을 실행하세요:
+    통합이 `BLOCKED_ROLES_LIST = ()` 설정으로 생성되었는지 확인하세요. 이 설정 없이 이미 생성했다면 다음을 실행하세요:
 
-    ```sql 차단된 역할 수정 theme={null}
+    ```sql Fix blocked roles theme={null}
     CREATE OR REPLACE SECURITY INTEGRATION REPLIT_OAUTH
       TYPE = OAUTH
       ENABLED = TRUE
@@ -203,31 +217,31 @@ Agent는 Snowflake 데이터에 대한 SQL 쿼리를 작성하고 실행하여 �
       COMMENT = 'OAuth integration for Replit connector';
     ```
 
-    오류가 계속되면 기본 역할이 차단되지 않았는지 확인하세요:
+    오류가 계속되면 기본 역할이 차단되어 있지 않은지 확인하세요:
 
-    ```sql 기본 역할 설정 theme={null}
+    ```sql Set default role theme={null}
     ALTER USER "YOUR_USERNAME" SET DEFAULT_ROLE = 'PUBLIC';
     ```
   </Accordion>
 
-  <Accordion title="인증 시 404 오류">
-    Snowflake 통합의 리디렉션 URI가 정확히 다음과 같은지 확인합니다:
+  <Accordion title="authentication 중 404 오류">
+    Snowflake 통합의 리디렉션 URI가 다음과 정확히 일치하는지 확인하세요:
 
     ```
     https://replit.com/connectors/oauth/callback
     ```
 
-    어떠한 불일치도 OAuth 흐름 중 404를 일으킵니다.
+    조금이라도 다르면 OAuth flow 중에 404 오류가 발생합니다.
   </Accordion>
 
-  <Accordion title="잘못된 범위 오류">
-    Replit의 커넥터 범위가 `refresh_token`으로만 설정되어 있는지 확인합니다. `session:role-any` 또는 `session:role:PUBLIC`과 같은 다른 범위를 제거하세요.
+  <Accordion title="잘못된 scope 오류">
+    Replit의 connector scope가 `refresh_token`으로만 설정되어 있는지 확인하세요. `session:role-any`나 `session:role:PUBLIC` 같은 다른 scope는 모두 제거하세요.
   </Accordion>
 
   <Accordion title="연결 실패 오류">
-    Replit의 클라이언트 ID와 클라이언트 시크릿이 Snowflake가 생성한 것과 일치하는지 확인합니다. 다음을 실행하여 다시 확인하세요:
+    Replit의 Client ID와 Client Secret이 Snowflake에서 생성한 값과 일치하는지 확인하세요. 다음을 실행하면 다시 확인할 수 있습니다:
 
-    ```sql 자격 증명 확인 theme={null}
+    ```sql Verify credentials theme={null}
     WITH secrets AS (
       SELECT PARSE_JSON(
         SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('REPLIT_OAUTH')
@@ -241,9 +255,11 @@ Agent는 Snowflake 데이터에 대한 SQL 쿼리를 작성하고 실행하여 �
   </Accordion>
 </AccordionGroup>
 
-## 관련 문서
+<div id="related-documentation">
+  ## 관련 문서
+</div>
 
-* [웨어하우스 커넥터 개요](/ko/connectors/warehouses/overview) — 지원되는 모든 웨어하우스 커넥터 개요
-* [Databricks 연결](/ko/connectors/warehouses/databricks) — 단계별 Databricks 설정
-* [커넥터 관리](/ko/replitai/managing-connectors) — 커넥터 관리 및 구성
-* [Snowflake — 맞춤형 클라이언트용 OAuth 구성](https://docs.snowflake.com/en/user-guide/oauth-custom) — Snowflake의 OAuth 문서
+* [warehouse connectors 개요](/ko/connectors/warehouses/overview) — 지원되는 모든 warehouse connectors 개요
+* [Databricks 연결](/ko/connectors/warehouses/databricks) — 단계별 Databricks 설정 방법
+* [Managing your connectors](/ko/replitai/managing-connectors) — connector 관리 및 구성
+* [Snowflake — 사용자 지정 클라이언트용 OAuth 구성](https://docs.snowflake.com/en/user-guide/oauth-custom) — Snowflake의 OAuth 문서

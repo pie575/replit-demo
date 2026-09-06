@@ -1,6 +1,8 @@
 ---
-title: "후보자 소싱하기"
-description: "직무 기술서를 기반으로 GitHub에서 일치하는 엔지니어를 찾고, 이미 Ashby에 있는 사람은 건너뛰고, 아웃리치 초안을 작성합니다."
+title: "후보자 소싱"
+description: "채용 공고를 바탕으로 GitHub에서 적합한 엔지니어를 찾고, 이미 Ashby에 등록된 사람은 제외한 뒤 접촉 메시지 초안을 작성합니다."
+sidebarTitle: "후보자 소싱"
+icon: "user-check"
 ---
 
 export const Connectors = ({items}) => <div style={{
@@ -45,7 +47,7 @@ export const Connectors = ({items}) => <div style={{
   color: "#F26207",
   marginTop: "2px"
 }}>
-                Not a native connector. Agent will ask for your API key.
+                기본 제공 connector가 아닙니다. Agent가 API 키를 요청합니다.
               </div> : null}
           </div>
         </div>)}
@@ -67,91 +69,103 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-Ashby는 이미 인바운드 지원자를 심사합니다. 이 워크플로는 아웃바운드용입니다:
-Drive의 직무 기술서를 읽고, GitHub에서 일치하는 엔지니어를 찾고, 이미 Ashby에
-있는 사람은 건너뛰고, 여러분이 보낼 아웃리치 초안을 작성합니다. Agent는
-새로운 사람을 짧은 적합성 이유와 후보자에 대한 초안과 함께 소싱됨으로
-기록합니다. 여러분이 검토하고 발송합니다. 이것만으로 채용 결정을 내리지
-마세요.
+Ashby는 이미 인바운드 지원서를 심사합니다. 이 workflow는 아웃바운드용입니다. Drive에 있는 채용
+공고를 읽고, GitHub에서 조건에 맞는 엔지니어를 찾고, 이미 Ashby에 등록된 사람은 건너뛰고,
+여러분이 보낼 outreach 초안을 작성합니다. Agent는 새로 찾은 인물을 sourced 상태로 기록하고,
+적합한 이유를 간단히 정리한 뒤 해당 후보자에 초안을 남깁니다. 검토와 발송은 직접 하세요. 이
+결과만으로 채용을 결정하지는 마세요.
 
-## 다음과 같은 경우에 적합합니다
+<div id="best-for">
+  ## 이런 분에게 적합합니다
+</div>
 
-* 인바운드 물량이 너무 적을 때 소싱된 목록이 필요한 테크니컬 리크루터.
-* 하루 종일 검색만 하지 않고도 GitHub로 매칭된 엔지니어가 필요한 채용 매니저.
+* 인바운드 지원자가 너무 적어 직접 발굴한 후보자 목록이 필요한 기술 리크루터
+* 하루 종일 검색에 매달리지 않고도 GitHub 기반으로 매칭된 엔지니어를 만나고 싶은 채용 담당자
 
-## 커넥터
+<div id="connectors">
+  ## Connectors
+</div>
 
 <Connectors
   items={[
 {
-  id: "google-drive",
-  name: "Google Drive",
-  why: "직무 기술서 및 필수 조건",
+id: "google-drive",
+name: "Google Drive",
+why: "채용 공고 및 필수 요건",
 },
 {
-  id: "github",
-  name: "GitHub",
-  why: "공개 저장소, 기여 내역, 프로필",
+id: "github",
+name: "GitHub",
+why: "공개 저장소, 기여 내역, 프로필",
 },
 {
-  id: "ashby",
-  name: "Ashby",
-  why: "기존 후보자 건너뛰기 및 소싱된 사람 기록",
+id: "ashby",
+name: "Ashby",
+why: "기존 후보자는 건너뛰고 소싱한 인재 기록",
 },
 ]}
 />
 
-## 시작하기 전에
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
 
-필수 조건과 우대 조건이 구분된 직무 기술서를 준비하세요. Drive, GitHub, Ashby를
-연결하세요. 지역, 시니어리티, 원하는 인원수를 말해주세요. 이것만으로 채용
-결정을 내리지 마세요.
+필수 요건과 우대 사항이 구분된 채용 공고를 준비하세요. Drive, GitHub, Ashby를 연결하세요. 근무지, 연차 수준, 원하는 후보자 수를 알려주세요. 이 결과만으로 채용을 결정하지 마세요.
 
-## Agent에게 요청하기
-
-<AiPrompt>
-  매주 월요일 9시에 실행되는 루틴을 만들어 주세요. 이 직무 기술서 \[Drive
-  링크 또는 붙여넣기]를 기반으로, 필수 조건에 맞는 엔지니어 30명을 GitHub에서
-  찾아주세요. 이미 Ashby에 있는 사람은 건너뛰세요. 각 사람에 대해 3줄짜리
-  적합성 이유와 짧은 아웃리치 초안을 작성해 주세요. 아무것도 발송하지
-  마세요. 새로운 사람은 노트와 초안을 후보자에 담아 소싱됨으로 Ashby에
-  추가해 주세요.
-</AiPrompt>
-
-## 예상 결과
-
-Agent가 직무 기술서를 읽고, GitHub를 검색하고, 이미 Ashby에 있는 사람은
-건너뛰고, 초안이 담긴 숏리스트를 반환합니다. 여러분이 검토하고 발송합니다.
-첫 결과는 노이즈가 많을 수 있습니다. 확인 후 필수 조건을 조정하세요.
-목록에서 GitHub 프로필 세 개를 열어 필수 조건과 일치하는지 확인하고, 무엇을
-보내기 전에 그 사람들이 이미 Ashby에 없는지 확인하세요.
-
-## 나에게 맞게 조정하기
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
 
 <AiPrompt>
-  \[언어/저장소 유형]에 최근 커밋이 있고 관련 경력이 \[n]년 이상인 사람만
-  포함해 주세요. 현재 고객이나 경쟁사 직원처럼 보이는 사람은 제외해 주세요.
+  매주 월요일 9:00에 실행되는 Routine을 만들어 줘. 이 채용 공고
+  [Drive 링크 또는 붙여넣기]를 기준으로 필수 요건에 맞는 엔지니어 30명을 GitHub에서 찾아 줘.
+  이미 Ashby에 등록된 사람은 제외해 줘. 각 후보자마다 적합한 이유를 3줄로 정리하고
+  짧은 outreach 초안도 작성해 줘. 아무것도 발송하지는 마. 새로운 사람은 Ashby에
+  sourced 상태로 추가하고, 메모와 초안을 해당 후보자에 함께 남겨 줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상되는 동작
+</div>
+
+Agent는 채용 공고를 읽고 GitHub를 검색한 뒤, 이미 Ashby에 등록된 사람은 건너뛰고
+초안이 포함된 shortlist를 반환합니다. 검토한 다음 발송하면 됩니다. 첫 결과는 다소 정돈되지 않을 수 있습니다.
+결과를 확인한 후 필수 요건을 더 좁혀 보세요. 목록에서 GitHub 프로필 세 개를 열어
+필수 요건에 부합하는지 확인하고, 해당 인물이 아직 Ashby에 없는지 점검한 뒤에
+발송하세요.
+
+<div id="make-it-work-for-you">
+  ## 내 방식에 맞게 활용하기
+</div>
+
+<AiPrompt>
+  [언어 / 저장소 유형]에 최근 commit 기록이 있고 관련 경력이 [n]년 이상인
+  사람만 포함해 줘. 현재 고객사나 경쟁사 직원으로 보이는 사람은 빼 줘.
 </AiPrompt>
 
 <AiPrompt>
-  이 예시들 \[붙여넣기]을 참고해 제 말투로 아웃리치를 다시 작성해 주세요.
-  80단어 이내로 유지해 주세요. 에이전트가 작성했다는 언급은 하지 마세요.
+  이 예시들 [붙여넣기]을 참고해서 내 말투로 outreach를 다시 작성해 줘. 80단어
+  이내로 써 줘. 에이전트가 작성했다는 말은 하지 마.
 </AiPrompt>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
-* **숏리스트에 노이즈가 많음:** 첫 결과를 본 후 필수 조건과 우대 조건을 조정하세요. 특정 언어나 저장소 유형의 최근 커밋을 요청하고, 현재 고객이나 경쟁사 직원처럼 보이는 사람은 제외하세요.
-* **이미 Ashby에 있는 사람이 계속 나타남:** Ashby가 올바른 워크스페이스에 연결되어 있는지, Agent가 표시 이름뿐 아니라 이메일이나 GitHub 사용자명으로 매칭하고 있는지 확인하세요.
-* **아웃리치가 발송됨:** 이 워크플로는 초안만 작성해야 합니다. 무언가 발송되었다면 루틴을 중지하고 후보자에게 이메일이나 메시지를 절대 보내지 말라고 Agent에게 알려주세요.
+* **shortlist에 불필요한 후보가 많은 경우:** 1차 검토 후 필수 요건과 nice-to-haves의 기준을 더 엄격하게 나누세요. 특정 언어나 저장소 유형의 최근 commit을 요청하고, 현재 고객이거나 경쟁사 직원으로 보이는 사람은 제외하세요.
+* **이미 Ashby에 있는 사람이 계속 나타나는 경우:** Ashby가 올바른 workspace에 연결되어 있는지, Agent가 표시 이름만이 아니라 이메일이나 GitHub 사용자 이름을 기준으로 매칭하는지 확인하세요.
+* **outreach가 발송된 경우:** 이 workflow는 초안 작성까지만 수행해야 합니다. 실제로 발송된 것이 있다면 Routine을 중지하고, 후보자에게 이메일이나 메시지를 절대 보내지 말라고 Agent에 지시하세요.
 
-## 관련 문서
+<div id="related">
+  ## 관련 항목
+</div>
 
 <CardGroup cols={2}>
-  <Card title="릴리스 노트 생성하기" href="/ko/use-cases/generate-release-notes">
-    팀이 이미 출시한 내용을 위해 동일한 GitHub 커넥터를 사용합니다.
+  <Card title="release notes 생성하기" href="/ko/use-cases/generate-release-notes">
+    팀이 이미 출시한 내용을 정리할 때도 동일한 GitHub connector를 사용합니다.
   </Card>
 
-  <Card title="투자자 피치 덱 만들기" href="/ko/use-cases/pitch-deck-from-website">
-    회사를 홍보하기도 하는 채용 매니저를 위해 동일한 Google Drive 커넥터를 사용합니다.
+  <Card title="investor pitch deck 만들기" href="/ko/use-cases/pitch-deck-from-website">
+    회사를 소개하는 자리에도 나서는 채용 담당자를 위해 동일한 Google Drive connector를 사용합니다.
   </Card>
 </CardGroup>

@@ -1,122 +1,144 @@
 ---
-title: "SAML"
-description: "워크스페이스 설정에서 직접 Replit Enterprise 조직의 SAML Single Sign-On을 설정하세요. IdP 설정 및 이메일 도메인 클레임을 포함합니다."
+title: "싱글 사인온(SAML SSO)"
+description: "IdP 구성과 이메일 도메인 소유권 확인을 포함해, Workspace Settings에서 바로 Replit Enterprise Organization의 SAML 싱글 사인온을 설정하세요."
 icon: "id-card"
 ---
 
-## 소개
+<div id="introduction">
+  ## 소개
+</div>
 
 <Note>
-  Replit에서 빌드한 **앱**의 로그인 흐름에 SSO를 추가하고 싶으신가요? [앱에 SSO 추가하기 (Clerk)](/ko/features/auth-and-identity/single-sign-on)를 참고하세요. 이 페이지는 **Replit 조직**을 위한 SSO 활성화 — 즉 팀이 replit.com에 로그인하는 방법을 다룹니다.
+  Replit에서 **직접 만든 앱**의 sign-in flow에 SSO를 추가하려고 하시나요? [앱에 SSO 추가하기(Clerk)](/ko/features/auth-and-identity/single-sign-on)를 참고하세요. 이 페이지에서는 **Replit organization**에 SSO를 활성화하는 방법, 즉 팀이 replit.com에 로그인하는 방식을 다룹니다.
 </Note>
 
 <Note>
-  Enterprise 플랜을 사용하는 조직만 SAML SSO를 사용할 수 있습니다. [가격 페이지에서 Enterprise 플랜을 직접 구매](https://replit.com/pricing)하거나 [문의하기](https://replit.com/teams#inlineForm)를 통해 안내를 받으실 수 있습니다.
+  SAML SSO는 Enterprise plan을 사용하는 organization만 이용할 수 있습니다. [pricing page에서 Enterprise plan을 바로 구매](https://replit.com/pricing)하거나 [문의](https://replit.com/teams#inlineForm)하여 안내를 받으실 수 있습니다.
 </Note>
 
-[SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) SSO를 사용하면 Identity Provider(IdP)를 통해 replit.com에 로그인하는 사용자를 인증할 수 있습니다. 조직의 사용자는 인증을 위해 IdP로 리디렉션되며, IdP는 사용자의 신원을 확인하고 로그인하는 응답을 Replit에 반환합니다.
+[SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) SSO를 사용하면 Identity Provider(IdP)를 통해 replit.com에 로그인하는 User를 인증할 수 있습니다. Organization에 속한 User는 인증을 위해 IdP로 리디렉션되고, IdP는 해당 User의 신원을 확인하는 응답을 Replit에 반환하여 로그인을 완료합니다.
 
-Enterprise 관리자는 Replit에 연락하지 않고 **Enterprise 설정 → Authentication**에서 직접 SAML SSO를 설정할 수 있습니다. 마법사가 Service Provider(SP) 값을 생성하고, IdP 자격 증명을 받아 SSO를 자동으로 프로비저닝합니다. 동일한 셀프서비스 흐름이 온라인으로 Enterprise 플랜을 구매할 때 가입 시에도 사용되므로 온보딩의 일부로 SSO 설정이 안내됩니다.
+Enterprise Admin은 Replit에 문의할 필요 없이 **Enterprise settings → Authentication**에서 직접 SAML SSO를 구성할 수 있습니다. 마법사가 Service Provider(SP) 값을 생성하고, IdP 자격 증명을 입력받아 SSO를 자동으로 프로비저닝합니다. 온라인으로 Enterprise plan을 구매할 때의 가입 과정에서도 동일한 self-serve flow가 사용되므로, 온보딩 과정에서 SSO 설정을 안내받게 됩니다.
 
-## SAML SSO 설정하기
+<div id="set-up-saml-sso">
+  ## SAML SSO 설정
+</div>
 
-<img src="/assets/mirror/saml-enterprise-settings-d2d44c2de846.png" alt="Enterprise 설정에서의 SAML SSO 설정" width="1024" height="613" data-path="images/teams/identity-and-access-management/saml-enterprise-settings.png" />
+<img src="/assets/mirror/saml-enterprise-settings-d2d44c2de846.png" alt="Enterprise settings의 SAML SSO 설정" width="1024" height="613" data-path="images/teams/identity-and-access-management/saml-enterprise-settings.png" />
 
-설정 마법사는 다섯 단계로 진행됩니다. Replit 조직과 Identity Provider 모두에 대한 관리자 권한이 필요합니다.
+설정 마법사는 다섯 단계로 진행됩니다. Replit Organization과 Identity Provider 양쪽 모두에 대한 관리자 권한이 필요합니다.
 
 <Steps>
   <Step title="Authentication 설정 열기">
-    워크스페이스 전환기를 열고 Enterprise 워크스페이스를 선택한 후 **Settings**를 엽니다. **Advanced**를 선택하고 **Authentication** 섹션을 확장한 다음 **SAML single sign-on** 카드에서 **Enable SSO**를 클릭하세요.
+    workspace 전환기를 열고 Enterprise workspace를 선택한 다음 **Settings**를 엽니다. **Advanced**를 선택하고 **Authentication** 섹션을 펼친 후 **SAML single sign-on** 카드에서 **Enable SSO**를 클릭합니다.
 
-    상태 표시가 **In-progress**로 변경되고 마법사가 IdP에 필요한 값을 표시합니다.
+    status 배지가 **In-progress**로 바뀌고, 마법사에 IdP 설정에 필요한 값이 표시됩니다.
   </Step>
 
-  <Step title="Identity Provider 선택하기">
-    **Configure your identity provider** 아래에서 IdP를 선택하세요:
+  <Step title="Identity Provider 선택">
+    **Configure your identity provider**에서 사용 중인 IdP를 선택합니다:
 
     * **Microsoft Entra ID**
     * **Google Workspace**
     * **Okta**
     * **Other provider**
 
-    각 옵션은 필드 레이블을 맞춤 설정하고 새 탭에서 SAML 애플리케이션을 만들 수 있도록 IdP 관리 콘솔의 딥 링크를 제공합니다.
+    선택한 옵션에 맞게 필드 이름이 바뀌며, 새 탭에서 SAML 애플리케이션을 생성할 수 있도록 해당 IdP 관리 콘솔로 바로 연결되는 링크가 제공됩니다.
   </Step>
 
-  <Step title="IdP에서 SAML 애플리케이션 만들기">
-    IdP의 관리 콘솔에서 Replit이 표시하는 값을 사용하여 새 SAML 애플리케이션을 만드세요:
+  <Step title="IdP에서 SAML 애플리케이션 생성">
+    IdP 관리 콘솔에서 Replit이 표시한 값을 사용해 새 SAML 애플리케이션을 생성합니다:
 
-    | 필드                          | 값                                                                  |
-    | --------------------------- | ------------------------------------------------------------------ |
-    | Audience URI / SP entity ID | 마법사에 표시된 값 복사 (조직 고유, `https://replit.com/<tenant-id>/saml/sp` 형식) |
-    | SSO URL (ACS URL)           | `https://replit.com/__/auth/handler`                               |
-    | Name ID format              | Email Address                                                      |
-    | Application username        | Email                                                              |
+    | 필드                          | 값                                                                                  |
+    | --------------------------- | ---------------------------------------------------------------------------------- |
+    | Audience URI / SP entity ID | 마법사에 표시된 값을 복사합니다(Organization마다 고유하며 `https://replit.com/<tenant-id>/saml/sp` 형식) |
+    | SSO URL (ACS URL)           | `https://replit.com/__/auth/handler`                                               |
+    | Name ID format              | Email Address                                                                      |
+    | Application username        | Email                                                                              |
   </Step>
 
-  <Step title="IdP의 값 입력하기">
-    IdP에서 SAML 애플리케이션이 만들어지면 다음 값을 Replit의 **Enter the values from your provider** 섹션에 복사하세요:
+  <Step title="IdP의 값 입력">
+    IdP에서 SAML 애플리케이션을 생성했다면 다음 값들을 Replit의 **Enter the values from your provider** 섹션에 복사해 넣습니다:
 
-    * **IdP SSO URL** — Replit이 인증 시 사용자를 리디렉션하는 URL
-    * **IdP entity ID** — IdP를 Replit에 식별시키는 값
-    * **X.509 certificate** — PEM 또는 base64 형식의 IdP 서명 인증서. `BEGIN/END` 마커는 선택 사항입니다.
-    * **Email domains** — 사용자가 로그인하는 도메인의 쉼표로 구분된 목록(예: `acme.com, acme.co.uk`). IdP가 보고할 수 있는 모든 별칭과 서브도메인을 포함하세요.
+    * **IdP SSO URL** — 인증 시 Replit이 사용자를 리디렉션하는 URL입니다.
+    * **IdP entity ID** — Replit이 IdP를 식별하는 데 사용하는 값입니다.
+    * **X.509 certificate** — PEM 또는 base64 형식의 IdP 서명 인증서입니다. `BEGIN/END` 표시는 선택 사항입니다.
+    * **Email domains** — 사용자가 로그인할 때 사용하는 도메인을 쉼표로 구분한 목록입니다(예: `acme.com, acme.co.uk`). IdP가 보고할 수 있는 모든 별칭과 하위 도메인을 포함하세요.
 
-    **Submit credentials**를 클릭하세요. Replit이 URL을 동기적으로 검증하고, 인증서를 파싱하며(만료되거나 아직 유효하지 않은 인증서는 거부), 주장된 이메일 도메인을 확인합니다. 각 도메인은 조직의 청구 관리자 중 한 명의 이메일과 일치해야 하며, 공개 도메인(예: `gmail.com`)은 클레임할 수 없습니다.
+    **Submit credentials**를 클릭합니다. Replit은 URL을 동기적으로 검증하고, 인증서를 구문 분석하며(만료되었거나 아직 유효하지 않은 인증서는 거부), 등록한 이메일 도메인을 확인합니다. 각 도메인은 Organization의 billing 관리자 중 최소 한 명의 이메일과 일치해야 하며, 공용 도메인(예: `gmail.com`)은 등록할 수 없습니다.
   </Step>
 
-  <Step title="프로비저닝 대기하기">
-    Replit이 기본 SAML 테넌트를 만드는 동안 상태가 \*\*Provisioning…\*\*으로 변경됩니다. 보통 약 1분 정도 소요됩니다. 완료되면 상태가 **Active**로 변경되고 조직이 SSO로 로그인할 수 있습니다.
+  <Step title="provisioning 대기">
+    Replit이 내부 SAML tenant를 생성하는 동안 status 배지가 **Provisioning…**으로 바뀝니다. 보통 1분 정도 걸립니다. 완료되면 status 배지가 **Active**로 바뀌고 Organization에서 SSO로 로그인할 수 있습니다.
 
-    프로비저닝이 실패하면 상태가 **Setup failed**로 변경되고 Replit이 자동으로 부분 상태를 정리합니다. **Try again**을 클릭하여 마법사를 다시 시작하세요.
+    provisioning에 실패하면 status 배지가 **Setup failed**로 바뀌며 Replit이 일부만 생성된 상태를 자동으로 정리합니다. **Try again**을 클릭해 마법사를 다시 시작하세요.
   </Step>
 </Steps>
 
-## 이메일 도메인 선택하기
+<div id="choose-your-email-domains">
+  ## 이메일 도메인 선택
+</div>
 
-조직에서 여러 이메일 도메인과 서브도메인을 클레임할 수 있습니다. 클레임한 도메인과 일치하는 이메일 도메인으로 가입하려는 사용자는 SAML SSO를 사용해야 합니다. 클레임한 도메인은 IdP가 사용자에게 보고하는 것과 일치해야 합니다. 이메일 도메인 별칭을 사용하는 경우 사용자가 SSO 없이 가입하는 것을 방지하기 위해 별칭도 포함하세요.
+Organization에 여러 이메일 도메인과 하위 도메인을 등록할 수 있습니다. 등록한 도메인과 일치하는 이메일 도메인으로 가입을 시도하는 사용자는 반드시 SAML SSO를 사용해야 합니다. 등록한 도메인은 IdP가 사용자 정보로 제공하는 도메인과 일치해야 합니다. 이메일 도메인 별칭을 사용한다면, 사용자가 SSO를 거치지 않고 가입하는 일이 없도록 별칭도 함께 포함하세요.
 
-예를 들어, 회사가 `acmeco.com`, `foo.acmeco.com`, `acmebiz.com`과 일치하는 이메일 도메인을 사용하는 경우 자격 증명을 제출할 때 세 가지 모두 클레임하세요.
+예를 들어 회사에서 `acmeco.com`, `foo.acmeco.com`, `acmebiz.com`에 해당하는 이메일 도메인을 사용한다면, 자격 증명을 제출할 때 세 도메인을 모두 등록하세요.
 
-Replit은 클레임된 각 도메인을 관리자의 이메일 주소에 대해 검증합니다. 활성화 후 도메인을 추가하거나 제거하려면 **Authentication** 카드의 **Email domains** 필드를 편집하세요. 기존 관리자의 이메일과 일치하지 않는 도메인을 클레임하려면 [support@replit.com](mailto:support@replit.com)에 문의하세요.
+Replit은 등록한 각 도메인을 관리자의 이메일 주소와 대조하여 검증합니다. 활성화 후 도메인을 추가하거나 제거하려면 **Authentication** 카드의 **Email domains** 필드를 편집하세요. 기존 관리자의 이메일과 일치하지 않는 도메인을 등록하려면 [support@replit.com](mailto:support@replit.com)으로 문의하세요.
 
-## SAML SSO 사용하기
+<div id="using-saml-sso">
+  ## SAML SSO 사용하기
+</div>
 
 <Note>
-  SAML로 가입해도 사용자가 자동으로 조직에 초대되지 않습니다. 자동화된 사용자 관리와 대량 작업의 경우 대신 [SCIM](/ko/teams/identity-and-access-management/scim)을 참조하세요.
+  SAML로 가입해도 사용자가 자동으로 Organization에 초대되지는 않습니다. 사용자 관리 자동화와 대량 작업이 필요하다면 [SCIM](/ko/teams/identity-and-access-management/scim)을 참고하세요.
 </Note>
 
-SAML SSO가 **Active** 상태가 되면 사용자는 **Continue with SSO** 버튼을 사용하여 [replit.com](https://replit.com)에 로그인할 수 있습니다.
+SAML SSO가 **Active** 상태가 되면 사용자는 **Continue with SSO** 버튼으로 [replit.com](https://replit.com)에 로그인할 수 있습니다.
 
-## FAQ
+<div id="faq">
+  ## 자주 묻는 질문
+</div>
 
-### SAML SSO 설정 전에 이미 replit.com 계정이 있는 사용자는 어떻게 되나요?
+<div id="what-happens-to-users-who-already-have-accounts-on-replitcom-before-saml-sso-was-set-up">
+  ### SAML SSO 설정 전에 이미 replit.com 계정을 보유한 사용자는 어떻게 되나요?
+</div>
 
-조직에서 SAML SSO가 활성화되면 클레임된 SSO 이메일 도메인을 가진 모든 사용자는 SSO를 사용하여 로그인해야 합니다. 기존 사용자는 이메일이 SSO 도메인과 일치하는 경우 이전 인증 방법(이메일 또는 소셜 로그인)을 더 이상 사용할 수 없습니다. 이들은 자동으로 조직에 추가되지 않습니다.
+Organization에 SAML SSO가 활성화되면 등록된 SSO 이메일 도메인을 사용하는 모든 사용자는 SSO로 로그인해야 합니다. 기존 사용자의 이메일이 SSO 도메인과 일치하는 경우 이전에 사용하던 인증 방식(이메일 또는 소셜 login)은 더 이상 사용할 수 없습니다. 다만 이러한 사용자가 Organization에 자동으로 추가되지는 않습니다.
 
-### IdP에서 액세스를 제거하면 Replit에서 사용자가 자동으로 프로비저닝 해제되나요?
+<div id="are-users-automatically-deprovisioned-in-replit-when-my-idp-removes-access">
+  ### IdP에서 액세스를 제거하면 Replit에서도 사용자가 자동으로 프로비저닝 해제되나요?
+</div>
 
-아니오, SAML SSO는 인증만 처리합니다. 자동화된 사용자 프로비저닝 및 프로비저닝 해제를 위해서는 Enterprise 고객에게 제공되는 [SCIM](/ko/teams/identity-and-access-management/scim) 통합을 사용할 수 있습니다. SCIM을 사용하면 IdP의 디렉토리를 동기화하여 사용자 역할과 프로비저닝을 자동으로 관리할 수 있습니다.
+아니요, SAML SSO는 인증만 처리합니다. 사용자 프로비저닝 및 프로비저닝 해제를 자동화하려면 Enterprise 고객에게 제공되는 [SCIM](/ko/teams/identity-and-access-management/scim) 통합을 사용할 수 있습니다. SCIM을 사용하면 IdP의 디렉터리를 동기화하여 사용자 역할과 프로비저닝을 자동으로 관리할 수 있습니다.
 
-### IdP에서 사용자에게 액세스가 부여되면 조직 시트가 자동으로 소비되나요?
+<div id="are-organization-seats-automatically-consumed-when-users-are-given-access-in-our-idp">
+  ### IdP에서 사용자에게 액세스 권한을 부여하면 Organization 좌석이 자동으로 사용되나요?
+</div>
 
-아니오, 시트는 사용자가 조직 초대를 수락할 때만 소비됩니다.
+아니요, 좌석은 사용자가 Organization 초대를 수락한 시점에만 사용됩니다.
 
-### SAML 설정이 실패하면 어떻게 되나요?
+<div id="what-if-saml-setup-fails">
+  ### SAML 설정이 실패하면 어떻게 하나요?
+</div>
 
-마법사가 **Setup failed** 표시로 실패를 보고하고, Replit이 자동으로 부분 프로비저닝을 롤백합니다. **Try again**을 클릭하여 마법사를 다시 시작하고, IdP 값을 다시 확인한 후 자격 증명을 재제출하세요. 오류가 지속되면 계정 관리자에게 문의하세요.
+마법사가 **Setup failed** 배지로 실패를 표시하며, Replit은 부분적으로 진행된 provisioning을 자동으로 롤백합니다. **Try again**을 클릭해 마법사를 다시 시작하고, IdP 값을 다시 확인한 후 자격 증명을 다시 제출하세요. 오류가 계속되면 account manager에게 문의하세요.
 
-### SAML SSO를 비활성화하려면 어떻게 하나요?
+<div id="how-do-i-disable-saml-sso">
+  ### SAML SSO는 어떻게 비활성화하나요?
+</div>
 
-셀프서비스 비활성화는 아직 지원되지 않습니다. 조직의 SSO를 끄려면 계정 관리자에게 문의하세요. 활성화 후에도 **Authentication** 카드에서 클레임된 이메일 도메인은 셀프서비스로 편집할 수 있습니다.
+셀프서비스 방식의 비활성화는 아직 지원되지 않습니다. Organization의 SSO를 끄려면 담당 account manager에게 문의하세요. 활성화 후에도 **Authentication** 카드에서 등록(claimed)된 이메일 도메인은 직접 수정할 수 있습니다.
 
-## 관련 리소스
+<div id="related-resources">
+  ## 관련 자료
+</div>
 
 <CardGroup cols={2}>
   <Card title="SCIM" icon="key" href="/ko/teams/identity-and-access-management/scim">
-    SCIM 통합으로 사용자 관리를 자동화하는 방법 알아보기
+    SCIM 통합으로 사용자 관리를 자동화하는 방법을 알아보세요
   </Card>
 
   <Card title="그룹 및 권한" icon="shield" href="/ko/teams/identity-and-access-management/groups-and-permissions">
-    사용자 역할과 액세스 관리 방법 이해하기
+    사용자 역할과 접근 권한을 관리하는 방법을 알아보세요
   </Card>
 </CardGroup>

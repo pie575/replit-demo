@@ -1,66 +1,70 @@
 ---
-title: "데이터베이스"
-description: "일반적인 데이터베이스 질문에 대한 답변—비활성화된 엔드포인트 수정, 테이블 복원, 프로덕션으로 마이그레이션, 연결 오류 해결."
+title: "Database"
+description: "비활성화된 endpoints 복구, 테이블 복원, production 마이그레이션, 연결 오류 등 자주 묻는 데이터베이스 질문에 대한 답변입니다."
+sidebarTitle: "Database"
+icon: "database"
 ---
 
-이 답변은 프로덕션 데이터베이스를 다룹니다. 전체 참조는 [프로덕션 데이터베이스](/ko/features/data-and-storage/development-and-production) 및 [SQL 데이터베이스](/ko/features/data-and-storage/sql-database)를 참조하세요.
+여기서는 production database에 대한 내용을 다룹니다. 전체 참고 자료는 [Production 데이터베이스](/ko/features/data-and-storage/development-and-production)와 [SQL 데이터베이스](/ko/features/data-and-storage/sql-database)를 확인하세요.
 
 <AccordionGroup>
-  <Accordion title="데이터베이스 엔드포인트가 비활성화되었습니다—&#x22;endpoint has been disabled&#x22; 오류를 어떻게 수정하나요?">
-    이 오류는 데이터베이스 컴퓨팅 엔드포인트가 일시 중지된 것을 의미합니다. 재개하려면:
+  <Accordion title="데이터베이스 endpoints가 비활성화되었습니다—&#x22;endpoint has been disabled&#x22; 오류는 어떻게 해결하나요?">
+    이 오류는 데이터베이스 컴퓨트 endpoint가 일시 중지되었다는 의미입니다. 일시 중지를 해제하려면 다음과 같이 하세요.
 
-    1. **Database** 창을 열고 드롭다운에서 **Development**를 선택합니다.
+    1. **Database** pane을 열고 드롭다운에서 **Development**를 선택합니다.
     2. **Unpause database** 버튼이 나타나면 선택합니다.
-    3. 드롭다운을 **Production**으로 전환하고 **Unpause database**가 나타나면 다시 선택합니다.
+    3. 드롭다운을 **Production**으로 전환하고, **Unpause database** 버튼이 나타나면 다시 선택합니다.
 
-    버튼이 나타나지 않으면, 충돌하는 `DATABASE_URL` 시크릿이 버튼을 숨기고 있을 수 있습니다. **Secrets** 창을 열고 `DATABASE_URL` 항목을 **Database** 창의 연결 문자열과 비교하여 일치하도록 충돌하는 시크릿을 업데이트하거나 제거하세요.
+    버튼이 나타나지 않는다면 충돌하는 `DATABASE_URL` secret이 버튼을 가리고 있을 수 있습니다. **Secrets** pane을 열어 `DATABASE_URL` 항목을 **Database** pane의 연결 문자열과 비교한 뒤, 서로 일치하도록 충돌하는 secret을 수정하거나 삭제하세요.
 
-    일반적인 원인은 미결제 청구서(재발 방지를 위해 결제하세요) 또는 게시 중 일시적인 일시 중지(위의 재개 단계로 해결)입니다. [프로덕션 데이터베이스](/ko/features/data-and-storage/development-and-production)를 참조하세요.
+    주로 미결제 Invoice(재발을 막으려면 결제하세요)나 publishing 중 발생한 일시적인 중지(위의 일시 중지 해제 단계로 해결됩니다)가 원인입니다. [Production 데이터베이스](/ko/features/data-and-storage/development-and-production)를 참고하세요.
   </Accordion>
 
-  <Accordion title="상태 페이지에 프로덕션 데이터베이스 장애가 표시됩니다—티켓을 제출해야 하나요?">
-    아니요. 장애가 [status.replit.com](https://status.replit.com)에 이미 나열되어 있다면 팀이 작업 중이며 티켓을 제출해도 수정 속도가 빨라지지 않습니다. 활성 인시던트를 열고 업데이트를 구독하여 진행 상황 알림을 받으세요.
+  <Accordion title="상태 페이지에 Production Database 장애가 표시됩니다—티켓을 접수해야 하나요?">
+    아니요. 장애가 이미 [status.replit.com](https://status.replit.com)에 등록되어 있다면 팀이 대응 중이며, 티켓을 접수해도 해결이 빨라지지는 않습니다. 진행 중인 인시던트를 열고 업데이트를 구독하면 진행 상황을 알림으로 받을 수 있습니다.
 
-    데이터베이스 문제가 상태 페이지에 나열되지 않은 경우 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+    데이터베이스 문제가 상태 페이지에 등록되어 있지 *않다면* [Replit Support에 문의](https://replit.com/support)하세요.
   </Accordion>
 
-  <Accordion title="삭제된 데이터베이스 테이블을 어떻게 복원하나요?">
-    Replit은 프로덕션 데이터베이스의 특정 시점 복원을 지원합니다. 복원 기간은 플랜에 따라 다릅니다—[Core](/ko/billing/plans/replit-core)는 7일, [Pro](/ko/billing/plans/replit-pro)는 28일입니다.
+  <Accordion title="삭제되거나 드롭된 데이터베이스 테이블은 어떻게 복원하나요?">
+    Replit은 production 데이터베이스에 대해 point-in-time restore를 지원합니다. 복원 가능 기간은 plan에 따라 다릅니다—[Core](/ko/billing/plans/replit-core)는 7일, [Pro](/ko/billing/plans/replit-pro)는 28일입니다.
 
-    복원하려면 **Database** 창을 열고 데이터베이스로 이동한 다음 복원 설정을 열고 원하는 타임스탬프를 선택하고 확인하세요. 복원 기간을 벗어난 경우 [Replit 지원팀에 문의](https://replit.com/support)하세요. [프로덕션 데이터베이스](/ko/features/data-and-storage/development-and-production)를 참조하세요.
+    복원하려면 **Database** pane을 열고 해당 데이터베이스로 이동한 뒤, 복원 설정을 열어 원하는 타임스탬프를 선택하고 확인합니다. 복원 가능 기간이 지났다면 [Replit Support에 문의](https://replit.com/support)하세요. [Production 데이터베이스](/ko/features/data-and-storage/development-and-production)를 참고하세요.
   </Accordion>
 
-  <Accordion title="데이터베이스가 동결되어 있고 Unpause 버튼이 보이지 않습니다">
-    충돌하는 데이터베이스 URL이 일반적으로 **Unpause** 버튼을 숨깁니다. **Secrets** 창을 열고 `DATABASE_URL` 항목을 찾아 **Database** 창의 연결 문자열과 비교하세요. 다를 경우 시크릿이 올바른 URL을 재정의하고 있습니다—시크릿을 제거하고 새로 고침한 다음 **Database** 창을 다시 확인하세요.
+  <Accordion title="데이터베이스가 중지되었는데 Unpause 버튼이 보이지 않습니다">
+    보통 충돌하는 데이터베이스 URL 때문에 **Unpause** 버튼이 가려집니다. **Secrets** pane을 열어 `DATABASE_URL` 항목을 찾은 뒤 **Database** pane의 연결 문자열과 비교하세요. 값이 다르면 해당 secret이 올바른 URL을 덮어쓰고 있는 것이므로, 삭제하고 새로 고침한 다음 **Database** pane을 다시 확인하세요.
 
-    충돌하는 시크릿을 제거한 후에도 버튼이 나타나지 않으면 프로젝트 URL과 함께 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+    충돌하는 secret을 삭제한 뒤에도 버튼이 나타나지 않으면 project URL과 함께 [Replit Support에 문의](https://replit.com/support)하세요.
   </Accordion>
 
   <Accordion title="앱에서 &#x22;connection pool exhausted&#x22; 오류가 발생합니다—무슨 의미인가요?">
-    앱이 풀이 허용하는 것보다 더 많은 데이터베이스 연결을 동시에 열고 있습니다. 일반적인 원인:
+    앱이 풀에서 허용하는 것보다 많은 데이터베이스 연결을 동시에 열고 있다는 뜻입니다. 주요 원인은 다음과 같습니다.
 
-    * 각 요청 후 연결이 닫히지 않는 경우
+    * 요청마다 연결이 닫히지 않는 경우
     * 트래픽 급증
-    * 연결을 오래 유지하는 느린 쿼리
+    * 느린 쿼리가 연결을 계속 점유하는 경우
 
-    대부분의 프레임워크는 요청마다 새 연결이 아닌 단일 공유 연결 풀을 사용합니다.
+    대부분의 프레임워크는 요청마다 새 연결을 만드는 대신 공유 연결 풀 하나를 사용하도록 설계되어 있습니다.
 
-    가장 빠른 수정을 위해 새 Agent 채팅을 열고 오류를 설명하여 Agent에게 앱의 데이터베이스 연결 관리 방식을 확인하도록 요청하세요.
+    가장 빠르게 해결하려면 새 Agent chat을 열고 오류 내용을 설명한 뒤, 앱이 데이터베이스 연결을 어떻게 관리하는지 확인해 달라고 Agent에게 요청하세요.
   </Accordion>
 
-  <Accordion title="개발 데이터베이스에서 프로덕션으로 어떻게 마이그레이션하나요?">
-    Replit은 테스트 변경 사항이 라이브 데이터에 영향을 미치지 않도록 개발 및 프로덕션 데이터베이스를 분리합니다. 프로덕션에 대해 마이그레이션을 실행하려면 배포의 빌드 또는 사전 배포 단계에 마이그레이션 명령을 추가하여 각 배포 시 실행되도록 하세요. 예를 들어 Drizzle에는 `drizzle-kit migrate`를 사용하세요. 프로덕션 환경의 Shell에서 수동으로 마이그레이션을 실행할 수도 있습니다.
+  <Accordion title="development 데이터베이스에서 production으로 어떻게 마이그레이션하나요?">
+    Replit은 테스트 변경 사항이 라이브 데이터에 영향을 주지 않도록 development 데이터베이스와 production 데이터베이스를 분리해 관리합니다. production에 대해 마이그레이션을 실행하려면, deployment의 build 또는 pre-deploy 단계에 마이그레이션 명령을 추가해 배포할 때마다 실행되도록 하세요. 예를 들어 Drizzle에서는 `drizzle-kit migrate`를 사용합니다. production 환경의 Shell에서 마이그레이션을 수동으로 실행할 수도 있습니다.
 
-    [게시 시 프로덕션 데이터베이스 생성](/ko/features/data-and-storage/development-and-production)을 참조하세요.
+    [Publishing 시 production 데이터베이스 생성](/ko/features/data-and-storage/development-and-production)을 참고하세요.
   </Accordion>
 
-  <Accordion title="결제가 정상인데도 데이터베이스에 &#x22;endpoint disabled&#x22;가 표시됩니다">
-    가끔 결제와 무관하게 발생합니다. 수동으로 재개를 시도하세요: **Database** 창을 열고 **Development**를 선택한 다음 나타나면 **Unpause database**를 선택하고 **Production**에서도 반복하세요.
+  <Accordion title="billing이 정상인데도 데이터베이스에 &#x22;endpoint disabled&#x22;가 표시됩니다">
+    이 문제는 billing과 무관하게 발생하기도 합니다. 수동으로 일시 중지를 해제해 보세요. **Database** pane을 열고 **Development**를 선택한 뒤, **Unpause database**가 나타나면 선택하고, **Production**에 대해서도 동일하게 반복합니다.
 
-    버튼이 나타나지 않거나 문제가 계속 발생하면 프로젝트 URL과 함께 [Replit 지원팀에 문의](https://replit.com/support)하세요—수동 재개가 필요할 수 있습니다. [프로덕션 데이터베이스](/ko/features/data-and-storage/development-and-production)를 참조하세요.
+    버튼이 나타나지 않거나 문제가 계속 재발한다면 project URL과 함께 [Replit Support에 문의](https://replit.com/support)하세요—수동 일시 중지 해제가 필요할 수 있습니다. [Production 데이터베이스](/ko/features/data-and-storage/development-and-production)를 참고하세요.
   </Accordion>
 </AccordionGroup>
 
-## 도움이 더 필요하신가요?
+<div id="still-need-help">
+  ## 아직 도움이 필요하신가요?
+</div>
 
-데이터베이스 질문의 답변을 여기서 찾을 수 없다면 [Replit 지원팀에 문의](https://replit.com/support)하세요.
+database 관련 질문에 대한 답을 찾지 못하셨다면 [Replit Support에 문의하세요](https://replit.com/support).

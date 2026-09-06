@@ -1,75 +1,87 @@
 ---
-title: "웨어하우스 커넥터"
+title: "Warehouse Connectors"
 description: "Replit Agent를 데이터 웨어하우스(BigQuery, Databricks, Snowflake) 및 분석 플랫폼에 연결하여 데이터 기반 애플리케이션을 구축하세요."
 sidebarTitle: "개요"
 icon: "warehouse"
 ---
 
-웨어하우스 커넥터를 사용하면 Replit Agent가 조직의 데이터 웨어하우스를 안전하게 쿼리할 수 있습니다. 빌더는 자연어를 사용하여 대시보드, 보고 도구 및 데이터 애플리케이션을 만들 수 있으며 SQL 전문 지식이 필요하지 않습니다. 관리자는 역할 기반 접근으로 중앙 제어를 유지합니다.
+warehouse 커넥터를 사용하면 Replit Agent가 조직의 데이터 웨어하우스를 안전하게 쿼리할 수 있습니다. builder는 자연어만으로 dashboard, 리포팅 도구, 데이터 애플리케이션을 만들 수 있어 SQL 전문 지식이 필요 없습니다. Admin은 역할 기반 접근 제어를 통해 중앙에서 관리 권한을 유지합니다.
 
-## 지원되는 웨어하우스
+<div id="supported-warehouses">
+  ## 지원되는 데이터 웨어하우스
+</div>
 
-웨어하우스 커넥터는 **Enterprise** 플랜에서 사용 가능합니다.
+warehouse 커넥터는 **Enterprise** plan에서 사용할 수 있습니다.
 
-| 웨어하우스            | 설정 가이드                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| BigQuery         | 지금 사용 가능 — 설정 가이드 준비 중                                                               |
-| Databricks       | [Databricks 연결](/ko/connectors/warehouses/databricks)                                |
-| Microsoft Fabric | [Microsoft Fabric으로 데이터 앱 구축](/ko/connectors/warehouses/microsoft-fabric) (비공개 미리보기) |
-| Snowflake        | [Snowflake 연결](/ko/connectors/warehouses/snowflake)                                  |
+| 웨어하우스            | 설정 가이드                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------- |
+| BigQuery         | 현재 사용 가능 — 설정 가이드 준비 중                                                                    |
+| Databricks       | [Databricks 연결](/ko/connectors/warehouses/databricks)                                        |
+| Microsoft Fabric | [Microsoft Fabric에서 데이터 앱 만들기](/ko/connectors/warehouses/microsoft-fabric) (private preview) |
+| Snowflake        | [Snowflake 연결](/ko/connectors/warehouses/snowflake)                                          |
 
-각 웨어하우스는 OAuth 통합, ID 모델 및 자격 증명 형식이 다르기 때문에 자체 설정 흐름을 가집니다. 사용하는 웨어하우스를 선택하고 전용 가이드를 따르세요.
+OAuth integration, ID 모델, 자격 증명 형식이 저마다 다르기 때문에 웨어하우스별로 설정 flow가 따로 있습니다. 사용 중인 웨어하우스를 선택한 후 해당 전용 가이드를 따르세요.
 
-## 분석 및 데이터 플랫폼
+<div id="analytics-and-data-platforms">
+  ## 분석 및 데이터 플랫폼
+</div>
 
-분석 커넥터는 Enterprise 외에도 Core 및 Pro 플랜에서 사용 가능합니다. 분석 도구를 연결하여 Agent가 제품 데이터를 읽고 작업할 수 있게 하세요:
+분석 커넥터는 Enterprise뿐만 아니라 Core 및 Pro plan에서도 사용할 수 있습니다. 분석 도구를 연결하면 Agent가 제품 데이터를 읽고 활용할 수 있습니다.
 
-* **Segment** — CDP의 고객 데이터, 이벤트 스트림 및 대상 세그먼트
-* **Amplitude** — 제품 분석, 사용자 행동 데이터 및 참여 지표
+* **Segment** — CDP의 고객 데이터, 이벤트 스트림, 오디언스 세그먼트
+* **Amplitude** — 제품 분석, 사용자 행동 데이터, 참여 지표
 * **Hex** — 협업 데이터 노트북 및 쿼리 결과
 
-다른 Replit 커넥터와 동일한 방식으로 관리하세요. [커넥터 관리](/ko/replitai/managing-connectors)를 참고하세요.
+다른 Replit 커넥터와 동일한 방식으로 관리할 수 있습니다. [커넥터 관리하기](/ko/replitai/managing-connectors)를 참조하세요.
 
-## 웨어하우스 커넥터 작동 방식
+<div id="how-warehouse-connectors-work">
+  ## warehouse 커넥터 작동 방식
+</div>
 
-설정은 세 가지 역할이 관여하는 일회성 프로세스입니다:
+설정은 세 가지 역할이 참여하는 일회성 과정입니다.
 
-1. **웨어하우스 관리자** — 웨어하우스에서 OAuth 통합 또는 서비스 ID를 생성합니다
-2. **Replit 조직 관리자** — Replit에 자격 증명을 추가하고 접근을 구성합니다
-3. **빌더** — 로그인하고 Agent로 구축을 시작합니다
+1. **웨어하우스 관리자** — 웨어하우스에 OAuth integration 또는 서비스 ID를 생성합니다
+2. **Replit Organization 관리자** — Replit에 자격 증명을 추가하고 접근 권한을 설정합니다
+3. **Builder** — 로그인한 뒤 Agent로 빌드를 시작합니다
 
-구성이 완료되면 빌더는 Agent에게 웨어하우스를 사용하도록 요청하고 Agent는 SQL을 작성하여 실행합니다.
+설정을 마치면 builder가 Agent에게 웨어하우스를 사용하도록 요청하고, Agent가 해당 웨어하우스에 대해 SQL을 작성하고 실행합니다.
 
-### 웨어하우스 데이터로 구축
+<div id="building-with-warehouse-data">
+  ### 웨어하우스 데이터로 빌드하기
+</div>
 
-연결 후 데이터를 사용하는 애플리케이션을 Agent에게 구축하도록 요청할 수 있습니다. Agent가 할 수 있는 일:
+연결을 마치면 Agent에게 해당 데이터를 활용하는 애플리케이션을 만들어 달라고 요청할 수 있습니다. Agent는 다음과 같은 작업을 수행할 수 있습니다.
 
-* 라이브 데이터를 가져오고 표시하는 내부 도구 구축
-* 웨어하우스 데이터를 기반으로 차트와 시각화가 있는 대시보드 생성
-* 애플리케이션 백엔드를 구동하는 SQL 쿼리 생성
-* 무엇을 구축할지 이해하는 데 도움이 되는 스키마 및 테이블 구조 설명
+* 실시간 데이터를 가져와 표시하는 내부 도구 빌드
+* 웨어하우스 데이터를 기반으로 한 charts와 시각화를 갖춘 dashboard 생성
+* 애플리케이션의 backend를 구동할 SQL 쿼리 생성
+* 무엇을 만들지 파악할 수 있도록 schema와 테이블 구조 설명
 
 <Note>
-  Agent는 데이터에 대한 임시 질문에 답할 수 있지만, 웨어하우스 커넥터의 주요 목적은 조직의 데이터를 활용하는 기능적 애플리케이션을 구축할 수 있게 하는 것입니다. 웨어하우스 쿼리는 인스턴스에 직접 실행되므로 OAuth 범위 및 데이터베이스 사용자 권한이 필요한 읽기 및 쓰기 작업을 허용하는지 확인하세요.
+  Agent가 데이터에 대한 즉석 질문에 답할 수도 있지만, warehouse 커넥터의 주된 목적은 Agent가 조직의 데이터를 활용해 실제로 동작하는 애플리케이션을 빌드하도록 하는 데 있습니다. 웨어하우스 쿼리는 사용자의 인스턴스에서 직접 실행되므로, OAuth scopes와 database 사용자 permissions가 필요한 읽기 및 쓰기 작업을 허용하는지 확인하세요.
 </Note>
 
-## 커넥터 가용성
+<div id="connector-availability">
+  ## 커넥터 제공 여부
+</div>
 
-| 커넥터              | Starter | Core | Pro | Enterprise   |
-| ---------------- | ------- | ---- | --- | ------------ |
-| BigQuery         | —       | —    | —   | ✅            |
-| Databricks       | —       | —    | —   | ✅            |
-| Microsoft Fabric | —       | —    | —   | ✅ (비공개 미리보기) |
-| Snowflake        | —       | —    | —   | ✅            |
-| Segment          | —       | ✅    | ✅   | ✅            |
-| Amplitude        | —       | ✅    | ✅   | ✅            |
-| Hex              | —       | ✅    | ✅   | ✅            |
+| 커넥터              | Starter | Core | Pro | Enterprise          |
+| ---------------- | ------- | ---- | --- | ------------------- |
+| BigQuery         | —       | —    | —   | ✅                   |
+| Databricks       | —       | —    | —   | ✅                   |
+| Microsoft Fabric | —       | —    | —   | ✅ (private preview) |
+| Snowflake        | —       | —    | —   | ✅                   |
+| Segment          | —       | ✅    | ✅   | ✅                   |
+| Amplitude        | —       | ✅    | ✅   | ✅                   |
+| Hex              | —       | ✅    | ✅   | ✅                   |
 
-## 관련 문서
+<div id="related-documentation">
+  ## 관련 문서
+</div>
 
-* [Databricks 연결](/ko/connectors/warehouses/databricks) — 단계별 Databricks 설정
-* [Microsoft Fabric으로 데이터 앱 구축](/ko/connectors/warehouses/microsoft-fabric) — Power BI 시맨틱 모델을 기반으로 한 대시보드 구축 (비공개 미리보기)
-* [Snowflake 연결](/ko/connectors/warehouses/snowflake) — OAuth 구성 및 문제 해결을 포함한 단계별 Snowflake 설정
-* [커넥터 관리](/ko/replitai/managing-connectors) — Core 및 Pro의 협업 워크스페이스와 Enterprise 조직 전체의 커넥터 관리
-* [커넥터 개요](/ko/features/integrations/overview) — 모든 통합 유형에 대해 알아보기
-* [워크스페이스](/ko/features/collaboration/workspaces) — 개인 및 팀 워크스페이스 이해
+* [Databricks 연결하기](/ko/connectors/warehouses/databricks) — 단계별 Databricks 설정 방법
+* [Microsoft Fabric에서 데이터 앱 만들기](/ko/connectors/warehouses/microsoft-fabric) — Power BI 시맨틱 모델을 기반으로 한 dashboard 구축(private preview)
+* [Snowflake 연결하기](/ko/connectors/warehouses/snowflake) — OAuth 구성 및 문제 해결을 포함한 단계별 Snowflake 설정 방법
+* [커넥터 관리하기](/ko/replitai/managing-connectors) — Core 및 Pro의 협업 workspace와 Enterprise의 조직 전반에서 커넥터 관리하기
+* [커넥터 개요](/ko/features/integrations/overview) — 모든 integration 유형 알아보기
+* [Workspace](/ko/features/collaboration/workspaces) — 개인 workspace와 Team Workspace 이해하기

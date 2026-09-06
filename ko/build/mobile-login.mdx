@@ -1,6 +1,8 @@
 ---
-title: "로그인 추가하기"
-description: "Clerk를 사용해 플레이어가 PixelGames에 로그인할 수 있도록 해보세요."
+title: "로그인 추가"
+description: "Clerk를 사용해 플레이어가 PixelGames에 로그인할 수 있도록 설정하세요."
+sidebarTitle: "로그인 추가"
+icon: "right-to-bracket"
 ---
 
 export const AiPrompt = ({children}) => {
@@ -18,80 +20,83 @@ export const AiPrompt = ({children}) => {
     </CodeBlock>;
 };
 
-export const loginPrompt = "Add sign-in to PixelGames using Clerk. Anyone can still play without an account, signing in is only for players who want one.";
-export const appleSignInPrompt = "Add Sign in with Apple to PixelGames, but only show it on iOS. Keep the Android version as email and Google only.";
+export const loginPrompt = "Clerk를 사용해 PixelGames에 로그인을 추가하세요. 계정 없이도 누구나 계속 플레이할 수 있으며, 로그인은 계정을 만들고 싶은 플레이어만 사용합니다.";
+export const appleSignInPrompt = "PixelGames에 Sign in with Apple을 추가하되 iOS에서만 표시하세요. Android 버전은 이메일과 Google 로그인만 유지하세요.";
 
-저장할 것이 아직 없더라도, 지금 PixelGames에 로그인 기능을 추가하세요. 플레이어가 계정을 가지면
-나중에 최고 점수, 잠금 해제된 게임 등 다음에 만들 무엇이든 그 계정에 연결할 수 있습니다.
+아직 저장할 데이터가 없더라도 지금 PixelGames에 로그인 기능을 추가하세요. 플레이어에게 계정이 생기면
+최고 점수, 잠금 해제한 게임 등 앞으로 만들 무엇이든 나중에 계정에 연결할 수 있습니다.
 
-로그인에는 Replit의 내장 통합 기능인 [Clerk Auth](/features/auth-and-identity/clerk-auth)를
-사용하세요. Agent가 자동으로 프로비저닝하고 PixelGames만의 브랜드화된 로그인 화면을
-제공합니다.
+로그인에는 Replit에 기본 제공되는 통합인 [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)를
+사용하세요. Agent가 자동으로 프로비저닝하고 PixelGames 전용 브랜드 로그인 화면까지 만들어 줍니다.
 
 <AiPrompt>
   {loginPrompt}
 </AiPrompt>
 
-<Frame caption="PixelGames의 Clerk 로그인 화면, 이메일 또는 Google.">
-  <img src="/assets/mirror/mobile-signin-2b3700144e02.png" alt="Continue with email과 Continue with Google이 있는 PixelGames 로그인 모달" data-path="images/pixelgames/mobile/mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/mobile-signin.png" />
+<Frame caption="이메일 또는 Google로 로그인하는 PixelGames의 Clerk 로그인 화면.">
+  <img src="/assets/mirror/mobile-signin-2b3700144e02.png" alt="이메일로 계속하기와 Google로 계속하기가 있는 PixelGames 로그인 모달" data-path="images/pixelgames/mobile/mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/mobile-signin.png" />
 </Frame>
 
-## Sign in with Apple 추가하기
+<div id="add-sign-in-with-apple">
+  ## Sign in with Apple 추가
+</div>
 
-Apple의 App Store 심사에서는 Google과 같은 다른 소셜 로그인을 제공할 때마다 **Sign in with
-Apple**을 동등한 옵션으로 제공하도록 요구하지만, iOS에서만 그렇습니다. Android에는 이러한
-요구사항이 없습니다.
+Apple App Store 심사에서는 Google 같은 다른 소셜 로그인을 제공하는 경우 이에 상응하는 **Sign in with Apple**도 함께 제공하도록 요구합니다. 단, iOS에만 해당하며 Android에는 이러한 요구 사항이 없습니다.
 
 <AiPrompt>
   {appleSignInPrompt}
 </AiPrompt>
 
-<Frame caption="이메일 및 Google과 함께 추가된 Sign in with Apple, iOS 전용.">
+<Frame caption="이메일 및 Google과 함께 추가된 Sign in with Apple, iOS 전용입니다.">
   <img src="/assets/mirror/apple-mobile-signin-2eee321f670f.png" alt="Continue with Google 위에 Continue with Apple이 추가된 PixelGames 로그인 모달" data-path="images/pixelgames/mobile/apple-mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/apple-mobile-signin.png" />
 </Frame>
 
-## 제공자 활성화하기
+<div id="enable-the-providers">
+  ## 제공업체 활성화하기
+</div>
 
-코드에 제공자를 추가하는 것만으로는 충분하지 않으며, 각 제공자를 앱의 인증 설정에서도 켜야
-합니다. **Users & Auth → Configure → SSO providers → Production**을 열고 **Google**과
-**Apple** 모두 Enabled로 표시되는지 확인하세요.
+코드에 제공업체를 추가하는 것만으로는 충분하지 않으며, 각 제공업체를 앱의 auth 설정에서도 켜야 합니다. **Users &amp; Auth → Configure → SSO 제공업체 → Production**으로 이동해 **Google**과 **Apple**이 모두 Enabled로 표시되는지 확인하세요.
 
-<Frame caption="Production 환경의 SSO providers에서 Google과 Apple이 활성화됨.">
-  <img src="/assets/mirror/sso-provider-0547c43ad601.png" alt="Google과 Apple이 활성화된 SSO providers를 보여주는 Replit Users and Auth 패널" data-path="images/pixelgames/mobile/sso-provider.png" width="1266" height="502" data-path="images/pixelgames/mobile/sso-provider.png" />
+<Frame caption="Production 환경의 SSO 제공업체에서 활성화된 Google과 Apple.">
+  <img src="/assets/mirror/sso-provider-0547c43ad601.png" alt="Google과 Apple이 활성화된 SSO 제공업체를 보여주는 Replit Users and Auth pane" data-path="images/pixelgames/mobile/sso-provider.png" width="1266" height="502" data-path="images/pixelgames/mobile/sso-provider.png" />
 </Frame>
 
 <Note>
-  **Development**와 **Production**은 각각 별도의 제공자 목록을 가집니다. 한쪽을 활성화해도
-  다른 쪽은 활성화되지 않으므로, 게시하기 전에 Production을 확인하세요.
+  **Development**와 **Production**은 제공업체 목록이 서로 별개입니다. 한쪽에서 활성화해도 다른 쪽에는 적용되지 않으므로, 게시하기 전에 Production을 확인하세요.
 </Note>
 
-## 테스트하기
+<div id="test-it">
+  ## 테스트하기
+</div>
 
-계정 하나로는 부족합니다. PixelGames가 플레이어를 구별한다는 것을 증명하려면 두 개가
-필요합니다.
+계정 하나로는 부족합니다. PixelGames가 플레이어를 제대로 구분하는지 확인하려면 계정이 두 개 필요합니다.
 
-1. 로그인하지 않고 한 라운드를 플레이하세요. PixelGames는 계속 작동해야 합니다.
-2. 자신의 계정으로 로그인하세요.
-3. 로그아웃한 다음 다른 계정으로 로그인하고, 첫 번째 계정이 아닌 별도의 세션에 있는지
+1. 로그인하지 않은 상태로 한 판 플레이해 보세요. PixelGames는 그래도 정상 작동해야 합니다.
+2. 본인 계정으로 로그인하세요.
+3. 로그아웃한 다음 다른 계정으로 로그인해, 첫 번째 계정이 아닌 별도의 session으로 접속되는지
    확인하세요.
-4. 첫 번째 계정으로 다시 로그인하고 해당 계정으로 돌아오는지 확인하세요.
+4. 다시 첫 번째 계정으로 로그인해 해당 계정으로 돌아오는지 확인하세요.
 5. iOS에서는 **Continue with Apple**이 Google 위에 표시되는지 확인하세요. Android에서는
-   전혀 표시되지 않는지 확인하세요.
+   아예 표시되지 않아야 합니다.
 
-## 다음 단계
+<div id="whats-next">
+  ## 다음 단계
+</div>
 
 <CardGroup cols={2}>
-  <Card title="모바일 앱에서 이미지 저장하기" icon="image" href="/ko/build/mobile-store-images">
-    플레이어가 로그인하면 프로필 사진을 저장해보세요.
+  <Card title="모바일 앱에 이미지 저장하기" icon="image" href="/ko/build/mobile-store-images">
+    플레이어가 로그인하면 프로필 사진을 저장하세요.
   </Card>
 
   <Card title="네이티브 기기 기능 추가하기" icon="camera" href="/ko/build/mobile-camera">
-    PixelGames에 더 많은 기능을 추가해보세요.
+    PixelGames에 더 많은 기능을 추가하세요.
   </Card>
 </CardGroup>
 
-## 관련 항목
+<div id="related">
+  ## 관련 문서
+</div>
 
-* [모바일 앱에서 이미지 저장하기](/ko/build/mobile-store-images)
-* [인앱 결제 추가하기](/ko/build/mobile-payments)
-* [로그인 제공자 설정하기](/features/auth-and-identity/sign-in-providers)
+* [모바일 앱에 이미지 저장하기](/ko/build/mobile-store-images)
+* [인앱 구매 추가하기](/ko/build/mobile-payments)
+* [로그인 제공업체 구성하기](/ko/features/auth-and-identity/sign-in-providers)

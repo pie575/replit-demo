@@ -1,432 +1,466 @@
 ---
-title: "Databricks 커넥터"
-description: "Replit Agent가 Databricks 워크스페이스를 기반으로 애플리케이션을 구축할 수 있도록 Databricks 커넥터를 선택하고 설정하세요."
+title: "Databricks Connectors"
+description: "Replit Agent가 Databricks workspace를 기반으로 애플리케이션을 구축할 수 있도록 Databricks connector를 선택하고 설정하세요."
 sidebarTitle: "Databricks"
 icon: "database"
 ---
 
 <Info>
-  Databricks 커넥터는 **Enterprise** 플랜에서만 사용 가능합니다.
+  Databricks connector는 **Enterprise** plan에서만 사용할 수 있습니다.
 </Info>
 
 <Frame>
-  <img src="/assets/mirror/templates-dropdown-zoom-9e06ca94568a.png" alt="Databricks 앱 조직 템플릿이 표시된 Templates 드롭다운이 열린 Replit 홈 프롬프트 박스" width="1680" height="300" data-path="images/connectors/databricks/templates-dropdown-zoom.png" />
+  <img src="/assets/mirror/templates-dropdown-zoom-9e06ca94568a.png" alt="Databricks App 조직 template이 표시된 Templates 드롭다운이 열려 있는 Replit 홈 prompt box" width="1680" height="300" data-path="images/connectors/databricks/templates-dropdown-zoom.png" />
 </Frame>
 
-Databricks 커넥터를 사용하면 Replit Agent가 Databricks 워크스페이스를 쿼리할 수 있습니다. 빌더는 자연어를 사용하여 대시보드, 보고 도구 및 데이터 애플리케이션을 만들 수 있습니다. SQL 전문 지식이 필요하지 않습니다.
+Databricks connector를 사용하면 Replit Agent가 Databricks workspace에 쿼리를 실행할 수 있습니다. builder는 자연어만으로 dashboard, 리포팅 도구, 데이터 애플리케이션을 만들 수 있으며, SQL 전문 지식은 필요하지 않습니다.
 
-Replit은 두 가지 Databricks 연결 유형을 지원합니다. 각 쿼리를 실행할 ID에 따라 하나를 선택하세요.
+Replit은 두 가지 Databricks 연결 유형을 지원합니다. 각 쿼리를 실행할 주체(ID)에 따라 알맞은 유형을 선택하세요.
 
-## 연결 유형 선택
+<div id="choose-a-connection-type">
+  ## 연결 유형 선택
+</div>
 
-|                | **User-to-machine (U2M)**           | **Service principal (M2M)** |
-| -------------- | ----------------------------------- | --------------------------- |
-| Replit의 커넥터 이름 | Databricks for Databricks Apps(U2M) | Databricks(서비스 주체)          |
-| 쿼리 ID          | 개별 빌더                               | 공유 서비스 주체                   |
-| Databricks 권한  | 각 빌더의 Unity Catalog 권한              | 서비스 주체의 권한                  |
-| 감사 속성          | 쿼리를 실행한 빌더                          | 서비스 주체                      |
-| 빌더 로그인         | 각 빌더가 자신의 Databricks 계정으로 로그인       | 개별 Databricks 로그인 없음        |
-| 적합한 용도         | 사용자별 권한 및 감사 속성                     | 공유 접근 및 비대화형 워크플로우          |
+|                      | **사용자 대 머신(U2M)**                    | **서비스 주체(M2M)**                |
+| -------------------- | ------------------------------------ | ------------------------------ |
+| Replit의 connector 이름 | Databricks for Databricks Apps (U2M) | Databricks (Service Principal) |
+| 쿼리 실행 주체             | 개별 builder                           | 공유 service principal           |
+| Databricks 권한        | 각 builder의 Unity Catalog 권한          | service principal의 권한          |
+| audit 기록 주체          | 쿼리를 실행한 builder                      | service principal              |
+| builder 로그인          | 각 builder가 자신의 Databricks 계정으로 로그인   | 개별 Databricks 로그인 불필요          |
+| 권장 사용 사례             | 사용자별 권한 관리와 audit 기록이 필요한 경우         | 공유 접근과 비대화형 workflows          |
 
 <CardGroup cols={2}>
-  <Card title="사용자-머신(U2M) 설정" icon="user" href="#set-up-the-u2m-connector">
-    각 빌더의 Databricks ID, 권한, 감사 속성을 사용합니다.
+  <Card title="사용자 대 머신(U2M) 설정" icon="user" href="#set-up-the-u2m-connector">
+    각 builder의 Databricks 아이덴티티와 권한, audit 기록을 그대로 활용합니다.
   </Card>
 
   <Card title="서비스 주체(M2M) 설정" icon="server" href="#set-up-the-service-principal-connector">
-    승인된 빌더를 위해 하나의 공유 Databricks ID와 권한 세트를 사용합니다.
+    승인된 builder가 하나의 공유 Databricks 아이덴티티와 권한 집합을
+    사용합니다.
   </Card>
 </CardGroup>
 
-## U2M 커넥터 설정
+<div id="set-up-the-u2m-connector">
+  ## U2M connector 설정
+</div>
 
-U2M 설정에는 세 가지 역할이 관여합니다.
+U2M 설정에는 세 가지 역할이 필요합니다:
 
-1. **Databricks 계정 관리자**: OAuth 앱 연결을 만들고 SQL 웨어하우스 세부 정보를 제공합니다.
-2. **Replit 조직 관리자**: OAuth 자격 증명으로 커넥터를 구성합니다.
-3. **빌더**: 자신의 Databricks 계정으로 로그인하고 구축을 시작합니다.
+1. **Databricks account admin**: OAuth app connection을 생성하고 SQL Warehouse 세부 정보를 제공합니다.
+2. **Replit organization admin**: OAuth 자격 증명으로 connector를 구성합니다.
+3. **Builder**: 자신의 Databricks 계정으로 로그인한 후 빌드를 시작합니다.
 
-### U2M 사전 요구 사항
+<div id="u2m-prerequisites">
+  ### U2M 사전 요구사항
+</div>
 
-시작하기 전에 다음을 확인하세요.
+시작하기 전에 다음 사항을 확인하세요:
 
-* Databricks **계정 관리자**. 앱 연결은 워크스페이스 관리자 설정이 아닌 계정 콘솔에서 구성됩니다.
-* Replit 조직 관리자.
-* 커넥터를 사용할 모든 빌더의 Databricks 계정.
-* SQL 웨어하우스에 대한 **사용 가능** 권한과 필요한 Unity Catalog 권한을 포함하여 모든 빌더의 워크스페이스 접근 권한.
+* Databricks **account admin** 권한. app connection은 workspace admin 설정이 아니라 계정 콘솔에서 구성합니다.
+* Replit organization admin 권한.
+* connector를 사용할 모든 builder의 Databricks 계정.
+* 모든 builder의 workspace 접근 권한. 여기에는 SQL Warehouse에 대한 **Can use** permission과 필요한 Unity Catalog permissions가 포함됩니다.
 
-### 1단계: OAuth 앱 연결 만들기
+<div id="step-1-create-an-oauth-app-connection">
+  ### 1단계: OAuth app connection 생성
+</div>
 
-<Note>이 단계를 완료하려면 Databricks 계정 관리자여야 합니다.</Note>
+<Note>이 단계를 완료하려면 Databricks account admin이어야 합니다.</Note>
 
-Databricks 계정 관리자는 Replit을 OAuth 애플리케이션으로 등록합니다. 앱 연결은 Replit을 구성하는 데 사용되는 클라이언트 ID와 클라이언트 시크릿을 제공합니다.
+Databricks account admin이 Replit을 OAuth 애플리케이션으로 등록합니다. 이 app connection에서 Replit 구성에 사용할 client ID와 client secret을 얻을 수 있습니다.
 
 <Steps>
   <Step title="Databricks 계정 콘솔 열기">
-    Databricks 워크스페이스에서 오른쪽 상단의 워크스페이스 선택기를 열고 **계정 관리**를 선택합니다.
+    Databricks workspace의 오른쪽 상단에서 workspace 선택기를 열고 **Manage account**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/manage-account-6374ed6bf0f2.png" alt="계정 관리가 표시된 Databricks 워크스페이스 선택기가 열려 있음" width="2000" height="1144" data-path="images/connectors/databricks/u2m/manage-account.png" />
+      <img src="/assets/mirror/manage-account-6374ed6bf0f2.png" alt="Manage account가 표시된 상태로 열린 Databricks workspace 선택기" width="2000" height="1144" data-path="images/connectors/databricks/u2m/manage-account.png" />
     </Frame>
   </Step>
 
-  <Step title="앱 연결 열기">
-    계정 콘솔에서 **설정**을 선택한 다음 **앱 연결** 탭을 엽니다.
+  <Step title="App connections 열기">
+    계정 콘솔에서 **Settings**를 선택한 다음 **App connections** 탭을 엽니다.
 
     <Frame>
-      <img src="/assets/mirror/app-connections-96228e7f0f2e.png" alt="앱 연결 탭이 선택되고 연결 추가 버튼이 표시된 Databricks 계정 설정 페이지" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-connections.png" />
+      <img src="/assets/mirror/app-connections-96228e7f0f2e.png" alt="App connections 탭이 선택되고 Add connection 버튼이 보이는 Databricks 계정 Settings 페이지" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-connections.png" />
     </Frame>
   </Step>
 
   <Step title="Replit 연결 구성">
-    **연결 추가**를 선택합니다. `replit-u2m`과 같이 Replit을 식별하는 애플리케이션 이름을 입력합니다.
+    **Add connection**을 선택합니다. `replit-u2m`처럼 Replit임을 알 수 있는 애플리케이션 이름을 입력합니다.
 
-    **리디렉션 URL**에 다음을 입력합니다.
+    **Redirect URLs**에 다음을 입력합니다:
 
     ```text theme={null}
     https://replit.com/connectors/oauth/callback
     ```
 
-    **접근 범위**에서 **All APIs**를 선택합니다. 이렇게 하면 Agent가 Databricks SQL과 Databricks Apps를 구축하고 관리하는 데 필요한 Databricks API를 사용할 수 있습니다.
+    **Access scopes**에서 **All APIs**를 선택합니다. 이렇게 하면 Agent가 Databricks Apps를 빌드하고 관리하는 데 필요한 Databricks SQL과 Databricks API를 사용할 수 있습니다.
 
-    **클라이언트 시크릿 생성**을 선택합니다. Databricks는 연결이 생성된 후에는 이 연결에 시크릿을 추가할 수 없습니다.
+    **Generate a client secret**을 선택합니다. 연결을 만든 뒤에는 Databricks에서 이 연결에 secret을 추가할 수 없습니다.
 
-    조직의 보안 정책에 따라 토큰 수명을 설정합니다. 예시에서는 Databricks가 표시하는 최댓값인 **Access token TTL** `1440`분(24시간)과 **Refresh token TTL** `129600`분(90일)을 사용합니다. 리프레시 토큰 수명이 짧을수록 빌더가 더 자주 로그인해야 할 수 있습니다.
+    조직의 보안 정책에 맞게 token 수명을 설정합니다. 예시에서는 Databricks가 표시하는 최댓값인 **Access token TTL** `1440`분(24시간)과 **Refresh token TTL** `129600`분(90일)을 사용합니다. refresh token 수명을 짧게 설정하면 builder가 더 자주 로그인해야 할 수 있습니다.
 
-    **추가**를 선택합니다.
+    **Add**를 선택합니다.
 
     <Warning>
-      **All APIs**는 SQL 단독보다 더 광범위한 접근 권한을 부여합니다. 각 빌더의 Databricks 권한으로 커넥터의 실제 접근 범위를 제어하세요.
+      **All APIs**는 SQL만 허용하는 경우보다 더 광범위한 접근 권한을 부여합니다. connector의 실제 접근 범위는 각 builder의 Databricks permissions로 제어하세요.
     </Warning>
 
     <Frame>
-      <img src="/assets/mirror/app-configuration-6799b5769326.png" alt="Replit 애플리케이션 이름, 리디렉션 URL, All APIs 접근 권한, 클라이언트 시크릿 생성, 토큰 수명이 구성된 Databricks 연결 추가 양식" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-configuration.png" />
+      <img src="/assets/mirror/app-configuration-6799b5769326.png" alt="Replit 애플리케이션 이름, redirect URL, All APIs 접근, client secret 생성, token 수명이 구성된 Databricks Add connection 양식" width="2000" height="1144" data-path="images/connectors/databricks/u2m/app-configuration.png" />
     </Frame>
   </Step>
 
   <Step title="OAuth 자격 증명 저장">
-    **클라이언트 ID**와 **클라이언트 시크릿**을 복사한 다음 조직의 시크릿 관리자에 저장합니다.
+    **Client ID**와 **Client Secret**을 복사한 다음 조직의 secret 관리 도구에 저장합니다.
 
     <Warning>
-      Databricks는 클라이언트 시크릿을 한 번만 표시합니다. 만료일을 기록해 두고 시크릿이 만료되기 전에 앱 연결을 교체하세요.
+      Databricks는 client secret을 한 번만 표시합니다. 만료일을 기록해 두고 secret이 만료되기 전에 app connection을 교체하세요.
     </Warning>
 
     <Frame>
-      <img src="/assets/mirror/oauth-credentials-15b2e6c67309.png" alt="클라이언트 ID와 클라이언트 시크릿이 가려진 Databricks 연결 생성 완료 대화 상자와 일회성 시크릿 경고 및 만료일" width="2000" height="1144" data-path="images/connectors/databricks/u2m/oauth-credentials.png" />
+      <img src="/assets/mirror/oauth-credentials-15b2e6c67309.png" alt="client ID와 client secret이 가려진 Databricks Connection created 대화 상자와 일회성 secret 경고 및 만료일" width="2000" height="1144" data-path="images/connectors/databricks/u2m/oauth-credentials.png" />
     </Frame>
   </Step>
 </Steps>
 
 <Note>
-  새로 만들거나 업데이트한 OAuth 앱 연결은 사용 가능해지기까지 최대 30분이 걸릴 수 있습니다.
+  새로 만들거나 업데이트한 OAuth app connection은 사용할 수 있게 되기까지 최대 30분이
+  걸릴 수 있습니다.
 </Note>
 
-### 2단계: SQL 웨어하우스 세부 정보 공유
+<div id="step-2-share-the-sql-warehouse-details">
+  ### 2단계: SQL Warehouse 세부 정보 공유
+</div>
 
-각 빌더는 U2M 커넥터를 승인할 때 SQL 웨어하우스 세부 정보를 입력합니다. 내부 온보딩 페이지 등 빌더가 접근할 수 있는 곳에 이 값들을 게시하세요.
+각 builder는 U2M connector를 승인할 때 SQL Warehouse 세부 정보를 입력합니다. 내부 온보딩 페이지처럼 builder가 확인할 수 있는 곳에 이 값들을 게시하세요.
 
 <Steps>
-  <Step title="SQL 웨어하우스 열기">
-    Databricks 워크스페이스에서 **SQL 웨어하우스**를 선택하고 빌더가 사용할 웨어하우스를 엽니다.
+  <Step title="SQL Warehouses 열기">
+    Databricks workspace에서 **SQL Warehouses**를 선택한 후, builder가 사용할 웨어하우스를 엽니다.
 
     <Frame>
-      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="사용 가능한 웨어하우스가 표시된 Databricks SQL 웨어하우스 페이지" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="사용 가능한 웨어하우스를 보여주는 Databricks SQL Warehouses 페이지" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
     </Frame>
   </Step>
 
   <Step title="연결 세부 정보 복사">
-    **연결 세부 정보**를 선택한 다음 **서버 호스트명**과 **HTTP 경로**를 복사합니다.
+    **Connection details**를 선택한 다음 **Server hostname**과 **HTTP path**를 복사합니다.
 
     <Frame>
-      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="서버 호스트명과 HTTP 경로가 있는 Databricks SQL 웨어하우스 연결 세부 정보 페이지" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="서버 호스트 이름과 HTTP 경로가 표시된 Databricks SQL Warehouse 연결 세부 정보 페이지" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
     </Frame>
   </Step>
 </Steps>
 
-### 3단계: Replit에서 U2M 활성화
+<div id="step-3-enable-u2m-in-replit">
+  ### 3단계: Replit에서 U2M 활성화
+</div>
 
-<Note>커넥터를 구성하려면 Replit 조직 관리자여야 합니다.</Note>
+<Note>connector를 구성하려면 Replit 조직 관리자여야 합니다.</Note>
 
 <Steps>
-  <Step title="U2M 커넥터 열고 활성화">
-    Replit 계정 홈에서 **설정**을 연 다음 **통합**을 엽니다. `Databricks U2M`을 검색하여 \*\*Databricks for Databricks Apps(U2M)\*\*을 찾고 **활성화**를 선택합니다.
+  <Step title="U2M connector 열고 활성화하기">
+    Replit 계정 홈에서 **Settings**를 연 다음 **Integrations**로 이동합니다. `Databricks U2M`을 검색해 **Databricks for Databricks Apps (U2M)**를 찾은 뒤 **Enable**을 선택합니다.
 
-    Databricks 앱 연결에서 얻은 **클라이언트 ID**와 **클라이언트 시크릿**을 입력합니다.
+    Databricks app connection에서 확인한 **Client ID**와 **Client Secret**을 입력합니다.
 
-    Replit에 표시된 리디렉션 URL이 Databricks에 구성된 URL과 일치하는지 확인합니다.
+    Replit에 표시된 리디렉션 URL이 Databricks에 구성한 URL과 일치하는지 확인합니다.
 
     ```text theme={null}
     https://replit.com/connectors/oauth/callback
     ```
 
-    **커넥터 범위**에서 `all-apis`와 `offline_access`를 활성화합니다. `offline_access` 범위는 Replit에 장기 세션을 위한 리프레시 토큰을 제공합니다.
+    **Connector Scopes**에서 `all-apis`와 `offline_access`를 활성화합니다. `offline_access` scope를 사용하면 Replit이 장기 session에 필요한 refresh token을 받습니다.
 
-    **구성**을 선택합니다.
+    **Configure**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/enable-connector-39c1eeebd230.png" alt="Databricks U2M으로 필터링된 Replit 통합 설정과 리디렉션 URL, OAuth 자격 증명 필드, 커넥터 범위가 표시된 활성화 패널" width="2000" height="1144" data-path="images/connectors/databricks/u2m/enable-connector.png" />
+      <img src="/assets/mirror/enable-connector-39c1eeebd230.png" alt="리디렉션 URL, OAuth 자격 증명 필드, connector scope가 표시된 활성화 패널과 함께 Databricks U2M으로 필터링된 Replit Integrations 설정" width="2000" height="1144" data-path="images/connectors/databricks/u2m/enable-connector.png" />
     </Frame>
   </Step>
 
-  <Step title="커넥터가 활성화되었는지 확인">
-    **내 통합** 아래에 \*\*Databricks for Databricks Apps(U2M)\*\*이 표시되는지 확인합니다.
+  <Step title="connector 활성화 여부 확인하기">
+    **Databricks for Databricks Apps (U2M)**가 **Your integrations** 아래에 표시되는지 확인합니다.
   </Step>
 </Steps>
 
-### 4단계: 빌더로 로그인
+<div id="step-4-sign-in-as-a-builder">
+  ### 4단계: builder로 로그인
+</div>
 
-각 빌더는 커넥터를 사용하기 전에 자신의 Databricks 계정으로 로그인합니다. Replit은 리프레시 토큰이 만료될 때까지 세션을 갱신할 수 있습니다.
+각 builder는 connector를 사용하기 전에 자신의 Databricks 계정으로 로그인합니다. Replit은 refresh token이 만료될 때까지 session을 갱신할 수 있습니다.
 
 <Steps>
-  <Step title="커넥터에 로그인">
-    **통합** 페이지에서 \*\*Databricks for Databricks Apps(U2M)\*\*을 찾아 **로그인**을 선택합니다. 연결 세부 정보를 검토한 다음 **Databricks for Databricks Apps로 계속**을 선택합니다.
+  <Step title="connector에 로그인">
+    **Integrations** 페이지에서 **Databricks for Databricks Apps (U2M)**을 찾아 **Sign in**을 선택하세요. Connection details를 확인한 다음 **Continue to Databricks for Databricks Apps**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/connect-modal-8ae2c2569658.png" alt="리디렉션, 개인정보 보호, 권한 제어를 설명하는 Databricks for Databricks Apps 연결 모달" width="2000" height="1144" data-path="images/connectors/databricks/u2m/connect-modal.png" />
+      <img src="/assets/mirror/connect-modal-8ae2c2569658.png" alt="리디렉션, 개인정보 보호 및 권한 제어를 설명하는 Connect Databricks for Databricks Apps 모달" width="2000" height="1144" data-path="images/connectors/databricks/u2m/connect-modal.png" />
     </Frame>
   </Step>
 
-  <Step title="SQL 웨어하우스 세부 정보 입력">
-    Databricks 관리자가 제공한 SQL 웨어하우스 **HTTP 경로**를 입력한 다음 **다음**을 선택합니다.
+  <Step title="SQL Warehouse 세부 정보 입력">
+    Databricks 관리자에게 받은 SQL Warehouse **HTTP path**를 입력한 다음 **Next**를 선택하세요.
 
     <Frame>
-      <img src="/assets/mirror/http-path-9e8a8a14b6ab.png" alt="2단계 중 1단계에서 SQL 웨어하우스 HTTP 경로를 요청하는 Databricks for Databricks Apps 연결 대화 상자" width="2000" height="1144" data-path="images/connectors/databricks/u2m/http-path.png" />
+      <img src="/assets/mirror/http-path-9e8a8a14b6ab.png" alt="2단계 중 1단계에서 SQL Warehouse HTTP path를 입력하도록 요청하는 Connect Databricks for Databricks Apps 대화 상자" width="2000" height="1144" data-path="images/connectors/databricks/u2m/http-path.png" />
     </Frame>
 
-    다음으로 Replit은 SQL 웨어하우스 **서버 호스트명**을 요청합니다. 이를 입력하고 Databricks로 계속 진행합니다. 메시지가 표시되면 로그인하고 요청된 접근 권한을 검토한 다음 요청을 승인합니다.
+    이어서 Replit이 SQL Warehouse **Server hostname**을 요청합니다. 값을 입력하고 Databricks로 계속 진행하세요. 로그인 화면이 나타나면 로그인한 뒤, 요청된 접근 권한을 확인하고 승인합니다.
 
-    이 연결을 통해 Agent가 실행하는 모든 쿼리는 사용자의 Databricks 권한을 사용하며 Databricks 감사 로그에 사용자로 귀속됩니다.
+    Agent가 이 연결을 통해 실행하는 모든 쿼리에는 사용자의 Databricks permissions가 적용되며, Databricks audit logs에 사용자 본인의 활동으로 기록됩니다.
 
-    승인 후 Databricks는 사용자를 Replit으로 돌려보내고 커넥터를 사용할 준비가 됩니다.
+    승인이 완료되면 Databricks가 다시 Replit으로 이동시키며, 이때부터 connector를 사용할 수 있습니다.
   </Step>
 </Steps>
 
-## 서비스 주체 커넥터 설정
+<div id="set-up-the-service-principal-connector">
+  ## service principal connector 설정
+</div>
 
-서비스 주체 설정에는 세 가지 역할이 관여합니다.
+service principal 설정에는 다음 세 가지 역할이 필요합니다:
 
-1. **Databricks 관리자**: Databricks에서 서비스 주체를 만들고 권한을 부여합니다.
-2. **Replit 조직 관리자**: Replit에서 커넥터와 접근 권한을 구성합니다.
-3. **빌더**: 공유 Databricks ID로 구축을 시작합니다.
+1. **Databricks 관리자**: Databricks에서 service principal을 생성하고 permissions을 부여합니다.
+2. **Replit Organization Admin**: Replit에서 connector와 액세스 권한을 구성합니다.
+3. **Builder**: 공유된 Databricks 자격 증명으로 building을 시작합니다.
 
-### 서비스 주체 사전 요구 사항
+<div id="service-principal-prerequisites">
+  ### service principal 사전 요구 사항
+</div>
 
-시작하기 전에 다음을 확인하세요.
+시작하기 전에 다음 항목을 확인하세요.
 
-* Databricks 계정 관리자 또는 워크스페이스 관리자 접근 권한.
-* Replit 조직 관리자 접근 권한.
+* Databricks account admin 또는 workspace admin 액세스 권한
+* Replit Organization Admin 액세스 권한
 
-### 1단계: Databricks에서 서비스 주체 만들기
+<div id="step-1-create-a-service-principal-in-databricks">
+  ### 1단계: Databricks에서 service principal 만들기
+</div>
 
 <Note>
-  이 단계를 완료하려면 Databricks 계정 관리자 또는 워크스페이스 관리자여야 합니다.
+  이 단계를 완료하려면 Databricks account admin 또는 workspace admin이어야 합니다.
 </Note>
 
-Databricks 관리자는 Replit이 Databricks에 연결하는 데 사용하는 [서비스 주체](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)라는 머신 간 ID를 만듭니다.
+Databricks 관리자는 Replit이 Databricks에 연결할 때 사용하는 머신 대 머신 ID인 [service principal](https://docs.databricks.com/aws/en/admin/users-groups/service-principals)을 생성합니다.
 
 <Steps>
-  <Step title="설정 열기">
-    Databricks에서 오른쪽 상단의 아바타를 선택한 다음 **설정**을 선택합니다.
+  <Step title="Settings 열기">
+    Databricks에서 오른쪽 상단의 아바타를 선택한 다음 **Settings**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/settings-menu-8f2dcd4dbee3.png" alt="설정이 선택된 Databricks 워크스페이스 메뉴" width="3438" height="1984" data-path="images/connectors/databricks/settings-menu.png" />
+      <img src="/assets/mirror/settings-menu-8f2dcd4dbee3.png" alt="Settings가 선택된 Databricks workspace 메뉴" width="3438" height="1984" data-path="images/connectors/databricks/settings-menu.png" />
     </Frame>
   </Step>
 
-  <Step title="ID 및 접근 선택">
-    설정 사이드바에서 **ID 및 접근**을 선택합니다.
+  <Step title="Identity and access 선택">
+    Settings 사이드바에서 **Identity and access**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/settings-page-2a8bcd7c22a4.png" alt="사이드바에 ID 및 접근이 있는 Databricks 설정 페이지" width="3438" height="1984" data-path="images/connectors/databricks/settings-page.png" />
+      <img src="/assets/mirror/settings-page-2a8bcd7c22a4.png" alt="사이드바에 Identity and access가 표시된 Databricks Settings 페이지" width="3438" height="1984" data-path="images/connectors/databricks/settings-page.png" />
     </Frame>
   </Step>
 
-  <Step title="서비스 주체 관리">
-    **관리 및 권한** 아래에서 **서비스 주체**를 찾아 **관리**를 선택합니다.
+  <Step title="service principal 관리">
+    **Management and permissions** 아래에서 **Service principals**를 찾아 **Manage**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/identity-and-access-0e79404ed30f.png" alt="서비스 주체 관리 버튼이 표시된 ID 및 접근 설정 페이지" width="3438" height="1984" data-path="images/connectors/databricks/identity-and-access.png" />
+      <img src="/assets/mirror/identity-and-access-0e79404ed30f.png" alt="Service principals의 Manage 버튼이 표시된 Identity and access 설정 페이지" width="3438" height="1984" data-path="images/connectors/databricks/identity-and-access.png" />
     </Frame>
   </Step>
 
-  <Step title="새 서비스 주체 추가">
-    **서비스 주체 추가**를 선택한 다음 **새로 추가**를 선택합니다.
+  <Step title="새 service principal 추가">
+    **Add service principal**을 선택한 다음 **Add new**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/add-service-principal-ac5b52f21f4c.png" alt="새로 추가 버튼이 있는 서비스 주체 추가 대화 상자" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal.png" />
+      <img src="/assets/mirror/add-service-principal-ac5b52f21f4c.png" alt="Add new 버튼이 있는 Add service principal 대화 상자" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal.png" />
     </Frame>
   </Step>
 
-  <Step title="서비스 주체 이름 지정">
-    서비스 주체의 명확한 이름을 입력한 다음 **추가**를 선택합니다.
+  <Step title="service principal 이름 지정">
+    service principal의 이름을 알아보기 쉽게 입력한 다음 **Add**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/add-service-principal-name-897df9e5f7ac.png" alt="서비스 주체 이름이 입력된 서비스 주체 추가 대화 상자" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal-name.png" />
+      <img src="/assets/mirror/add-service-principal-name-897df9e5f7ac.png" alt="service principal 이름이 입력된 Add service principal 대화 상자" width="3438" height="1984" data-path="images/connectors/databricks/add-service-principal-name.png" />
     </Frame>
   </Step>
 
-  <Step title="서비스 주체 세부 정보 확인">
-    Databricks가 서비스 주체를 만든 후 활성 상태인지 확인합니다. Replit 커넥터를 구성하는 동안 서비스 주체 세부 정보가 필요한 경우 이 페이지를 열어 두세요.
+  <Step title="service principal 세부 정보 확인">
+    Databricks가 service principal을 생성한 후 활성 상태인지 확인합니다. Replit connector를 구성하는 동안 service principal 세부 정보가 필요하다면 이 페이지를 열어 두세요.
 
     <Frame>
-      <img src="/assets/mirror/service-principal-details-15a381d388bc.png" alt="Databricks 서비스 주체 세부 정보 페이지" width="3438" height="1984" data-path="images/connectors/databricks/service-principal-details.png" />
+      <img src="/assets/mirror/service-principal-details-15a381d388bc.png" alt="Databricks service principal 세부 정보 페이지" width="3438" height="1984" data-path="images/connectors/databricks/service-principal-details.png" />
     </Frame>
   </Step>
 
   <Step title="접근 권한 부여">
-    **권한** 탭을 열고, **접근 권한 부여**를 선택하고, 서비스 주체를 선택하고, 권한을 **관리**로 설정한 다음 **저장**을 선택합니다.
+    **Permissions** tab을 열고 **Grant access**를 선택한 후 service principal을 선택하고, permission을 **Manage**로 설정한 다음 **Save**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/grant-access-edbaa2541a7d.png" alt="관리 권한이 선택된 Databricks 서비스 주체 접근 권한 부여 대화 상자" width="3438" height="1984" data-path="images/connectors/databricks/grant-access.png" />
+      <img src="/assets/mirror/grant-access-edbaa2541a7d.png" alt="Manage permission이 선택된 Databricks service principal의 Grant access 대화 상자" width="3438" height="1984" data-path="images/connectors/databricks/grant-access.png" />
     </Frame>
   </Step>
 </Steps>
 
-### 2단계: SQL 웨어하우스 연결 세부 정보 가져오기
+<div id="step-2-get-your-sql-warehouse-connection-details">
+  ### 2단계: SQL Warehouse 연결 정보 확인
+</div>
 
-Replit 커넥터는 올바른 컴퓨팅 리소스로 쿼리를 라우팅하기 위해 Databricks SQL 웨어하우스 연결 세부 정보가 필요합니다.
+Replit connector가 쿼리를 올바른 컴퓨팅 리소스로 라우팅하려면 Databricks SQL Warehouse 연결 정보가 필요합니다.
 
 <Steps>
-  <Step title="SQL 웨어하우스 열기">
-    Databricks 사이드바에서 **SQL 웨어하우스**를 선택합니다.
+  <Step title="SQL Warehouses 열기">
+    Databricks 사이드바에서 **SQL Warehouses**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="사용 가능한 웨어하우스가 표시된 Databricks SQL 웨어하우스 페이지" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
+      <img src="/assets/mirror/sql-warehouses-cc178d18a33b.png" alt="사용 가능한 웨어하우스가 표시된 Databricks SQL Warehouses 페이지" width="3438" height="1984" data-path="images/connectors/databricks/sql-warehouses.png" />
     </Frame>
   </Step>
 
   <Step title="웨어하우스 선택 또는 생성">
-    Replit Agent가 사용할 SQL 웨어하우스를 선택합니다. 아직 없는 경우 **SQL 웨어하우스 만들기**를 선택하여 새 웨어하우스를 만듭니다.
+    Replit Agent가 사용할 SQL Warehouse를 선택합니다. 아직 없다면 **Create SQL warehouse**를 선택해 새 웨어하우스를 생성합니다.
   </Step>
 
-  <Step title="연결 세부 정보 복사">
-    웨어하우스를 열고 **연결 세부 정보**를 선택합니다. **서버 호스트명** 및 **HTTP 경로** 값을 찾습니다. Replit에서 Databricks 커넥터를 만들 때 이 값들이 필요합니다.
+  <Step title="연결 정보 복사">
+    해당 웨어하우스를 열고 **Connection details**를 선택합니다. **Server hostname**과 **HTTP path** 값을 확인하세요. Replit에서 Databricks connector를 생성할 때 이 값들이 필요합니다.
 
     <Frame>
-      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="서버 호스트명과 HTTP 경로가 있는 Databricks SQL 웨어하우스 연결 세부 정보 페이지" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
+      <img src="/assets/mirror/connection-details-938b970b98e6.png" alt="서버 호스트 이름과 HTTP 경로가 표시된 Databricks SQL Warehouse 연결 정보 페이지" width="3438" height="1984" data-path="images/connectors/databricks/connection-details.png" />
     </Frame>
   </Step>
 </Steps>
 
-### 3단계: Replit에서 Databricks 커넥터 만들기
+<div id="step-3-create-the-databricks-connector-in-replit">
+  ### 3단계: Replit에서 Databricks connector 만들기
+</div>
 
-<Note>커넥터를 구성하려면 Replit 조직 관리자여야 합니다.</Note>
+<Note>connector를 구성하려면 Replit 조직 관리자여야 합니다.</Note>
 
-Replit 관리자는 빌더가 커넥터를 사용할 수 있도록 Replit에 Databricks 연결 세부 정보를 추가합니다.
+Replit 관리자가 Databricks 연결 정보를 Replit에 추가하면 builder가 해당 connector를 사용할 수 있습니다.
 
 <Steps>
-  <Step title="통합으로 이동">
-    Replit 계정 홈에서 **통합** 페이지를 엽니다. **커넥터** 아래에서 \*\*Databricks(서비스 주체)\*\*를 찾아 **로그인**을 선택합니다.
+  <Step title="Integrations로 이동">
+    Replit 계정 홈에서 **Integrations** 페이지를 엽니다. **Connectors** 아래에서 **Databricks (Service Principal)**를 찾아 **Sign in**을 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/integrations-databricks-signin-75d3367013da.png" alt="로그인 버튼이 있는 Databricks(서비스 주체) 커넥터가 표시된 Databricks로 필터링된 Replit 통합 페이지" width="3436" height="1978" data-path="images/connectors/databricks/integrations-databricks-signin.png" />
+      <img src="/assets/mirror/integrations-databricks-signin-75d3367013da.png" alt="Databricks로 필터링된 Replit Integrations 페이지에 Sign in 버튼과 함께 Databricks (Service Principal) connector가 표시된 모습" width="3436" height="1978" data-path="images/connectors/databricks/integrations-databricks-signin.png" />
     </Frame>
   </Step>
 
   <Step title="연결 확인">
-    Replit은 인증을 위해 Databricks로 리디렉션하기 전에 확인 대화 상자를 표시합니다. 세부 정보를 검토하고 **Databricks로 계속**을 선택합니다.
+    Replit은 authentication을 위해 Databricks로 이동하기 전에 확인 대화 상자를 표시합니다. 세부 정보를 확인한 후 **Continue to Databricks**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/connect-databricks-intro-e842722d93ea.png" alt="OAuth 리디렉션, 데이터 사용 및 권한을 설명하는 Databricks 연결 대화 상자" width="3436" height="1978" data-path="images/connectors/databricks/connect-databricks-intro.png" />
+      <img src="/assets/mirror/connect-databricks-intro-e842722d93ea.png" alt="OAuth 리디렉션, 데이터 사용, permissions를 설명하는 Connect Databricks 대화 상자" width="3436" height="1978" data-path="images/connectors/databricks/connect-databricks-intro.png" />
     </Frame>
   </Step>
 
-  <Step title="SQL 웨어하우스 HTTP 경로 입력">
-    Databricks SQL 웨어하우스 연결 세부 정보의 **HTTP 경로**를 붙여넣은 다음(예: `/sql/1.0/warehouses/abcdef1234567890`) **다음**을 선택합니다.
+  <Step title="SQL Warehouse HTTP 경로 입력">
+    Databricks SQL Warehouse의 Connection details에서 **HTTP path**를 붙여넣은 다음(예: `/sql/1.0/warehouses/abcdef1234567890`) **Next**를 선택합니다.
 
     <Frame>
-      <img src="/assets/mirror/connector-http-path-5c8ae35516f8.png" alt="SQL 웨어하우스 HTTP 경로를 요청하는 Databricks 연결 대화 상자 1/2단계" width="3436" height="1978" data-path="images/connectors/databricks/connector-http-path.png" />
+      <img src="/assets/mirror/connector-http-path-5c8ae35516f8.png" alt="SQL Warehouse HTTP 경로 입력을 요청하는 Connect Databricks 대화 상자 2단계 중 1단계" width="3436" height="1978" data-path="images/connectors/databricks/connector-http-path.png" />
     </Frame>
   </Step>
 
-  <Step title="SQL 웨어하우스 서버 호스트명 입력">
-    동일한 연결 세부 정보의 **서버 호스트명**을 붙여넣은 다음(예: `abc-12345678-wxyz.cloud.databricks.com`) **Databricks로 계속**을 선택하여 인증을 완료합니다.
+  <Step title="SQL Warehouse 서버 호스트 이름 입력">
+    동일한 Connection details에서 **Server hostname**을 붙여넣은 다음(예: `abc-12345678-wxyz.cloud.databricks.com`) **Continue to Databricks**를 선택해 authentication을 완료합니다.
 
     <Frame>
-      <img src="/assets/mirror/connector-server-hostname-b97fb74713f1.png" alt="SQL 웨어하우스 서버 호스트명을 요청하는 Databricks 연결 대화 상자 2/2단계" width="3436" height="1978" data-path="images/connectors/databricks/connector-server-hostname.png" />
+      <img src="/assets/mirror/connector-server-hostname-b97fb74713f1.png" alt="SQL Warehouse 서버 호스트 이름 입력을 요청하는 Connect Databricks 대화 상자 2단계 중 2단계" width="3436" height="1978" data-path="images/connectors/databricks/connector-server-hostname.png" />
     </Frame>
   </Step>
 
-  <Step title="접근 구성">
-    역할 기반 접근 제어를 사용하여 조직의 어떤 구성원이나 그룹이 이 커넥터를 사용할 수 있는지 선택합니다.
+  <Step title="접근 권한 구성">
+    역할 기반 access control을 사용해 조직 내에서 이 connector를 사용할 수 있는 Members 또는 groups를 선택합니다.
   </Step>
 
-  <Step title="커넥터가 활성 상태인지 확인">
-    **통합** 페이지로 돌아가 \*\*Databricks(서비스 주체)\*\*가 **활성** 연결 상태로 **커넥터** 아래에 표시되는지 확인합니다.
+  <Step title="connector 활성화 확인">
+    다시 **Integrations** 페이지로 돌아가 **Connectors** 아래에 **Databricks (Service Principal)**가 **Active** 연결 status로 표시되는지 확인합니다.
 
     <Frame>
-      <img src="/assets/mirror/integrations-page-d3e1d6b88376.png" alt="활성 연결 상태의 Databricks(서비스 주체) 커넥터가 표시된 Replit 통합 페이지" width="1680" height="1199" data-path="images/connectors/databricks/integrations-page.png" />
+      <img src="/assets/mirror/integrations-page-d3e1d6b88376.png" alt="Databricks (Service Principal) connector가 Active 연결 status로 표시된 Replit Integrations 페이지" width="1680" height="1199" data-path="images/connectors/databricks/integrations-page.png" />
     </Frame>
   </Step>
 </Steps>
 
-## Agent로 구축
+<div id="build-with-agent">
+  ## Agent로 빌드하기
+</div>
 
-두 연결 방법 중 하나로 연결한 후, 빌더는 Agent를 사용하여 Databricks 데이터를 활용하는 애플리케이션을 만들 수 있습니다.
+두 가지 방법 중 어느 쪽으로 연결하든, builder는 Agent를 사용해 Databricks 데이터를 활용하는 애플리케이션을 만들 수 있습니다.
 
 <Steps>
-  <Step title="배포용 Databricks App 템플릿 선택">
-    완성된 앱을 Databricks 환경에 배포하려면 **Databricks App** 템플릿을 선택하세요. 구성된 커넥터로 Databricks 데이터와 자산에 접근하는 데는 이 템플릿이 필요하지 않습니다.
+  <Step title="배포용 Databricks App 템플릿 선택하기">
+    완성된 앱을 Databricks 환경에 배포하려면 **Databricks App** 템플릿을 선택하세요. 구성된 connector로 Databricks 데이터와 asset에 접근할 때는 이 템플릿이 필요하지 않습니다.
 
-    Replit 홈페이지에서 템플릿 선택기를 열고 **Databricks App**을 선택합니다.
+    Replit 홈페이지에서 템플릿 선택기를 열고 **Databricks App**을 선택하세요.
 
     <Frame>
-      <img src="/assets/mirror/databricks-template-cdfbbba1a2ab.png" alt="프롬프트 박스 위에 Databricks App 템플릿이 선택된 Replit 홈페이지" width="1200" height="400" data-path="images/connectors/databricks/u2m/databricks-template.png" />
+      <img src="/assets/mirror/databricks-template-cdfbbba1a2ab.png" alt="prompt box 위에 Databricks App 템플릿이 선택된 Replit 홈페이지" width="1200" height="400" data-path="images/connectors/databricks/u2m/databricks-template.png" />
     </Frame>
   </Step>
 
-  <Step title="애플리케이션 설명">
-    미리 채워진 지침 뒤에 프롬프트를 추가하세요. 영감을 얻으려면 [Databricks Dev Hub 템플릿](https://www.databricks.com/devhub/templates)을 살펴보세요.
+  <Step title="애플리케이션 설명하기">
+    미리 입력된 지침 뒤에 prompt를 추가하세요. 아이디어가 필요하다면 [Databricks Dev Hub 템플릿](https://www.databricks.com/devhub/templates)을 둘러보세요.
   </Step>
 
-  <Step title="검토 및 반복">
-    Agent가 생성한 SQL, 쿼리하는 테이블, 애플리케이션 구조를 검토합니다. 자연어로 변경 사항을 요청하세요.
+  <Step title="검토하고 반복하기">
+    Agent가 생성한 SQL, 쿼리한 테이블, 애플리케이션 구조를 검토하세요. 변경 사항은 자연어로 요청할 수 있습니다.
   </Step>
 </Steps>
 
-## 문제 해결
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
 
 <AccordionGroup>
-  <Accordion title="쿼리가 빈 결과를 반환함">
-    쿼리를 실행하는 ID의 Databricks 권한을 확인합니다. U2M의 경우 개별
-    빌더이고, 서비스 주체 커넥터의 경우 공유 서비스 주체입니다. 해당 ID에
-    메타데이터 접근 권한은 있지만 데이터에 대한 읽기 권한이 없을 수 있습니다.
-    필요한 카탈로그, 스키마 또는 테이블 권한을 부여하고 다시 시도하세요.
+  <Accordion title="쿼리가 빈 결과를 반환합니다">
+    쿼리를 실행하는 ID의 Databricks permissions를 확인하세요. U2M에서는 개별
+    builder가 해당 ID이고, service principal connector에서는 공유 service
+    principal이 해당 ID입니다. 해당 ID에 메타데이터 접근 권한은 있어도 데이터
+    읽기 권한은 없을 수 있습니다. 필요한 카탈로그, schema 또는 테이블 권한을
+    부여한 후 다시 시도하세요.
   </Accordion>
 
-  <Accordion title="커넥터가 SQL 웨어하우스에 연결할 수 없음">
-    **서버 호스트명**과 **HTTP 경로**가 Databricks의 SQL 웨어하우스
-    연결 세부 정보와 일치하는지 확인합니다. U2M의 경우 영향을 받는 빌더가
-    입력한 값을 확인하세요. 또한 웨어하우스가 실행 중이며 쿼리 ID에 이를
-    사용할 권한이 있는지 확인하세요.
+  <Accordion title="connector가 SQL Warehouse에 연결하지 못합니다">
+    **Server hostname**과 **HTTP path**가 Databricks의 SQL Warehouse
+    Connection details와 일치하는지 확인하세요. U2M의 경우 문제가 발생한
+    builder가 입력한 값을 확인하세요. 또한 warehouse가 실행 중인지, 쿼리를
+    실행하는 ID에 사용 권한이 있는지도 확인하세요.
   </Accordion>
 
-  <Accordion title="인증 실패">
-    U2M의 경우 Databricks 앱 연결의 **리디렉션 URL**에
-    `https://replit.com/connectors/oauth/callback`이 마지막에 슬래시 없이
-    등록되어 있는지 확인하세요. 모든 빌더에서 인증이 실패하면 공유된
-    클라이언트 ID와 클라이언트 시크릿을 확인하고, 시크릿이 만료되지
-    않았는지 확인하고, Replit의 범위가 Databricks 앱 연결과 일치하는지
+  <Accordion title="authentication이 실패합니다">
+    U2M의 경우, Databricks app connection의 **Redirect URLs** 항목에
+    `https://replit.com/connectors/oauth/callback`이 후행 슬래시 없이
+    등록되어 있는지 확인하세요. 모든 builder에서 authentication이 실패한다면
+    공유 Client ID와 Client Secret을 확인하고, secret이 만료되지 않았는지
+    점검한 뒤, Replit의 scopes가 Databricks app connection과 일치하는지
     확인하세요.
 
-    서비스 주체 커넥터의 경우 Replit에 입력된 서비스 주체 세부 정보가
-    Databricks에서 생성한 서비스 주체와 일치하는지 확인하세요. 자격 증명이
-    교체된 경우 Replit에서 커넥터를 업데이트하세요.
+    service principal connector의 경우, Replit에 입력한 service principal
+    정보가 Databricks에서 생성한 service principal과 일치하는지 확인하세요.
+    자격 증명을 교체했다면 Replit에서 connector를 업데이트하세요.
   </Accordion>
 
-  <Accordion title="커넥터가 다시 로그인을 요청함">
-    이는 리프레시 토큰이 만료되거나 취소된 경우 U2M에서 발생할 수 있습니다.
-    Databricks 인증 흐름을 다시 완료하세요. 보안 정책에서 요구하는 것보다
-    빌더가 더 자주 다시 연결해야 하는 경우 앱 연결의 토큰 수명을 검토하세요.
+  <Accordion title="connector가 다시 로그인하라고 요청합니다">
+    U2M에서 refresh token이 만료되거나 취소되면 이런 현상이 발생할 수 있습니다.
+    Databricks 승인 flow를 다시 완료하세요. 보안 정책에서 요구하는 것보다
+    builder가 더 자주 재연결해야 한다면 app connection의 token 수명을
+    검토하세요.
   </Accordion>
 </AccordionGroup>
 
-## 관련 문서
+<div id="related-documentation">
+  ## 관련 문서
+</div>
 
-* [웨어하우스 커넥터 개요](/ko/connectors/warehouses/overview): 지원되는 모든 웨어하우스 커넥터.
-* [Snowflake 연결](/ko/connectors/warehouses/snowflake): 단계별 Snowflake 설정.
-* [커넥터 관리](/ko/replitai/managing-connectors): 커넥터 관리 및 구성.
-* [Databricks OAuth 사용자-머신 인증](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-u2m): U2M OAuth에 관한 Databricks 문서.
-* [Databricks에서 커스텀 OAuth 애플리케이션 활성화](https://docs.databricks.com/aws/en/integrations/enable-disable-oauth): 앱 연결에 관한 Databricks 문서.
-* [Databricks 서비스 주체](https://docs.databricks.com/aws/en/admin/users-groups/service-principals): 서비스 주체에 관한 Databricks 문서.
-* [Databricks SQL 웨어하우스](https://docs.databricks.com/aws/en/compute/sql-warehouse/): SQL 웨어하우스 컴퓨팅에 관한 Databricks 문서.
+* [Warehouse connectors 개요](/ko/connectors/warehouses/overview): 지원되는 모든 warehouse connectors를 소개합니다.
+* [Snowflake 연결](/ko/connectors/warehouses/snowflake): Snowflake 설정 단계별 안내입니다.
+* [Managing your connectors](/ko/replitai/managing-connectors): connector 관리 및 구성 방법입니다.
+* [Databricks OAuth 사용자-머신 간 권한 부여](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-u2m): U2M OAuth에 대한 Databricks 문서입니다.
+* [Databricks에서 사용자 지정 OAuth 애플리케이션 활성화](https://docs.databricks.com/aws/en/integrations/enable-disable-oauth): app connection에 대한 Databricks 문서입니다.
+* [Databricks service principal](https://docs.databricks.com/aws/en/admin/users-groups/service-principals): service principal에 대한 Databricks 문서입니다.
+* [Databricks SQL Warehouses](https://docs.databricks.com/aws/en/compute/sql-warehouse/): SQL Warehouse 컴퓨트에 대한 Databricks 문서입니다.

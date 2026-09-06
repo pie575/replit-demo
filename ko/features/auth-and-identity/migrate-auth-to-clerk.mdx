@@ -1,107 +1,127 @@
 ---
 title: "Replit Auth에서 Clerk로 마이그레이션하기"
-description: "Agent를 사용해 기존 Replit Auth 앱을 사용자 데이터를 유지한 채로 Clerk Auth로 이전하세요."
+description: "Agent를 사용해 기존 Replit Auth 앱을 Clerk Auth로 옮기면서 앱의 사용자 데이터를 그대로 유지하세요."
+sidebarTitle: "Clerk로 마이그레이션"
+icon: "right-left"
 ---
 
-이 가이드를 사용하여 기존 [Replit Auth](/ko/features/auth-and-identity/authentication) 앱을 [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)로 이전하세요. Agent는 해당되는 앱에 대해 마이그레이션을 처리하므로, 기존 사용자는 자신의 데이터에 계속 접근할 수 있습니다.
+이 가이드를 참고해 기존 [Replit Auth](/ko/features/auth-and-identity/authentication) 앱을 [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)로 옮기세요. 조건을 충족하는 앱은 Agent가 마이그레이션을 처리하므로, 다시 방문한 사용자도 기존 데이터에 그대로 접근할 수 있습니다.
 
 <Note>
-  이 자동화된 마이그레이션은 Replit Auth를 사용하는 앱을 위한 것입니다. 앱이 다른 인증 시스템을 사용한다면 이 흐름을 사용하지 마세요.
+  이 자동 마이그레이션은 Replit Auth를 사용하는 앱을 위한 기능입니다. 앱이 다른 인증 시스템을 사용한다면 이 절차를 사용하지 마세요.
 </Note>
 
-## 마이그레이션 시작하기
+<div id="start-the-migration">
+  ## 마이그레이션 시작
+</div>
 
-Agent 마이그레이션은 항상 새로운 task에서 실행해야 합니다.
+Agent 마이그레이션은 항상 새 task에서 실행해야 합니다.
 
 다음 두 가지 방법 중 하나로 마이그레이션을 시작할 수 있습니다.
 
-### Agent에서 시작하기
+<div id="start-from-agent">
+  ### Agent에서 시작하기
+</div>
 
 <Steps>
   <Step title="새 task 만들기">
-    사이드바에서 \*\*+\*\*를 선택하거나 **Cmd+Shift+P**(Mac) 또는 **Ctrl+Shift+P**(Windows)를 눌러 새 task를 만드세요.
+    사이드바에서 **+**를 선택하거나 **Cmd+Shift+P**(Mac) 또는 **Ctrl+Shift+P**(Windows)를 눌러 새 task를 만듭니다.
 
-    <Frame caption="새 task 계획하기: 원하는 것을 설명하면 Agent가 계획을 만들어 줍니다.">
-      <img src="/assets/mirror/replit-auth-to-clerk-new-task-090bed68b68c.png" alt="사이드바에서 새 task 만들기 버튼이 강조 표시된 New task 화면, Cmd Shift P 단축키를 보여주는 툴팁, Message Agent 작성창 위의 Plan a new task 빈 상태" width="1750" height="1948" data-path="images/workspace/auth/replit-auth-to-clerk-new-task.png" />
+    <Frame caption="새 task 계획하기: 원하는 내용을 설명하면 Agent가 계획을 세워 줍니다.">
+      <img src="/assets/mirror/replit-auth-to-clerk-new-task-090bed68b68c.png" alt="사이드바에 새 task 만들기 버튼이 강조 표시되고, Cmd Shift P 단축키를 보여주는 툴팁과 Message Agent 입력창 위에 새 task 계획하기 빈 상태가 표시된 New task 화면" width="1750" height="1948" data-path="images/workspace/auth/replit-auth-to-clerk-new-task.png" />
     </Frame>
   </Step>
 
-  <Step title="Agent를 사용해 마이그레이션하기">
-    새 task에서 Agent에게 앱을 Replit Auth에서 Clerk로 마이그레이션해 달라고 요청하세요.
+  <Step title="Agent로 마이그레이션하기">
+    새 task에서 Agent에게 앱을 Replit Auth에서 Clerk으로 마이그레이션해 달라고 요청하세요.
   </Step>
 </Steps>
 
-### Auth 패널에서 시작하기
+<div id="start-from-the-auth-pane">
+  ### Auth pane에서 시작하기
+</div>
 
 <Steps>
   <Step title="Tools 열기">
-    Project Editor에서 **Tools**를 여세요.
+    Project Editor에서 **Tools**를 엽니다.
 
-    <Frame caption="Tools 탭을 열면 활성 도구 옆에 도구 목록이 표시됩니다.">
-      <img src="/assets/mirror/replit-auth-to-clerk-open-tools-6eeea4995d4f.png" alt="Publishing 개요 옆에 Publishing, Domains, Monitoring, Users & Auth 등을 보여주는 도구 목록이 열려 있는 Project Editor Tools 탭" width="1500" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-open-tools.png" />
+    <Frame caption="Tools 탭을 열면 현재 활성화된 도구와 함께 도구 목록이 표시됩니다.">
+      <img src="/assets/mirror/replit-auth-to-clerk-open-tools-6eeea4995d4f.png" alt="Project Editor의 Tools 탭이 열려 있고, Publishing 개요 옆에 Publishing, Domains, Monitoring, Users & Auth 등의 도구 목록이 표시된 모습" width="1500" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-open-tools.png" />
     </Frame>
   </Step>
 
-  <Step title="Users & Auth 선택하기">
-    <Frame caption="도구 목록의 Users & Auth.">
-      <img src="/assets/mirror/replit-auth-to-clerk-users-auth-684bf872c3b2.png" alt="Users & Auth가 강조 표시되고 'Let users log in to your App using a prebuilt login page'라는 툴팁이 표시된 도구 목록" width="1154" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-users-auth.png" />
+  <Step title="Users & Auth 선택">
+    <Frame caption="도구 목록에 표시된 Users & Auth.">
+      <img src="/assets/mirror/replit-auth-to-clerk-users-auth-684bf872c3b2.png" alt="Users & Auth가 강조 표시되고 '미리 만들어진 로그인 페이지를 사용해 사용자가 App에 로그인할 수 있도록 합니다'라는 툴팁이 표시된 도구 목록" width="1154" height="1018" data-path="images/workspace/auth/replit-auth-to-clerk-users-auth.png" />
     </Frame>
   </Step>
 
-  <Step title="Update now 선택하기">
-    **Introducing a new Replit Auth** 배너에서 **Update now**를 선택하세요.
+  <Step title="Update now 선택">
+    **Introducing a new Replit Auth** 배너에서 **Update now**를 선택합니다.
 
-    <Frame caption="Users & Auth 도구에 Introducing a new Replit Auth 배너와 Update now 작업이 표시됩니다.">
-      <img src="/assets/mirror/replit-auth-to-clerk-banner-64d3b381da86.png" alt="Users & Auth가 선택된 Project Editor와 Update now 버튼이 표시된 Introducing a new Replit Auth 배너" width="1220" height="764" data-path="images/workspace/auth/replit-auth-to-clerk-banner.png" />
+    <Frame caption="Users & Auth 도구에 Introducing a new Replit Auth 배너와 Update now 버튼이 표시된 모습.">
+      <img src="/assets/mirror/replit-auth-to-clerk-banner-64d3b381da86.png" alt="Users & Auth가 선택된 Project Editor와 Update now 버튼이 있는 Introducing a new Replit Auth 배너" width="1220" height="764" data-path="images/workspace/auth/replit-auth-to-clerk-banner.png" />
     </Frame>
   </Step>
 
-  <Step title="Agent에게 마이그레이션 요청하기">
-    대화 상자에서 **Ask agent to migrate**를 선택하세요.
+  <Step title="Ask agent to migrate">
+    대화 상자에서 **Ask agent to migrate**를 선택합니다.
 
-    <Frame caption="마이그레이션 개요 대화 상자는 Clerk Auth 업데이트를 설명하고 Ask agent to migrate를 제공합니다.">
+    <Frame caption="마이그레이션 개요 대화 상자에서 Clerk Auth 업데이트를 설명하고 Ask agent to migrate 옵션을 제공합니다.">
       <img src="/assets/mirror/replit-auth-to-clerk-dialog-c485c7e997bc.png" alt="Ask agent to migrate 버튼이 있는 Introducing a new Replit Auth 대화 상자" width="1259" height="790" data-path="images/workspace/auth/replit-auth-to-clerk-dialog.png" />
     </Frame>
   </Step>
 </Steps>
 
-### 마이그레이션 계획 검토하기
+<div id="review-the-migration-plan">
+  ### 마이그레이션 계획 검토
+</div>
 
-어떤 방법으로 시작하든, Agent는 **Migrate from Replit Auth to Clerk** task를 만들고 마이그레이션 계획을 준비합니다. task가 진행되기 전에 **View plan**을 선택하여 계획을 검토하세요.
+어떤 방식으로 시작하든 Agent는 **Migrate from Replit Auth to Clerk** task를 생성하고 마이그레이션 계획을 준비합니다. **View plan**을 선택해 task가 진행되기 전에 계획을 검토하세요.
 
-<Frame caption="Migrate from Replit Auth to Clerk task는 마이그레이션 플레이북을 검토할 수 있도록 View plan 작업으로 시작합니다.">
-  <img src="/assets/mirror/replit-auth-to-clerk-task-998d61b55c3d.png" alt="View plan 버튼과 마이그레이션 플레이북 검토 활동이 표시된 Migrate from Replit Auth to Clerk라는 제목의 Agent task" width="575" height="900" data-path="images/workspace/auth/replit-auth-to-clerk-task.png" />
+<Frame caption="Migrate from Replit Auth to Clerk task는 마이그레이션 플레이북을 검토할 수 있도록 View plan 동작으로 시작합니다.">
+  <img src="/assets/mirror/replit-auth-to-clerk-task-998d61b55c3d.png" alt="View plan 버튼과 마이그레이션 플레이북 검토 활동이 표시된 Migrate from Replit Auth to Clerk 제목의 Agent task" width="575" height="900" data-path="images/workspace/auth/replit-auth-to-clerk-task.png" />
 </Frame>
 
 Agent가 작업하는 동안에는 앱의 인증 코드나 Clerk 자격 증명을 변경하지 마세요.
 
-## Agent가 수행하는 작업
+<div id="what-agent-does">
+  ## Agent가 수행하는 작업
+</div>
 
-Agent는 다음 순서로 마이그레이션을 완료합니다.
+Agent는 다음 순서로 마이그레이션을 진행합니다.
 
-1. 계정 신원 정보와 지원되는 로그인 자격 증명을 포함해 Replit Auth 사용자 데이터를 Clerk로 이전합니다.
-2. 앱을 변경하기 전에 데이터 마이그레이션이 끝날 때까지 기다립니다.
-3. 앱의 로그인 및 세션 로직을 업데이트하고, 앱을 다시 시작하고, 사용 가능한 자동화된 검사를 실행합니다.
+1. 계정 신원 정보와 지원되는 로그인 자격 증명을 포함한 Replit Auth의 user 데이터를 Clerk으로 이전합니다.
+2. data 마이그레이션이 완료될 때까지 기다린 후 app을 변경합니다.
+3. app의 로그인 및 session 로직을 업데이트하고 app을 다시 시작한 뒤, 사용 가능한 자동 검사를 실행합니다.
 
-## 앱 데이터는 그대로 유지됩니다
+<div id="your-app-data-stays-in-place">
+  ## 앱 데이터는 그대로 유지됩니다
+</div>
 
-Agent는 앱의 인증 코드만 변경합니다. 앱의 기존 데이터베이스 데이터나 스키마는 업데이트하지 않습니다. 테이블과 관계는 그대로 유지됩니다.
+Agent는 앱의 인증 코드만 변경합니다. 앱의 기존 database 데이터나 schema는 변경하지 않으므로, 테이블과 관계는 그대로 유지됩니다.
 
-기존 사용자는 프로필, 저장된 작업, 권한 등 이미 소유하고 있는 레코드와 계속 연결된 상태로 유지됩니다.
+기존 사용자는 프로필, 저장된 작업, permissions 등 이미 보유한 레코드와 계속 연결된 상태로 유지됩니다.
 
-## 소요 시간
+<div id="how-long-it-takes">
+  ## 소요 시간
+</div>
 
-Agent가 작업하는 데 10분에서 1시간 정도 걸릴 것으로 예상하세요. 데이터 마이그레이션 자체는 소규모 앱의 경우 몇 분, 사용자가 많은 앱의 경우 최대 몇 시간까지 걸릴 수 있습니다. Agent는 해당 마이그레이션이 완료될 때까지 앱의 코드를 변경하기 시작하지 않습니다.
+Agent는 10분에서 1시간 정도 작업합니다. data 마이그레이션 자체는 규모가 작은 app이라면 몇 분, User가 많은 app이라면 최대 두어 시간까지 걸릴 수 있습니다. Agent는 이 마이그레이션이 완료된 후에야 app의 코드를 변경하기 시작합니다.
 
-## 마이그레이션 이후
+<div id="after-the-migration">
+  ## 마이그레이션 이후
+</div>
 
-게시하기 전에 Development 환경에서 업데이트된 앱을 테스트하세요.
+Publish하기 전에 Development 환경에서 업데이트된 앱을 테스트하세요.
 
-1. 기존 계정으로 로그인하여 저장된 데이터를 사용할 수 있는지 확인하세요.
-2. 로그아웃한 다음 다시 로그인하세요.
-3. 새 테스트 계정을 만들어 예상대로 앱을 사용할 수 있는지 확인하세요.
+1. 기존 계정으로 로그인한 뒤 저장된 데이터가 그대로 있는지 확인합니다.
+2. 로그아웃했다가 다시 로그인합니다.
+3. 새 테스트 계정을 만들어 앱이 정상적으로 동작하는지 확인합니다.
 
-## 추가 자료
+<div id="additional-resources">
+  ## 추가 자료
+</div>
 
 * [Clerk Auth 개요](/ko/features/auth-and-identity/clerk-auth) — Replit에서 Clerk Auth가 작동하는 방식
-* [커스텀 auth 마이그레이션 계획하기](/ko/features/auth-and-identity/custom-auth-migration) — 커스텀 인증 시스템 마이그레이션 계획하기
+* [사용자 지정 인증 마이그레이션 계획](/ko/features/auth-and-identity/custom-auth-migration) — 사용자 지정 인증 시스템에서 마이그레이션하는 방법 계획하기

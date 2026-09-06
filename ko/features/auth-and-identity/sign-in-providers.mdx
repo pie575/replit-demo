@@ -1,85 +1,109 @@
 ---
-title: "로그인 제공자"
-description: "Clerk Auth를 사용하는 앱에서 Google, GitHub, Apple, X 로그인을 위한 커스텀 OAuth 자격 증명을 설정하는 방법을 알아보세요."
+title: "로그인 제공업체"
+description: "Clerk Auth를 사용하는 앱에서 Google, GitHub, Apple, X 로그인용 사용자 지정 OAuth 자격 증명을 설정하세요."
+sidebarTitle: "로그인 제공업체"
+icon: "right-to-bracket"
 ---
 
-앱이 [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)를 사용하면, 방문자는 소셜 제공자로 로그인할 수 있습니다. Replit은 기본으로 공유 자격 증명을 제공합니다. 이 페이지에서는 각 제공자에 대해 **직접** OAuth 자격 증명을 가져오는 방법을 다루며, 이를 통해 로그인 화면에 앱의 이름과 브랜딩을 표시할 수 있습니다.
+앱에서 [Clerk Auth](/ko/features/auth-and-identity/clerk-auth)를 사용하면 방문자가 소셜 제공업체 계정으로 로그인할 수 있습니다. Replit은 별도 설정 없이 사용할 수 있는 공유 자격 증명을 기본 제공합니다. 이 페이지에서는 각 제공업체마다 **직접 보유한** OAuth 자격 증명을 사용하는 방법을 다룹니다. 이렇게 하면 로그인 화면에 앱의 이름과 브랜딩이 표시됩니다.
 
-모든 제공자에 대한 흐름은 동일합니다: 제공자의 콘솔에서 OAuth 앱을 만들고, Replit이 보여주는 URL을 복사한 다음, 생성된 자격 증명을 제공자의 편집 패널에 붙여넣습니다.
+절차는 모든 제공업체에서 동일합니다. 제공업체의 콘솔에서 OAuth app을 생성하고, Replit에 표시된 URL을 복사한 다음, 발급받은 자격 증명을 해당 제공업체의 편집 패널에 붙여넣으면 됩니다.
 
 <Note>
-  커스텀 OAuth 자격 증명은 **Production** 환경에서만 사용할 수 있으므로, 먼저 앱을 [게시](/ko/features/publishing/overview)해야 합니다. 각 제공자의 편집 패널은 **Users & Auth** 도구에서 엽니다: **Configure** 탭, **SSO providers** 섹션에서 **Production** 환경을 선택한 다음 제공자 옆의 **Edit**을 선택하세요. 전체 흐름은 [SSO 제공자용 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
+  사용자 지정 OAuth 자격 증명은 **Production** 환경에서만 사용할 수 있으므로 앱을 먼저 [게시](/ko/features/publishing/overview)해야 합니다. 각 제공업체의 편집 패널은 **Users &amp; Auth** 도구에서 열 수 있습니다. **Configure** 탭의 **SSO providers** 섹션에서 **Production** 환경을 선택한 다음, 제공업체 옆의 **Edit**를 선택하세요. 전체 절차는 [SSO provider의 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참조하세요.
 </Note>
 
-## Google
+<div id="google">
+  ## Google
+</div>
 
-이 가이드는 Google Cloud Console에서 Google OAuth 앱을 만드는 과정을 안내합니다. **Client ID**와 **Client Secret**을 수집하고, Clerk가 요구하는 JavaScript 원본과 리디렉션 URI를 구성하게 됩니다.
+이 가이드에서는 Google Cloud Console에서 Google OAuth app을 생성하는 방법을 안내합니다. **Client ID**와 **Client Secret**을 받아두고, Clerk에서 요구하는 JavaScript 출처(origin)와 리디렉션 URI를 설정합니다.
 
-필요한 것: [Google Cloud Console](https://console.cloud.google.com/) 접근 권한입니다.
+필요 사항: [Google Cloud Console](https://console.cloud.google.com/) 액세스 권한
 
-### 1단계: Google OAuth 앱 만들기
+<div id="step-1-create-a-google-oauth-app">
+  ### 1단계: Google OAuth app 생성
+</div>
 
-[Google Cloud Console](https://console.cloud.google.com/)로 이동합니다.
+[Google Cloud Console](https://console.cloud.google.com/)로 이동합니다:
 
-#### 프로젝트 만들기 또는 선택하기
+<div id="create-or-select-a-project">
+  #### 프로젝트 생성 또는 선택
+</div>
 
-1. 프로젝트 드롭다운에서 기존 프로젝트를 선택하거나 새 프로젝트를 만듭니다
-2. 프로젝트의 Dashboard로 리디렉션됩니다
+1. 프로젝트 드롭다운에서 기존 프로젝트를 선택하거나 새 프로젝트를 생성합니다
+2. 해당 프로젝트의 대시보드로 이동합니다
 
-#### OAuth 동의 화면 구성하기
+<div id="configure-oauth-consent-screen">
+  #### OAuth consent screen 구성
+</div>
 
-1. 왼쪽 사이드바에서 메뉴 아이콘(≡)을 선택하고 **APIs & Services**를 선택합니다
+1. 왼쪽 사이드바에서 메뉴 아이콘(≡)을 선택한 다음 **APIs &amp; Services**를 선택합니다
 2. **OAuth consent screen**을 선택합니다
-3. 필요한 정보로 앱의 동의 화면을 구성합니다
+3. 필요한 정보를 입력해 앱의 동의 화면을 구성합니다
 4. 변경 사항을 저장합니다
 
-#### OAuth 자격 증명 만들기
+<div id="create-oauth-credentials">
+  #### OAuth 자격 증명 만들기
+</div>
 
-1. **APIs & Services**에서 **Credentials**를 선택합니다
+1. **APIs &amp; Services**에서 **Credentials**를 선택합니다
 2. 상단의 **Create Credentials**를 선택한 다음 **OAuth client ID**를 선택합니다
 3. 애플리케이션 유형으로 **Web application**을 선택합니다
-4. **Authorized JavaScript origins**와 **Authorized redirect URIs**를 **Auth 패널**의 **Provider setup**에 표시된 정확한 값으로 설정합니다. 나열된 모든 값을 추가하세요 — 게시된 도메인과 커스텀 도메인이 모두 포함됩니다. 이 값들을 찾는 방법은 [SSO 제공자용 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
+4. **Authorized JavaScript origins**와 **Authorized redirect URIs**를 **Auth pane**의 **Provider setup**에 표시된 값과 정확히 동일하게 설정합니다. 나열된 값을 빠짐없이 추가하세요. 게시된 도메인과 사용자 지정 도메인이 모두 포함됩니다. 값을 확인하는 방법은 [SSO provider의 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
 5. **Create**를 선택합니다
 6. **Client ID**와 **Client Secret**을 저장합니다
 
 <Warning>
-  Client Secret을 안전하게 보관하고 절대 버전 관리 시스템에 커밋하지 마세요.
+  Client Secret은 안전하게 보관하고 절대 version control에 commit하지 마세요.
 </Warning>
 
 <Warning>
-  Google 로그인은 임베디드 브라우저나 인앱 웹뷰에서는 작동하지 않습니다. 사용자는 표준 웹 브라우저를 사용해야 합니다.
+  Google 로그인은 임베디드 브라우저나 인앱 webview에서는 작동하지 않습니다. User는 일반 웹 브라우저를 사용해야 합니다.
 </Warning>
 
-### 문제 해결
+<div id="troubleshooting">
+  ### 문제 해결
+</div>
 
-#### Redirect URI mismatch
+<div id="redirect-uri-mismatch">
+  #### Redirect URI mismatch
+</div>
 
-* Google Cloud Console의 리디렉션 URI가 **Auth 패널**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
-* 후행 슬래시나 오타가 없는지 확인하세요
-* Google의 구성이 전파되기까지 몇 분 정도 기다리세요
+* Google Cloud Console에 등록된 리디렉션 URI가 **Auth pane**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
+* 끝에 슬래시가 붙어 있지 않은지, 오타가 없는지 확인하세요
+* Google의 설정이 반영될 때까지 몇 분 정도 기다리세요
 
-#### Invalid client
+<div id="invalid-client">
+  #### Invalid client
+</div>
 
-* Client ID와 Client Secret이 올바르게 복사되었는지 다시 확인하세요
-* 여분의 공백이 없는지 확인하세요
-* OAuth 동의 화면이 구성되었는지 확인하세요
+* Client ID와 Client Secret이 정확하게 복사되었는지 다시 확인하세요
+* 앞뒤에 불필요한 공백이 없는지 확인하세요
+* OAuth consent screen이 설정되어 있는지 확인하세요
 
-#### 커스텀 도메인에서 작동하지 않음
+<div id="not-working-on-custom-domain">
+  #### 사용자 지정 도메인에서 작동하지 않는 경우
+</div>
 
-* **Auth 패널**의 **Provider setup**에 표시된 커스텀 도메인 항목을 Authorized JavaScript origins와 Authorized redirect URIs 모두에 추가하세요
+* **Auth pane**의 **Provider setup**에 표시된 사용자 지정 도메인 항목을 Authorized JavaScript origins와 Authorized redirect URIs에 모두 추가하세요
 
-## GitHub
+<div id="github">
+  ## GitHub
+</div>
 
-이 가이드는 GitHub Developer Settings에서 GitHub OAuth 앱을 만드는 과정을 안내합니다. **Client ID**와 **Client Secret**을 수집하여 **Auth 패널**에 입력하게 됩니다.
+이 가이드에서는 GitHub Developer Settings에서 GitHub OAuth app을 만드는 방법을 안내합니다. 여기서 확인한 **Client ID**와 **Client Secret**은 **Auth pane**에 입력하게 됩니다.
 
-필요한 것: [GitHub 계정](https://github.com)입니다.
+준비물: [GitHub 계정](https://github.com).
 
-### 1단계: GitHub OAuth 앱 만들기
+<div id="step-1-create-a-github-oauth-app">
+  ### 1단계: GitHub OAuth app 만들기
+</div>
 
-1. [GitHub Developer Settings](https://github.com/settings/developers)로 이동합니다
-2. 사이드바에서 **OAuth Apps**를 선택합니다
-3. **New OAuth App**을 선택합니다
-4. 애플리케이션 세부 정보를 입력합니다:
+1. [GitHub Developer Settings](https://github.com/settings/developers)로 이동합니다.
+2. 사이드바에서 **OAuth Apps**를 선택합니다.
+3. **New OAuth App**을 선택합니다.
+4. 애플리케이션 세부 정보를 입력합니다.
 
 **Application name:**
 
@@ -87,49 +111,63 @@ description: "Clerk Auth를 사용하는 앱에서 Google, GitHub, Apple, X 로�
 
 **Homepage URL** 및 **Authorization callback URL:**
 
-두 값 모두 **Auth 패널**의 **Provider setup**에 표시된 값으로 정확히 설정합니다. 이 값들을 찾는 방법은 [SSO 제공자용 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
+두 항목 모두 **Auth pane**의 **Provider setup**에 표시된 값과 정확히 동일하게 설정합니다. 해당 값을 확인하는 방법은 [SSO provider의 OAuth 자격 증명 구성](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)을 참고하세요.
 
-5. **Register application**을 선택합니다
+5. **Register application**을 선택합니다.
 
-### 2단계: 클라이언트 자격 증명 생성하기
+<div id="step-2-generate-client-credentials">
+  ### 2단계: 클라이언트 자격 증명 생성
+</div>
 
-1. 앱의 설정 페이지에서 **Client ID**가 표시됩니다 - 복사하세요
-2. **Generate a new client secret**을 선택합니다
-3. **Client Secret**을 즉시 복사하세요
+1. 앱의 설정 페이지에서 **Client ID**를 확인하고 복사합니다
+2. **Generate a new client secret**를 선택합니다
+3. **Client Secret**을 즉시 복사합니다
 
 <Warning>
-  Client Secret을 안전하게 저장하세요. 페이지를 벗어난 후에는 다시 볼 수 없습니다. 잃어버렸다면 새로 생성해야 합니다.
+  Client Secret은 안전하게 보관하세요. 페이지를 벗어나면 다시 확인할 수 없으며, 분실한 경우 새로 생성해야 합니다.
 </Warning>
 
-### 문제 해결
+<div id="troubleshooting-2">
+  ### 문제 해결
+</div>
 
-#### Redirect URI mismatch
+<div id="redirect-uri-mismatch-2">
+  #### Redirect URI mismatch
+</div>
 
-* Authorization callback URL이 **Auth 패널**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
+* Authorization callback URL이 **Auth pane**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
 * 오타나 잘못된 프로토콜이 없는지 확인하세요
-* 후행 슬래시가 없어야 합니다
+* 끝에 슬래시(/)를 붙이지 마세요
 
-#### Invalid client
+<div id="invalid-client-2">
+  #### Invalid client
+</div>
 
-* Client ID와 Client Secret이 올바르게 복사되었는지 다시 확인하세요
-* 붙여넣을 때 여분의 공백이 없는지 확인하세요
+* Client ID와 Client Secret이 정확히 복사되었는지 다시 확인하세요
+* 붙여넣을 때 앞뒤에 공백이 들어가지 않았는지 확인하세요
 
-#### 커스텀 도메인에서 작동하지 않음
+<div id="not-working-on-custom-domain-2">
+  #### 사용자 지정 도메인에서 작동하지 않는 경우
+</div>
 
-* Homepage URL과 Authorization callback URL을 **Auth 패널**의 **Provider setup**에 표시된 커스텀 도메인 값으로 업데이트하세요
+* **Auth pane**의 **Provider setup**에 표시된 사용자 지정 도메인 값으로 Homepage URL과 Authorization callback URL을 업데이트하세요
 
-## Apple
+<div id="apple">
+  ## Apple
+</div>
 
-이 가이드는 Sign in with Apple에 필요한 Apple App ID, Services ID, Private Key를 생성하는 과정을 안내합니다. **Team ID**, **Services ID**, **Key ID**, **Private Key**를 수집하여 **Auth 패널**에 입력하게 됩니다.
+이 가이드에서는 Sign in with Apple에 필요한 Apple App ID, Services ID, Private Key를 생성하는 방법을 안내합니다. 여기서 확보한 **Team ID**, **Services ID**, **Key ID**, **Private Key**를 **Auth pane**에 입력하게 됩니다.
 
-필요한 것: [Apple Developer 계정](https://developer.apple.com/account)입니다(Apple Developer Program 가입 필요).
+필요한 것: [Apple Developer account](https://developer.apple.com/account)(Apple Developer Program 등록 필요).
 
-### 1단계: Apple App ID 만들기
+<div id="step-1-create-an-apple-app-id">
+  ### 1단계: Apple App ID 생성
+</div>
 
 1. [Apple Developer 포털](https://developer.apple.com/account)로 이동합니다
-2. **Certificates, IDs & Profiles**로 이동한 다음 **Identifiers**를 선택합니다
+2. **Certificates, IDs &amp; Profiles**로 이동한 다음 **Identifiers**를 선택합니다
 3. 드롭다운에서 **App IDs**를 선택합니다
-4. **+** 아이콘을 선택하여 새 식별자를 등록합니다
+4. **+** 아이콘을 선택해 새 식별자를 등록합니다
 5. **App IDs**를 선택한 다음 **Continue**를 선택합니다
 6. **App**을 선택한 다음 **Continue**를 선택합니다
 7. 다음 항목을 입력합니다:
@@ -137,174 +175,218 @@ description: "Clerk Auth를 사용하는 앱에서 Google, GitHub, Apple, X 로�
    * **Bundle ID**: 고유 식별자
 8. Capabilities에서 **Sign In with Apple**을 활성화합니다
 9. **Continue**를 선택한 다음 **Register**를 선택합니다
-10. **App ID Prefix를 저장하세요**(상단에 표시됨) - 이것이 **Team ID**입니다
+10. **App ID Prefix를 저장하세요**(상단에 표시됨) - 이 값이 **Team ID**입니다
 
-### 2단계: Apple Services ID 만들기
+<div id="step-2-create-an-apple-services-id">
+  ### 2단계: Apple Services ID 생성
+</div>
 
-1. Identifiers 페이지에서 드롭다운에서 **Services IDs**를 선택합니다
-2. \*\*+\*\*를 선택하여 새 식별자를 등록합니다
+1. Identifiers 페이지의 드롭다운에서 **Services IDs**를 선택합니다
+2. **+**를 선택해 새 식별자를 등록합니다
 3. **Services IDs**를 선택한 다음 **Continue**를 선택합니다
 4. 다음 항목을 입력합니다:
    * **Description**: Services ID의 이름
-   * **Identifier**: 고유 식별자(저장해 두세요 - 이것이 **Services ID**입니다)
+   * **Identifier**: 고유 식별자(이 값이 **Services ID**이므로 저장해 두세요)
 5. **Continue**를 선택한 다음 **Register**를 선택합니다
 
-#### Services ID 구성하기
+<div id="configure-the-services-id">
+  #### Services ID 구성하기
+</div>
 
 1. 새로 만든 Services ID를 선택합니다
 2. **Sign In with Apple**을 활성화합니다
 3. **Configure**를 선택합니다
-4. 다음을 설정합니다:
+4. 다음 항목을 설정합니다:
 
    * **Primary App ID**: 1단계에서 만든 App ID를 선택합니다
-   * **Domains and Subdomains**: **Auth 패널**의 **Provider setup**에 표시된 값을 복사합니다(`https://` 프로토콜 접두사 제외)
-   * **Return URLs**: **Auth 패널**의 **Provider setup**에 표시된 값을 복사합니다
+   * **Domains and Subdomains**: **Auth pane**의 **Provider setup**에 표시된 값을 복사합니다(`https://` 프로토콜 접두사 제외)
+   * **Return URLs**: **Auth pane**의 **Provider setup**에 표시된 값을 복사합니다
 
-   이 값들을 찾는 방법은 [SSO 제공자용 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
-5. **Next**를 선택한 다음 **Done**, **Continue**, **Save**를 순서대로 선택합니다
+   해당 값을 확인하는 방법은 [SSO provider의 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참조하세요.
+5. **Next**, **Done**, **Continue**, **Save**를 차례로 선택합니다
 
-### 3단계: Apple Private Key 만들기
+<div id="step-3-create-an-apple-private-key">
+  ### 3단계: Apple Private Key 생성
+</div>
 
 1. Apple Developer 포털 사이드바에서 **Keys**를 선택합니다
-2. \*\*+\*\*를 선택하여 새 키를 등록합니다
+2. **+**를 선택해 새 키를 등록합니다
 3. **Key Name**을 입력합니다
 4. **Sign In with Apple**을 활성화합니다
-5. **Configure**를 선택한 다음 1단계에서 만든 App ID를 선택합니다
-6. **Save**를 선택한 다음 **Continue**, **Register**를 순서대로 선택합니다
-7. **Key ID를 저장하세요**
-8. 프라이빗 키 파일(.p8)을 **다운로드**합니다
+5. **Configure**를 선택한 다음, 1단계에서 만든 App ID를 선택합니다
+6. **Save**, **Continue**, **Register**를 차례로 선택합니다
+7. **Key ID를 저장해 둡니다**
+8. Private Key 파일(.p8)을 **다운로드**합니다
 
 <Warning>
-  프라이빗 키는 한 번만 다운로드할 수 있습니다. 안전하게 보관하세요 — 다시 다운로드할 수 없습니다.
+  Private Key는 한 번만 다운로드할 수 있습니다. 다시 다운로드할 수 없으니 안전하게 보관하세요.
 </Warning>
 
-### 4단계: Apple Private Email Relay 구성하기
+<div id="step-4-configure-apple-private-email-relay">
+  ### 4단계: Apple Private Email Relay 구성
+</div>
 
-Apple의 Hide My Email 기능을 사용하면 사용자가 실제 이메일을 노출하지 않고 로그인할 수 있습니다. 이런 사용자에게 이메일을 보내려면 이메일 소스를 등록해야 합니다.
+Apple의 나의 이메일 가리기 기능을 사용하면 사용자가 실제 이메일 주소를 공개하지 않고 로그인할 수 있습니다. 이러한 사용자에게 이메일을 보내려면 Email Source를 등록하세요.
 
 1. Apple Developer 포털 사이드바에서 **Services**를 선택합니다
 2. **Sign in with Apple for Email Communication** 아래에서 **Configure**를 선택합니다
-3. \*\*+\*\*를 선택하여 Email Source를 추가합니다
-4. **Auth 패널**의 **Provider setup**에 표시된 Email Source 값을 입력합니다
-5. **Next**를 선택한 다음 **Register**, **Done**을 순서대로 선택합니다
-6. DNS 확인을 기다립니다(녹색 체크 아이콘)
+3. **+**를 선택하여 Email Source를 추가합니다
+4. **Auth pane**의 **Provider setup** 아래에 표시된 Email Source 값을 입력합니다
+5. **Next**, **Register**, **Done**을 차례로 선택합니다
+6. DNS 확인이 완료될 때까지 기다립니다(녹색 체크 icon 표시)
 
 <Info>
-  일부 지역(중국, 인도)에서는 Apple ID가 이메일 대신 전화번호에 연결되어 있을 수 있습니다. 앱이 모든 사용자에게 이메일을 요구하는 경우, 이러한 지역의 사용자에게는 Sign in with Apple이 실패할 수 있습니다.
+  일부 지역(중국, 인도)에서는 Apple ID가 이메일이 아닌 전화번호에 연결되어 있을 수 있습니다. 앱에서 모든 사용자에게 이메일을 요구하는 경우, 해당 지역 사용자는 Sign in with Apple 로그인에 실패할 수 있습니다.
 </Info>
 
-### 문제 해결
+<div id="troubleshooting-3">
+  ### 문제 해결
+</div>
 
-#### Invalid client
+<div id="invalid-client-3">
+  #### Invalid client
+</div>
 
 * 모든 자격 증명이 올바르게 입력되었는지 확인하세요
-* 프라이빗 키에 BEGIN 및 END 줄이 포함되어 있는지 확인하세요
-* Services ID가 올바르게 구성되었는지 확인하세요
+* Private Key에 BEGIN 및 END 줄이 포함되어 있는지 확인하세요
+* Services ID가 올바르게 구성되어 있는지 확인하세요
 
-#### Invalid redirect URI
+<div id="invalid-redirect-uri">
+  #### 잘못된 리디렉션 URI
+</div>
 
-* Apple Services ID 구성의 Return URL이 **Auth 패널**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
-* Domains and Subdomains의 도메인이 게시된 도메인과 일치하는지 확인하세요(`https://` 제외)
+* Apple Services ID 설정의 Return URL이 **Auth pane**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
+* Domains and Subdomains에 입력한 도메인이 게시된 도메인(`https://` 제외)과 일치하는지 확인하세요
 
-#### 이메일 릴레이가 작동하지 않음
+<div id="email-relay-not-working">
+  #### 이메일 릴레이가 작동하지 않는 경우
+</div>
 
-* Apple Developer 포털에서 Email Source에 녹색 체크가 표시되는지 확인하세요
-* 최근에 추가했다면 DNS 전파를 기다리세요
+* Apple Developer 포털에서 Email Source에 녹색 체크 표시가 있는지 확인하세요
+* 최근에 추가했다면 DNS 전파가 완료될 때까지 기다리세요
 
-#### 커스텀 도메인에서 작동하지 않음
+<div id="not-working-on-custom-domain-3">
+  #### 사용자 지정 도메인에서 작동하지 않는 경우
+</div>
 
-* **Auth 패널**의 **Provider setup**에 표시된 커스텀 도메인 항목을 Domains and Subdomains(`https://` 제외)와 Return URLs에 추가하세요
+* **Auth pane**의 **Provider setup**에 표시된 사용자 지정 도메인 항목을 Domains and Subdomains(`https://` 제외)와 Return URLs에 추가하세요
 
-### 추가 자료
+<div id="additional-resources">
+  ### 추가 자료
+</div>
 
 * [Apple Sign in with Apple 문서](https://developer.apple.com/sign-in-with-apple/)
-* [Private Email Relay Service 가이드](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)
+* [Private Email Relay 서비스 가이드](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)
 
-## X (Twitter)
+<div id="x-twitter">
+  ## X (Twitter)
+</div>
 
-이 가이드는 X Developer Portal에서 X OAuth 앱을 만드는 과정을 안내합니다. **Client ID**와 **Client Secret**을 수집하여 **Auth 패널**에 입력하게 됩니다.
+이 가이드에서는 X Developer Portal에서 X OAuth app을 만드는 방법을 안내합니다. 여기서 얻은 **Client ID**와 **Client Secret**을 **Auth pane**에 입력하게 됩니다.
 
-필요한 것: [X Developer 계정](https://developer.twitter.com/)입니다(무료 등급 사용 가능).
+준비물: [X Developer account](https://developer.twitter.com/)(무료 등급 사용 가능).
 
-### 1단계: X Developer 앱 설정하기
+<div id="step-1-set-up-x-developer-app">
+  ### 1단계: X Developer 앱 설정
+</div>
 
-#### 개발자 계정 만들기(필요한 경우)
+<div id="create-a-developer-account-if-needed">
+  #### developer account 생성(필요한 경우)
+</div>
 
-1. [X Developer Portal](https://developer.twitter.com/en/portal/dashboard)로 이동합니다
-2. 개발자 계정이 없다면 신청합니다
-3. 사용 사례를 설명하는 신청서를 작성합니다
+1. [X Developer Portal](https://developer.twitter.com/en/portal/dashboard)로 이동합니다.
+2. developer account가 없다면 신청합니다.
+3. 사용 사례를 설명하여 신청서를 작성합니다.
 
-#### 앱 만들기 또는 선택하기
+<div id="create-or-select-an-app">
+  #### 앱 생성 또는 선택
+</div>
 
-1. X Developer Portal에서 **Projects & Apps**로 이동합니다
-2. 기존 앱을 사용하거나 **Add App**을 선택합니다
-3. 앱 이름을 입력하고 **Next**를 선택합니다
-4. **App settings**를 선택합니다
+1. X Developer Portal에서 **Projects &amp; Apps**로 이동합니다.
+2. 기존 앱을 사용하거나 **Add App**을 선택합니다.
+3. 앱 이름을 입력하고 **Next**를 선택합니다.
+4. **App settings**를 선택합니다.
 
-### 2단계: 인증 구성하기
+<div id="step-2-configure-authentication">
+  ### 2단계: authentication 구성
+</div>
 
 1. **User authentication settings**로 스크롤합니다
 2. **Set up**을 선택합니다
 
 **App permissions:**
 
-최소 권한 수준을 선택하세요.
+최소 권한 수준을 선택합니다:
 
-* **Read** - 사용자 프로필에 필요(최소 요구 사항)
-* **Write** - 사용자를 대신하여 게시하기 위해 필요(선택 사항)
-* **Direct Messages** - DM 접근을 위해 필요(선택 사항)
+* **Read** - User 프로필 조회에 필요합니다(최소)
+* **Write** - User를 대신해 게시할 때 사용합니다(선택 사항)
+* **Direct Messages** - DM 접근에 사용합니다(선택 사항)
 
 <Warning>
-  권한은 요청된 스코프와 일치해야 합니다. 앱이 `tweet.write`를 요청하는데 Read만 활성화했다면 인증이 실패합니다.
+  권한은 요청하는 스코프와 일치해야 합니다. App이 `tweet.write`를 요청하는데 Read만 활성화했다면 authentication에 실패합니다.
 </Warning>
 
 **Type of app:**
 
-**Web App, Automated App or Bot**을 선택하세요
+**Web App, Automated App or Bot**을 선택합니다
 
 **App info:**
 
-* **Callback URI / Redirect URL**: **Auth 패널**의 **Provider setup**에 표시된 값을 복사합니다
-* **Website URL**: **Auth 패널**의 **Provider setup**에 표시된 값을 복사합니다
+* **Callback URI / Redirect URL**: **Auth pane**의 **Provider setup**에 표시된 값을 복사합니다
+* **Website URL**: **Auth pane**의 **Provider setup**에 표시된 값을 복사합니다
 
-이 값들을 찾는 방법은 [SSO 제공자용 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
+이 값들을 찾는 방법은 [SSO provider의 OAuth 자격 증명 구성하기](/ko/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)를 참고하세요.
 
 3. **Save**를 선택합니다
-4. **Client ID와 Client Secret을 저장하세요**
+4. **Client ID와 Client Secret을 저장합니다**
 
 <Warning>
-  Client Secret을 안전하게 보관하세요. 잃어버리면 재생성 시 기존 값이 무효화됩니다.
+  Client Secret은 안전하게 보관하세요. 분실한 경우 새로 생성하면 기존 값은 무효화됩니다.
 </Warning>
 
-### 문제 해결
+<div id="troubleshooting-4">
+  ### 문제 해결
+</div>
 
-#### Redirect URI mismatch
+<div id="redirect-uri-mismatch-3">
+  #### Redirect URI mismatch
+</div>
 
-* Callback URI가 **Auth 패널**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
+* Callback URI가 **Auth pane**의 **Provider setup**에 표시된 값과 정확히 일치하는지 확인하세요
 * 오타나 잘못된 프로토콜이 없는지 확인하세요
-* 후행 슬래시가 없어야 합니다
+* 끝에 슬래시(/)를 붙이지 마세요
 
-#### Invalid client
+<div id="invalid-client-4">
+  #### Invalid client
+</div>
 
 * Client ID와 Client Secret을 다시 확인하세요
-* 여분의 공백이 없는지 확인하세요
+* 앞뒤에 공백이 없는지 확인하세요
 * OAuth 1.0a가 아닌 OAuth 2.0 자격 증명을 사용하고 있는지 확인하세요
 
-#### Scope/permission 오류
+<div id="scopepermission-errors">
+  #### 스코프/권한 오류
+</div>
 
-* 스코프가 X Developer Portal에서 활성화된 권한과 일치하는지 확인하세요
+* X Developer Portal에서 활성화한 권한과 스코프가 일치하는지 확인하세요
 * 최소한 Read 권한이 활성화되어 있는지 확인하세요
 
-#### 개발 모드의 앱
+<div id="app-in-development-mode">
+  #### 개발 모드의 앱
+</div>
 
-* X 앱은 제한된 사용자 수로 개발 모드에서 시작합니다
-* 프로덕션 용도로는 상향된 접근 권한을 신청해야 할 수 있습니다
+* X 앱은 사용자 수가 제한된 개발 모드로 시작합니다
+* 프로덕션 용도로 사용하려면 상위 액세스 권한을 신청해야 할 수 있습니다
 
-#### 커스텀 도메인에서 작동하지 않음
+<div id="not-working-on-custom-domain-4">
+  #### 사용자 지정 도메인에서 작동하지 않는 경우
+</div>
 
-* Website URL과 Callback URI를 **Auth 패널**의 **Provider setup**에 표시된 커스텀 도메인 값으로 업데이트하세요
+* **Auth pane**의 **Provider setup**에 표시된 사용자 지정 도메인 값으로 Website URL과 Callback URI를 업데이트하세요
 
-### 추가 자료
+<div id="additional-resources-2">
+  ### 추가 자료
+</div>
 
 * [X OAuth 2.0 문서](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
 * [X OAuth 스코프](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)
