@@ -8,9 +8,8 @@ localize a real, production-scale Mintlify documentation site.
 ## What's here
 
 - The full English content and navigation structure of Replit's public docs,
-  imported from Replit's own per-page Markdown export.
-- Pre-existing French, Japanese, Korean, and Portuguese localizations
-  (`fr/`, `ja/`, `ko/`, `pt/`) wired into `docs.json`'s multi-language navigation.
+  imported from Replit's own per-page Markdown export. **English only** — no
+  locales are configured or present.
 - The mirrored `docs.json` theme, fonts, and styling, so the local preview looks
   like the production site (with a blue **(Demo)** badge added next to the logo
   to distinguish it from the real thing).
@@ -20,10 +19,11 @@ localize a real, production-scale Mintlify documentation site.
 
 ## Why it exists
 
-This project exists purely to give General Translation a realistic, full-size
-Mintlify docs site to demo localization workflows against — content import,
-translation, and multi-locale navigation — without needing write access to
-Replit's actual repository.
+This project exists purely to give General Translation a realistic, full-size,
+**untranslated** Mintlify docs site to demo localization workflows against —
+without needing write access to Replit's actual repository. Any translation
+tooling (locale directories, `gt.config.json`, `gt-lock.json`, etc.) should be
+set up fresh as part of a demo run rather than assumed to already exist here.
 
 ## Running locally
 
