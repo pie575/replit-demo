@@ -1,0 +1,220 @@
+---
+title: "Replit AI로 효과적인 prompt 작성하기"
+description: "Replit Agent를 사용할 때 효과적인 prompt를 작성하는 원칙과 예시를 알아보세요."
+sidebarTitle: "효과적인 prompt 작성"
+icon: "comment-dots"
+---
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 동영상", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+효과적인 프롬프트 작성이란 유능한 조수에게 명확하게 지시를 내리는 것과 같습니다. [**Agent**](/ko/features/agent/overview)를 잘 이끌어주면 아이디어에서 앱까지 빠르게 도달할 수 있습니다.
+
+<YouTubeEmbed videoId="7m5SjKZBw6I" title="더 나은 vibe coding을 위한 10가지 팁" />
+
+<div id="quick-examples">
+  ## 간단한 예시
+</div>
+
+모호한 prompt와 효과적인 prompt의 차이를 살펴보세요:
+
+<AccordionGroup>
+  <Accordion title="코드 수정하기" icon="bug">
+    **모호함:** &quot;내 코드를 고쳐줘.&quot;
+
+    **효과적임:** &quot;사용자 입력을 처리할 때 스크립트가 실패합니다. 오류는 검증 함수에 있는 것 같습니다. `validate_input` 부분을 디버깅하도록 도와줄 수 있나요? 오류 메시지는 다음과 같습니다: [details]&quot;
+
+    효과적인 prompt는 문제가 되는 부분과 의심되는 함수를 짚어주고 context를 함께 제공합니다.
+  </Accordion>
+
+  <Accordion title="기능 만들기" icon="hammer">
+    **모호함:** &quot;website를 만들어줘.&quot;
+
+    **효과적임:** &quot;Home, About Me, Contact Form 섹션이 있는 간단한 포트폴리오 website를 만들어 주세요. 깔끔하고 현대적인 디자인 theme과 자리표시자 콘텐츠를 사용해 주세요.&quot;
+
+    효과적인 prompt는 목적, 핵심 기능, 원하는 디자인 방향을 분명히 밝힙니다.
+  </Accordion>
+
+  <Accordion title="성능 개선" icon="gauge-high">
+    **모호함:** &quot;느리게 만들지 마.&quot;
+
+    **효과적임:** &quot;더 큰 입력도 효율적으로 처리하도록 데이터 처리 함수를 리팩터링해 주세요. 다른 알고리즘이나 자료 구조를 사용할 수 있을까요?&quot;
+
+    하지 말아야 할 constraints를 나열하기보다, *어떻게* 개선할지 Agent에게 알려주세요.
+  </Accordion>
+
+  <Accordion title="UI 변경" icon="paintbrush">
+    **모호함:** &quot;애니메이션을 추가해줘.&quot;
+
+    **효과적임:** &quot;페이지가 처음 로드될 때 landing page의 메인 이미지가 부드럽게 페이드 인되도록 애니메이션을 넣어 반겨주는 느낌을 만들어 주세요.&quot;
+
+    대상이 되는 element, 원하는 효과, 타이밍, 의도한 사용자 경험을 함께 명시하세요.
+  </Accordion>
+
+  <Accordion title="복잡한 시스템" icon="server">
+    **모호함:** &quot;백엔드를 만들어줘.&quot;
+
+    **효과적임:** &quot;서버 측 로직을 구성해 주세요. 사용자 authentication(가입/login)을 구현하고, 사용자 프로필 데이터를 안전하게 가져오는 API 엔드포인트를 만들어 주세요.&quot;
+
+    큰 task는 구체적인 기능 단위로 나누세요.
+  </Accordion>
+</AccordionGroup>
+
+<div id="core-principles">
+  ## 핵심 원칙
+</div>
+
+<Frame>
+  <img src="/assets/mirror/10-tips-59c524521960.png" alt="Replit Agent로 효과적인 프롬프트를 작성하는 열 가지 팁" width="1259" height="1101" data-path="images/tutorials/10-tips.png" />
+</Frame>
+
+<div id="plan-first">
+  ### 계획 먼저 세우기
+</div>
+
+<Tip>prompt를 작성하기 전에 앱의 기능과 사용자 flow를 먼저 정리하세요. 계획이 명확할수록 prompt도 더 명확해집니다.</Tip>
+
+프로덕트 매니저처럼 애플리케이션의 구조를 고민해 보세요. 전체 목표를 논리적인 단계로 나눠 보세요.
+
+**이렇게 하지 말고:** &quot;task 관리 앱을 만들어줘.&quot;
+
+**이렇게 해보세요:** &quot;1. 입력 필드와 task list가 있는 기본 HTML 구조를 만들어줘. 2. task를 추가하는 JavaScript를 넣어줘. 3. database를 사용해 task를 저장해줘. 4. task를 완료로 표시하는 기능을 추가해줘.&quot;
+
+그런 다음 각 단계마다 Agent에 prompt를 입력하세요.
+
+<div id="build-incrementally">
+  ### 점진적으로 빌드하세요
+</div>
+
+각 단계를 성공적으로 마칠 때마다 [**Checkpoints**](/ko/features/agent/overview#checkpoints)를 사용해 진행 상황을 저장하세요. 문제가 생기면 정상 작동하던 상태로 roll back한 뒤 다른 방식을 시도할 수 있습니다.
+
+**이렇게 하지 마세요:** &quot;완전한 전자상거래 플랫폼을 만들어 줘.&quot;
+
+**이렇게 해보세요:** &quot;Replit Auth를 사용한 사용자 가입과 login 기능이 있는 전자상거래 사이트의 기본 full-stack project를 설정해 줘.&quot; 그런 다음 상품 목록, 장바구니, checkout 기능을 요청하는 prompt를 차례로 이어가세요.
+
+<div id="be-specific">
+  ### 구체적으로 작성하세요
+</div>
+
+필요한 것을 정확히 정의하세요. 출력 형식, constraints, 예외 상황까지 명시합니다.
+
+**이렇게 쓰는 대신:** &quot;문의 양식을 추가해줘.&quot;
+
+**이렇게 해보세요:** &quot;`/contact` 경로에 다음 필드를 갖춘 문의 양식 페이지를 만들어줘:
+
+* 이름 (필수)
+* 이메일 (필수, 올바른 형식이어야 함)
+* 메시지 (필수, 최소 10자)
+
+제출하면 양식 데이터를 `contact@mydomain.com`으로 보내줘.&quot;
+
+<div id="use-positive-language">
+  ### 긍정적인 표현을 사용하세요
+</div>
+
+피해야 할 것이 아니라 *원하는* 것을 말하세요.
+
+**이렇게 하지 마세요:** &quot;사용자 프로필 페이지를 헷갈리게 만들지 마세요.&quot;
+
+**이렇게 해보세요:** &quot;깔끔한 사용자 프로필 페이지를 디자인하세요. 사용자 이름을 눈에 띄게 표시하고, 그 아래에 이메일과 가입일을 표시하세요. &#39;Edit Profile&#39; 버튼도 넣어주세요.&quot;
+
+<div id="keep-it-simple">
+  ### 간단하게 유지하세요
+</div>
+
+명확하고 간결한 표현을 사용하세요. 복잡한 요청은 항목별로 나누어 작성하세요.
+
+**이렇게 쓰지 말고:** &quot;사용자 생성 콘텐츠 아티팩트의 동적 생성 및 조회를 지원하는 서버 측 인프라를 구현하세요.&quot;
+
+**이렇게 해보세요:** &quot;사용자가 블로그 게시물을 등록할 수 있는 백엔드 기능을 만드세요. 사용자는 제목과 본문을 입력합니다. 게시물은 데이터베이스에 저장하세요.&quot;
+
+<div id="working-with-context">
+  ## Context 활용하기
+</div>
+
+<div id="provide-relevant-files">
+  ### 관련 파일 제공
+</div>
+
+project 전체를 첨부하기보다는 특정 파일을 지목해서 언급하세요.
+
+**이렇게 하지 마세요:** (전부 첨부하고) &quot;우리 design system을 기반으로 사용자 프로필 페이지를 구현해 줘.&quot;
+
+**이렇게 해보세요:** &quot;사용자 프로필 페이지를 만들어 줘. 사용자 데이터는 서버 엔드포인트에서 가져와. 스타일은 [디자인 문서 URL]을 따르고 이 mockup에 맞춰 줘: [`profile_mockup.jpg` 첨부].&quot;
+
+<Tip>관련 없는 task로 넘어갈 때는 새 Chat을 시작하세요. 그래야 context가 쌓여 생기는 혼선을 막을 수 있습니다.</Tip>
+
+<div id="show-examples">
+  ### 예시 보여주기
+</div>
+
+코드 스니펫, 샘플 데이터, 스크린샷 같은 구체적인 예시를 제공해 모호함을 줄이세요.
+
+**이렇게 하지 말고:** &quot;상품 카드를 더 보기 좋게 만들어줘.&quot;
+
+**이렇게 해보세요:** &quot;상점 페이지의 상품 카드를 다시 디자인해줘. 각 카드에는 상품 이미지, 이름, 가격, &#39;Add to Cart&#39; 버튼이 표시되어야 하고, 이 layout과 비슷하게 만들어줘: [스크린샷 첨부]. 테두리는 밝은 회색으로 해줘.&quot;
+
+<div id="debugging-effectively">
+  ## 효과적으로 디버깅하기
+</div>
+
+오류가 발생하면 다음 정보를 제공하세요.
+
+* **정확한** 오류 메시지
+* 관련 코드 조각
+* 오류가 발생한 파일 이름
+* 달성하려던 목표
+* 이미 시도해 본 방법
+
+**이렇게 말하는 대신:** &quot;로그인 페이지가 작동하지 않아요.&quot;
+
+**이렇게 해보세요:** &quot;`/login`에서 올바른 자격 증명으로 로그인하면 브라우저 콘솔에 &#39;User not found&#39; 오류가 표시됩니다. database 조회가 제대로 동작하지 않는 것 같습니다. `auth.js`의 login 처리 코드는 다음과 같습니다.&quot;
+
+<div id="ask-for-guidance">
+  ## 조언 구하기
+</div>
+
+<Tip>본격적으로 만들기 전에 Plan mode로 전환해 여러 선택지를 살펴보세요. Agent에게 라이브러리, 접근 방식, 장단점을 물어볼 수 있습니다.</Tip>
+
+**이렇게 하지 말고:** &quot;결제 기능 추가해줘.&quot;
+
+**이렇게 해보세요:** &quot;Replit으로 만든 web app에서 신용카드 결제를 받으려면 어떤 방법이 좋을까? 연동이 비교적 간단한 방법이면 좋겠어.&quot;
+
+<div id="iterate-on-your-prompts">
+  ## prompt 다듬기
+</div>
+
+첫 prompt가 완벽하지 않아도 괜찮습니다. 흔한 일입니다. 결과가 원하는 대로 나오지 않았다면 다음을 시도해 보세요.
+
+* 세부 정보를 더 추가하기
+* 예시 제시하기
+* 지시를 더 간단하게 바꾸기
+* 다른 방식으로 설명해 보기
+
+**처음:** &quot;내 website에 헤더를 만들어 줘.&quot;
+
+**다듬은 후:** &quot;왼쪽에는 사이트 logo가, 오른쪽에는 내비게이션 링크(Home, About, Contact)가 있는 고정 헤더 컴포넌트를 만들어 줘.&quot;
+
+<div id="summary">
+  ## 요약
+</div>
+
+효과적인 프롬프트 작성의 핵심은 다음과 같습니다.
+
+* prompt를 작성하기 전에 **계획하기**
+* Checkpoints를 활용해 점진적으로 **빌드하기**
+* requirements를 **구체적으로 명시하기**
+* 예시와 관련 파일로 **context 제공하기**
+* 결과가 기대에 못 미칠 때 **반복 개선하기**
+
+이러한 원칙을 익히면 Agent와 함께 더 빠르게 앱을 만들 수 있습니다.

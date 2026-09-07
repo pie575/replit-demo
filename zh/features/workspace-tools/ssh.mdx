@@ -1,0 +1,280 @@
+---
+title: "SSH"
+description: "了解如何设置和使用 SSH，将本地开发环境连接到 Replit App，实现安全的远程访问和文件同步。"
+icon: "network-wired"
+---
+
+<div id="what-is-ssh">
+  ## 什么是 SSH？
+</div>
+
+SSH 是 Secure Shell 的缩写，是一种安全协议，可让你远程访问 Replit App 的命令行界面。借助 SSH，你可以轻松传输文件，并使用惯用的本地集成开发环境 (IDE) 编辑 Replit 上的代码，从而提升开发流程中的协作效率与生产力。
+
+Core、Pro 及其他所有付费 plan 均可使用 SSH 功能。
+
+流程概览如下：
+
+* 在本地机器上生成 SSH 密钥对
+* 将该 SSH 密钥添加到任意 Replit App 的 **SSH** 面板中
+* 使用 SSH 客户端或支持 SSH 的编辑器 (如 [VSCode](https://code.visualstudio.com/) 或 [Cursor](https://www.cursor.com/)) 进行连接
+
+<Note>
+  SSH 密钥关联的是你的 Account，而非某个特定的 Replit App。也就是说，公钥只需添加一次，之后即可连接到任何你有权访问的 Replit App。
+</Note>
+
+<div id="why-use-ssh">
+  ## 为什么要使用 SSH？
+</div>
+
+* **Replit App 与编辑器自动同步更新**：您在 Replit App 中所做的任何更改都会立即同步到编辑器中；在编辑器中所做的任何修改也会同步到 Replit App。这种无缝同步可确保您的代码库在各个平台上始终保持最新状态。
+
+* **文件管理同步**：无论您添加、删除还是更新文件，这些更改都会在编辑器与 Replit App 之间实时同步。无论从何处发起更改，项目结构都能保持一致。
+
+* **文件夹管理和文件移动**：在文件夹之间移动文件时，编辑器与 Replit App 之间也会同步。这样可确保在一个环境中对组织结构所做的更改准确反映到另一个环境中，保持项目的完整性和结构。
+
+<div id="find-or-create-a-keypair">
+  ## 查找或创建密钥对
+</div>
+
+若要为你的账户配置 SSH，你需要准备好 SSH 公钥。
+
+<div id="figuring-out-if-you-already-have-a-keypair">
+  ### 确认是否已有密钥对
+</div>
+
+你可以在本地计算机的终端中运行以下命令，检查是否已有公钥：
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    ls -l ~/.ssh
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    dir %HOMEPATH%\.ssh
+    ```
+  </Tab>
+</Tabs>
+
+如果出现错误也没关系，请继续[生成新的密钥对](#generating-a-new-keypair)。
+如果看到名为 `replit.pub` 的文件，请继续[获取公钥内容](#get-the-contents-of-your-public-key)。
+
+<div id="generating-a-new-keypair">
+  ### 生成新的密钥对
+</div>
+
+在你的设备上，打开终端 (或命令提示符) 窗口，并粘贴以下命令：
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```bash theme={null}
+    ssh-keygen -t ed25519 -f ~/.ssh/replit -q -N ""
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    ssh-keygen -t ed25519 -f %HOMEPATH%\.ssh\replit -q -N ""
+    ```
+  </Tab>
+</Tabs>
+
+此命令会检查指定的 SSH 公钥文件是否已存在。如果不存在，则会使用适当的参数创建新的 SSH 密钥。
+
+<div id="get-the-contents-of-your-public-key">
+  ### 获取公钥内容
+</div>
+
+确认已有密钥对或创建好密钥对后，请查看公钥的内容 (即两个名称相似的文件中带 `.pub` 后缀的那个) ，后续步骤会用到。
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    cat ~/.ssh/replit.pub
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    notepad %HOMEPATH%\.ssh\replit.pub
+    ```
+  </Tab>
+</Tabs>
+
+保存 `replit.pub` 的内容，以便在本文后续步骤中使用，然后继续[将 SSH 密钥添加到您的账户](#add-the-ssh-key-to-your-account)。
+
+<div id="add-the-ssh-key-to-your-account">
+  ## 将 SSH 密钥添加到您的账户
+</div>
+
+<div id="add-the-public-key-directly-in-a-replit-app-using-the-ssh-pane">
+  ### 使用 SSH 面板直接在 Replit App 中添加公钥
+</div>
+
+1. 在 Replit App 的任意窗口中，点击 **+** 按钮，然后搜索 **SSH**。
+
+<Frame>
+  <img src="/assets/mirror/ssh-tool-2db02c6a83d0.png" alt="Replit 界面中的 SSH 工具按钮" width="846" height="328" data-path="images/ssh-vscode/ssh-tool.png" />
+</Frame>
+
+2. 切换到 **Keys** 标签页，然后选择 **New SSH key**。
+3. 在弹出窗口中，为密钥填写 **Label** (例如 my-ssh-key) ，并将复制的公钥粘贴到 **Key** 字段中。
+   点击 **Add SSH Key** 按钮。密钥即添加完成并已获授权，可以使用。
+
+<Frame>
+  <img src="/assets/mirror/add-ssh-key-with-values-5d6f440e56ba.png" alt="已填写标签和密钥字段的添加 SSH 密钥对话框" width="500" height="511" data-path="images/ssh-vscode/add-ssh-key-with-values.png" />
+</Frame>
+
+<div id="add-the-public-key-directly-in-settings">
+  ### 直接在设置中添加公钥
+</div>
+
+你也可以打开 **Settings**，在 **Account** 下选择 **Advanced** (或 **SSH keys** 选项) 来添加 SSH 密钥。选择 **Add SSH key**，然后粘贴上一节[查找或创建密钥对](#find-or-create-a-keypair)中 `replit.pub` 文件的内容。
+
+<Note>
+  如果你的机器上有多个公钥，请务必确保 SSH 配置中使用的私钥与公钥是正确的一对。
+</Note>
+
+<div id="connecting-to-your-replit-app">
+  ## 连接到你的 Replit App
+</div>
+
+<div id="configure-your-ssh-config">
+  ### 配置 SSH 配置文件
+</div>
+
+1. 在终端中，确保 `~/.ssh` 目录和 `~/.ssh/config` 文件存在：
+
+<Tabs>
+  <Tab title="Mac/Linux">
+    ```sh theme={null}
+    mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/config && chmod 600 ~/.ssh/config
+    open -a 'TextEdit' ~/.ssh/config || nano ~/.ssh/config
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ```sh theme={null}
+    if not exist %HOMEPATH%\.ssh mkdir %HOMEPATH%\.ssh && type \NUL > %HOMEPATH%\.ssh\config
+    notepad %HOMEPATH%\.ssh\config
+    ```
+  </Tab>
+</Tabs>
+
+2. 添加以下配置块，使所有 `*.replit.dev` 域名均使用 `replit` 密钥对：
+
+<Tabs>
+  <Tab title="Mac/Linux/Windows">
+    ```
+    Host *.replit.dev
+        Port 22
+        IdentityFile ~/.ssh/replit
+        StrictHostKeyChecking accept-new
+    ```
+  </Tab>
+</Tabs>
+
+<div id="connect-from-vscode-or-cursor">
+  ### 从 VS Code 或 Cursor 连接
+</div>
+
+1. 在 Replit App 中，打开 **SSH** 面板。
+
+2. 在 SSH 面板中，前往 **Connect** 标签页并选择 **Launch VS Code**。
+
+<Tabs>
+  <Tab title="使用 VS Code 连接">
+    <img src="/assets/mirror/ssh-connect-439a3c150846.png" alt="显示 Launch VS Code 选项的 SSH 连接标签页" width="788" height="482" data-path="images/ssh-vscode/ssh-connect.png" />
+  </Tab>
+</Tabs>
+
+3. 如果系统提示你填写 `~/.ssh/config`，请输入以下内容：
+
+   ```
+   Host *.replit.dev
+       Port 22
+       IdentityFile ~/.ssh/replit
+       StrictHostKeyChecking accept-new
+   ```
+
+   <Note>
+     仅在首次尝试连接到 VS Code 或其他编辑器时，系统才会提示你添加 SSH 配置。若要再次打开配置文件，请选择 **Configure SSH Hosts...**。
+   </Note>
+
+4. 如果出现外部应用程序警告，请选择 **Yes**，确认要在首选编辑器或 VS Code 中打开项目。
+
+5. 系统可能会定期提示你安装或更新 SSH 扩展。Replit 会尽力兼容这些 IDE 的最新版本，你也可能会收到重要的安全更新。
+
+<div id="connect-manually">
+  ### 手动连接
+</div>
+
+在 **SSH** 面板的“Connect”选项卡底部，可以找到“Connect manually”。
+
+复制该命令，将其粘贴到本地终端 (Mac 或 Linux) 或本地命令提示符 (Windows) 中，即可直接连接。
+
+这也是排查 IDE 连接问题的好方法；在向 Replit 支持团队反馈缺陷时，还可以借此收集有价值的“详细 (verbose) ”连接信息。
+
+**提示正在尝试使用不存在的私钥进行连接的错误**：
+
+```
+$ ssh -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+Warning: Identity file /Users/user/.ssh/replit not accessible: No such file or directory.
+```
+
+**SSH 连接尝试的完整调试日志，可随错误报告一并提交**：
+
+```
+$ ssh -vvv -i ~/.ssh/replit -p 22 c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+OpenSSH_9.6p1, LibreSSL 3.3.6
+debug1: Reading configuration data /Users/.../.ssh/config
+debug1: /Users/.../.ssh/config line 1: Applying options for *
+debug1: /Users/.../.ssh/config line 4: Applying options for *.replit.dev
+debug3: channel_clear_timeouts: clearing
+debug1: Connecting to c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev port 22.
+debug1: Connection established.
+debug1: identity file /Users/dstewart/.ssh/replit type 3
+debug1: Local version string SSH-2.0-OpenSSH_9.6
+debug1: Remote protocol version 2.0, remote software version Replit-SSH-Proxy
+debug1: compat_banner: no match: Replit-SSH-Proxy
+debug3: fd 5 is O_NONBLOCK
+...
+Welcome to the Replit SSH Proxy.
+
+Visit https:/.replit.com/replit-workspace/ssh to learn more about SSH on Replit.
+debug3: receive packet: type 51
+debug1: Authentications that can continue: password,publickey
+debug3: start over, passed a different list password,publickey
+debug3: preferred publickey,keyboard-interactive,password
+debug3: authmethod_lookup publickey
+debug3: remaining preferred: keyboard-interactive,password
+debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+...
+debug2: we did not send a packet, disable method
+debug3: authmethod_lookup password
+debug3: remaining preferred: ,password
+debug3: authmethod_is_enabled password
+debug1: Next authentication method: password
+```
+
+<div id="connect-via-a-tool-not-listed-here">
+  ### 通过此处未列出的工具连接
+</div>
+
+面向不同平台和操作系统的 SSH 客户端有很多，各自提供的功能或集成也不尽相同。
+
+你随时可以将“手动连接”中显示的命令拆解为各个组成部分，据此确定每个客户端的配置方式：
+
+```sh theme={null}
+ssh -i ~/.ssh/replit -p 22  c96b6ade-d5e4-4f7a-bc5b-52334509b2a3@c96b6ade-d5e4-4f7a-bc5b-52334509b2a3-00-16nh2hskw3ql8.riker.replit.dev
+       ^-----v-----^    ^^  ^-----------------v----------------^ ^------------------------------v-------------------------------------^
+        Private Key   Port                   User               @                           Hostname
+```
+
+**主机名**：`<your_hostname>.<cluster>.replit.dev`
+**端口**：`<port_number>`
+**用户**：`Username`
+**私钥**：电脑上私钥文件的路径，通常与 `replit.pub` 位于同一目录。

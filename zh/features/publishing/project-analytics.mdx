@@ -1,0 +1,132 @@
+---
+title: "项目分析"
+description: "在 Growth 面板中跟踪已发布应用的访客、流量来源、页面、设备和自定义事件。"
+sidebarTitle: "项目分析"
+icon: "chart-line-up"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+项目分析 可以展示用户如何发现并使用你已发布的 web app。打开 **Growth** 面板，即可查看访客趋势、流量来源和自定义事件。
+
+Replit 会为受支持的已发布应用收集默认流量指标。如果使用付费方案，Agent 还可以添加自定义事件，并回答与分析数据相关的问题。
+
+<div id="before-you-start">
+  ## 开始之前
+</div>
+
+使用 项目分析 需要满足以下条件：
+
+* **已发布的网站。** Analytics 支持网站类型的 [artifact](/zh/features/projects-and-artifacts/artifacts)，不会从移动应用或其他类型的 artifact 收集事件。
+* **受支持的 deployment。** 项目分析 支持 [Autoscale](/zh/features/publishing/deployment-types#autoscale)、[Reserved VM](/zh/features/publishing/deployment-types#reserved-vm) 和 [Static](/zh/features/publishing/deployment-types#static) deployment。
+* **高级分析需要付费方案。** 自定义事件和通过 Agent 进行分析查询仅在付费方案中提供。
+* **在下次发布时启用分析。** 只有在你开启 **Enable analytics** 并发布或重新发布应用后，Replit 才会开始收集事件。
+
+<div id="open-project-analytics">
+  ## 打开项目分析
+</div>
+
+1. 在 Project Editor 中打开你的 project。
+2. 选择 **Tools**。
+3. 在 **Replit Cloud** 下选择 **Growth**。
+
+<Note>
+  在你发布应用之前，**Growth** 面板会一直处于锁定状态，并提示你 **Go to Publishing**。
+</Note>
+
+<Frame caption="Growth 面板展示 SEO 工具、高级分析操作和默认访客指标">
+  <img src="/assets/mirror/growth-analytics-ce6d2d4e49c7.png" alt="Growth 面板显示 SEO 评分、使用 Agent 添加指标、Summarize my analytics 和 Suggest project improvements 快捷选项、访客总数以及访客趋势图" width="2000" height="1707" data-path="images/deployments/project-analytics/growth-analytics.png" />
+</Frame>
+
+只有当已发布的应用产生流量后，分析数据才会显示。新应用在有人访问之前，图表可能是空的。
+
+<div id="review-default-analytics">
+  ## 查看默认分析数据
+</div>
+
+默认分析使用 IP 流量数据展示以下指标：
+
+* **Visitors**：所选时间段内的独立访客大致数量。
+* **Visitors over time (hour)** 或 **Visitors over time (day)**：所选时间段内访客活动的变化趋势。
+* **Top Pages**：流量最高的页面。
+* **Top Referrers**：为你的应用带来流量的网站。
+* **Top Countries**：访客大致所在的国家/地区。
+* **Top Browsers**：访客使用的浏览器。
+* **Top Devices**：访客使用的设备类型。
+
+使用时间范围菜单可查看 6 小时至 30 天的各个时间段。访客总数会将每个时间段与前一个等长时间段进行对比。
+
+如果你的应用使用了 [Replit Auth](/zh/features/auth-and-identity/authentication)，该面板还会显示所选时间段的 **Unique Logged in Users**。
+
+<Note>
+  访客数量仅为大致数值。该数据基于网络和浏览器数据统计，同一个人在不同设备或不同自然月中可能被计为多个访客。
+</Note>
+
+<div id="add-custom-events-with-agent">
+  ## 使用 Agent 添加自定义事件
+</div>
+
+自定义事件用于衡量对你的应用而言重要的操作，例如：完成注册、选择套餐、提交表单和完成购买。
+
+<Steps>
+  <Step title="使用 Agent 添加指标">
+    打开 **Growth**。在 **高级分析** 中，选择 **使用 Agent 添加指标**。告诉 Agent 你想衡量哪些操作，Agent 会在应用中的相应位置添加事件
+    跟踪代码。
+  </Step>
+
+  <Step title="启用分析并发布">
+    打开 **Publishing**，开始一次新的发布或重新发布。在 **Suggested
+    add-ons** 下，开启 **Enable analytics**，然后发布应用。Replit
+    将从该版本开始收集页面浏览量和自定义事件。
+  </Step>
+</Steps>
+
+<Tip>
+  你也可以直接在 Chat 中让 Agent 配置分析。随着应用或衡量目标的变化，你可以
+  随时让 Agent 添加或更新事件。
+</Tip>
+
+Replit 会自动为已发布的应用添加分析跟踪器，你无需添加跟踪脚本、网站 ID 或分析相关的环境变量。
+
+<Warning>
+  请勿在自定义事件名称或属性中包含 Secrets、个人数据或访客自由填写的内容。
+</Warning>
+
+<div id="ask-agent-about-your-analytics">
+  ## 向 Agent 询问分析数据
+</div>
+
+当你的应用收集到数据后，可以使用 **高级分析** 中的快捷选项：
+
+* **Summarize my analytics**：Agent 会汇总你的 project 过去七天的分析数据。
+* **Suggest project improvements**：Agent 会分析这些数据，并就 project 的改进方向给出建议。
+
+你也可以向 Agent 提出具体问题。
+
+<AiPrompt>
+  对比过去七天的访客数和完成注册数。展示每日趋势，并找出转化率最高的页面。
+</AiPrompt>
+
+Agent 可以分析页面浏览量、流量来源、自定义事件、事件属性和漏斗，它会基于你 project 的分析数据返回汇总结果。
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+* [SEO 评分](/zh/features/publishing/seo-rating)：了解已发布应用在搜索方面的准备情况。
+* [SEO Agent](/zh/features/publishing/seo-agent)：借助 Agent 发现并修复技术性 SEO 问题。
+* [监控](/zh/features/publishing/monitoring-a-deployment)：查看运行时间、请求性能、日志和资源使用情况。
+* [发布之后](/zh/features/publishing/after-you-publish)：了解如何维护和改进已上线的应用。

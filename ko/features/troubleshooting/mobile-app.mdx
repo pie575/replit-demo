@@ -1,0 +1,225 @@
+---
+title: "모바일 앱 문제 해결"
+description: "Replit에서 Expo와 React Native로 모바일 앱을 개발할 때 자주 발생하는 문제를 해결하세요."
+sidebarTitle: "모바일 앱"
+icon: "mobile-screen"
+---
+
+Replit에서 모바일 앱을 개발하다 보면 미리보기, 번들링 또는 패키지 종속성과 관련된 문제가 발생할 수 있습니다. 이 가이드에서는 간단한 해결 방법부터 시작해 심층적인 디버깅 단계까지 차례로 살펴보며 자주 발생하는 문제를 해결하는 방법을 안내합니다.
+
+<div id="quick-fixes">
+  ## 빠른 해결 방법
+</div>
+
+먼저 다음 방법을 시도해 보세요. 대부분의 문제는 이것으로 해결됩니다.
+
+| 문제                      | 시도할 방법                                  |
+| ----------------------- | --------------------------------------- |
+| 휴대폰에 변경 사항이 반영되지 않음     | 휴대폰을 흔들어 Expo 메뉴를 연 다음 **Reload**를 탭하세요 |
+| Preview에 변경 사항이 반영되지 않음 | Console에서 **R**을 눌러 다시 번들링하세요           |
+| App이 멈추거나 응답하지 않음       | Console에서 App을 중지한 후 다시 시작하세요           |
+
+<div id="common-issues">
+  ## 자주 발생하는 문제
+</div>
+
+<AccordionGroup>
+  <Accordion title="기기에 변경 사항이 반영되지 않습니다">
+    변경했는데도 휴대폰에 반영되지 않는 경우:
+
+    1. **휴대폰을 흔들어** Expo 개발자 메뉴를 엽니다
+    2. **Reload**를 눌러 번들을 다시 download합니다
+
+    웹 preview에서는 console에서 **R**을 눌러 다시 번들링하세요.
+
+    그래도 변경 사항이 보이지 않으면 cache를 지워 보세요(아래 [Metro cache 지우기](#clear-the-metro-cache) 참고).
+  </Accordion>
+
+  <Accordion title="Expo Go에 빨간 오류 화면이 표시됩니다">
+    빨간 오류 화면은 대개 JavaScript 오류나 모듈 누락을 뜻합니다. 오류 메시지를 읽어 보세요. 문제가 있는 파일과 줄을 정확히 알려 주는 경우가 많습니다.
+
+    **주요 원인:**
+
+    * package가 설치되지 않았거나 버전이 맞지 않음
+    * 웹에서는 작동하지만 네이티브에서는 작동하지 않는 모듈(또는 그 반대)
+    * 코드의 구문 오류
+
+    **시도해 볼 방법:**
+
+    1. 오류 메시지를 꼼꼼히 읽어 보세요. 무엇이 문제인지 정확히 알려 주는 경우가 많습니다
+    2. 메시지를 공유해 Agent에게 오류 수정을 요청하세요
+    3. 오류에 특정 package가 언급된다면 dependencies를 다시 설치해 보세요([packages 재설치](#reinstall-packages) 참고)
+  </Accordion>
+
+  <Accordion title="웹에서는 작동하지만 휴대폰에서 앱이 중단됩니다(또는 그 반대)">
+    일부 packages나 기능은 플랫폼에 따라 다르게 동작합니다. React Native는 iOS, Android, 웹 세 가지 대상으로 컴파일됩니다. 웹에서 잘 작동하는 라이브러리라도 네이티브를 지원하지 않거나 별도의 configuration이 필요할 수 있습니다.
+
+    **시도해 볼 방법:**
+
+    1. 해당 package 문서에서 사용 중인 플랫폼을 지원하는지 확인하세요
+    2. Agent에게 &quot;이 package는 Expo Go와 호환되나요?&quot;라고 물어보세요
+    3. 모바일에서 지원되지 않는다면 해당 기능을 서버로 옮기는 것을 고려하세요
+
+    <Tip>
+      packages를 알아볼 때는 &quot;Expo compatible&quot; 표기를 찾아보거나 [Expo SDK 문서](https://docs.expo.dev/versions/latest/)에서 지원되는 모듈을 확인하세요.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="QR 코드가 스캔되지 않거나 앱이 연결되지 않습니다">
+    **네트워크를 확인하세요:**
+
+    * 휴대폰과 컴퓨터가 같은 WiFi 네트워크에 연결되어 있어야 합니다
+    * 일부 회사 네트워크나 공용 네트워크는 연결을 차단합니다
+
+    **터널 모드를 사용해 보세요:**
+    제한된 네트워크를 사용 중이라면 터널 모드로 트래픽을 Expo 서버를 통해 라우팅할 수 있습니다. Agent에게 터널 모드로 앱을 시작해 달라고 요청하거나, shell에서 `npx expo start --tunnel`을 실행하세요.
+
+    **Expo Go를 재시작하세요:**
+    스캔하기 전에 Expo Go를 완전히 종료했다가 다시 여세요.
+  </Accordion>
+
+  <Accordion title="Build에 시간이 오래 걸립니다">
+    첫 build는 cache가 없어 항상 더 느립니다. 이후 build는 더 빨라집니다.
+
+    **build 시간에 영향을 주는 요소:**
+
+    * project에 포함된 packages 개수
+    * cache를 지운 뒤의 첫 실행
+    * packages를 download할 때의 네트워크 속도
+
+    build가 계속 느리다면 불필요한 packages가 설치되어 있지는 않은지 확인하세요.
+  </Accordion>
+
+  <Accordion title="모듈을 찾을 수 없다는 오류">
+    &quot;Unable to resolve module&quot; 또는 &quot;Module not found&quot;가 표시되는 경우:
+
+    1. package가 설치되지 않았을 수 있습니다. Agent에게 설치를 요청하세요
+    2. package는 설치되었지만 cache가 오래됐을 수 있습니다. cache를 지우세요
+    3. package가 존재하지 않거나 이름을 잘못 입력했을 수 있습니다. package 이름을 확인하세요
+
+    모듈이 분명히 있어야 하는 상황이라면 [packages 재설치](#reinstall-packages)를 시도해 보세요.
+  </Accordion>
+</AccordionGroup>
+
+<div id="debugging-commands">
+  ## 디버깅 명령어
+</div>
+
+간단한 해결 방법이 통하지 않을 때는 아래 명령어로 여러 캐시와 상태를 초기화할 수 있습니다. Shell에서 실행하세요.
+
+<div id="clear-the-metro-cache">
+  ### Metro cache 지우기
+</div>
+
+Metro는 React Native 코드를 컴파일하는 bundler입니다. cache를 지우면 처음부터 새로 빌드됩니다.
+
+Shell에서 다음을 실행하세요:
+
+```bash theme={null}
+npx expo start --clear
+```
+
+이 명령은 bundler 캐시를 지우고 개발 서버를 재시작합니다. 출력에 &quot;Bundler cache is empty. Rebuilding.&quot;이 표시됩니다.
+
+<Tip>
+  캐시 관련 문제가 자주 발생한다면 시작 명령에 `-c`를 추가할 수 있습니다. Agent에게 dev 명령에 clear 플래그를 추가해 달라고 요청하세요.
+</Tip>
+
+<div id="reinstall-packages">
+  ### 패키지 재설치
+</div>
+
+모듈 오류나 버전 불일치가 나타난다면 패키지를 다시 설치해 보세요. 대부분 해결됩니다.
+
+Shell에서 다음을 실행하세요:
+
+```bash theme={null}
+rm -rf node_modules && npm install
+```
+
+설치된 packages를 모두 삭제하고 `package.json`을 기준으로 처음부터 다시 설치합니다.
+
+<Note>
+  project에서 다른 package manager(예: `bun` 또는 `pnpm`)를 사용한다면 그에 맞는 설치 명령어인 `bun install` 또는 `pnpm install`을 사용하세요.
+</Note>
+
+<div id="check-for-version-mismatches">
+  ### 버전 불일치 확인
+</div>
+
+Expo Doctor는 패키지 간 버전 불일치와 같은 일반적인 문제가 있는지 프로젝트를 검사합니다.
+
+Shell에서 다음을 실행하세요:
+
+```bash theme={null}
+npx expo-doctor
+```
+
+출력에 경고가 있는지 확인하세요. 해결 방법이 제안되더라도 신중하게 판단해야 하며, packages를 무작정 업그레이드하면 새로운 문제가 생길 수 있습니다.
+
+<Warning>
+  packages는 명확한 이유가 있을 때만 업데이트하세요. 별다른 이유 없이 &quot;그냥&quot; 업그레이드하면 새 버전에 호환되지 않는 changes가 있어 앱이 망가질 수 있습니다.
+</Warning>
+
+<div id="full-reset">
+  ## 전체 초기화
+</div>
+
+다른 방법이 모두 통하지 않을 때는 전체 초기화로 모든 cache를 지우고 전부 다시 설치할 수 있습니다.
+
+<Accordion title="최후의 수단: 전체 초기화 명령어">
+  이 명령어는 모든 cache를 제거하고 packages를 처음부터 다시 설치합니다. 최후의 수단으로만 사용하세요.
+
+  ```bash theme={null}
+  rm -rf node_modules .expo && npm cache clean --force && npm install && npx expo start --clear
+  ```
+
+  **각 명령어의 동작:**
+
+  1. `rm -rf node_modules` — 설치된 packages를 삭제합니다
+  2. `rm -rf .expo` — Expo의 로컬 cache를 삭제합니다
+  3. `npm cache clean --force` — npm의 전역 cache를 지웁니다
+  4. `npm install` — 모든 packages를 다시 설치합니다
+  5. `npx expo start --clear` — 새로운 Metro cache로 시작합니다
+
+  이 명령어를 실행하면 모든 것이 처음부터 다시 빌드되므로 다음 build는 평소보다 오래 걸립니다.
+</Accordion>
+
+<div id="clear-cache-on-your-device">
+  ### 기기에서 cache 지우기
+</div>
+
+새로고침해도 휴대폰의 app이 예전 코드에 그대로 멈춰 있는 것 같다면:
+
+* **iOS**: Expo Go에서 **Settings**로 이동한 후 **Clear Cache**를 탭하세요
+* **Android**: **Settings &gt; Apps &gt; Expo Go &gt; Storage &gt; Clear Cache**로 이동하세요
+
+<div id="quick-reference">
+  ## 빠른 참조
+</div>
+
+| 문제                 | 먼저 시도                    | 다음으로 시도             |
+| ------------------ | ------------------------ | ------------------- |
+| 변경 사항이 반영되지 않음     | 휴대폰 흔들기 → Reload         | Metro cache 지우기     |
+| Bundler 오류         | `npx expo start --clear` | node&#95;modules 삭제 |
+| 모듈을 찾을 수 없음        | dependencies 재설치         | 전체 초기화              |
+| 버전 불일치 경고          | `npx expo-doctor` 실행     | 제안된 수정 사항 검토        |
+| 새 package가 동작하지 않음 | 서버 재시작                   | Metro cache 지우기     |
+| app.json 변경        | 서버 재시작                   | —                   |
+
+<div id="getting-more-help">
+  ## 추가 도움 받기
+</div>
+
+그래도 해결되지 않는다면:
+
+* **Agent에게 물어보기**: 오류 내용과 시도해본 방법을 설명하세요. Agent가 문제를 진단하고 해결해주는 경우가 많습니다.
+* **Expo 문서 확인하기**: [Expo 문제 해결 가이드](https://docs.expo.dev/troubleshooting/overview/)에서 더 다양한 상황을 다룹니다.
+* **오류 검색하기**: 정확한 오류 메시지를 복사해 검색해보세요. 이미 같은 문제를 겪은 사람이 있을 가능성이 높습니다.
+
+<div id="next-steps">
+  ## 다음 단계
+</div>
+
+* [Native Mobile Apps](/ko/features/artifact-types/building-mobile-apps)로 돌아가기
+* 전체 게시 과정 알아보기: [모바일 앱 빌드 및 출시](/ko/build/mobile-app)

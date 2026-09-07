@@ -1,0 +1,905 @@
+---
+title: "Task board"
+description: "Task board에서 Agent task가 각 단계를 거치는 동안 검토, 시작, 모니터링하고 변경 사항을 적용하세요."
+sidebarTitle: "Task board"
+icon: "table-columns"
+---
+
+export const TaskReviewDrawer = ({taskNumber = 23, taskTitle = "Story regeneration: redo pages or whole stories", taskDescription = 'Added story and page-level regeneration capabilities:\n\nBackend (API):\n- POST /api/stories/:storyId/regenerate: regenerates the entire story, deletes existing pages, sets status to "generating", and re-runs the full story text and image generation pipeline in the background\n- POST /api/stories/:storyId/pages/:pageId/regenerate: regenerates a single page with body { target: "text" | "image" | "both" }\n\nFrontend (story-preview.tsx):\n- Per-page regeneration menu: subtle three-dot icon overlay on the image area with options for "Regenerate Text", "Regenerate Image", or "Regenerate Both"\n- "Regenerate Story" button in header with confirmation dialog\n- Loading state: regenerating pages show a spinner and skeleton text while other pages remain readable'}) => {
+  if (typeof document !== "undefined" && !document.getElementById("task-review-drawer-styles")) {
+    const style = document.createElement("style");
+    style.id = "task-review-drawer-styles";
+    style.textContent = `
+      .trd-wrap {
+        --trd-surface: var(--replit-docs-bg, #F6F6F4);
+        --trd-surface-higher: var(--replit-docs-bg-elevated, #F1F1EE);
+        --trd-border: var(--replit-docs-border, #DEDAD5);
+        --trd-border-strong: var(--replit-docs-border-strong, #CAC4BE);
+        --trd-text: var(--replit-docs-text, #1D1D1D);
+        --trd-text-dim: var(--replit-docs-text-muted, #5C5C5C);
+        --trd-text-dimmest: var(--replit-docs-text-subtle, #858585);
+        --trd-icon: var(--replit-docs-text-subtle, #858585);
+        --trd-btn-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --trd-btn-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --trd-positive-bg: hsla(140, 50%, 38%, 1);
+        --trd-positive-text: #FFFFFF;
+        --trd-positive-hover: hsla(140, 50%, 33%, 1);
+        --trd-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        --trd-icon-surface: var(--replit-docs-bg-elevated, #F1F1EE);
+        --trd-icon-border: var(--replit-docs-border, #DEDAD5);
+      }
+      .dark .trd-wrap,
+      html.dark .trd-wrap,
+      [data-theme="dark"] .trd-wrap {
+        --trd-surface: var(--replit-docs-bg, #1E1E1F);
+        --trd-surface-higher: var(--replit-docs-bg-elevated, #222223);
+        --trd-border: var(--replit-docs-border, #39393D);
+        --trd-border-strong: var(--replit-docs-border-strong, #4A4A50);
+        --trd-text: var(--replit-docs-text, #F5F5F5);
+        --trd-text-dim: var(--replit-docs-text-muted, #B8B8BE);
+        --trd-text-dimmest: var(--replit-docs-text-subtle, #8E8F97);
+        --trd-icon: var(--replit-docs-text-subtle, #8E8F97);
+        --trd-btn-bg: var(--replit-docs-bg-elevated, #222223);
+        --trd-btn-hover: var(--replit-docs-bg-muted, #222223);
+        --trd-positive-bg: hsla(140, 50%, 33%, 1);
+        --trd-positive-text: #FFFFFF;
+        --trd-positive-hover: hsla(140, 50%, 28%, 1);
+        --trd-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        --trd-icon-surface: var(--replit-docs-bg-elevated, #222223);
+        --trd-icon-border: var(--replit-docs-border, #39393D);
+      }
+      .trd-wrap, .trd-wrap * {
+        font-family: 'IBM Plex Sans', sans-serif !important;
+      }
+      @keyframes trd-fade-in {
+        from { transform: translateY(8px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @media (hover: hover) {
+        .trd-wrap .trd-dismiss:hover { background: var(--trd-btn-hover) !important; }
+        .trd-wrap .trd-apply:hover { background: var(--trd-positive-hover) !important; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const PlusIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.25a.75.75 0 0 1 .75.75v6.25H19a.75.75 0 0 1 0 1.5h-6.25V19a.75.75 0 0 1-1.5 0v-6.25H5a.75.75 0 0 1 0-1.5h6.25V5a.75.75 0 0 1 .75-.75Z" />
+    </svg>;
+  const ArrowUpIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 1 1-1.06 1.06l-5.72-5.72V19a.75.75 0 0 1-1.5 0V6.81l-5.72 5.72a.75.75 0 0 1-1.06-1.06l7-7Z" clipRule="evenodd" />
+    </svg>;
+  const ApplyIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path fillRule="evenodd" d="M6 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM2.25 6a3.75 3.75 0 1 1 4.527 3.67 8.25 8.25 0 0 0 7.554 7.553A3.751 3.751 0 0 1 21.75 18a3.75 3.75 0 0 1-7.43.726 9.75 9.75 0 0 1-7.57-4.53V21a.75.75 0 0 1-1.5 0V9.675A3.751 3.751 0 0 1 2.25 6ZM18 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clipRule="evenodd" />
+    </svg>;
+  const AgentModesIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M1.25 6V4A2.75 2.75 0 0 1 4 1.25h2a.75.75 0 0 1 0 1.5H4A1.25 1.25 0 0 0 2.75 4v2a.75.75 0 0 1-1.5 0ZM21.25 6V4a1.25 1.25 0 0 0-1.126-1.244L20 2.75h-2a.75.75 0 0 1 0-1.5h2A2.75 2.75 0 0 1 22.75 4v2a.75.75 0 0 1-1.5 0ZM21.25 20v-2a.75.75 0 0 1 1.5 0v2A2.75 2.75 0 0 1 20 22.75h-2a.75.75 0 0 1 0-1.5h2A1.25 1.25 0 0 0 21.25 20ZM1.25 20v-2a.75.75 0 0 1 1.5 0v2l.006.124A1.25 1.25 0 0 0 4 21.25h2a.75.75 0 0 1 0 1.5H4A2.75 2.75 0 0 1 1.25 20ZM16 12a4 4 0 1 0-8 0 4 4 0 0 0 8 0Zm1.5 0a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0Z" />
+    </svg>;
+  const ChevronDown = <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--trd-text-dimmest)">
+      <path fillRule="evenodd" d="M12.53 15.53a.75.75 0 0 1-1.06 0l-6-6a.75.75 0 0 1 1.06-1.06L12 13.94l5.47-5.47a.75.75 0 1 1 1.06 1.06l-6 6Z" clipRule="evenodd" />
+    </svg>;
+  const SparkleIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path fill="#009118" d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+      <path fill="#6CD97E" d="m18.663 13.33.273.007a5.332 5.332 0 1 1-5.598 5.6l-.007-.275.006-.265a5.38 5.38 0 0 1 .137-.963c.006-.026.01-.052.017-.078.012-.047.026-.095.04-.142a4.84 4.84 0 0 1 .032-.114l.007-.024.065-.193.02-.054.022-.06c.021-.056.044-.112.067-.167l.026-.059c.024-.056.048-.112.074-.167l.058-.118a4.854 4.854 0 0 1 .145-.265l.024-.043a5.29 5.29 0 0 1 .08-.129c.02-.032.04-.065.062-.097a5.34 5.34 0 0 1 .468-.607l.071-.079a5.562 5.562 0 0 1 .265-.267l.11-.1a5.3 5.3 0 0 1 .308-.252l.058-.045c.046-.034.093-.068.14-.1l.049-.034.073-.049.07-.043.112-.07c.043-.026.089-.05.133-.075.026-.014.051-.03.078-.044l.114-.059c.041-.02.083-.042.126-.062l.089-.04.146-.065.086-.033c.048-.019.095-.038.143-.055l.023-.008.202-.068.024-.007c.062-.019.125-.036.189-.053l.043-.012c.062-.016.125-.03.189-.044l.078-.018a5.34 5.34 0 0 1 .485-.074c.011 0 .023-.003.034-.005.09-.009.18-.014.27-.02l.274-.006ZM5.332 0a5.332 5.332 0 0 1 5.332 5.332l-.008.274a5.332 5.332 0 0 1-5.324 5.058l-.274-.007A5.332 5.332 0 0 1 5.332 0Z" />
+    </svg>;
+  const descriptionLines = taskDescription.split("\n").filter(l => l.trim());
+  return <div className="trd-wrap" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: "100%",
+    maxWidth: "427px",
+    minWidth: "320px",
+    alignSelf: "center",
+    margin: "48px auto",
+    opacity: 0,
+    animation: "trd-fade-in 300ms ease-out forwards"
+  }}>
+      {}
+      <div style={{
+    background: "var(--trd-surface)",
+    border: "1px solid var(--trd-border-strong)",
+    borderRadius: "6px",
+    padding: "8px",
+    boxShadow: "var(--trd-shadow)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px"
+  }}>
+        {}
+        <div>
+          <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    padding: "4px"
+  }}>
+            {}
+            <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px"
+  }}>
+              <div style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "28px",
+    height: "28px",
+    borderRadius: "8px",
+    background: "var(--trd-icon-surface)",
+    border: "1px solid var(--trd-icon-border)",
+    flexShrink: 0
+  }}>
+                {SparkleIcon}
+              </div>
+              <span style={{
+    fontSize: "14px",
+    lineHeight: "1.4",
+    color: "var(--trd-text)"
+  }}>
+                Ready for review
+              </span>
+            </div>
+
+            {}
+            <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px"
+  }}>
+              <span style={{
+    fontSize: "13px",
+    lineHeight: "1.4",
+    color: "var(--trd-text-dim)"
+  }}>
+                Task #{taskNumber}: {taskTitle}
+              </span>
+
+              {}
+              <div style={{
+    fontSize: "12px",
+    lineHeight: "1.5",
+    color: "var(--trd-text-dimmest)",
+    maxHeight: "50px",
+    overflow: "hidden",
+    position: "relative"
+  }}>
+                {descriptionLines.map((line, i) => <span key={i}>
+                    {line}
+                    <br />
+                  </span>)}
+              </div>
+            </div>
+
+            {}
+            <div style={{
+    display: "flex",
+    gap: "8px"
+  }}>
+              <button className="trd-dismiss" type="button" style={{
+    width: "122px",
+    flexShrink: 0,
+    height: "32px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "none",
+    borderRadius: "8px",
+    background: "var(--trd-btn-bg)",
+    color: "var(--trd-text)",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    cursor: "pointer",
+    transition: "background 120ms ease-out"
+  }}>
+                Dismiss
+              </button>
+              <button className="trd-apply" type="button" style={{
+    flex: 1,
+    height: "32px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    border: "none",
+    borderRadius: "8px",
+    background: "var(--trd-positive-bg)",
+    color: "var(--trd-positive-text)",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    cursor: "pointer",
+    transition: "background 120ms ease-out"
+  }}>
+                <span>Apply changes to main version</span>
+                {ApplyIcon}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {}
+        <div style={{
+    padding: 0
+  }}>
+          <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px"
+  }}>
+            {}
+            <div style={{
+    padding: "5px 6px",
+    minHeight: "21px",
+    fontSize: "14px",
+    lineHeight: "1.3",
+    color: "var(--trd-text-dimmest)"
+  }}>
+              Message agent…
+            </div>
+
+            {}
+            <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    paddingBottom: "2px"
+  }}>
+              {}
+              <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "4px"
+  }}>
+                <button type="button" style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "24px",
+    border: "none",
+    borderRadius: "4px",
+    background: "transparent",
+    cursor: "pointer",
+    color: "var(--trd-icon)",
+    padding: 0
+  }}>
+                  {PlusIcon}
+                </button>
+              </div>
+
+              {}
+              <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    paddingRight: "2px"
+  }}>
+                <button type="button" style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    height: "24px",
+    padding: "0 4px",
+    border: "none",
+    borderRadius: "4px",
+    background: "transparent",
+    cursor: "pointer",
+    color: "var(--trd-icon)"
+  }}>
+                  {AgentModesIcon}
+                  {ChevronDown}
+                </button>
+                <button type="button" style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "28px",
+    height: "28px",
+    border: "none",
+    borderRadius: "8px",
+    background: "hsla(210, 100%, 74%, 1)",
+    color: "#FFFFFF",
+    padding: 0,
+    cursor: "pointer"
+  }}>
+                  {ArrowUpIcon}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
+};
+
+export const KanbanColumns = ({columns = []}) => {
+  if (typeof document !== "undefined" && !document.getElementById("kanban-board-styles")) {
+    const style = document.createElement("style");
+    style.id = "kanban-board-styles";
+    style.textContent = `
+      .kb-board {
+        --kb-bg: var(--replit-docs-bg, #F6F6F4);
+        --kb-col-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+        --kb-card-bg: var(--replit-docs-bg-task, #EDECE8);
+        --kb-border: var(--replit-docs-border, #DEDAD5);
+        --kb-text: var(--replit-docs-text, #1D1D1D);
+        --kb-text-dim: var(--replit-docs-text-muted, #5C5C5C);
+        --kb-text-dimmer: var(--replit-docs-text-muted, #5C5C5C);
+        --kb-text-dimmest: var(--replit-docs-text-subtle, #858585);
+        --kb-badge-bg: var(--replit-docs-bg-elevated, #F1F1EE);
+      }
+      .dark .kb-board,
+      html.dark .kb-board,
+      [data-theme="dark"] .kb-board {
+        --kb-bg: var(--replit-docs-bg, #1E1E1F);
+        --kb-col-bg: var(--replit-docs-bg-elevated, #222223);
+        --kb-card-bg: var(--replit-docs-bg-task, #252527);
+        --kb-border: var(--replit-docs-border, #39393D);
+        --kb-text: var(--replit-docs-text, #F5F5F5);
+        --kb-text-dim: var(--replit-docs-text-muted, #B8B8BE);
+        --kb-text-dimmer: var(--replit-docs-text-muted, #B8B8BE);
+        --kb-text-dimmest: var(--replit-docs-text-subtle, #8E8F97);
+        --kb-badge-bg: var(--replit-docs-bg-elevated, #222223);
+      }
+      .kb-board { overflow: visible; }
+    `;
+    document.head.appendChild(style);
+  }
+  return <div className="kb-board" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    display: "flex",
+    gap: "12px",
+    padding: "8px",
+    background: "var(--kb-bg)",
+    borderRadius: "12px"
+  }}>
+      {columns.map((col, ci) => <div key={ci} data-kb-column={col.title.toLowerCase()} style={{
+    flex: "1 1 0",
+    minWidth: "200px",
+    background: "var(--kb-col-bg)",
+    borderRadius: "8px",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "visible"
+  }}>
+          <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "12px 12px 8px 12px"
+  }}>
+            <span style={{
+    fontSize: "14px",
+    fontWeight: 500,
+    color: "var(--kb-text)"
+  }}>
+              {col.title}
+            </span>
+            <span data-kb-count style={{
+    fontSize: "12px",
+    color: "var(--kb-text-dimmer)",
+    background: "var(--kb-badge-bg)",
+    padding: "0 6px",
+    borderRadius: "4px",
+    lineHeight: "20px"
+  }}>
+              {col.count}
+            </span>
+          </div>
+          <div data-kb-cards style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    padding: "8px",
+    flex: "1 1 0"
+  }}>
+            {col.cards.map((card, i) => <TaskCard key={i} title={card.title} description={card.description} status={card.status} timestamp={card.timestamp} showMenu={card.showMenu} width="100%" />)}
+          </div>
+        </div>)}
+    </div>;
+};
+
+export const TaskCard = ({title = "Product Manager next steps discussion", description = "", status = "draft", timestamp = "Created 3 minutes ago", width = "364px", showMenu = false}) => {
+  if (typeof document !== "undefined" && !document.getElementById("task-card-styles")) {
+    const style = document.createElement("style");
+    style.id = "task-card-styles";
+    style.textContent = `
+      .task-card {
+        --tc-bg: var(--replit-docs-bg-task, #EDECE8);
+        --tc-border: var(--replit-docs-border, #DEDAD5);
+        --tc-text: var(--replit-docs-text, #1D1D1D);
+        --tc-text-dim: var(--replit-docs-text-muted, #5C5C5C);
+        --tc-text-dimmest: var(--replit-docs-text-subtle, #858585);
+        --tc-dot-active: #4A7BF7;
+        --tc-dot-draft: #A6A6A6;
+        --tc-dot-ready: #F59E0B;
+        --tc-dot-done: #22C55E;
+      }
+      .dark .task-card,
+      html.dark .task-card,
+      [data-theme="dark"] .task-card {
+        --tc-bg: var(--replit-docs-bg-task, #252527);
+        --tc-border: var(--replit-docs-border, #39393D);
+        --tc-text: var(--replit-docs-text, #F5F5F5);
+        --tc-text-dim: var(--replit-docs-text-muted, #B8B8BE);
+        --tc-text-dimmest: var(--replit-docs-text-subtle, #8E8F97);
+        --tc-dot-active: #6B9EFF;
+        --tc-dot-draft: #6B7280;
+        --tc-dot-ready: #FBBF24;
+        --tc-dot-done: #4ADE80;
+      }
+      @keyframes task-card-fade-in {
+        from { transform: translateY(6px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes tc-tl {
+        0%{opacity:1;fill:var(--tc-light)} 5%{opacity:1;fill:var(--tc-dark)} 10%{opacity:1;fill:var(--tc-dark)} 15%{opacity:1;fill:var(--tc-light)}
+        20%{opacity:0} 25%{opacity:1;fill:var(--tc-dark)} 30%{opacity:1;fill:var(--tc-light)} 35%{opacity:0}
+        40%{opacity:1;fill:var(--tc-dark)} 45%{opacity:1;fill:var(--tc-light)} 50%{opacity:0} 55%{opacity:1;fill:var(--tc-dark)}
+        60%{opacity:0} 65%{opacity:1;fill:var(--tc-light)} 70%{opacity:1;fill:var(--tc-light)} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:1;fill:var(--tc-light)} 85%{opacity:0} 90%{opacity:1;fill:var(--tc-light)} 95%{opacity:1;fill:var(--tc-light)}
+      }
+      @keyframes tc-tr {
+        0%{opacity:1;fill:var(--tc-dark)} 5%{opacity:0} 10%{opacity:0} 15%{opacity:0}
+        20%{opacity:1;fill:var(--tc-light)} 25%{opacity:1;fill:var(--tc-light)} 30%{opacity:1;fill:var(--tc-light)} 35%{opacity:1;fill:var(--tc-light)}
+        40%{opacity:0} 45%{opacity:1;fill:var(--tc-dark)} 50%{opacity:1;fill:var(--tc-dark)} 55%{opacity:0}
+        60%{opacity:1;fill:var(--tc-dark)} 65%{opacity:0} 70%{opacity:0} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:0} 85%{opacity:1;fill:var(--tc-dark)} 90%{opacity:0} 95%{opacity:0}
+      }
+      @keyframes tc-bl {
+        0%{opacity:1;fill:var(--tc-light)} 5%{opacity:0} 10%{opacity:0} 15%{opacity:0}
+        20%{opacity:1;fill:var(--tc-light)} 25%{opacity:1;fill:var(--tc-light)} 30%{opacity:1;fill:var(--tc-light)} 35%{opacity:1;fill:var(--tc-light)}
+        40%{opacity:0} 45%{opacity:1;fill:var(--tc-light)} 50%{opacity:1;fill:var(--tc-light)} 55%{opacity:0}
+        60%{opacity:1;fill:var(--tc-light)} 65%{opacity:0} 70%{opacity:0} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:0} 85%{opacity:1;fill:var(--tc-light)} 90%{opacity:0} 95%{opacity:0}
+      }
+      @keyframes tc-br {
+        0%{opacity:1;fill:var(--tc-light)} 5%{opacity:1;fill:var(--tc-dark)} 10%{opacity:1;fill:var(--tc-light)} 15%{opacity:1;fill:var(--tc-light)}
+        20%{opacity:0} 25%{opacity:1;fill:var(--tc-light)} 30%{opacity:1;fill:var(--tc-dark)} 35%{opacity:0}
+        40%{opacity:1;fill:var(--tc-light)} 45%{opacity:1;fill:var(--tc-light)} 50%{opacity:0} 55%{opacity:1;fill:var(--tc-light)}
+        60%{opacity:0} 65%{opacity:1;fill:var(--tc-dark)} 70%{opacity:1;fill:var(--tc-light)} 75%{opacity:1;fill:var(--tc-light)}
+        80%{opacity:1;fill:var(--tc-light)} 85%{opacity:0} 90%{opacity:1;fill:var(--tc-light)} 95%{opacity:1;fill:var(--tc-dark)}
+      }
+      @keyframes tc-drop {
+        0%{opacity:0} 5%{opacity:1;fill:var(--tc-dark)} 10%{opacity:1;fill:var(--tc-dark)} 15%{opacity:1;fill:var(--tc-dark)}
+        20%{opacity:0} 25%{opacity:0} 30%{opacity:0} 35%{opacity:0}
+        40%{opacity:1;fill:var(--tc-dark)} 45%{opacity:0} 50%{opacity:0} 55%{opacity:1;fill:var(--tc-dark)}
+        60%{opacity:0} 65%{opacity:1;fill:var(--tc-dark)} 70%{opacity:1;fill:var(--tc-dark)} 75%{opacity:0}
+        80%{opacity:1;fill:var(--tc-dark)} 85%{opacity:0} 90%{opacity:1;fill:var(--tc-dark)} 95%{opacity:1;fill:var(--tc-dark)}
+      }
+      @keyframes tc-dropalt {
+        0%{opacity:0} 5%{opacity:0} 10%{opacity:0} 15%{opacity:0}
+        20%{opacity:1;fill:var(--tc-dark)} 25%{opacity:0} 30%{opacity:0} 35%{opacity:1;fill:var(--tc-dark)}
+        40%{opacity:0} 45%{opacity:0} 50%{opacity:1;fill:var(--tc-dark)} 55%{opacity:0}
+        60%{opacity:1;fill:var(--tc-dark)} 65%{opacity:0} 70%{opacity:0} 75%{opacity:0}
+        80%{opacity:0} 85%{opacity:1;fill:var(--tc-dark)} 90%{opacity:0} 95%{opacity:0}
+      }
+      .task-card .tc-el-tl { animation: tc-tl 4s step-end infinite; }
+      .task-card .tc-el-tr { animation: tc-tr 4s step-end infinite; }
+      .task-card .tc-el-bl { animation: tc-bl 4s step-end infinite; }
+      .task-card .tc-el-br { animation: tc-br 4s step-end infinite; }
+      .task-card .tc-el-drop { animation: tc-drop 4s step-end infinite; }
+      .task-card .tc-el-dropalt { animation: tc-dropalt 4s step-end infinite; }
+      @media (hover: hover) {
+        .task-card:hover {
+          border-color: var(--tc-text-dimmest) !important;
+        }
+        .task-card .tc-menu-btn:hover {
+          background: var(--tc-border);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const colorPairs = {
+    active: {
+      dark: "#57ABFF",
+      light: "#A8D4FF"
+    },
+    "active-queued": {
+      dark: "#6BB5FF",
+      light: "#6BB5FF"
+    },
+    draft: {
+      dark: "#A6A6A6",
+      light: "#D4D4D4"
+    },
+    "draft-static": {
+      dark: "#A6A6A6",
+      light: "#D4D4D4"
+    },
+    "draft-done": {
+      dark: "#A6A6A6",
+      light: "#D4D4D4"
+    },
+    ready: {
+      dark: "#009118",
+      light: "#6CD97E"
+    },
+    "ready-drop": {
+      dark: "#009118",
+      light: "#6CD97E"
+    },
+    applying: {
+      dark: "#7C3AED",
+      light: "#C4B5FD"
+    },
+    done: {
+      dark: "#22C55E",
+      light: "#86EFAC"
+    }
+  };
+  const statusLabels = {
+    active: "Active",
+    "active-queued": "Queued",
+    draft: "Draft",
+    "draft-static": "Draft",
+    "draft-done": "Done",
+    ready: "Ready",
+    "ready-drop": "Ready",
+    applying: "Applying",
+    done: "Done"
+  };
+  const colors = colorPairs[status] || colorPairs.draft;
+  const applyingIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;--tc-dark:#009118;--tc-light:#6CD97E"><circle class="tc-el-tl" cx="5.332" cy="5.338" r="5.332" fill="#009118"/><circle class="tc-el-tr" cx="18.663" cy="5.338" r="5.332" fill="#009118"/><circle class="tc-el-bl" cx="5.332" cy="18.668" r="5.332" fill="#009118"/><circle class="tc-el-br" cx="18.663" cy="18.668" r="5.332" fill="#009118"/><path class="tc-el-drop" fill="#009118" d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z"/><g class="tc-el-dropalt" transform="rotate(90, 12, 12)"><path fill="#009118" d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z"/></g></svg>';
+  const doneIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;fill:var(--tc-text-dimmest)"><path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/><path fill-rule="evenodd" d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1Zm0 2a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" clip-rule="evenodd"/></svg>';
+  const handleApplyChanges = e => {
+    const tooltip = e.currentTarget.parentElement;
+    tooltip.style.display = "none";
+    const menuBtn = tooltip.previousElementSibling;
+    if (menuBtn) menuBtn.style.background = "none";
+    const card = e.currentTarget.closest(".task-card");
+    if (!card) return;
+    const headerRow = card.firstElementChild;
+    const oldIcon = headerRow.firstElementChild;
+    const menuWrapper = headerRow.lastElementChild;
+    const meta = card.lastElementChild;
+    const temp = document.createElement("div");
+    temp.innerHTML = applyingIconHtml;
+    headerRow.replaceChild(temp.firstElementChild, oldIcon);
+    meta.textContent = "Applying \u2022 just now";
+    menuWrapper.style.visibility = "hidden";
+    setTimeout(() => {
+      const currentIcon = headerRow.firstElementChild;
+      const doneTemp = document.createElement("div");
+      doneTemp.innerHTML = doneIconHtml;
+      headerRow.replaceChild(doneTemp.firstElementChild, currentIcon);
+      meta.textContent = "Done \u2022 just now";
+      const board = card.closest(".kb-board");
+      if (!board) return;
+      const doneCol = board.querySelector('[data-kb-column="done"]');
+      if (!doneCol) return;
+      const cardList = doneCol.querySelector("[data-kb-cards]");
+      const readyCol = board.querySelector('[data-kb-column="ready"]');
+      card.style.transition = "opacity 300ms, transform 300ms";
+      card.style.opacity = "0";
+      card.style.transform = "translateY(-10px)";
+      setTimeout(() => {
+        card.parentElement.removeChild(card);
+        if (readyCol) {
+          const rc = readyCol.querySelector("[data-kb-count]");
+          rc.textContent = parseInt(rc.textContent) - 1;
+        }
+        const dc = doneCol.querySelector("[data-kb-count]");
+        dc.textContent = parseInt(dc.textContent) + 1;
+        card.style.opacity = "0";
+        card.style.transform = "translateY(6px)";
+        cardList.insertBefore(card, cardList.firstChild);
+        requestAnimationFrame(() => {
+          card.style.transition = "opacity 300ms, transform 300ms";
+          card.style.opacity = "1";
+          card.style.transform = "translateY(0)";
+        });
+      }, 300);
+    }, 3000);
+  };
+  return <div className="task-card" style={{
+    fontFamily: "'IBM Plex Sans', sans-serif",
+    width: width,
+    background: "var(--tc-bg)",
+    border: "1px solid var(--tc-border)",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    margin: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+    cursor: "pointer",
+    opacity: 0,
+    animation: "task-card-fade-in 300ms ease-out forwards",
+    transition: "border-color 120ms ease-out"
+  }}>
+      {}
+      <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px"
+  }}>
+        {status === "done" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--tc-text-dimmest)" style={{
+    flexShrink: 0
+  }}>
+            <path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
+            <path fillRule="evenodd" d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1Zm0 2a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" clipRule="evenodd" />
+          </svg> : status === "draft-static" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle cx="18.663" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle cx="5.332" cy="18.668" r="5.332" fill={colors.dark} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.dark} />
+          </svg> : status === "draft-done" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="5.332" cy="18.668" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.light} />
+          </svg> : status === "active-queued" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="5.332" cy="18.668" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.light} />
+          </svg> : status === "ready-drop" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0
+  }}>
+            <circle cx="5.332" cy="5.338" r="5.332" fill={colors.light} />
+            <circle cx="18.663" cy="18.668" r="5.332" fill={colors.light} />
+            <path fill={colors.dark} d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+          </svg> : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{
+    flexShrink: 0,
+    "--tc-dark": colors.dark,
+    "--tc-light": colors.light
+  }}>
+            <circle className="tc-el-tl" cx="5.332" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle className="tc-el-tr" cx="18.663" cy="5.338" r="5.332" fill={colors.dark} />
+            <circle className="tc-el-bl" cx="5.332" cy="18.668" r="5.332" fill={colors.dark} />
+            <circle className="tc-el-br" cx="18.663" cy="18.668" r="5.332" fill={colors.dark} />
+            <path className="tc-el-drop" fill={colors.dark} d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+            <g className="tc-el-dropalt" transform="rotate(90, 12, 12)">
+              <path fill={colors.dark} d="M18.662 0a5.332 5.332 0 0 1 .001 10.664l-.412.01a8 8 0 0 0-7.577 7.59l-.01.398-.008.274A5.331 5.331 0 0 1 0 18.662a5.332 5.332 0 0 1 5.332-5.332l.398-.01a8 8 0 0 0 7.59-7.576l.011-.412A5.331 5.331 0 0 1 18.662 0Z" />
+            </g>
+          </svg>}
+        <span style={{
+    flex: 1,
+    fontSize: "14px",
+    lineHeight: "1.4",
+    color: "var(--tc-text)",
+    minWidth: 0
+  }}>
+          {title}
+        </span>
+        <div style={{
+    position: "relative",
+    flexShrink: 0
+  }}>
+          <button className="tc-menu-btn" type="button" aria-label="Thread actions" onClick={showMenu ? e => {
+    const btn = e.currentTarget;
+    const popup = btn.nextElementSibling;
+    const card = btn.closest(".task-card");
+    const isHidden = popup.style.display === "none";
+    popup.style.display = isHidden ? "flex" : "none";
+    btn.style.background = isHidden ? "var(--tc-border)" : "none";
+    if (card) card.style.zIndex = isHidden ? "9999" : "";
+  } : undefined} style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "24px",
+    border: "none",
+    background: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    color: "var(--tc-text-dimmest)",
+    padding: 0,
+    flexShrink: 0,
+    transition: "background 120ms ease-out"
+  }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path fillRule="evenodd" d="M10.25 5a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Zm0 7a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0Z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {showMenu && <div style={{
+    display: "none",
+    position: "absolute",
+    top: 0,
+    left: "28px",
+    background: "var(--tc-bg)",
+    border: "1px solid var(--tc-border)",
+    borderRadius: "8px",
+    padding: "4px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06)",
+    zIndex: 9999,
+    minWidth: "160px",
+    flexDirection: "column",
+    gap: "0"
+  }}>
+              <div onClick={handleApplyChanges} style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "6px 8px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    color: "var(--tc-text)",
+    fontSize: "14px"
+  }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{
+    flexShrink: 0
+  }}>
+                  <path fillRule="evenodd" d="M6 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM2.25 6a3.75 3.75 0 1 1 4.527 3.67 8.25 8.25 0 0 0 7.554 7.553A3.751 3.751 0 0 1 21.75 18a3.75 3.75 0 0 1-7.43.726 9.75 9.75 0 0 1-7.57-4.53V21a.75.75 0 0 1-1.5 0V9.675A3.751 3.751 0 0 1 2.25 6ZM18 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clipRule="evenodd" />
+                </svg>
+                <span>Apply changes</span>
+              </div>
+              <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "6px 8px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    color: "var(--tc-text)",
+    fontSize: "14px"
+  }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{
+    flexShrink: 0
+  }}>
+                  <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                </svg>
+                <span>Cancel</span>
+              </div>
+            </div>}
+        </div>
+      </div>
+      {}
+      {description && <div style={{
+    fontSize: "12px",
+    color: "var(--tc-text-dim)",
+    lineHeight: "1.5",
+    overflow: "hidden",
+    display: "-webkit-box",
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: "vertical",
+    paddingLeft: "0"
+  }}>
+          {description}
+        </div>}
+      {}
+      <div style={{
+    fontSize: "12px",
+    color: "var(--tc-text-dimmest)",
+    paddingLeft: "0"
+  }}>
+        {statusLabels[status] || status} • {timestamp}
+      </div>
+    </div>;
+};
+
+<div id="how-the-task-board-works">
+  ## Task board 작동 방식
+</div>
+
+Task board는 Agent task를 한곳에서 검토하고, 시작하고, 모니터링하고, 적용할 수 있게 해줍니다. Agent가 큰 요청을 여러 갈래로 나눌 때, 작업을 백그라운드에서 실행하고 싶을 때, 또는 project에서 이미 변경된 내용을 파악해야 할 때 활용하세요.
+
+<Frame>
+  <img src="/assets/mirror/task-board-progress-f4d3b5e7e93e.png" alt="Drafts, Active, Ready, Done 열로 정리된 task를 보여주는 task board" width="3456" height="1984" data-path="images/replitai/task-board-progress.png" />
+</Frame>
+
+Task는 상태에 따라 열로 정리됩니다. Board에는 Agent가 계획한 작업, 실행 중인 작업, 검토할 준비가 된 작업, 이미 적용된 작업이 표시됩니다.
+
+각 task는 진행 상황에 따라 왼쪽에서 오른쪽으로 이동합니다.
+
+* **Drafts**: Agent가 계획했지만 아직 시작하지 않은 task
+* **Active**: Agent가 현재 building 중인 task로, 활성 task limit에 걸려 대기 중인 task 포함
+* **Ready**: Agent가 완료하여 검토를 기다리는 task
+* **Done**: 완료, 보관 또는 취소된 task
+
+<div id="drafts">
+  ## Drafts
+</div>
+
+**Drafts**는 Agent가 아직 빌드를 시작하지 않은 계획 단계의 task입니다. 각 Draft에는 제목, 설명, 단계별 계획이 포함됩니다.
+
+작업을 시작하기 전에 Agent가 제안한 접근 방식을 검토하고 싶다면 Drafts를 활용하세요. 계획을 살펴보고 Agent에게 수정을 요청하거나, 준비가 되면 task를 시작할 수 있습니다.
+
+Drafts는 백그라운드 작업을 확정하기 전에 규모가 큰 기능을 미리 계획하고 싶을 때 유용합니다. 예를 들어 Agent는 온보딩 project를 authentication, 프로필 설정, dashboard UI, deployment 마무리 작업처럼 여러 개의 Draft로 나눌 수 있습니다.
+
+<div id="active">
+  ## Active
+</div>
+
+task를 수락하면 해당 task가 **Active** 열로 이동하고 Agent가 building을 시작합니다. 각 task는 project의 격리된 사본에서 실행되므로, 작업을 적용하기 전까지 메인 버전에는 아무런 변경도 일어나지 않습니다.
+
+일부 task는 다른 task에 의존합니다. 예를 들어 dashboard를 만드는 task는 database schema task가 먼저 완료되어야 할 수 있습니다. 이런 task는 선행 작업이 끝날 때까지 **Queued** 상태로 대기합니다. plan의 활성 백그라운드 task limit에 도달한 경우에도 task가 대기열에 들어갑니다.
+
+<KanbanColumns
+  columns={[
+{ title: 'Drafts', count: 2, cards: [
+{ title: '가족과 친구를 위한 선물 flow 추가', description: '부모가 다른 집 아이를 위한 이야기를 만들어 선물로 보낼 수 있게 합니다. 새로운 유입 채널이 열립니다.', status: 'draft-static', timestamp: '2m' },
+{ title: '다크 theme의 취침 독서 모드', description: '따뜻한 톤의 다크 theme와 잔잔한 배경음을 갖춘 전용 취침 모드가 앱을 하나의 완전한 취침 의식으로 만들어 줍니다.', status: 'draft-static', timestamp: '2m' },
+] },
+{ title: 'Active', count: 3, cards: [
+{ title: '이야기 이어가기: 후속편', description: '"모험 계속하기" 버튼을 추가하면 지난 이야기가 끝난 지점부터 이어지는 후속편이 생성됩니다.', status: 'active', timestamp: '12m' },
+{ title: '이야기 재생성: 페이지 다시 만들기', description: '개별 페이지를 재생성하는 기능을 추가하면 부모가 주도권을 갖게 되어 불편함이 줄어듭니다.', status: 'active', timestamp: '8m' },
+{ title: '가족과 친구를 위한 선물 flow 추가', description: '부모가 다른 집 아이를 위한 이야기를 만들어 선물로 보낼 수 있게 합니다.', status: 'active-queued', timestamp: '1m' },
+] }
+]}
+/>
+
+<div id="ready">
+  ## Ready
+</div>
+
+task의 building이 끝나면 **Ready** 상태로 이동합니다. 작업은 완료되었지만 메인 버전에는 아직 아무 변경도 반영되지 않았다는 뜻입니다.
+
+changes를 적용하는 방법은 두 가지입니다.
+
+* **스레드에서**: task의 스레드를 열고 **Apply changes to main version**을 선택해 작업을 project에 반영하거나, **Dismiss**를 선택해 폐기합니다
+* **board에서**: Ready 상태의 task 카드에서 three-dot menu를 선택한 뒤 **Apply changes**를 선택합니다
+
+<TaskReviewDrawer />
+
+Ready 상태의 task는 적용하기 전에 반드시 검토하세요. 작업 로그, 테스트 출력, Preview를 확인하면 Agent가 무엇을 변경했는지 파악할 수 있습니다.
+
+<div id="done">
+  ## Done
+</div>
+
+적용이 완료되면 task 카드가 **Done** 열로 이동합니다.
+
+Done 열에는 보관된 계획 세션과 취소된 task도 함께 표시됩니다. 완료된 작업이 Drafts나 Active로 다시 섞여 들어가지 않으면서도 그동안의 진행 내역을 확인할 수 있습니다.
+
+<KanbanColumns
+  columns={[
+{ title: 'Ready', count: 3, cards: [
+{ title: '다크 테마를 적용한 취침 독서 모드', description: '따뜻한 색조의 다크 테마와 잔잔한 배경음을 갖춘 전용 취침 모드입니다.', status: 'ready-drop', timestamp: '35m', showMenu: true },
+{ title: 'OG 미리보기가 포함된 공유 가능한 스토리 링크', description: '공개 공유 링크 추가는 성장에 가장 큰 힘이 되는 요소입니다.', status: 'ready-drop', timestamp: '31m', showMenu: true },
+{ title: '캐릭터 커스터마이징 강화', description: '외형 옵션을 추가하면 삽화가 한층 더 개인화된 느낌을 줍니다.', status: 'ready-drop', timestamp: '28m', showMenu: true },
+] },
+{ title: 'Done', count: 4, cards: [
+{ title: '단어 강조 표시가 있는 소리 내어 읽기 모드', description: '음성 합성으로 아이들이 스스로 이야기를 즐길 수 있습니다.', status: 'done', timestamp: '4h' },
+{ title: 'OG 미리보기가 포함된 공유 가능한 스토리 링크', description: '성장에 가장 큰 힘이 되는 공개 공유 링크입니다.', status: 'done', timestamp: '1h' },
+{ title: '캐릭터 커스터마이징 강화', description: '한층 더 개인화된 삽화를 위한 외형 옵션입니다.', status: 'done', timestamp: '4h' },
+{ title: '모바일 반응형 대응과 production 마무리 작업', description: '오류 상태, 모바일 layout, 로딩 애니메이션을 개선합니다.', status: 'done', timestamp: '4h' },
+] }
+]}
+/>
+
+여러 task의 변경 사항을 적용할 때는 Agent가 충돌을 자동으로 처리합니다. 결과가 이상해 보이면 Agent에게 수정을 요청하세요.
+
+<div id="find-and-filter-tasks">
+  ## task 찾기 및 필터링
+</div>
+
+프로젝트에 진행 중인 task가 많을 때는 Task board를 사용하세요. task 제목이나 task 번호로 검색하고, 초안을 필터링하고, 편집 모드에서 여러 task을 한 번에 관리할 수 있습니다.
+
+예를 들어 누군가 스레드, 리뷰 또는 Slack 대화에서 특정 task을 언급했다면 task 번호로 검색하세요. 진행 중이거나 완료된 task을 일일이 훑어보지 않고 계획된 작업에만 집중하고 싶다면 초안을 필터링하세요.
+
+추천 후속 task에 대해서는 [후속 task](/ko/features/agent/follow-up-tasks)을 참조하세요.
+
+<div id="rename-a-task">
+  ## task 이름 변경
+</div>
+
+scope가 바뀌다 보면 길게 이어진 task list는 한눈에 파악하기 어려워집니다. task 이름을 변경하려면 해당 카드(task list 사이드바 또는 task board)의 three-dot menu를 열고 **Rename**을 선택하세요. 더 명확한 제목을 입력한 뒤 **Save**를 선택합니다.
+
+task 이름을 변경하면 여러분과 팀원에게 보이는 이름만 바뀝니다. Agent가 이미 수행한 작업, task 기록, 대기 중인 changes는 그대로 유지됩니다.
+
+<div id="settings-on-each-task">
+  ## 각 task별 설정
+</div>
+
+모든 task에는 제목 옆에 전용 설정 드롭다운이 있습니다. 이 메뉴에서 Agent가 task를 마무리하는 방식과 결과가 project에 반영되는 방식을 지정할 수 있습니다:
+
+* **Auto-apply changes** (Drafts 및 Active): task가 준비되면 review를 거치지 않고 곧바로 메인 버전에 적용합니다.
+* **Auto-approve plan** (Drafts): Agent가 task에 대한 plan을 제안하면 자동으로 수락하고 building을 시작합니다.
+* **Apply changes** (Ready): 완료된 작업을 메인 버전에 적용합니다.
+* **Rename**: 카드에 표시되는 제목을 변경합니다.
+* **Review changes** (Ready): 준비된 task의 diff로 바로 이동합니다.
+* **Cancel**: task를 중지하거나 draft를 삭제합니다.
+
+auto-apply와 auto-approve는 한 번만 선택하는 빠른 동작이며, 켜 둔 상태로 유지되는 토글이 아닙니다. 메뉴 너비는 항상 일정하게 유지되므로 여러 task를 번갈아 열어도 label 위치가 흔들리지 않습니다.
+
+<Frame>
+  <img src="/assets/mirror/task-settings-dropdown-7ea7868303b4.png" alt="고정 너비 popover에 Apply changes, Rename, Review changes, Cancel 동작이 표시된, task 카드에서 열린 task 설정 드롭다운" width="858" height="536" data-path="images/replitai/task-settings-dropdown.png" />
+</Frame>

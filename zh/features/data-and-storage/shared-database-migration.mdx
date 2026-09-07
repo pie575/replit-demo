@@ -1,0 +1,253 @@
+---
+title: "修复使用共享数据库的已发布应用"
+description: "分步说明：如何更新仍在使用为其他应用创建的数据库的已发布应用。"
+sidebarTitle: "迁移共享数据"
+icon: "arrow-right-arrow-left"
+---
+
+部分较早发布的应用可能仍连接着最初为另一个应用创建的开发数据库。
+
+这种情况多见于在 Replit 上通过 fork 或 remix 创建的旧应用。在旧版 Neon 架构下，fork 出的应用可以继续沿用原应用的数据库连接。随着 Replit 全面隔离开发数据库与生产数据库，旧的共享开发数据库将陆续下线，已发布应用需要迁移到各自的生产数据库。
+
+如果你的已发布应用出现数据库连接错误，或者 Secrets 面板中的 `DATABASE_URL` 仍指向 `neon.tech`，请参照本指南操作。
+
+<Warning>
+  旧的共享数据库将于 **2026 年 6 月 8 日** 关停。请在此之前更新你的已发布应用，以免出现停机或永久性数据丢失。
+</Warning>
+
+<div id="before-you-start">
+  ## 开始之前
+</div>
+
+已发布的应用需要有自己的**生产数据库**。**Database** 面板中显示的开发数据库不应由已发布的应用直接使用。
+
+<Frame>
+  <img src="/assets/mirror/dev-database-5c024a6c134e.png" alt="Database 面板显示开发数据库" width="955" height="767" data-path="images/databases/shared-database-migration/dev-database.png" />
+</Frame>
+
+要解决这个问题，请先确定你属于以下哪种情况：
+
+* **情况 1：**你需要的数据已经存在于应用 **Database** 面板所显示的数据库中。
+* **情况 2：****Database** 面板中没有显示你需要的数据，因为已发布的应用仍在使用旧的共享开发数据库。
+
+<div id="how-to-tell-if-your-published-app-is-using-a-shared-database">
+  ## 如何判断已发布的应用是否使用了共享数据库？
+</div>
+
+如果符合以下任一情况，说明你已发布的应用受到了影响：
+
+* 数据库升级后，已发布的应用出现数据库连接错误
+* 你的应用是在 **2026 年 1 月 9 日之前**从另一个带有数据库的应用重混 (Remix) 而来的
+
+<div id="how-to-check-if-your-published-app-is-using-the-shared-database-from-the-source-app">
+  ## 如何检查已发布的应用是否正在使用源应用的共享数据库？
+</div>
+
+<div id="step-1-open-the-database-panel-in-the-source-app">
+  ### 第 1 步：在源应用中打开 Database 面板
+</div>
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-showing-secrets-763dd4c4845f.png" alt="Secret panel showing DATABASE_URL" width="792" height="418" data-path="images/databases/shared-database-migration/secret-pane-showing-secrets.png" />
+</Frame>
+
+获取 `NEON_DATABASE_URL` 的值；如果不存在 `NEON_DATABASE_URL`，则获取 `DATABASE_URL` 的值。
+
+<Info>
+  并非每个受影响的应用都有 `NEON_DATABASE_URL`。如果缺失，通常说明你应使用已发布应用 Secrets 中当前的 `DATABASE_URL`，前提是它仍指向 `neon.tech`。
+</Info>
+
+<div id="step-2-open-the-publish-panel-in-the-published-app">
+  ### 第 2 步：在已发布的应用中打开 Publishing 面板
+</div>
+
+<Frame>
+  <img src="/assets/mirror/production-app-secrets-e4da45c53e36.png" alt="已发布应用的 Secrets 中显示 DATABASE_URL" width="1385" height="1225" data-path="images/databases/shared-database-migration/production-app-secrets.png" />
+</Frame>
+
+要查看已发布应用的数据库 URL：
+
+1. 在 Replit 中打开你的应用
+2. 打开 **Publishing** 面板
+3. 打开 **Adjust Settings**
+4. 打开 **Secrets**
+5. 查找 `DATABASE_URL`
+
+<div id="step-3-compare-the-database-url-from-the-source-app-in-step-1-and-the-remix-app-in-step-2">
+  ### 第 3 步：对比第 1 步中源应用与第 2 步中 remix 应用的数据库 URL
+</div>
+
+如果两者相同，说明你发布的应用正在使用源应用共享的 Neon 开发数据库。
+
+<div id="how-to-copy-data-from-source-app-to-the-published-app">
+  ## 如何将数据从源应用复制到已发布的应用？
+</div>
+
+确认已发布的应用正在使用源应用的共享开发数据库后，下一步就是将所需数据迁移到已发布的应用。这里分两种情况：
+
+* 情况 1：已发布应用的 Database 面板中已有所需数据。
+* 情况 2：已发布应用的 Database 面板中没有所需数据。
+
+<div id="case-1-the-database-panel-already-shows-the-data-you-need">
+  ### 情况 1：Database 面板中已显示所需数据
+</div>
+
+如果你需要的数据已经显示在应用的 **Database** 面板中，这是最简单的方式。
+
+<div id="step-1-confirm-the-data-is-present">
+  #### 第 1 步：确认数据存在
+</div>
+
+<Frame>
+  <img src="/assets/mirror/my-data-12834f2ebfd6.png" alt="数据库面板显示我的数据行" width="865" height="454" data-path="images/databases/shared-database-migration/my-data.png" />
+</Frame>
+
+在已发布的应用中打开 **Database** 面板，确认所需的表和数据都在其中。
+
+如果在 Database 面板中看不到所需的数据，请先停在这一步，转而按照[情况 2](#case-2-the-database-panel-does-not-show-the-data-you-need) 中的步骤正确迁移数据。
+
+<div id="step-2-publish-or-republish-with-a-production-database">
+  #### 第 2 步：使用 production database 发布或重新发布
+</div>
+
+1. 在 Project Editor 中打开你的应用
+2. 选择 **Publish** 或 **Republish**
+3. 开启 **Create production database**
+4. 开启 **Set up your production database with your current development data**
+5. 完成发布流程
+
+发布时会创建已发布应用的新版本，并自动将其 `DATABASE_URL` 指向新的 production database。在此流程中，你无需手动更新该密钥。
+
+<Frame>
+  <img src="/assets/mirror/production-database-settings-8855bf453da9.png" alt="Publish settings showing Create production database options" width="1406" height="1207" data-path="images/databases/shared-database-migration/production-database-settings.png" />
+</Frame>
+
+<Warning>
+  复制到生产环境会覆盖已有的生产数据。有关恢复或管理 production database 的更多详情，请参阅 [Production
+  Databases](/zh/features/data-and-storage/development-and-production)。
+</Warning>
+
+<div id="step-3-verify-the-published-app">
+  #### 第 3 步：验证已发布的应用
+</div>
+
+打开已发布的应用，确认数据可以正常访问、应用运行正常。
+
+<div id="case-2-the-database-panel-in-the-published-app-does-not-show-the-data-you-need">
+  ### 情况 2：已发布应用的 Database 面板中没有你需要的数据
+</div>
+
+如果在已发布应用的 **Database** 面板中看不到所需数据，请按以下步骤导出数据。
+
+如果你的已发布应用仍连接着另一个应用的数据库，Database 面板中会显示“external database detected” (检测到外部数据库) 警告。
+
+<Frame>
+  <img src="/assets/mirror/external-database-detected-489d99632e74.png" alt="Database panel showing external database detected" width="1403" height="1208" data-path="images/databases/shared-database-migration/external-database-detected.png" />
+</Frame>
+
+<Warning>
+  如果仍有用户在使用你的应用并写入新数据，请在导出数据前安排一个短暂的维护窗口。
+</Warning>
+
+<div id="step-1-export-the-data-from-the-old-database">
+  #### 第 1 步：从旧数据库导出数据
+</div>
+
+<Frame>
+  <img src="/assets/mirror/pg-dump-example-54c6c790ccb1.png" alt="pg_dump example" width="1252" height="450" data-path="images/databases/shared-database-migration/pg-dump-example.png" />
+</Frame>
+
+在 Project Editor 中打开 **Shell**，然后运行：
+
+```bash theme={null}
+pg_dump -Fc "database_url" --no-owner --no-privileges -f backup.dump
+```
+
+`database_url` 是在[步骤 1：在源应用中打开 Database 面板](#step-1-open-the-database-panel-in-the-source-app)中获取的数据库 URL。
+
+<div id="step-2-remove-the-old-database_url-from-your-apps-secrets">
+  ### 第 2 步：从应用的 Secrets 中删除旧的 `DATABASE_URL`
+</div>
+
+<Frame>
+  <img src="/assets/mirror/secret-pane-eb253120f8a6.png" alt="secret pane example" width="1410" height="1184" data-path="images/databases/shared-database-migration/secret-pane.png" />
+</Frame>
+
+1. 在 Project Editor 中打开 **Secrets** 工具
+2. 找到旧的 `DATABASE_URL`
+3. 将其删除
+4. 刷新页面或重新打开 **Database** 面板
+
+完成后，你的应用应当不再指向旧的共享数据库，而是重新使用当前的开发数据库。
+
+<div id="step-3-import-the-data-into-your-apps-current-development-database">
+  ### 第 3 步：将数据导入应用当前的开发数据库
+</div>
+
+<Frame>
+  <img src="/assets/mirror/pg-restore-example-409ae4d7bf09.png" alt="pg_restore example" width="802" height="426" data-path="images/databases/shared-database-migration/pg-restore-example.png" />
+</Frame>
+
+移除旧的 `DATABASE_URL` 密钥后，应用当前的开发数据库应会在 Project Editor 中重新以 `$DATABASE_URL` 的形式可用。
+
+返回 Project Editor 中的 **Shell**，运行：
+
+```bash theme={null}
+pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+```
+
+这会将导出的数据加载到应用当前的开发数据库中。
+
+<div id="step-5-follow-case-1-to-publish-or-republish-with-a-production-database">
+  ### 第 5 步：按照情况 1 使用生产数据库发布或重新发布
+</div>
+
+当 **Database** 面板显示的数据无误后，按照[情况 1](#case-1-the-database-panel-already-shows-the-data-you-need) 通过 **Create production database** 发布或重新发布，并将这些数据复制到生产环境。
+
+<div id="step-6-verify-the-published-app">
+  ### 步骤 6：验证已发布的应用
+</div>
+
+<Frame>
+  <img src="/assets/mirror/successful-export-bfb997304cc1.png" alt="successful export" width="965" height="554" data-path="images/databases/shared-database-migration/successful-export.png" />
+</Frame>
+
+打开已发布的应用，确认数据可以正常访问且应用运行正常。
+
+<div id="troubleshooting">
+  ## 故障排查
+</div>
+
+<div id="the-import-fails-because-tables-already-exist">
+  ### 表已存在导致导入失败
+</div>
+
+上述 `pg_restore --clean --if-exists` 命令会在恢复之前，先删除并重新创建转储文件中匹配的对象。
+
+<div id="the-import-fails-with-role-or-policy-errors">
+  ### 导入时出现角色或策略相关错误
+</div>
+
+如果你的数据库使用了自定义 PostgreSQL 角色或基于角色的策略，导入可能会失败，因为这些角色在新数据库中尚不存在。
+
+Replit 的自动 Helium 迁移会在恢复前尝试重建角色存根，而上述手动流程不会。如果你在执行 `pg_restore` 时遇到与角色相关的错误，请[联系支持团队](https://replit.com/support)寻求帮助。
+
+<div id="i-already-fixed-the-app">
+  ### 我已经修复了应用
+</div>
+
+如果你已发布的应用已拥有自己的生产数据库且运行正常，则无需再做任何操作。
+
+<div id="need-more-help">
+  ## 需要更多帮助？
+</div>
+
+如果你不确定你的应用属于哪种情况，或在迁移过程中遇到问题，请[联系支持团队](https://replit.com/support)。
+
+<div id="related-docs">
+  ## 相关文档
+</div>
+
+* [数据库升级](/zh/features/data-and-storage/development-and-production#database-infrastructure-upgrade)
+* [生产数据库](/zh/features/data-and-storage/development-and-production)
+* [数据库](/zh/features/data-and-storage/sql-database)

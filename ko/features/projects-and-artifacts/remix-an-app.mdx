@@ -1,0 +1,235 @@
+---
+title: "앱 리믹스하기"
+description: "공개된 Replit App이나 템플릿의 복사본을 직접 만들어 workspace에서 살펴보고, 원하는 대로 수정하고, 확장해 보세요."
+sidebarTitle: "리믹스"
+icon: "clone"
+---
+
+export const RemixButton = ({replUrl = "https://replit.com/@sarahxli/Digital-Piano-Keys?v=1", label = "Remix this app", count = null}) => {
+  if (typeof document !== 'undefined' && !document.getElementById('remix-button-styles')) {
+    const style = document.createElement('style');
+    style.id = 'remix-button-styles';
+    style.textContent = `
+      /* Button container */
+      .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-muted, #F1F1EE);
+        --btn-bg-hover: var(--replit-docs-bg-elevated, #F1F1EE);
+        --btn-text: var(--replit-docs-text, #1D1D1D);
+        --btn-border: var(--replit-docs-border, #DEDAD5);
+        --transition-duration: 120ms;
+        display: flex;
+        justify-content: center;
+      }
+
+      .dark .remix-btn-container,
+      html.dark .remix-btn-container,
+      [data-theme="dark"] .remix-btn-container {
+        --btn-bg: var(--replit-docs-bg-elevated, #222223);
+        --btn-bg-hover: var(--replit-docs-bg-muted, #222223);
+        --btn-text: var(--replit-docs-text, #F5F5F5);
+        --btn-border: var(--replit-docs-border, #39393D);
+      }
+
+      /* Button base styles - matching template page exactly */
+      .remix-btn {
+        /* Layout */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        max-width: 400px;
+        min-width: 200px;
+        height: 36px;
+        padding: 0 16px;
+        gap: 8px;
+
+        /* Typography */
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5;
+        text-decoration: none;
+        white-space: nowrap;
+
+        /* Visual */
+        border-radius: 8px;
+        border: none;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        box-shadow: inset 0 0 0 1px var(--btn-border);
+
+        /* Interaction */
+        cursor: pointer;
+        user-select: none;
+        transition-property: background-color;
+        transition-duration: var(--transition-duration);
+        transition-timing-function: ease-out;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
+
+      /* Content (icon + label) - centered */
+      .remix-btn-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      /* Hover state */
+      @media (hover: hover) {
+        .remix-btn:hover {
+          background: var(--btn-bg-hover);
+        }
+      }
+
+      /* Active/pressed state */
+      .remix-btn:active {
+        background: var(--btn-bg-hover);
+        transform: scale(0.99);
+      }
+
+      /* Focus visible state */
+      .remix-btn:focus-visible {
+        outline: 2px solid #0079F2;
+        outline-offset: 2px;
+      }
+
+      /* Icon styles */
+      .remix-btn svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Label styles */
+      .remix-btn span {
+        font-weight: 600;
+      }
+
+      /* Animation */
+      @keyframes remix-btn-fade-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .remix-btn-container {
+        animation: remix-btn-fade-in 300ms ease-out;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  const handleClick = e => {
+    e.preventDefault();
+    const url = replUrl.includes('replit.com') ? replUrl : `https://replit.com${replUrl}`;
+    window.open(url, '_blank');
+  };
+  const RemixIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMin">
+      <path d="M17.47 13.47a.75.75 0 0 1 1.06 0l4 4a.745.745 0 0 1 .118.16c.016.027.032.054.044.083.007.016.01.032.016.049a.744.744 0 0 1 .042.238.743.743 0 0 1-.037.223c-.007.02-.012.042-.02.062a.748.748 0 0 1-.163.245l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H15.95a4.753 4.753 0 0 1-3.886-2.09l-.351-.442a.75.75 0 0 1 1.172-.936l.36.45.04.055a3.251 3.251 0 0 0 2.68 1.463h4.224l-2.72-2.72a.75.75 0 0 1 0-1.06ZM17.47 1.47a.75.75 0 0 1 1.06 0l4 4a.756.756 0 0 1 .162.816.749.749 0 0 1-.162.244l-4 4a.75.75 0 0 1-1.06-1.06l2.72-2.72H16.02a3.25 3.25 0 0 0-2.674 1.372l-5.44 8.58a4.75 4.75 0 0 1-3.934 2.047L2 18.75a.75.75 0 0 1 0-1.5h1.979a3.25 3.25 0 0 0 2.673-1.373l5.442-8.578.02-.03a4.751 4.751 0 0 1 3.913-2.018l4.162-.001-2.72-2.72a.75.75 0 0 1 0-1.06ZM3.972 5.25a4.75 4.75 0 0 1 4.27 2.612.751.751 0 0 1-1.34.675 3.252 3.252 0 0 0-2.698-1.781l-.226-.006H2a.75.75 0 0 1 0-1.5h1.972Z" />
+    </svg>;
+  return <div className="remix-btn-container" style={{
+    margin: '16px 0'
+  }}>
+      <button onClick={handleClick} className="remix-btn" type="button" tabIndex={0}>
+        <RemixIcon />
+        <span>{label}</span>
+      </button>
+    </div>;
+};
+
+Remix를 사용하면 커뮤니티가 만든 기존 app에서 시작할 수 있습니다. 처음부터 직접 만드는 것보다 빠르고, 실제로 동작하는 코드를 보며 배울 수 있는 좋은 방법입니다.
+
+<Tip>
+  Replit이 처음이신가요? [첫 번째 app 만들기](/ko/build/your-first-app)에서 Agent의 작동 방식을 처음부터 익혀 보세요.
+</Tip>
+
+<div id="what-is-a-remix">
+  ## Remix란
+</div>
+
+**Remix**는 현재 접근 권한이 있는 앱을 기반으로 새로 만드는 Replit App입니다. 공개 앱이나 template을 remix하면 직접 사용해 보고 반복적으로 개선할 수 있는 나만의 사본이 생성됩니다. Remix에서 변경한 내용은 원본 앱에 영향을 주지 않습니다.
+
+Remix에는 출처가 표시됩니다. 원본으로 연결되는 **Remixed from** 링크가 표시되고, 원본의 빌드 prompt가 cover page에 나타납니다.
+
+<div id="what-your-remix-includes">
+  ## Remix에 포함되는 항목
+</div>
+
+Remix는 원본과 완전히 분리된, 그대로 동작하는 복사본입니다.
+
+* **모든 파일과 설정**이 복사되므로 앱이 원본과 똑같이 실행됩니다.
+* **원본의 checkpoint 기록**도 함께 넘어오며, 원본 앱에서 가져온 기록으로 표시됩니다. 이 checkpoint 중 원하는 지점으로 roll back할 수 있으며, 해당 checkpoint를 만든 대화는 원본에 그대로 남습니다.
+* **완전히 새로운 Agent.** Remix는 새 Agent로 시작하며, 이전 채팅 기록을 물려받지 않습니다.
+* **secret은 값이 아닌 이름만.** 앱에서 secret(예: API key)을 사용하는 경우, 어떤 값을 입력해야 하는지 알 수 있도록 Remix에 이름이 값 없이 나열됩니다. 값은 본인의 앱을 remix할 때만 복사됩니다.
+* **새 database.** Remix는 원본의 database에 절대 연결되지 않습니다. 원본에서 지원하는 경우 **원본 App에서 데이터 복사** 옵션으로 데이터 자체를 복사할 수 있으며, 이때도 변경 사항이 원본에 영향을 주는 일은 없습니다.
+* Replit Auth를 사용하는 앱이라면 **로그인 설정도 새로 구성**됩니다.
+
+복사되지 않는 항목: deployment, 도메인, connector 설정은 본인의 복사본에서 직접 구성해야 합니다. 또한 Remix는 Private 상태로 시작하므로, 직접 publish하기 전까지는 아무것도 공유되지 않습니다.
+
+<div id="how-to-remix-an-app">
+  ## 앱을 remix하는 방법
+</div>
+
+<Steps>
+  <Step title="앱의 cover page 열기">
+    [커뮤니티](https://replit.com/community/all)에 있는 앱처럼 remix하고 싶은 앱을 찾아보세요. 앱의 cover page에는 실시간 미리보기와 공유 옵션이 표시됩니다.
+  </Step>
+
+  <Step title="앱 remix하기">
+    **Remix this App**을 선택해 나만의 버전을 만들기 시작합니다.
+  </Step>
+
+  <Step title="앱 세부 정보 입력하기">
+    **Remix App** 대화 상자에서 복사본의 이름과 설명(선택 사항)을 입력한 후 **Remix App**을 선택합니다. 이 정보는 나중에 수정할 수 있습니다.
+
+    <Frame>
+      <img src="/assets/mirror/quickstart_remix_dialog-39c49a3d7bb7.png" alt="앱 이름, 설명, 개인정보 설정이 표시된 Remix App 대화 상자" width="1222" height="1202" data-path="images/getting-started/quickstart_remix_dialog.png" />
+    </Frame>
+  </Step>
+
+  <Step title="복사본 살펴보기">
+    복사본이 workspace에서 열리면서 자동으로 실행됩니다. **Preview** tab으로 이동해 실행 중인 모습을 확인하세요.
+  </Step>
+</Steps>
+
+<div id="try-it">
+  ## 직접 해보기
+</div>
+
+[template으로 시작하기](/ko/design/start-from-a-template)에 소개된 추천 template 중 하나인 **Supercar showcase** template을 Remix해 보세요:
+
+<Frame>
+  <img src="/assets/mirror/supercar-showcase-0dac55fd5243.webp" alt="Supercar showcase template 커버 이미지. 실버 슈퍼카 hero가 담긴 어두운 landing page" width="1920" height="1080" data-path="images/design/replit-design/templates/supercar-showcase.webp" />
+</Frame>
+
+<RemixButton replUrl="https://replit.com/t/replit-gallery/repls/Apex-01/view" label="이 앱 Remix하기" />
+
+<div id="build-on-your-remix">
+  ## Remix를 기반으로 빌드하기
+</div>
+
+Remix가 workspace에서 열리면 Agent로 앱을 수정하고 확장할 수 있습니다. **Agent** 탭에 추가하려는 기능을 설명하는 prompt를 입력하세요.
+
+Agent가 적용한 변경 사항을 되돌리려면 변경 후 생성된 checkpoint에서 **Rollback to here**를 선택하세요. 자세한 내용은 [checkpoint 및 롤백](/ko/features/version-control/checkpoints-and-rollbacks)을 참조하세요.
+
+<div id="remix-or-build-from-a-prompt">
+  ## Remix할까요, prompt로 만들까요?
+</div>
+
+두 방식 모두 도착점은 같습니다. Agent와 함께 발전시켜 나가는 나만의 앱이죠. 다만 출발점이 다릅니다.
+
+|             | Remix               | prompt로 만들기              |
+| ----------- | ------------------- | ------------------------ |
+| 출발점         | 그대로 복사한, 작동하는 앱     | 설명을 바탕으로 Agent가 만든 앱     |
+| 첫 결과물       | 즉시 나오며 원본과 동일함      | 시간이 더 걸리고 결과물이 매번 다름     |
+| Agent의 첫 동작 | 사용자의 direction을 기다림 | prompt를 바탕으로 계획하고 build함 |
+
+원하는 것에 가까운 앱이 이미 있다면 remix하세요. Agent가 첫 turn부터 백지가 아니라 실제로 작동하는 앱을 대상으로 작업할 수 있습니다. 어디서도 비슷한 것을 찾을 수 없는 아이디어라면 prompt로 만들어 보세요.
+
+<div id="next-steps">
+  ## 다음 단계
+</div>
+
+* **더 많은 Remix 살펴보기**: [커뮤니티](https://replit.com/community/all)를 둘러보며 remix하고 배울 만한 app을 찾아보세요
+* **처음부터 만들기**: Agent로 [나만의 app 만들기](/ko/build/your-first-app)에 도전해 경험을 비교해 보세요
+* **Remix할 수 있도록 게시하기**: 개선한 버전을 공유해 다른 사람들이 여러분의 작업을 발전시킬 수 있도록 하세요

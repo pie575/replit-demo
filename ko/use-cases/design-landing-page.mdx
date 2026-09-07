@@ -1,0 +1,162 @@
+---
+title: "랜딩 페이지 디자인하기"
+description: "Notion 브리프와 브랜드 파일을 활용해 Replit Design에서 대기자 명단 또는 출시 페이지를 디자인하세요."
+sidebarTitle: "랜딩 페이지 디자인하기"
+icon: "window-maximize"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                기본 제공 connector가 아닙니다. Agent가 API key를 요청합니다.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+아직 페이지가 없습니다. 새 제품, 대기자 명단, 캠페인 중 무엇이든 마찬가지죠. Notion 브리프와 Google Drive에 있는 브랜드 파일을 활용해 Replit Design에서 랜딩 페이지를 디자인해 보세요. 히어로 섹션, 근거, 작동 방식, 그리고 하나의 행동 유도 문구로 구성됩니다. Agent는 Notion에 담긴 제안과 문구, 그리고 Drive에 있는 로고, 색상, 서체를 사용합니다. 이것은 코드로 구현된 사이트가 아니라 페이지의 비주얼 시스템입니다. Build할 때 프레임을 spec으로 활용하세요.
+
+<div id="best-for">
+  ## 이런 경우에 적합합니다
+</div>
+
+* 제품 출시 전에 대기자 명단 페이지나 출시 페이지가 필요한 제품 디자이너
+* Notion 브리프와 Drive assets를 바탕으로 브랜드에 맞는 첫 layout을 만들고 싶은 창업자
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "브리프: 제안, 대상 고객, 근거, 행동 유도 문구",
+},
+{
+id: "google-drive",
+name: "Google Drive",
+why: "로고, 색상, 서체, 브랜드 에셋",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
+
+브리프(제안, 대상 고객, 행동 유도 문구)가 담긴 Notion 페이지와 Drive에 저장된 브랜드 파일을 준비하세요. 그런 다음 Notion과 Drive를 연결합니다. 페이지의 대상이 누구인지, 주요 행동 유도 문구는 무엇인지(가입, 대기자 명단 등록, 데모 예약, 구매) 알려주세요.
+
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
+
+<AiPrompt>
+  이 Notion 페이지 [링크]와 Google Drive의 브랜드 파일을 활용해서, Replit Design으로
+  [대기자 명단 / 출시 / 데모 예약]용 랜딩 페이지를 디자인해 줘. Notion에 있는 제안,
+  타깃 고객, 근거, 행동 유도 문구를 활용해. 데스크톱과 모바일 프레임을 만들어 줘.
+  행동 유도 문구가 하나 있는 히어로 섹션, 소셜 프루프, 작동 방식, 마지막 행동 유도 문구
+  순서로. 기존 로고, 색상, 서체를 사용해.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 기대할 수 있는 결과
+</div>
+
+Agent가 Notion 브리프와 Drive 브랜드 파일을 읽은 뒤 Replit Design에 프레임을 배치합니다.
+결과물은 데스크톱 페이지와 모바일 crop이며, 배포된 앱이 만들어지지는 않습니다. 직접 build할 때 프레임을 spec으로
+활용하거나, 이후 Build workflow에서 Agent에게 구현을 요청하세요. 데스크톱과 모바일을 나란히 놓고 Preview해 보세요.
+프레임을 최종본으로 확정하기 전에 행동 유도 문구, 입증 요소, colors가 Notion 및 Drive의 내용과 일치하는지
+확인하세요.
+
+<div id="make-it-work-for-you">
+  ## 나에게 맞게 활용하기
+</div>
+
+<AiPrompt>
+  이 페이지를 대기자 명단 랜딩 페이지로 만들어 줘. 핵심 약속 하나, 입증 요소 세 가지,
+  이메일 수집을 넣고 추가 내비게이션은 빼 줘. 입증 요소는 Notion에서 가져와 줘.
+</AiPrompt>
+
+<AiPrompt>
+  이 Notion 표 [링크]에 있는 세 가지 등급으로 가격 섹션을 추가해 줘. 비주얼 시스템은
+  그대로 유지하고, 가운데 plan을 강조해 줘.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+* **문구가 브리프 내용과 다른 경우:** Notion 페이지 링크를 제공하고, 사이트 내용을 다시 쓰지 말고 해당 문서의 제안, 대상 고객, 근거, 행동 유도 문구를 사용하도록 Agent에게 요청하세요.
+* **색상과 서체가 브랜드와 맞지 않는 경우:** Drive를 연결한 뒤 logo, 색상, 서체 파일을 지정하세요.
+* **live site가 나올 것으로 기대한 경우:** 이 workflow는 배포된 앱이 아니라 Replit Design의 프레임을 생성합니다. 생성된 프레임을 spec으로 활용하거나, 이후 Build workflow에서 이를 구현하도록 Agent에게 요청하세요.
+
+<div id="related">
+  ## 관련 문서
+</div>
+
+<CardGroup cols={2}>
+  <Card title="소셜 아이콘과 배너 만들기" href="/ko/use-cases/create-social-kit">
+    프로필과 커버 asset에도 동일한 Google Drive 브랜드 파일을 활용합니다.
+  </Card>
+
+  <Card title="유료 이벤트 웹사이트 출시하기" href="/ko/use-cases/launch-event-website">
+    동일한 Notion 소스를 프레임뿐 아니라 공개 페이지 제작에도 활용합니다.
+  </Card>
+</CardGroup>

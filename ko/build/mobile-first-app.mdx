@@ -1,0 +1,249 @@
+---
+title: "첫 모바일 앱 시작하기"
+description: "Agent와 함께 레트로 스타일 게임 앱 PixelGames를 네이티브 iOS 및 Android 앱으로 만들어 보세요."
+sidebarTitle: "모바일 앱 시작하기"
+icon: "wand-magic-sparkles"
+---
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "복사됨!";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        프롬프트 복사
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Replit에서 Build ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pixelGamesPrompt = "PixelGames라는 모바일 앱을 만드세요. 클래식 Game Boy 스타일의 레트로 휴대용 게임기 UI로, 크림색 플라스틱 본체와 회색 화면 베젤, 격자선이 있는 올리브그린 LCD 화면을 적용하세요. D-pad와 둥근 A/B 버튼 두 개를 추가하고, 화면 아래에는 MENU 및 START 버튼도 배치하세요. Blocks, Snake, Racer, Pinball의 네 가지 게임이 있는 메뉴를 표시하세요.";
+
+Replit에서 모바일 앱을 만드는 과정은 웹 앱을 만들 때와 동일합니다. 원하는 것을 설명하면 Agent가 코드를 작성합니다. 이 가이드에서는 예시 하나를 따라가며 그 과정을 살펴봅니다. 직접 떠올린 아이디어에 적용하기 전에 전체적인 흐름을 파악해 보세요.
+
+<Frame caption="최종 결과: 휴대폰에서 실행 중인 PixelGames 메뉴와 Blocks 게임.">
+  <img src="/assets/mirror/pixelgames-home-screen-eeffe5c27dc1.webp" alt="Blocks, Snake, Racer, Pinball이 나열되고 Blocks가 선택된 PixelGames 메뉴" width="420" height="420" data-path="images/pixelgames/mobile/pixelgames-home-screen.webp" />
+</Frame>
+
+<PromptActions prompt={pixelGamesPrompt} campaign="docs-mobile-first-app" />
+
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
+
+무료로 만들 수 있는 [Replit 계정](https://replit.com/)만 있으면 됩니다.
+
+목표는 전체 과정을 한 번에 끝까지 완주하는 것입니다.
+
+* [Agent](/ko/features/agent/overview)로 만들기
+* 모바일 앱으로 테스트하기
+* 게시하고 공유하기
+
+Agent는 Replit의 AI 빌더입니다. 원하는 것을 설명하기만 하면 Agent가 앱을 만들고, 무엇을 했는지 설명하고,
+문제가 있으면 고쳐줍니다.
+
+<div id="1-tell-agent-to-build-the-app">
+  ## 1. Agent에게 앱 제작 요청하기
+</div>
+
+Replit을 열고 새 앱을 시작하세요. 만들고 싶은 것을 설명한 다음, 앱 유형으로 **모바일 앱**을
+선택합니다.
+
+<AiPrompt>
+  {pixelGamesPrompt}
+</AiPrompt>
+
+<Frame caption="모바일 project와 Console Shell UI를 설정하는 Agent.">
+  <img src="/assets/mirror/pixelgames-scaffolding-6b34f56cd5f2.png" alt="Mobile 모드가 선택된 상태로 Replit 홈페이지에 입력된 PixelGames 빌드 프롬프트" data-path="images/pixelgames/mobile/pixelgames-scaffolding.png" width="877" height="411" data-path="images/pixelgames/mobile/pixelgames-scaffolding.png" />
+</Frame>
+
+<div id="2-confirm-it-works-in-preview">
+  ## 2. preview에서 정상 작동하는지 확인하기
+</div>
+
+Replit은 preview pane에서 PixelGames를 iOS 또는 Android 앱처럼 바로 시뮬레이션합니다. 변경 사항을 확인하는 가장 빠른 방법입니다.
+
+<Steps>
+  <Step title="시뮬레이터는 자동으로 시작됩니다">
+    PixelGames가 준비되는 즉시 Replit이 시뮬레이션을 실행하므로 별도의 설정은 필요하지 않습니다.
+  </Step>
+
+  <Step title="드롭다운으로 플랫폼 전환하기">
+    preview pane 툴바(렌치 및 새로고침 icon 옆)에 있는 **Simulate on...** 드롭다운으로 **iOS**, **Android**, **Web** 간에 전환하세요.
+  </Step>
+</Steps>
+
+<Frame caption="Replit preview pane의 Simulate on... 드롭다운.">
+  <img src="/assets/mirror/replit-simulate-dropdown-130bd3168cfe.png" alt="Simulate on Web, iOS 또는 Android 드롭다운이 열려 있는 Replit preview pane" data-path="images/pixelgames/mobile/replit-simulate-dropdown.png" width="1920" height="992" data-path="images/pixelgames/mobile/replit-simulate-dropdown.png" />
+</Frame>
+
+<div id="check-that-it-actually-works">
+  ### 실제로 작동하는지 확인하기
+</div>
+
+플레이어처럼 PixelGames를 직접 사용해 보세요:
+
+* **MENU** 화면에서 **Blocks**는 선택할 수 있고 나머지 세 게임은 &quot;SOON&quot;으로 표시되는지 확인합니다.
+* Blocks를 열고 D-pad와 A/B 버튼으로 블록을 몇 개 움직여 봅니다.
+* 플레이하는 동안 HUD의 점수, 레벨, 라인이 갱신되는지 확인합니다.
+
+이상한 점이 보이면 무엇을 봤는지 Agent에게 설명하세요. 버그를 직접 찾아낼 필요는
+없습니다.
+
+<div id="youve-got-pixelgames-running">
+  ## PixelGames가 실행되었습니다
+</div>
+
+프롬프트 하나로 시작해 플레이할 수 있는 게임까지 만들었고, Replit 안에서 바로 Preview로 확인했습니다.
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+<AccordionGroup>
+  <Accordion title="preview pane이 계속 빈 화면입니다">
+    첫 빌드는 1~2분 정도 걸리므로, 멈췄다고 단정하기 전에 잠시 기다려 보세요.
+    그 후에도 계속 비어 있다면 Console에서 오류를 확인하고 Agent에 공유하세요.
+  </Accordion>
+
+  <Accordion title="변경 사항이 Preview에 반영되지 않습니다">
+    Console에서 **R**을 눌러 PixelGames를 다시 로드하고, 그래도 이전 상태로 보이면 preview pane
+    Toolbar의 새로 고침 icon을 사용하세요.
+  </Accordion>
+
+  <Accordion title="Preview에 빨간 오류 화면이 표시됩니다">
+    대개 JavaScript 오류이거나 package가 누락된 경우입니다. 메시지를 읽어 보면 문제가 발생한 파일과
+    줄을 정확히 알려 주는 경우가 많으니, 이를 Agent에 공유하고 수정을 요청하세요.
+  </Accordion>
+
+  <Accordion title="웹에서는 App이 작동하지만 iOS나 Android에서 깨집니다(또는 그 반대)">
+    일부 package는 플랫폼마다 다르게 동작합니다. 웹에서 잘 작동하는 package라도 네이티브를 지원하지 않거나
+    별도의 설정이 필요할 수 있습니다. 해당 package를 사용하기 전에 Agent에게 &quot;이 package가 네이티브를 지원하나요?&quot;라고
+    물어보세요.
+  </Accordion>
+
+  <Accordion title="빌드에 시간이 오래 걸립니다">
+    아직 cache된 것이 없어 첫 빌드는 항상 느리며, 이후 빌드는 더 빨라집니다.
+    계속 느리다면 Agent에게 project에 불필요한 package가 있는지 확인해 달라고 요청하세요.
+  </Accordion>
+
+  <Accordion title="모듈을 찾을 수 없다는 오류가 발생합니다">
+    package가 설치되지 않았거나, 설치는 되었지만 cache가 오래된 상태라는 뜻입니다. Agent에게 package를
+    설치하거나 cache를 지워 달라고 요청하고, package 이름에 오타가 없는지도 다시 확인하세요.
+  </Accordion>
+</AccordionGroup>
+
+<div id="whats-next">
+  ## 다음 단계
+</div>
+
+<CardGroup cols={2}>
+  <Card title="휴대폰에서 테스트하기" icon="mobile" href="/ko/build/mobile-preview-testing">
+    PixelGames를 실제 휴대폰 앱처럼 체험해 보세요. 엄지로 누르는 버튼, 햅틱 피드백, 실제 화면
+    크기까지 그대로입니다.
+  </Card>
+
+  <Card title="로그인 추가하기" icon="right-to-bracket" href="/ko/build/mobile-login">
+    플레이어가 로그인하고 진행 상황을 저장할 수 있게 하세요.
+  </Card>
+
+  <Card title="모바일 앱에 이미지 저장하기" icon="image" href="/ko/build/mobile-store-images">
+    프로필 사진을 App Storage에 저장하세요.
+  </Card>
+
+  <Card title="푸시 알림 보내기" icon="bell" href="/ko/build/mobile-push-notifications">
+    새 게임이 출시되면 플레이어에게 알려주세요.
+  </Card>
+
+  <Card title="결제 추가하기" icon="credit-card" href="/ko/build/mobile-payments">
+    PixelGames의 콘텐츠에 대해 플레이어에게 요금을 청구하세요.
+  </Card>
+</CardGroup>

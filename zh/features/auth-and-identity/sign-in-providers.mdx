@@ -1,0 +1,392 @@
+---
+title: "登录身份提供方"
+description: "为使用 Clerk Auth 的应用设置 Google、GitHub、Apple 和 X 登录的自定义 OAuth 凭据。"
+sidebarTitle: "登录身份提供方"
+icon: "right-to-bracket"
+---
+
+当你的应用使用 [Clerk Auth](/zh/features/auth-and-identity/clerk-auth) 时，访问者可以通过社交身份提供方登录。Replit 默认提供共享凭据；本页面介绍如何为各个身份提供方使用你**自己的** OAuth 凭据，从而在登录界面上展示你应用的名称和品牌形象。
+
+各身份提供方的配置流程都相同：在该身份提供方的控制台中创建一个 OAuth 应用，复制 Replit 显示的 URL，再将生成的凭据粘贴到该身份提供方的编辑面板中。
+
+<Note>
+  自定义 OAuth 凭据仅在 **Production** 环境中可用，因此你的应用需先完成[发布](/zh/features/publishing/overview)。可从 **Users &amp; Auth** 工具中打开各身份提供方的编辑面板：进入 **Configure** 选项卡的 **SSO providers** 部分，选择 **Production** 环境，然后点击身份提供方旁的 **Edit**。有关整体流程，请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+</Note>
+
+<div id="google">
+  ## Google
+</div>
+
+本指南将引导你在 Google Cloud Console 中创建 Google OAuth 应用。你将获取 **Client ID** 和 **Client Secret**，并配置 Clerk 所需的 JavaScript 来源和重定向 URI。
+
+前提条件：拥有 [Google Cloud Console](https://console.cloud.google.com/) 的访问权限。
+
+<div id="step-1-create-a-google-oauth-app">
+  ### 步骤 1：创建 Google OAuth 应用
+</div>
+
+前往 [Google Cloud Console](https://console.cloud.google.com/)：
+
+<div id="create-or-select-a-project">
+  #### 创建或选择项目
+</div>
+
+1. 在项目下拉菜单中选择现有项目，或新建一个项目
+2. 页面会跳转到该项目的 Dashboard
+
+<div id="configure-oauth-consent-screen">
+  #### 配置 OAuth 同意屏幕
+</div>
+
+1. 在左侧边栏中，点击菜单图标 (≡)，然后选择 **APIs &amp; Services**
+2. 选择 **OAuth consent screen**
+3. 填写必要信息，完成应用同意屏幕的配置
+4. 保存更改
+
+<div id="create-oauth-credentials">
+  #### 创建 OAuth 凭据
+</div>
+
+1. 在 **APIs &amp; Services** 中，选择 **Credentials**
+2. 点击顶部的 **Create Credentials**，然后选择 **OAuth client ID**
+3. 应用类型选择 **Web application**
+4. 将 **Authorized JavaScript origins** 和 **Authorized redirect URIs** 设置为 **Auth 面板** 中 **Provider setup** 下显示的确切值。列出的每个值都要添加，其中包括你已发布的域名和所有自定义域名。查找方法请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+5. 点击 **Create**
+6. 保存你的 **Client ID** 和 **Client Secret**
+
+<Warning>
+  请妥善保管 Client Secret，切勿将其提交到版本控制系统。
+</Warning>
+
+<Warning>
+  Google 登录无法在嵌入式浏览器或应用内网页视图中使用，用户必须使用标准网页浏览器。
+</Warning>
+
+<div id="troubleshooting">
+  ### 故障排查
+</div>
+
+<div id="redirect-uri-mismatch">
+  #### 重定向 URI 不匹配
+</div>
+
+* 确认 Google Cloud Console 中的重定向 URI 与 **Auth 面板**中 **Provider setup** 下显示的值完全一致
+* 确保结尾没有多余的斜杠，也没有拼写错误
+* 等待几分钟，让 Google 的配置生效
+
+<div id="invalid-client">
+  #### 客户端无效
+</div>
+
+* 仔细核对 Client ID 和 Client Secret 是否复制正确
+* 确保没有多余的空格
+* 确认已配置 OAuth 同意屏幕
+
+<div id="not-working-on-custom-domain">
+  #### 在自定义域名上无法使用
+</div>
+
+* 将 **Auth 面板** 中 **Provider setup** 下显示的自定义域名条目同时添加到 Authorized JavaScript origins 和 Authorized redirect URIs 中
+
+<div id="github">
+  ## GitHub
+</div>
+
+本指南将引导你在 GitHub Developer Settings 中创建 GitHub OAuth 应用。你需要获取 **Client ID** 和 **Client Secret**，并将其填入 **Auth 面板**。
+
+前提条件：一个 [GitHub 账户](https://github.com)。
+
+<div id="step-1-create-a-github-oauth-app">
+  ### 第 1 步：创建 GitHub OAuth 应用
+</div>
+
+1. 前往 [GitHub 开发者设置](https://github.com/settings/developers)
+2. 在侧边栏中选择 **OAuth Apps**
+3. 选择 **New OAuth App**
+4. 填写应用信息：
+
+**Application name：**
+
+为应用输入一个名称。
+
+**Homepage URL** 和 **Authorization callback URL：**
+
+两者都需填写 **Auth 面板**中 **Provider setup** 下显示的确切值。查找方法请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+
+5. 选择 **Register application**
+
+<div id="step-2-generate-client-credentials">
+  ### 步骤 2：生成客户端凭据
+</div>
+
+1. 在应用的设置页面上可以看到 **Client ID**，将其复制下来
+2. 选择 **Generate a new client secret**
+3. 立即复制你的 **Client Secret**
+
+<Warning>
+  请妥善保存你的 Client Secret。一旦离开该页面，就无法再次查看。如果丢失，只能重新生成一个。
+</Warning>
+
+<div id="troubleshooting-2">
+  ### 故障排查
+</div>
+
+<div id="redirect-uri-mismatch-2">
+  #### 重定向 URI 不匹配
+</div>
+
+* 确认授权回调 URL 与 **Auth 面板**中 **Provider setup** 下显示的值完全一致
+* 检查是否存在拼写错误或协议填写错误
+* 结尾不要带斜杠
+
+<div id="invalid-client-2">
+  #### 客户端无效
+</div>
+
+* 请再次核对 Client ID 和 Client Secret 是否复制正确
+* 确保粘贴时没有多余的空格
+
+<div id="not-working-on-custom-domain-2">
+  #### 在自定义域名上无法正常工作
+</div>
+
+* 将 Homepage URL 和 Authorization callback URL 更新为 **Auth 面板** 的 **Provider setup** 中显示的自定义域名值
+
+<div id="apple">
+  ## Apple
+</div>
+
+本指南将引导你创建“通过 Apple 登录”所需的 Apple App ID、Services ID 和私钥。你需要获取 **Team ID**、**Services ID**、**Key ID** 和**私钥**，并将其填入 **Auth 面板**。
+
+前提条件：一个 [Apple 开发者账户](https://developer.apple.com/account) (需先加入 Apple Developer Program) 。
+
+<div id="step-1-create-an-apple-app-id">
+  ### 第 1 步：创建 Apple App ID
+</div>
+
+1. 前往 [Apple 开发者门户](https://developer.apple.com/account)
+2. 进入 **Certificates, IDs &amp; Profiles**，然后打开 **Identifiers**
+3. 从下拉菜单中选择 **App IDs**
+4. 点击 **+** 图标注册新的标识符
+5. 选择 **App IDs**，然后点击 **Continue**
+6. 选择 **App**，然后点击 **Continue**
+7. 填写以下内容：
+   * **Description**：App ID 的名称
+   * **Bundle ID**：你的唯一标识符
+8. 在 Capabilities 中启用 **Sign In with Apple**
+9. 点击 **Continue**，然后点击 **Register**
+10. **保存 App ID Prefix** (显示在页面顶部) ——这就是你的 **Team ID**
+
+<div id="step-2-create-an-apple-services-id">
+  ### 第 2 步：创建 Apple Services ID
+</div>
+
+1. 在 Identifiers 页面，从下拉菜单中选择 **Services IDs**
+2. 选择 **+** 注册新的标识符
+3. 选择 **Services IDs**，然后选择 **Continue**
+4. 填写以下内容：
+   * **Description**：为你的 Services ID 取一个名称
+   * **Identifier**：你的唯一标识符 (请妥善保存，这就是你的 **Services ID**)
+5. 选择 **Continue**，然后选择 **Register**
+
+<div id="configure-the-services-id">
+  #### 配置 Services ID
+</div>
+
+1. 选择新创建的 Services ID
+2. 启用 **Sign In with Apple**
+3. 选择 **Configure**
+4. 进行如下设置：
+
+   * **Primary App ID**：选择第 1 步中创建的 App ID
+   * **Domains and Subdomains**：复制 **Auth 面板** 中 **Provider setup** 下显示的值 (不含 `https://` 协议前缀)
+   * **Return URLs**：复制 **Auth 面板** 中 **Provider setup** 下显示的值
+
+   有关如何查找这些值，请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+5. 依次选择 **Next**、**Done**、**Continue**，最后选择 **Save**
+
+<div id="step-3-create-an-apple-private-key">
+  ### 第 3 步：创建 Apple 私钥
+</div>
+
+1. 在 Apple Developer 门户的侧边栏中，选择 **Keys**
+2. 选择 **+** 注册新密钥
+3. 输入 **Key Name**
+4. 启用 **Sign In with Apple**
+5. 选择 **Configure**，然后选择第 1 步中创建的 App ID
+6. 依次选择 **Save**、**Continue** 和 **Register**
+7. **保存 Key ID**
+8. **下载**私钥文件 (.p8)
+
+<Warning>
+  私钥仅可下载一次，请妥善保管，之后将无法再次下载。
+</Warning>
+
+<div id="step-4-configure-apple-private-email-relay">
+  ### 第 4 步：配置 Apple 私密电子邮件转发服务
+</div>
+
+Apple 的“隐藏邮箱地址”功能让用户无需透露真实邮箱即可登录。若要向这类用户发送邮件，需要注册你的邮件来源。
+
+1. 在 Apple Developer 门户侧边栏中，选择 **Services**
+2. 在 **Sign in with Apple for Email Communication** 下，选择 **Configure**
+3. 选择 **+** 添加邮件来源
+4. 输入 **Auth 面板** 中 **Provider setup** 下显示的邮件来源值
+5. 依次选择 **Next**、**Register**、**Done**
+6. 等待 DNS 验证完成 (出现绿色对勾图标)
+
+<Info>
+  在部分地区 (中国、印度) ，Apple ID 可能绑定的是手机号而非邮箱。如果你的应用要求所有用户都提供邮箱，这些地区的用户可能无法通过 Apple 登录。
+</Info>
+
+<div id="troubleshooting-3">
+  ### 故障排查
+</div>
+
+<div id="invalid-client-3">
+  #### 无效的客户端
+</div>
+
+* 确认所有凭据均已正确输入
+* 确保私钥包含 BEGIN 和 END 行
+* 检查 Services ID 是否配置正确
+
+<div id="invalid-redirect-uri">
+  #### 无效的重定向 URI
+</div>
+
+* 确认 Apple Services ID 配置中的 Return URL 与 **Auth 面板**中 **Provider setup** 下显示的值完全一致
+* 检查 Domains and Subdomains 中填写的域名是否与你已发布的域名一致 (不包含 `https://`)
+
+<div id="email-relay-not-working">
+  #### 邮件中继无法正常工作
+</div>
+
+* 确认 Apple Developer 门户中的邮件来源显示绿色对勾
+* 如果是最近才添加的，请等待 DNS 生效
+
+<div id="not-working-on-custom-domain-3">
+  #### 在自定义域名上无法使用
+</div>
+
+* 将 **Auth 面板** (身份验证面板) 中 **Provider setup** (身份提供方设置) 下显示的自定义域名条目 (不含 `https://`) 添加到 Domains and Subdomains 和 Return URLs 中
+
+<div id="additional-resources">
+  ### 更多资源
+</div>
+
+* [Apple「通过 Apple 登录」文档](https://developer.apple.com/sign-in-with-apple/)
+* [私密电子邮件转发服务指南](https://developer.apple.com/help/account/configure-app-capabilities/configure-private-email-relay-service)
+
+<div id="x-twitter">
+  ## X (Twitter)
+</div>
+
+本指南将引导你在 X 开发者门户中创建 X OAuth 应用。你需要获取 **Client ID** 和 **Client Secret**，并将其填入 **Auth 面板**。
+
+前提条件：拥有一个 [X 开发者账号](https://developer.twitter.com/) (提供免费套餐) 。
+
+<div id="step-1-set-up-x-developer-app">
+  ### 第 1 步：设置 X 开发者应用
+</div>
+
+<div id="create-a-developer-account-if-needed">
+  #### 创建开发者账号 (如有需要)
+</div>
+
+1. 前往 [X 开发者门户](https://developer.twitter.com/en/portal/dashboard)
+2. 如果还没有开发者账号，请提交申请
+3. 在申请中说明你的使用场景，并完成填写
+
+<div id="create-or-select-an-app">
+  #### 创建或选择应用
+</div>
+
+1. 在 X Developer Portal 中，前往 **Projects &amp; Apps**
+2. 使用现有应用，或选择 **Add App**
+3. 输入应用名称，然后选择 **Next**
+4. 选择 **App settings**
+
+<div id="step-2-configure-authentication">
+  ### 第 2 步：配置身份验证
+</div>
+
+1. 向下滚动到 **User authentication settings**
+2. 选择 **Set up**
+
+**应用权限：**
+
+选择最低权限级别：
+
+* **Read** - 读取用户资料所必需 (最低要求)
+* **Write** - 用于代表用户发帖 (可选)
+* **Direct Messages** - 用于访问私信 (可选)
+
+<Warning>
+  权限必须与所请求的作用域一致。如果应用请求了 `tweet.write`，而你只启用了 Read，身份验证将会失败。
+</Warning>
+
+**应用类型：**
+
+选择 **Web App, Automated App or Bot**
+
+**应用信息：**
+
+* **Callback URI / Redirect URL**：复制 **Auth 面板** 中 **Provider setup** 下显示的值
+* **Website URL**：复制 **Auth 面板** 中 **Provider setup** 下显示的值
+
+关于如何查找这些值，请参阅[为 SSO 身份提供方配置 OAuth 凭据](/zh/features/auth-and-identity/clerk-auth#configuring-oauth-credentials-for-an-sso-provider)。
+
+3. 选择 **Save**
+4. **保存你的 Client ID 和 Client Secret**
+
+<Warning>
+  请妥善保管 Client Secret。一旦丢失，重新生成后旧密钥即失效。
+</Warning>
+
+<div id="troubleshooting-4">
+  ### 故障排查
+</div>
+
+<div id="redirect-uri-mismatch-3">
+  #### 重定向 URI 不匹配
+</div>
+
+* 确认回调 URI 与 **Auth** 面板中 **Provider setup** 下显示的值完全一致
+* 检查是否存在拼写错误或协议填写错误
+* 结尾不要带斜杠
+
+<div id="invalid-client-4">
+  #### 客户端无效
+</div>
+
+* 仔细核对 Client ID 和 Client Secret
+* 确保没有多余的空格
+* 确认使用的是 OAuth 2.0 凭据 (而非 OAuth 1.0a)
+
+<div id="scopepermission-errors">
+  #### 作用域/权限错误
+</div>
+
+* 确认作用域与 X Developer Portal 中启用的权限一致
+* 确保至少启用了 Read 权限
+
+<div id="app-in-development-mode">
+  #### 应用处于开发模式
+</div>
+
+* X 应用初始处于开发模式，可用用户数量有限
+* 若要用于生产环境，你可能需要申请更高级别的访问权限
+
+<div id="not-working-on-custom-domain-4">
+  #### 在自定义域名上无法正常使用
+</div>
+
+* 将 Website URL 和 Callback URI 更新为 **Auth 面板**中 **Provider setup** 下显示的自定义域名值
+
+<div id="additional-resources-2">
+  ### 更多资源
+</div>
+
+* [X OAuth 2.0 文档](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
+* [X OAuth 权限范围](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)

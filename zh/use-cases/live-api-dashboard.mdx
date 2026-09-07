@@ -1,0 +1,95 @@
+---
+title: "构建实时 API 仪表板"
+description: "将公共 API 转换为自动更新的仪表板。"
+sidebarTitle: "构建实时 API 仪表板"
+icon: "chart-mixed"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+通过 API 构建包含关键指标、图表和筛选器的实时仪表板。它会自动刷新、
+支持导出，并且仅显示数据中实际包含的内容。将任何需要
+持久保存的数据存储在 Replit Database 中。
+
+<div id="best-for">
+  ## 最适合
+</div>
+
+* 需要供他人查看的仪表板，而非截图的产品经理。
+* 需要通过 API 实时更新的私有仪表板的运营和数据负责人。
+
+<div id="before-you-start">
+  ## 开始之前
+</div>
+
+先明确这个仪表板需要支持哪些决策，并写下来。准备好 API URL，或使用下面的 DummyJSON 端点。
+
+<Info>
+  如需测试，可以使用以下免费的 DummyJSON API 端点：
+
+  * 订单：`https://dummyjson.com/carts?limit=0`
+  * 客户：`https://dummyjson.com/users?limit=0`
+  * 商品目录：`https://dummyjson.com/products?limit=0`
+  * 分类：`https://dummyjson.com/products/categories`
+</Info>
+
+<div id="prompt-the-agent">
+  ## 向 Agent 发出提示
+</div>
+
+<AiPrompt>
+  根据此 API [URL] 构建实时仪表板。展示可帮助做出 [该决策] 的关键指标、图表和
+  筛选器。自动刷新并支持导出。将所有需要持久化保存的内容存储在 Replit Database 中。仅展示
+  数据实际包含的内容。
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 预期效果
+</div>
+
+Agent 会加载数据、选取汇总指标和图表，并添加筛选器。请至少对照数据源核实一个数字。如果使用的是 DummyJSON，可挑选一个订单并打开 `https://dummyjson.com/carts/{id}`，确认总额一致。切换某个筛选器，确认每张卡片和图表都会随之更新。导出一次，并将其中一行与 API 数据进行核对。
+
+<div id="make-it-work-for-you">
+  ## 按你的需求定制
+</div>
+
+<AiPrompt>
+  添加类别筛选器，使页面上的所有数值都会重新计算。
+</AiPrompt>
+
+<AiPrompt>缓存 API 响应，确保仪表板加载时保持快速。</AiPrompt>
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+* **API 不可用或数据结构不正确：**检查 URL，并确认响应中包含所需字段。要快速测试，可使用上方的 DummyJSON 端点。
+* **数值与预期不符：**让 Agent 显示查询或转换过程，然后至少将一个数值与源数据核对。
+* **筛选器未更新图表：**让 Agent 将每个筛选器同时关联到摘要卡片和图表数据。如果仪表板响应较慢，请缓存 API 响应或减少启动时加载的记录。
+
+<div id="related">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="生成每周销售报告" href="/zh/use-cases/weekly-pipeline-report">
+    每周概览，替代实时仪表板。
+  </Card>
+
+  <Card title="上线付费活动网站" href="/zh/use-cases/launch-event-website">
+    基于您已有数据打造的另一款实时 Replit App。
+  </Card>
+</CardGroup>

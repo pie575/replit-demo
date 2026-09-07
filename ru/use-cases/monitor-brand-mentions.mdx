@@ -1,0 +1,172 @@
+---
+title: "Отслеживание упоминаний бренда"
+description: "Не упускайте важные обсуждения вашего бренда и направляйте их туда, где уже работает команда."
+sidebarTitle: "Отслеживание упоминаний бренда"
+icon: "hashtag"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не встроенный connector. Agent запросит ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Отслеживайте упоминания бренда в X, выявляйте важные обсуждения, обобщайте тональность и
+контекст, отправляйте значимые упоминания в Slack и архивируйте их в Notion. Agent отсеивает шум
+и отмечает только то, что требует ответа, — так вы заметите всплеск активности прежде, чем он обернётся проблемой для поддержки или
+репутации.
+
+<div id="best-for">
+  ## Кому подойдёт
+</div>
+
+* Бренд- и комьюнити-менеджерам, которым важно замечать всплески тональности раньше, чем они перерастут в проблему для поддержки или репутации.
+* Руководителям направлений соцсетей и поддержки, которым нужны только упоминания, требующие ответа, а не все подряд.
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "x",
+name: "X",
+why: "Источник публичных упоминаний и обсуждений",
+auth: "api-key",
+},
+{
+id: "slack",
+name: "Slack",
+why: "Оповещение команды, когда упоминание требует ответа",
+},
+{ id: "notion", name: "Notion", why: "Архивирование сводок для последующего просмотра" },
+]}
+/>
+
+<div id="before-you-start">
+  ## Прежде чем начать
+</div>
+
+Подготовьте название бренда или интересующие вас аккаунты, канал в Slack для оповещений и
+базу данных в Notion для архива.
+
+Agent запросит ваш **X Bearer Token**. Создайте учётную запись на
+[console.x.com](https://console.x.com) и сгенерируйте там Bearer Token.
+
+Пополните кредиты аккаунта разработчика X. Без кредитов поиск упоминаний в X
+работать не будет.
+
+<div id="prompt-the-agent">
+  ## Отправьте prompt агенту
+</div>
+
+<AiPrompt>
+  Создай Routine, которая запускается каждое утро в 8:00. Отслеживай упоминания
+  [бренда] в X. Выявляй важные обсуждения, кратко описывай тональность и
+  контекст, отправляй релевантные упоминания в Slack и архивируй их в Notion.
+  Игнорируй информационный шум. Отмечай всё, что требует ответа.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## Чего ожидать
+</div>
+
+Agent отслеживает упоминания, оценивает, какие из них важны, публикует краткую сводку в Slack
+и сохраняет обсуждение в Notion. Просмотрите первую подборку и уточните, что считать «важным».
+Если упоминания не приходят, проверьте, задан ли Bearer Token и есть ли кредиты на аккаунте
+разработчика X. После первого утреннего запуска откройте оповещение в Slack, перейдите по ссылке
+на X и убедитесь, что в строке Notion указана та же ссылка.
+
+<div id="make-it-work-for-you">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Отправляйте оповещения в Slack только об упоминаниях с негативной тональностью или более чем [n] отметками «Нравится».
+  Всё остальное архивируйте в Notion.
+</AiPrompt>
+
+<AiPrompt>
+  Добавьте в Slack ежедневную сводку с 5 наиболее важными упоминаниями и общей тональностью.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## Устранение неполадок
+</div>
+
+* **Упоминания вообще не приходят:** убедитесь, что задан Bearer Token для X, а на аккаунте разработчика X есть кредиты. Без кредитов поиск упоминаний не работает даже с действительным токеном.
+* **В Slack тишина, а Notion заполняется:** возможно, Agent принимает всё за шум. Уточните, что считать «важным», или попросите его публиковать ежедневную сводку, даже если отвечать не на что.
+* **В архиве беспорядок:** укажите Agent на базу данных Notion со столбцами, которые вы уже используете (дата, ссылка, тональность, нужен ответ). Попросите его сопоставлять данные с этими полями, а не создавать каждый раз новую страницу.
+
+<div id="related">
+  ## По теме
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Анализируйте отзывы клиентов" href="/ru/use-cases/analyze-customer-feedback">
+    Та же настройка Slack и Notion для обращений в службу поддержки.
+  </Card>
+
+  <Card title="Отслеживайте конкурентов" href="/ru/use-cases/monitor-competitors">
+    Те же оповещения в Slack и архив в Notion для сайтов конкурентов.
+  </Card>
+</CardGroup>

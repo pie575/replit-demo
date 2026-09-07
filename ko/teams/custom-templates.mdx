@@ -1,0 +1,357 @@
+---
+title: "Custom Templates"
+description: "Replit Enterprise에서 custom template을 설정하고 관리하여 조직이 Agent로 빌드하는 방식을 표준화하세요."
+sidebarTitle: "Templates"
+icon: "rectangle-list"
+---
+
+<div id="getting-started">
+  ## 시작하기
+</div>
+
+Replit은 어떤 프레임워크나 스택이든 작성하고 실행할 수 있는 클라우드 개발 환경입니다. custom template을 만드는 방법으로는 다음 두 가지를 권장합니다.
+
+1. **Git provider에서 [Import](https://replit.com/import)** — 기존에 사용하던 스타터 스택(또는 원하는 조건에 맞는 스택)을 GitHub, GitLab, Bitbucket에서 가져옵니다.
+2. **Blank template fork하기** — [Blank template](https://replit.com/@replit/Nothing?v=1)을 fork해 완전히 비어 있는 개발 환경에서 처음부터 시작합니다.
+
+이미 많은 고객이 Rust, Python, Java, C++ 등 다양한 스택에 맞는 템플릿을 성공적으로 만들었습니다. 어디서든 실행되는 것이라면 Replit에서도 실행할 수 있습니다.
+
+<Tip>
+  첫 템플릿을 만들 때는 Replit의 **Field Engineering 팀**과 함께 작업하시길 권장합니다. 이 팀은 다양한 스택에서 custom template을 구성해 본 폭넓은 경험을 갖추고 있어 언제든 도움을 드릴 수 있습니다. 담당 Account Executive에게 문의하시면 연결해 드립니다.
+</Tip>
+
+Custom Templates를 사용하면 Enterprise Admin이 사전 구성된 시작점을 만들어 조직의 모든 Member에게 Agent input box에서 바로 노출할 수 있습니다. builder가 custom template을 선택하면 Agent가 이를 fork한 뒤, 템플릿의 Configuration, Instructions, skills를 기준으로 이후의 모든 작업을 진행합니다. 별도의 설정은 필요하지 않습니다.
+
+<Note>
+  Custom Templates는 **Enterprise** plan에서만 사용할 수 있습니다. 템플릿을 pin하고 관리하는 것은 조직 Admin만 가능합니다.
+</Note>
+
+<div id="how-custom-templates-work">
+  ## custom template 작동 방식
+</div>
+
+custom template은 조직 내의 일반 Replit App 중 **Agent input box에 pin된** 앱을 말합니다. builder가 이를 선택하면 다음과 같이 동작합니다.
+
+1. Agent가 template을 fork하여 새 앱을 생성합니다(모든 파일이 복사됩니다)
+2. Agent가 계획 단계를 건너뛰고 곧바로 building을 시작합니다
+3. template의 `custom_instruction/instructions.md` 파일이 Agent의 context에 주입됩니다
+4. `.agents/skills/`에 있는 커스텀 [skill](/ko/features/agent/skills)을 인식해 사용할 수 있게 됩니다
+5. [`replit.md`](/ko/features/project-setup/replit-dot-md) 파일이 지속적으로 project context를 제공합니다
+
+따라서 조직의 표준과 패턴, 도구가 첫 상호작용부터 그대로 적용됩니다.
+
+<div id="template-file-structure">
+  ## 템플릿 파일 구조
+</div>
+
+custom template에 권장되는 구성은 다음과 같습니다:
+
+```
+my-template/
+├── .replit                              # App 설정(run 명령, 포트, 모듈)
+├── replit.md                            # Agent 메모리: 프로젝트 개요 및 선호 설정
+├── custom_instruction/
+│   └── instructions.md                  # Agent의 prompt에 삽입되는 회사 Instructions
+├── .agents/
+│   └── skills/
+│       └── my-skill/
+│           └── SKILL.md                 # Agent가 필요할 때 호출하는 커스텀 skill
+└── ...                                  # 나머지 저장소 구조
+```
+
+각 파일은 서로 다른 역할을 합니다. 아래 섹션에서는 각 파일을 설정하는 방법을 차례로 설명합니다.
+
+<div id="set-up-a-custom-template">
+  ## custom template 설정
+</div>
+
+<div id="create-the-base-app">
+  ### 기본 앱 만들기
+</div>
+
+Organization에 새 Replit App을 만듭니다. builder가 출발점으로 사용할 모든 파일, dependencies, configuration을 포함하도록 project를 설정하세요. 여기에는 다음이 포함됩니다:
+
+* 소스 코드 뼈대(컴포넌트, 유틸리티, config 파일)
+* 미리 설치된 dependencies(`package.json`, `requirements.txt` 등)
+* [`.replit` 파일](/ko/replit-app/configuration)의 Environment configuration
+
+<div id="configure-shared-secrets">
+  ### 공유 secret 구성
+</div>
+
+template이 API key, token 또는 기타 자격 증명을 사용한다면, pin하기 전에 template의 **Secrets**(Tools pane 내)에 추가하세요. builder가 해당 template으로 새 app을 생성하면 모든 secret이 새 app에 자동으로 복사되므로, builder는 자격 증명을 직접 설정할 필요 없이 바로 작업을 시작할 수 있습니다.
+
+builder가 어떤 값을 사용할 수 있고 각 key가 어디에 쓰이는지 알 수 있도록, 모든 secret을 `custom_instruction/instructions.md`(또는 전용 skill)에 문서화하세요.
+
+<Warning>
+  secret은 fork 시점에 복사되며, 이후 동적으로 동기화되지는 않습니다. key를 교체하거나 template에 새 secret을 추가하더라도 이전에 fork된 기존 app에는 반영되지 않습니다. 이 경우 builder가 해당 app에서 secret을 직접 추가하거나 업데이트해야 합니다.
+</Warning>
+
+<div id="write-custom-instructions">
+  ### 사용자 지정 지침 작성
+</div>
+
+project 루트에 `custom_instruction/instructions.md` 파일을 만드세요. 이 파일은 template에서 가장 중요한 파일로, 조직이 소프트웨어를 어떻게 개발하는지 Agent에게 알려줍니다.
+
+<Warning>
+  폴더 이름은 `custom_instructions`가 아니라 `custom_instruction`(단수형)이어야 합니다.
+</Warning>
+
+Agent는 이 파일을 회사가 제공한 지침이라는 점을 명시하는 서문과 함께 system prompt에 그대로 삽입합니다. Markdown으로 작성하고 다음 내용을 포함하세요.
+
+* **아키텍처 패턴**: apps를 어떻게 구성해야 하는지
+* **Coding Standards**: 명명 규칙, 파일 구성 규칙, 린팅 기준
+* **컴포넌트 사용**: 어떤 라이브러리와 컴포넌트를 사용해야 하는지(그리고 피해야 하는지)
+* **API 패턴**: backend 서비스 호출 방법, authentication 처리 방법, 오류 처리 방법
+* **테스트 requirements**: 어떤 테스트가 필요하며 어떻게 실행하는지
+* **배포 가이드라인**: 환경별 Configuration 및 배포 workflows
+
+````markdown theme={null}
+# 회사 엔지니어링 표준
+
+## 아키텍처
+모든 web app은 React와 TypeScript를 사용합니다. 컴포넌트는 훅을 사용하는
+함수형 컴포넌트만 사용하세요. 상태 관리는 로컬 상태에 Zustand,
+서버 상태에 React Query를 사용합니다.
+
+## 컴포넌트 라이브러리
+사내 design system 패키지인 `@acme/ui`를 사용하세요. 버튼, 입력창, 폼,
+모달에는 순수 HTML 요소를 절대 사용하지 말고, 항상 `@acme/ui`의 해당
+컴포넌트를 사용하세요.
+
+컴포넌트는 다음과 같이 가져옵니다:
+```tsx
+import { Button, TextField, Modal } from '@acme/ui';
+```
+
+## API integration
+모든 API 호출은 `@acme/api-client` 패키지를 거칩니다. fetch나 axios를
+직접 사용하지 마세요. authentication은 클라이언트가 자동으로 처리합니다.
+
+## 테스트
+모든 컴포넌트에는 그에 대응하는 테스트 파일이 있어야 합니다. 단위 테스트에는
+Vitest를, 통합 테스트에는 Playwright를 사용하세요.
+````
+
+**크기 제한**: 콘텐츠에는 약 25KB의 소프트 제한이 적용됩니다. 이 제한을 초과하는 콘텐츠는 점진적으로 잘릴 수 있습니다. Instructions가 길어지면 모든 내용을 `instructions.md`에 담아 두지 말고, 상세한 참고 자료는 `.agents/skills/` 아래의 [skills](/ko/features/agent/skills)로 옮기세요. skills는 필요한 시점에만 불러오므로 instruction 크기 제한에 포함되지 않으며, 기본 instructions는 상위 수준의 규칙에만 집중할 수 있습니다.
+
+<div id="add-custom-skills">
+  ### 커스텀 skill 추가
+</div>
+
+Agent가 따라야 할 특수한 workflow는 `.agents/skills/` 디렉터리에 skill로 만드세요. 각 skill은 YAML frontmatter가 포함된 `SKILL.md` 파일이 들어 있는 디렉터리입니다.
+
+```
+.agents/skills/
+├── use-design-system/
+│   └── SKILL.md
+├── api-integration/
+│   └── SKILL.md
+└── run-tests/
+    └── SKILL.md
+```
+
+각 `SKILL.md` 파일에는 frontmatter에 `name`과 `description`이 포함되어야 합니다:
+
+```markdown theme={null}
+---
+name: use-design-system
+description: Use when building UI components. Provides component patterns, theming rules, and accessibility requirements for the Acme design system.
+---
+
+# Acme Design System
+
+## Available components
+
+- `Button` — Primary, secondary, and ghost variants
+- `TextField` — Text input with validation support
+- `Modal` — Dialog overlay with focus trapping
+...
+```
+
+| 필드            | 필수 여부 | 상세 설명                                           |
+| ------------- | ----- | ----------------------------------------------- |
+| `name`        | 예     | 최대 64자. 소문자, 숫자, 하이픈만 사용할 수 있습니다.               |
+| `description` | 예     | 최대 1,024자. skill이 어떤 일을 하는지, 언제 사용하는지 설명합니다.    |
+| `enabled`     | 아니요   | 기본값은 `true`입니다. 삭제하지 않고 비활성화하려면 `false`로 설정하세요. |
+
+**skill이 로드되는 방식**: Agent는 prompt에서 `name`과 `description`만 확인합니다. 해당 skill이 현재 task와 관련이 있을 때만 전체 `SKILL.md` 내용을 읽어 들입니다. 그래서 `description`이 매우 중요합니다. Agent가 해당 skill을 사용해야 하는 상황이 잘 드러나도록 작성하세요.
+
+skill에는 `SKILL.md`와 함께 보조 파일을 포함할 수도 있습니다:
+
+```
+.agents/skills/use-design-system/
+├── SKILL.md
+├── references/
+│   └── component-api.md
+└── assets/
+    └── theme-tokens.json
+```
+
+skill에 대한 자세한 내용은 [Agent Skills](/ko/features/agent/skills)와 [skill 사용하기](/ko/build/use-agent-skills)를 참고하세요.
+
+<div id="configure-replitmd">
+  ### replit.md 구성하기
+</div>
+
+project 루트에 `replit.md` 파일을 미리 만들어 template의 아키텍처 개요를 담아 두세요. 이 파일은 항상 Agent의 context로 로드되어 지속적인 project 메모리 역할을 합니다.
+
+이 파일은 다음 네 가지 섹션으로 구성해야 합니다:
+
+```markdown theme={null}
+# 개요
+React, TypeScript, Acme design system으로 구축한 작업 관리 애플리케이션.
+PostgreSQL과 함께 Express.js 백엔드를 사용합니다.
+
+# 사용자 환경설정
+- 모든 파일에 TypeScript 사용
+- 훅을 사용하는 함수형 컴포넌트 선호
+- Acme 코딩 표준 준수
+
+# 시스템 아키텍처
+- 프론트엔드: React + TypeScript + @acme/ui
+- 백엔드: Express.js + TypeScript
+- 데이터베이스: Drizzle ORM 기반 PostgreSQL
+- 인증: @acme/auth를 통한 Acme SSO
+
+# 외부 종속성
+- @acme/ui: 내부 design system
+- @acme/api-client: API 통합 계층
+- @acme/auth: 인증 SDK
+```
+
+Agent는 project가 발전함에 따라 `replit.md`를 업데이트합니다. 파일이 약 4,000 tokens를 넘어서면 Agent가 자동으로 내용을 요약하여 핵심만 담긴 유용한 상태로 유지합니다.
+
+자세한 내용은 [replit.md](/ko/features/project-setup/replit-dot-md)를 참조하세요.
+
+<div id="pin-the-template-to-your-organization">
+  ### 조직에 template pin하기
+</div>
+
+template이 준비되었다면 다음 단계를 따르세요.
+
+1. 조직에서 template App으로 이동합니다
+2. App의 작업 메뉴(three-dot menu)를 엽니다
+3. **Pin to Agent input box**를 선택합니다
+
+<img src="/assets/mirror/custom-templates-pin-to-agent-b733d3eb9a80.png" alt="Pin to Agent input box 옵션이 표시된 App 작업 메뉴" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  조직 관리자(`system_admins` 역할을 가진 Members)만 template을 pin하거나 pin 해제할 수 있습니다.
+</Note>
+
+Members가 pin된 template을 편집하지는 못하고 보고 사용만 할 수 있도록 Member 접근 권한을 **Read-only**로 설정하세요.
+
+<img src="/assets/mirror/custom-templates-members-read-only-cf6aa160c8ef.png" alt="Member 접근 권한이 Read-only로 설정된 Invite 대화 상자" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+이제 조직의 모든 Members에게 Agent input box 아래에 선택 가능한 알약 모양 버튼 형태로 template이 표시됩니다. 제거하려면 같은 메뉴를 열고 **Unpin from Agent input box**를 선택하세요.
+
+<div id="control-template-access">
+  ### 템플릿 접근 권한 제어
+</div>
+
+템플릿을 pin하면 조직의 모든 구성원에게 표시됩니다. 대상을 좁혀 배포하려면 템플릿 앱의 **Invite** 버튼을 사용해 특정 [그룹 또는 개별 사용자](/ko/teams/identity-and-access-management/groups-and-permissions)와 공유하세요. 이렇게 하면 조직 전체 입력창에는 템플릿을 pin하지 않은 채로, 템플릿을 보고 fork할 수 있는 팀이나 사용자를 제한할 수 있습니다.
+
+<div id="what-happens-when-a-builder-selects-a-template">
+  ## builder가 template을 선택하면 어떻게 되나요
+</div>
+
+<img src="/assets/mirror/custom-templates-input-box-553384ac7dd0.png" alt="Agent 입력창에 선택 가능한 알약 형태로 표시된 template" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+조직 구성원이 Agent input box에서 pin된 template을 선택하면 다음 과정이 진행됩니다:
+
+1. **Fork**: template의 복사본으로 모든 파일이 포함된 새 앱이 생성됩니다
+2. **계획 단계 건너뛰기**: Agent가 초기 계획 대화를 생략하고 곧바로 building 모드로 들어갑니다
+3. **Instructions 불러오기**: `custom_instruction/instructions.md`를 읽어 회사가 제공한 지침으로 Agent의 system prompt에 주입합니다
+4. **Skills 탐색**: `.agents/skills/`에 있는 skills를 식별해 필요할 때 불러올 수 있도록 Agent의 context에 나열합니다
+5. **project context 불러오기**: `replit.md`를 읽어 Agent의 context에 주입합니다(파일이 없으면 자동으로 생성됩니다)
+6. **Configuration 상속**: `.replit` 파일, dependencies, 모든 template 파일이 새 앱으로 그대로 옮겨집니다
+
+builder는 곧바로 원하는 requirements를 담아 Agent에 prompt를 보낼 수 있고, Agent는 template이 설정해 둔 가드레일 안에서 동작합니다.
+
+<div id="how-files-work-together">
+  ## 파일이 함께 작동하는 방식
+</div>
+
+각 구성 파일은 서로 다른 역할을 합니다:
+
+| 파일                                   | 목적                | Agent가 읽는 시점           | Agent의 수정 가능 여부            |
+| ------------------------------------ | ----------------- | ---------------------- | -------------------------- |
+| `custom_instruction/instructions.md` | 조직의 표준과 규칙        | 항상(system prompt에 주입됨) | 아니요                        |
+| `.agents/skills/*/SKILL.md`          | 특화된 workflows와 패턴 | 필요할 때(관련이 있는 경우)       | 예(Agent도 skills를 생성할 수 있음) |
+| `replit.md`                          | project 개요와 기본 설정 | 항상(system prompt에 주입됨) | 예(Agent가 지속적으로 업데이트함)      |
+| `.replit`                            | 런타임 구성            | App을 구성할 때             | 예                          |
+
+**핵심 차이점**: `custom_instruction/instructions.md`는 조직 표준을 규정하는 고정된 기준 문서입니다. `replit.md`는 project가 발전함에 따라 Agent가 계속 갱신하는 살아 있는 문서입니다. Skills는 특정 workflows에 필요할 때 참조하는 자료입니다.
+
+<div id="best-practices">
+  ## 모범 사례
+</div>
+
+<div id="keep-instructions-focused">
+  ### 핵심에 집중한 지침 작성
+</div>
+
+가장 중요한 패턴을 중심으로 `custom_instruction/instructions.md`를 작성하세요. 다음 항목에 집중하세요.
+
+* 되돌리기 어려운 결정(아키텍처, 데이터 모델)
+* 반드시 일관성을 유지해야 하는 패턴(컴포넌트 사용 방식, API conventions)
+* builder가 모를 수 있는 표준(내부 라이브러리, 팀 conventions)
+
+changelog, 구현 세부 사항, 자주 바뀌는 정보는 포함하지 마세요.
+
+<div id="write-discoverable-skill-descriptions">
+  ### 잘 검색되는 skill 설명 작성
+</div>
+
+`SKILL.md` frontmatter의 `description` 필드는 Agent가 skill을 언제 불러올지 판단하는 기준입니다. 해당 skill이 필요한 task와 잘 맞아떨어지는 설명을 작성하세요:
+
+```yaml theme={null}
+# 좋은 예 — 언제 사용하는지 설명함
+description: Use when building forms or handling user input. Provides validation patterns, error display conventions, and accessible form layouts.
+
+# 효과가 떨어지는 예 — 너무 모호함
+description: Form utilities and helpers.
+```
+
+<div id="organize-skills-by-workflow">
+  ### workflow 기준으로 skills 구성하기
+</div>
+
+기술 분류가 아니라 workflow를 중심으로 skills를 묶으세요.
+
+| 접근 방식           | 예시                                           |
+| --------------- | -------------------------------------------- |
+| **workflow 기준** | `build-a-form`, `connect-to-api`, `add-auth` |
+| **기술 영역 기준**    | `react-utils`, `api-helpers`, `auth-config`  |
+
+workflow 기준으로 구성하면 Agent가 필요한 순간에 알맞은 skills를 찾아 쓸 수 있습니다.
+
+<div id="iterate-on-your-template">
+  ### template 개선하기
+</div>
+
+template은 쓸수록 좋아집니다. 팀이 template으로 개발을 시작했다면 다음을 실천하세요.
+
+1. Agent가 자주 틀리는 패턴을 파악해 `instructions.md`에 추가하세요
+2. Agent가 문제를 잘 해결했다면 새 skill을 만들어 그 해법을 남겨두세요
+3. stack이 발전하는 데 맞춰 기본 dependencies와 configurations를 업데이트하세요
+4. template으로 새 App을 만들어 사용 경험을 직접 확인하며 changes를 테스트하세요
+
+<div id="template-updates-and-existing-apps">
+  ### 템플릿 업데이트와 기존 App
+</div>
+
+템플릿 App에 적용한 변경 사항은 해당 템플릿으로 **새로** 만든 App에 반영됩니다. 이전에 템플릿에서 fork한 기존 App은 독립적인 복사본이므로 업데이트가 반영되지 않습니다.
+
+<div id="related-resources">
+  ## 관련 자료
+</div>
+
+* [Agent skills](/ko/features/agent/skills) — skill의 작동 방식과 만드는 방법 알아보기
+* [Use a skill](/ko/build/use-agent-skills) — skill을 사용하고 만드는 실습 가이드
+* [replit.md](/ko/features/project-setup/replit-dot-md) — project 수준의 context로 Agent의 동작 맞춤 설정하기
+* [design system](/ko/teams/custom-design-system) — Agent가 활용할 조직의 design system 설정하기
+* [App 구성](/ko/replit-app/configuration) — `.replit` 파일 구성하기
+* [Developer frameworks](/ko/features/project-setup/developer-frameworks) — 언어 및 프레임워크 스타터 template이 제거된 이유와 이제 project를 시작하는 방법
+* [Enterprise 개요](/ko/category/teams) — Enterprise 기능 알아보기

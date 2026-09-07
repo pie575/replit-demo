@@ -1,0 +1,196 @@
+---
+title: "Agent skills"
+description: "了解何时及如何使用 Agent Skills，包括主动与被动模式、如何选择性使用、安全性，以及 skills 与 MCP servers 的区别。"
+sidebarTitle: "Agent skills"
+icon: "puzzle-piece"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const YouTubeEmbed = ({videoId, title = "YouTube 视频", startAt}) => {
+  if (!videoId) {
+    return null;
+  }
+  let url = "https://www.youtube.com/embed/" + videoId;
+  if (startAt) {
+    url = url + "?start=" + startAt;
+  }
+  return <Frame>
+      <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+    </Frame>;
+};
+
+Skills 可为 Agent 赋予新能力。借助 Skills，你可以与 Agent 分享你的专业经验、偏好的模式和专门知识，使其产出更优质、更一致的结果。
+
+<YouTubeEmbed videoId="C5Al8KhUrZw" title="掌握 Agent Skills：AI 辅助开发的变革性框架" />
+
+<div id="why-skills-matter">
+  ## 为什么 skills 很重要
+</div>
+
+每次使用 Agent 构建时，你都会积累有用的上下文：问题解决方案、设计决策和框架偏好。但聊天结束后，这些上下文就会消失。skills 可以将其保留下来。
+
+GSAP 动画 skill 能教 Agent 如何正确使用特定库。design system skill 可确保它采用你指定的颜色和间距规则。错误修复 skill 会记录解决方案，避免 Agent 重复犯同样的错误。原本结果不一致的任务会变得可靠。
+
+skills 也是一项[开放标准](https://agentskills.io/specification)。它们可与包括 Replit Agent 在内的任何智能体配合使用，因此你可以在不同工具之间使用它们。
+
+<div id="proactive-vs-reactive-skills">
+  ## 主动型与被动型技能
+</div>
+
+帮助你思考何时以及如何创建技能的框架。理解这两种模式能让你更高效。
+
+<div id="proactive-skills">
+  ### 主动式 skills
+</div>
+
+主动式 skills 是指在开始构建*之前*添加的 skills。研究你想使用的库或模式，为其查找或创建 skills，然后开始编写 prompt。
+
+**示例：**在构建带有手绘 SVG 动画的作品集网站之前，先研究动画库并找到 GSAP。安装 GSAP React skill，然后让 Agent 构建动画。Agent 从一开始就拥有所需的专业知识，了解该库的 API、最佳实践和常见模式。没有这个 skill，它可能会生成泛泛而谈或不正确的内容。
+
+这种模式尤其适用于以下情况：
+
+* 你使用的是一个很流行，但包含细微模式、Agent 可能无法自行准确掌握的库
+* 你希望整个 project 的设计选择保持一致 (排版、间距、动画风格)
+* 你刚开始一个 project，并且已经明确技术方向
+
+<div id="reactive-skills">
+  ### 被动式 skills
+</div>
+
+被动式 skills 是在解决问题*之后*创建的。你遇到问题后，与 Agent 一起调试并修复它，然后将解决方案记录下来，避免问题再次发生。
+
+**示例：**在为移动应用构建 Canvas 时，你发现图像边缘有锯齿，而且放大后会变得更明显。使用 Agent 调试后发现，这是缩小混叠问题——一种反直觉的渲染问题：图像缩小时反而看起来更差。实施修复后，请 Agent 创建一个 skill：
+
+<AiPrompt>
+  创建一个 skill，记录我们刚刚了解到的缩小混叠修复方法。包括根本原因、解决方案，以及此问题通常出现的场景，以便你今后能够预防它。
+</AiPrompt>
+
+Agent 会利用对话历史编写项目专用的 skill。下次再遇到此问题时，你可以让 Agent 参考该 skill，而无需从头开始调试。
+
+以下情况尤其适合采用这种模式：
+
+* 你修复了一个不易察觉的 bug，并希望避免它再次出现
+* 你在调试过程中了解了应用架构
+* 你希望将一个花费大量精力才发现的解决方案固化下来
+
+<div id="being-selective-with-skills">
+  ## 有选择地使用技能
+</div>
+
+把技能想象成你给朋友指路、帮他找到你公寓的说明。一份有针对性的指引清单很有用；一本塞满文档的活页夹则不然——没人有时间通读，重要细节也容易被淹没。
+
+Agent 也是如此。如果添加过多技能，Agent 可能会感到困惑。请慎重选择要为特定项目启用的技能，并移除不再需要的技能。
+
+<Note>
+  技能最适合用于沉淀具体、可重复的模式，而不是提供泛泛的指导。请专注于明确的工作流程、既定规范和经过验证的解决方案。
+</Note>
+
+<div id="authoring-skills-well">
+  ## 高效编写 skill
+</div>
+
+skill 可能较为复杂精细。以下原则有助于确保其效果：
+
+* **描述理想流程。** 告诉 Agent 如何正确完成任务。如果你发现自己在列举*不该*做什么，通常意味着应重新审视整个方法。
+* **尽可能使用脚本。** 确定性的脚本能减轻 Agent 的思考负担，比每次都要求它推理完成相同步骤更可靠。
+* **链接到其他文件。** 将 skill 设计为指向其他 Markdown 文件，让 Agent 仅加载当前 task 所需的文件。
+* **定期进行基准测试。** 这样才能确认 skill 确实有效，而非想当然地认为它有效。
+* **亲自编写。** 目标是提供简洁、有针对性的上下文。与其批量生成，不如手写 skill。Agent 可以帮你起草，但应自行完善，确保每一行都有存在的价值。
+* **保持定制化。** 不要为代码整洁性或安全性创建通用 skill——Agent 已内置这些能力。你的 skill 应涵盖仅与你或你的组织相关的内容。
+
+大多数 skill 的失效方式都可以诊断：
+
+* **skill 在不该触发时触发。** 描述范围过宽。请缩小范围，并说明*不应*在何时使用——“不用于博客文章或帮助文档”通常比任何正向指令都更有用。
+* **skill 触发了，但输出不符合预期。** 指令过于笼统。将“让它显得专业”这类模糊指导替换为具体规则：确切名称、明确 requirements，以及明确需要避免的事项。
+* **两个 skill 发生冲突。** 修改描述，确保它们不会在同一个 task 上同时触发。冲突几乎总是范围界定问题，而不是指令问题。
+
+skill 会过时，因此请像维护文档一样持续维护它们。
+
+<div id="taking-skills-workspace-wide">
+  ## 在整个 workspace 中使用 skills
+</div>
+
+以上内容适用于单个 project 中的 skills。在团队中，你还可以为整个 workspace 自定义 Agent，让每个人从一开始就遵循相同的约定，无需在每个 project 中反复说明。Workspace 自定义包含两部分：
+
+* **自定义指令** — 在任何人输入 prompt 前，始终注入 Agent 上下文的规则，适用于每个 project 和每条消息。仅将其用于真正通用的少数规则，例如“绝不以明文存储凭据”。由于它们会在每个回合加载，每个字都会占用一部分 Agent 的上下文预算，因此请保持简短。
+* **Workspace skills** — 即上文所述的 skills，可供 workspace 中所有人使用，并集中管理。只有相关 task 调用时才会占用极少资源，因此你可以提供许多 skills，而不会影响输出质量。
+
+一个简单的判断方法是：如果某条规则无论任何人在构建什么都应始终适用，它就是自定义指令；如果它只对某一类 task 有意义，它就是 skill。
+
+如需了解如何设置自定义指令和 workspace skills，以及谁可以管理它们，请参阅 [Agent 自定义](/zh/features/agent/agent-customization)。
+
+<div id="security-considerations">
+  ## 安全注意事项
+</div>
+
+Replit Skills 窗格中的技能均已通过安全审核。但技能可从任何来源安装——它们来自一个任何人都可以贡献的[开源仓库](https://github.com/vercel-labs/skills)。
+
+由于技能是 Agent 会执行的指令，恶意技能可能会指示 Agent 从你的项目中窃取敏感数据。从外部来源安装任何技能前：
+
+1. **打开文件。** 技能只是 Markdown 文件。使用前请阅读 `/.agents/skills/` 中的内容。
+2. **检查来源。** 确认该技能来自可信的仓库或作者。
+3. **查看指令内容。** 确保该技能未引用可疑的外部 URL，也未要求提供敏感信息。
+
+<Warning>
+  安装前务必检查来自外部来源的技能。Replit Skills 窗格中的技能已通过审核，但通过 CLI 安装或从互联网复制的技能尚未经过审核。
+</Warning>
+
+<div id="skills-vs-mcp-servers">
+  ## Skills 与 MCP servers
+</div>
+
+Skills 和 MCP servers 是扩展 agent 的两种主要方式，分别适用于不同的场景。
+
+**Skills** 更节省上下文。调用 skill 前，只会加载简短说明。适合用于：
+
+* 工作流程和规范 (“如何发布”“代码审查清单”)
+* 参考资料 (API 模式、风格指南、设计系统)
+* 可复用的提示词和专业知识 (动画库、框架模式)
+
+**MCP servers** 更占用上下文。所有工具说明都会预先加载；添加过多可能会降低输出质量。适合用于：
+
+* 连接外部服务 (Notion、Linear、Figma)
+* 需要访问 API 的操作
+* 能够*执行*操作而不只是提供指导的工具
+
+关键区别在于：skills 定义 agent 应该*如何*工作；MCP servers 定义 agent 可以访问*什么*。两者都适用于 Replit Agent 等编码 agent，也适用于你自行构建的 agent。
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Agent 自定义" icon="sliders" href="/zh/features/agent/agent-customization">
+    为整个团队设置适用于 Workspace 的自定义指令和技能。
+  </Card>
+
+  <Card title="Use a skill" icon="puzzle-piece" href="/zh/build/use-agent-skills">
+    将技能附加到消息中、在项目中安装技能，或基于技能创建新项目。
+  </Card>
+
+  <Card title="Agent Skills 参考" icon="book" href="/zh/features/agent/skills">
+    了解技能结构及其底层工作原理的技术细节。
+  </Card>
+
+  <Card title="Replit 上的 MCP 服务器" icon="server" href="/zh/features/mcp/overview">
+    通过模型上下文协议将 Agent 连接到外部服务和工具。
+  </Card>
+
+  <Card title="高效编写提示词" icon="wand-magic-sparkles" href="/zh/learn/effective-prompting">
+    编写更清晰的指令，让 Agent 在首次尝试时就更接近你的预期。
+  </Card>
+</CardGroup>

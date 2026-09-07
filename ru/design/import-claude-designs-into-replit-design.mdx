@@ -1,0 +1,155 @@
+---
+title: "Импорт дизайнов из Claude в Replit Design"
+description: "Отправьте дизайн из Claude в Replit, создайте проект на основе статического HTML и поручите Agent превратить его в интерактивное приложение."
+sidebarTitle: "Импорт из Claude"
+icon: "file-import"
+---
+
+export const platform_0 = "Claude"
+
+export const projectType_0 = "project"
+
+export const setupDescription_0 = "Agent превращает ваш статический дизайн в интерактивное приложение и настраивает его для запуска в Replit"
+
+Дизайн, созданный в Claude, показывает, как должен выглядеть интерфейс. С помощью функции Claude **Send to Replit** вы можете передать этот дизайн в Replit, где он станет проектом, а Agent превратит его в работающее интерактивное приложение.
+
+<Note>
+  Это новая интеграция. Пункт **Send to Replit** появляется в меню Claude **Send to…**, только если Claude предлагает Replit в качестве места назначения для вашего дизайна. Доступность этой функции определяется Claude, поэтому пока она может быть доступна не для всех учётных записей. Когда вы подтверждаете передачу, Claude запрашивает на экране согласия Replit разрешения **Access apps**, **Create and manage apps** и **Stay signed in to this application**.
+</Note>
+
+<Frame>
+  <img src="/assets/mirror/claude-design-canvas-fa8be1a1ea5a.png" alt="Дизайн Velocity, открытый в Canvas Claude; этот готовый дизайн передаётся в Replit, чтобы превратить его в интерактивное приложение" width="2000" height="1143" data-path="images/claude-to-app/claude-design-canvas.png" />
+</Frame>
+
+<div id="how-it-works">
+  ## Как это работает
+</div>
+
+Передача начинается в Claude и завершается в Replit:
+
+1. Вы создаёте самостоятельный дизайн на Canvas Claude.
+2. Вы отправляете дизайн в Replit через меню Claude **Share → Отправить в…**.
+3. Вы разрешаете Claude доступ к своей учётной записи Replit и выбираете workspace.
+4. Replit создаёт проект, добавляя ваш дизайн в качестве статического файла `index.html`.
+5. Agent получает задачу **Turn this Claude design into a real app** и делает дизайн интерактивным.
+
+Claude *отправляет* дизайн в Replit через авторизованное подключение приложения. Вам не нужно ничего предварительно настраивать в Replit — процесс начинается в Claude.
+
+<div id="before-you-start">
+  ## Перед началом работы
+</div>
+
+Вам понадобятся:
+
+* [учётная запись Replit](https://replit.com).
+* Учётная запись Claude с дизайном в Canvas Claude.
+* Целевой workspace Replit для нового проекта.
+
+<div id="send-a-design-from-claude-to-replit">
+  ## Отправка дизайна из Claude в Replit
+</div>
+
+Начните с дизайна в Claude, на основе которого хотите создать приложение.
+
+<Steps>
+  <Step title="Откройте дизайн в Claude">
+    В Claude откройте дизайн, который хотите превратить в приложение.
+  </Step>
+
+  <Step title="Откройте меню Send to">
+    Выберите **Share**, затем откройте меню **Send to…**. В качестве варианта назначения появится Replit.
+
+    <Frame>
+      <img src="/assets/mirror/claude-send-to-menu-d4353906aea3.png" alt="Меню Claude «Send to…», в котором Replit указан как вариант назначения наряду с Claude Code" width="2000" height="1143" data-path="images/claude-to-app/claude-send-to-menu.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите Replit">
+    Выберите **Replit**, чтобы начать передачу в свою учётную запись Replit.
+  </Step>
+
+  <Step title="Разрешите доступ к Replit">
+    На экране согласия Replit с заголовком **Claude would like to access your Replit account** проверьте разрешения, которые запрашивает Claude: **Access apps**, **Create and manage apps** и **Stay signed in to this application**, — затем подтвердите подключение.
+
+    <Frame>
+      <img src="/assets/mirror/replit-oidc-consent-76dfc4d92a2f.png" alt="Экран согласия Replit с заголовком «Claude would like to access your Replit account», на котором показаны разрешения Access apps, Create and manage apps и Stay signed in to this application, а также средство выбора workspace" width="2000" height="1143" data-path="images/claude-to-app/replit-oidc-consent.png" />
+    </Frame>
+  </Step>
+
+  <Step title="Выберите workspace">
+    Выберите workspace Replit, в котором нужно создать новый проект, затем подтвердите выбор.
+  </Step>
+</Steps>
+
+После подтверждения Replit создаст проект на основе вашего дизайна и откроет его в workspace.
+
+<div id="what-gets-imported">
+  ## Что импортируется
+</div>
+
+Replit импортирует дизайн как единый самодостаточный файл `index.html`. Импорт сохраняет визуальную раскладку, стили и ассеты, включённые Claude в дизайн.
+
+Импорт даёт вам рабочую отправную точку. Поскольку дизайн импортируется как статический HTML, после импорта вам всё ещё нужно добавить поведение, данные и интерактивность.
+
+<div id="what-is-not-imported">
+  ## Что не импортируется
+</div>
+
+При передаче передаётся дизайн, а не полноценное приложение. В импорт не входят:
+
+* Логика бэкенда и серверная функциональность.
+* База данных или сохранённые данные.
+* Интерактивные элементы, такие как работающие формы, состояние и навигация.
+
+Agent добавляет эту функциональность, превращая дизайн в полноценное приложение.
+
+<div id="let-agent-make-the-design-interactive">
+  ## Сделайте дизайн интерактивным с помощью Agent
+</div>
+
+После импорта Agent запускает в Workspace задачу **Turn this Claude design into a real app**. Agent берёт ваш статический дизайн за основу и реализует подразумеваемое им интерактивное поведение.
+
+<Frame caption="Дизайн Velocity из Claude в виде фрейма в Replit Design после завершения работы Agent.">
+  <img src="/assets/mirror/claude-design-in-replit-design-ff81b055b1f5.webp" alt="Дизайн сервиса аренды суперкаров Velocity, отправленный из Claude и открытый как фрейм дизайна Claude в Replit Design; задача Agent отмечена как завершённая на панели чата" width="1600" height="1004" data-path="images/claude-to-app/claude-design-in-replit-design.webp" />
+</Frame>
+
+После завершения задачи откройте Preview, чтобы протестировать результат. Сравните работающее приложение с исходным дизайном Claude и убедитесь, что:
+
+* Раскладка и стили достаточно точно соответствуют дизайну.
+* Кнопки, формы и навигация работают как ожидается.
+* Приложение продолжает работать после обновления страницы.
+
+Если чего-то не хватает или что-то выглядит не так, опишите нужные изменения Agent и позвольте ему доработать приложение.
+
+<div id="configure-and-run-your-app">
+  ## Настройте и запустите приложение
+</div>
+
+Во время импорта {setupDescription_0}. Если приложению требуются изменения, воспользуйтесь следующими инструментами Project Editor:
+
+* **[Agent](/ru/features/agent/overview)**: Дорабатывайте функции, устраняйте ошибки и вносите изменения в код
+* **[Secrets](/ru/core-concepts/project-editor/app-setup/secrets)**: Добавляйте API-ключи и переменные окружения
+* **[Workflows](/ru/features/workspace-tools/workflows)**: Задайте для приложения команду **Run**
+
+<div id="continue-your-journey">
+  ## Продолжайте работу
+</div>
+
+Теперь, когда вы импортировали свой {platform_0} {projectType_0}, ознакомьтесь со следующими шагами:
+
+* [Replit Agent](/ru/features/agent/overview): Помощь в добавлении функций, отладке и рефакторинге
+* [Replit Deployments](/ru/learn/projects-and-artifacts/replit-deployments): Опубликуйте приложение
+* [Совместная работа](/ru/build/invite-teammates): Разрабатывайте вместе с коллегами
+
+<div id="billing">
+  ## Биллинг
+</div>
+
+Чтобы превратить дизайн в работающее приложение, используется Agent, который может расходовать кредиты. Расход кредитов зависит от объёма работы, которую Agent выполняет на основе импортированного дизайна.
+
+<div id="related">
+  ## По теме
+</div>
+
+* [Импорт из provider](/ru/build/import-from-providers)
+* [Импорт дизайнов Figma в Replit Design](/ru/design/import-figma-designs-into-replit-design)

@@ -1,0 +1,210 @@
+---
+title: "设置设计系统"
+description: "使用组织的设计系统配置 Agent，包括组件库、品牌资产、设计令牌和视觉标准，确保每个 App、网站和 artifact 都遵循您的设计语言。"
+sidebarTitle: "设计系统"
+icon: "palette"
+---
+
+设计系统让 Agent 掌握所需信息，为您的组织在 Replit 上创建的所有内容构建符合品牌规范的 UI，包括 web app、移动 App、幻灯片和其他 artifact。通过在标准的 Replit pnpm monorepo 中设置组件库、设计令牌、品牌资产和使用规则，Agent 可从第一个 prompt 起应用您的视觉语言。
+
+<Note>
+  设计系统仅适用于 **Enterprise** 计划。只有组织管理员可以配置和管理设计系统。
+</Note>
+
+<div id="why-set-up-a-design-system">
+  ## 为什么要建立设计系统
+</div>
+
+如果没有设计系统，每位构建者都需要手动向 Agent 说明您的组件库、颜色令牌和布局规范。建立设计系统可解决这一问题，具体体现在：
+
+* **固化视觉标准**：Agent 会使用您指定的组件、颜色和间距，而非通用默认值
+* **确保一致性**：每个 App 都遵循相同的设计语言
+* **缩短上手时间**：新构建者可立即产出符合品牌风格的成果
+* **沉淀团队经验**：将团队成员脑海中的设计决策和组件使用模式记录下来，供 Agent 使用
+
+<div id="what-you-will-need">
+  ## 所需准备
+</div>
+
+* tarfile 格式或一组 tarfile 格式的前端代码组件库
+* 设计系统中使用的字体资源和图标
+* 设计系统相关的 AI 文档 (MCP、Agent Skills)
+
+<div id="what-you-can-configure">
+  ## 可配置的内容
+</div>
+
+设置设计系统包括三个部分：
+
+1. **自定义说明**。`custom_instruction/instructions.md` 文件为 Agent 提供适用于所有项目的高层规则：使用哪个组件库、引用哪些设计令牌，以及遵循哪些模式。Agent 会始终将此文件纳入上下文。
+
+2. **技能**。`.agents/skills/` 中的技能包含 Agent 按需加载的详细参考资料。可将其用于组件 API 文档、主题指南、布局模式库，以及其他对于主说明文件来说篇幅过大的深入参考内容。
+
+3. **设计和品牌资产**。将徽标、图标、字体和其他品牌资产放在专用文件夹中 (例如 `src/assets/brand/`) 。配置 Vite 路径别名，以便 Agent 和开发者能够通过 `@brand/logo.svg` 这类简洁的导入路径引用这些资产，而非使用易出问题的相对路径。这样可确保整个项目中的资产引用保持一致。
+
+<div id="step-by-step-guide">
+  ## 分步指南
+</div>
+
+本指南将带您使用打包为 tar 文件的现有组件库，从头开始搭建设计系统：
+
+1. **创建一个新的 Replit App**，并上传 tar 文件。
+2. **让 Replit Agent 安装软件包并展示所有组件。** Agent 会配置项目并渲染您的组件库。
+3. **检查输出结果。** 确保所有组件均显示正确且符合预期。确认无误后，继续[创建设计系统 skill](#creating-the-design-system-skill)。
+
+<div id="creating-the-design-system-skill">
+  ### 创建设计系统技能
+</div>
+
+组件准备就绪后，最后一步是创建设计系统技能，让 Agent 能在每个 project 中引用你的组件、令牌和使用模式。
+
+复制以下完整 prompt 并粘贴到 Agent 中。将 `<your-design-system-name>` 替换为你的设计系统名称：
+
+````
+Create a `<your-design-system-name>` design system skill from the components and packages in this project.
+
+Use the file structure shown below with a `SKILL.md` at the root, a `references/` directory for guides and component docs, and a `packages/` directory containing all dependencies needed to function.
+
+Go through every component in the project and document each one in its own file under `references/components/`, including its props, variants, and example usage.
+
+Format `SKILL.md` as an index that links out to the guide and component reference files, with a "General Guidance" section and a "Components" section, following the example shown below.
+
+File structure:
+
+.agents/skills/your-design-system/
+├── SKILL.md
+├── references/
+│   ├── guides/
+│   │   ├── setup.md
+│   │   ├── guardrails.md
+│   │   ├── layout-and-spacing.md
+│   │   └── ...
+│   └── components/
+│       ├── component-index.md
+│       ├── button.md
+│       ├── checkbox.md
+│       └── ...
+└── packages/
+    └── (Tar files or code components)
+
+The `SKILL.md` file acts as an index that links out to separate markdown files for guides and component references. Each linked file covers one topic in detail. Here is an example of what the generated `SKILL.md` looks like:
+
+```markdown
+---
+name: your-design-system
+description: Use when building or modifying any UI. Provides component API references, layout guidance, and visual style rules for your design system.
+---
+
+# Your Design System
+
+## General Guidance
+
+- [Setup](references/guides/setup.md) — Installation, project configuration, and provider setup
+- [Guardrails](references/guides/guardrails.md) — Hard rules that must never be broken (banned patterns, required tokens, accessibility minimums)
+- [Layout & Spacing](references/guides/layout-and-spacing.md) — Grid system, spacing scale, responsive breakpoints, and page templates
+- ...
+
+## Components
+
+- [Component Index](references/components/component-index.md) — Full list of available components with status and category
+
+Individual component references (props, variants, examples):
+
+- [Button](references/components/button.md)
+- [Checkbox](references/components/checkbox.md)
+- ...
+```
+
+Guide files cover one topic each — setup and installation steps, best practices and rules, reference tables for token values, and short code examples showing correct usage.
+
+Component files document a single component each, including the component name, a brief description, a props table, usage examples, and any guidelines or constraints. The more complete these files are, the better Agent's output will be.
+````
+
+<div id="connect-your-skill-to-agent">
+  ### 将你的技能关联到 Agent
+</div>
+
+创建技能后，请确保你的 `custom_instruction/instructions.md` 引导 Agent 使用它：
+
+```markdown theme={null}
+# 设计系统
+
+阅读并遵循位于 `.agents/skills/your-design-system/` 的设计系统技能。
+在构建或修改 UI 时，始终应用该设计系统。
+```
+
+最后，在 `replit.md` 中预先写入设计系统相关的上下文信息，让 Agent 从一开始就了解你的视觉规范。包括项目概述、首选组件库、关键设计偏好 (如间距尺度和无障碍要求) 以及技术栈。
+
+<div id="validate-your-setup">
+  ### 验证设置
+</div>
+
+在部署设计系统之前，请确认以下事项：
+
+* `custom_instruction/instructions.md` 已将 Agent 指向你的设计系统技能
+* `.agents/skills/` 包含该技能，以及组件参考资料、指南和软件包
+* `replit.md` 已预先填写项目概述、偏好设置和架构信息
+* 已包含设计令牌文件 (`tokens.css` 或同类文件)
+* `package.json` 中已预先安装设计系统软件包
+* 创建一个新的测试 App，并验证 Agent 能否正确使用设计系统
+
+<div id="pin-the-design-system-to-your-organization">
+  ### 将设计系统固定到组织
+</div>
+
+设计系统准备就绪后，将其固定，以便组织中的每位成员都能使用：
+
+1. 前往组织中的设计系统 App
+2. 打开 App 的操作菜单 (三点菜单)
+3. 选择 **固定到 Agent 输入框**
+
+<img src="/assets/mirror/custom-templates-pin-to-agent-b733d3eb9a80.png" alt="App 操作菜单中显示“固定到 Agent 输入框”选项" width="984" height="856" data-path="images/teams/custom-templates-pin-to-agent.png" />
+
+<Note>
+  只有组织管理员 (具有 `system_admins` 角色的成员) 可以固定或取消固定设计系统。
+</Note>
+
+将成员访问权限设为 **只读**，这样成员便可查看和使用已固定的设计系统，但无法对其进行编辑。
+
+<img src="/assets/mirror/custom-templates-members-read-only-cf6aa160c8ef.png" alt="邀请对话框中成员访问权限设为“只读”" width="954" height="1064" data-path="images/teams/custom-templates-members-read-only.png" />
+
+现在，设计系统会以可选标签的形式显示在组织中每位成员的 Agent 输入框下方。要移除它，请打开同一菜单，然后选择 **从 Agent 输入框取消固定**。
+
+<img src="/assets/mirror/custom-templates-input-box-553384ac7dd0.png" alt="设计系统以可选标签的形式显示在 Agent 输入框中" width="1746" height="726" data-path="images/teams/custom-templates-input-box.png" />
+
+<div id="maintain-your-design-system-over-time">
+  ## 持续维护设计系统
+</div>
+
+设计系统会不断演进，请及时更新：
+
+* 当设计系统新增颜色、间距或排版值时，**更新令牌文件**
+* 当组件新增 props、变体或使用模式时，**更新技能**
+* 当设计原则或标准发生变化时，**更新说明**
+* 当设计系统发布新版本时，**更新包版本**
+* 创建新的 App 并验证 Agent 是否生成正确输出，**定期测试**
+
+<div id="design-systems-vs-custom-templates">
+  ## 设计系统与自定义模板
+</div>
+
+设计系统和[自定义模板](/zh/teams/custom-templates)用途不同：
+
+|          | 设计系统                                    | 自定义模板                       |
+| -------- | --------------------------------------- | --------------------------- |
+| **用途**   | 将前端技术栈替换为团队所用的技术栈，并使用团队的代码组件            | 完全替换默认技术栈 (例如 Rust、Go、C++)  |
+| **技术栈**  | 在标准 Replit pnpm monorepo 中使用            | 定义完全自定义的项目结构                |
+| **提供内容** | 组件库规范、设计令牌、品牌资产、视觉 skill                | 完整样板：运行时、构建配置、依赖项和项目布局      |
+| **适用于**  | Web 应用、移动应用、幻灯片、artifact——Agent 构建的任何内容 | 仅适用于基于该特定模板创建的应用            |
+
+如果希望 Agent 在常规 Replit 体验中遵循你的视觉标准，请使用设计系统。如果需要从根本上采用不同的技术栈，请使用自定义模板。
+
+<div id="related-resources">
+  ## 相关资源
+</div>
+
+* [自定义模板](/zh/teams/custom-templates) - 为您的组织设置完全自定义的 stack 模式
+* [Agent Skills](/zh/features/agent/skills) - 了解 skills 的工作方式及创建方法
+* [Use a skill](/zh/build/use-agent-skills) - 使用 skills 的实用指南
+* [replit.md](/zh/features/project-setup/replit-dot-md) - 利用项目背景自定义 Agent 的行为
+* [Enterprise 概览](/zh/category/teams) - 了解 Enterprise 功能

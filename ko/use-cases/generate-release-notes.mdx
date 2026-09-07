@@ -1,0 +1,153 @@
+---
+title: "릴리스 노트 생성"
+description: "매주 GitHub와 Linear의 변경 사항을 사람들이 실제로 읽고 싶어지는 릴리스 노트로 바꿔보세요."
+sidebarTitle: "릴리스 노트 생성"
+icon: "file-lines"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                기본 제공 connector가 아닙니다. Agent가 API key를 요청합니다.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+매주 GitHub과 Linear에서 변경 사항을 pull하고, 신규·개선·수정으로 분류한 고객용 릴리스 노트를 생성한 뒤 Notion에 게시하세요. 내부 전용 작업은 제외하고 breaking change로 보이는 항목에는 표시를 남기면, 제품 팀과 지원 팀, 고객이 일정한 주기로 동일한 내용을 공유할 수 있습니다.
+
+<div id="best-for">
+  ## 이런 경우에 적합합니다
+</div>
+
+* 버전 태그가 나올 때까지 기다리지 않고 주간 changelog를 확인해야 하는 product managers.
+* 고객과 동일한 내용을 공유해야 하는 제품 마케팅 및 지원 담당자.
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{ id: "github", name: "GitHub", why: "merge된 pull request 및 태그" },
+{ id: "linear", name: "Linear", why: "issues 및 고객용 제목" },
+{ id: "notion", name: "Notion", why: "게시된 노트" },
+]}
+/>
+
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
+
+Agent에 저장소와 Linear 팀을 지정하세요. 게시할 페이지를 위해 Notion을 연결하세요. 주간 run을
+어느 요일에 실행할지 알려주세요.
+
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
+
+<AiPrompt>
+  매주 월요일 9:00에 실행되는 Routine을 만들어줘. GitHub과 Linear에서 지난주 변경 사항을
+  가져와서 New, Improved, Fixed로 분류한 고객용 릴리스 노트를 생성한 다음
+  Notion에 게시해줘. 내부용 작업은 제외하고, breaking change로 보이는 항목은
+  표시해줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상 결과
+</div>
+
+Agent가 pull request와 issue를 바탕으로 지난주 노트 초안을 작성한 다음, Notion 페이지로 정리합니다.
+고객에게 보내기 전에 문체를 다듬으세요. 내부 잡무처럼 보이는 항목은 빼고,
+breaking change는 맨 위에 배치하세요. publish하기 전에 지난주에 merge된 pull request와 페이지 내용을 비교해 보세요.
+
+<div id="make-it-work-for-you">
+  ## 내 방식대로 활용하기
+</div>
+
+<AiPrompt>
+  두 가지 버전으로 작성해 줘. 하나는 고객용, 하나는 내부 changelog용이야. 둘 다 같은
+  Notion 페이지에 넣어 줘.
+</AiPrompt>
+
+<AiPrompt>
+  #ship 채널에 Notion 페이지 링크와 주요 내용 3가지를 담은 Slack post를
+  추가해 줘.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+* **내부 작업 항목이 릴리스 노트에 포함되는 경우:** Agent가 올바른 저장소와 Linear 팀을 참조하도록 지정하고, 고객에게 전달되지 않는 내부 작업은 제외하도록 다시 요청하세요.
+* **breaking change가 눈에 띄지 않게 묻힌 경우:** &quot;breaking&quot;이 무엇을 의미하는지(login, billing, 또는 필수 migration) Agent에게 알려주고, 해당 항목에 표시를 달아 맨 위에 배치하도록 요청하세요.
+* **엉뚱한 Notion 페이지에 작성되는 경우:** 정확한 페이지 또는 database 링크를 알려주고, 지난주 노트를 덮어쓸지 아니면 run마다 새 페이지를 만들지 지정하세요.
+
+<div id="related">
+  ## 관련 문서
+</div>
+
+<CardGroup cols={2}>
+  <Card title="후보자 발굴하기" href="/ko/use-cases/source-candidates">
+    배포가 아닌 채용에 활용하는 동일한 GitHub connector입니다.
+  </Card>
+
+  <Card title="고객 피드백 분석하기" href="/ko/use-cases/analyze-customer-feedback">
+    Notion에서 티켓도 검토하는 프로덕트 매니저를 위한 안내입니다.
+  </Card>
+</CardGroup>

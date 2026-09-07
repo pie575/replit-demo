@@ -1,0 +1,251 @@
+---
+title: "Создайте своё первое мобильное приложение"
+description: "Создайте PixelGames — игровое приложение в стиле ретро — как нативное приложение для iOS и Android с помощью Agent."
+sidebarTitle: "Создайте мобильное приложение"
+icon: "wand-magic-sparkles"
+---
+
+export const PromptActions = ({prompt = "", campaign = "docs-prompt-actions"}) => {
+  const LZ_SRC = "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js";
+  const ensureLZString = () => {
+    if (typeof document === "undefined") return;
+    if (window.LZString) return;
+    if (document.querySelector(`script[src="${LZ_SRC}"]`)) return;
+    const s = document.createElement("script");
+    s.src = LZ_SRC;
+    s.async = true;
+    document.head.appendChild(s);
+  };
+  const handleCopy = async e => {
+    const btn = e.currentTarget;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = prompt;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.dataset.label || btn.innerText;
+    btn.dataset.label = original;
+    btn.innerText = "Скопировано!";
+    setTimeout(() => {
+      if (btn.isConnected) btn.innerText = original;
+    }, 1500);
+  };
+  const handleBuild = () => {
+    if (!prompt || typeof window === "undefined") return;
+    const utm = `utm_source=replit-docs&utm_medium=docs&utm_campaign=${encodeURIComponent(campaign)}&utm_content=prompt-actions`;
+    let url;
+    if (window.LZString) {
+      const encoded = window.LZString.compressToEncodedURIComponent(prompt);
+      url = `https://replit.com/?prompt=${encoded}&referrer=replit-docs&${utm}`;
+    } else {
+      url = `https://replit.com/?prompt=${encodeURIComponent(prompt)}&referrer=replit-docs&${utm}`;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  ensureLZString();
+  const baseButtonStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    lineHeight: 1.2,
+    fontFamily: "inherit",
+    textDecoration: "none"
+  };
+  return <div style={{
+    display: "flex",
+    gap: "12px",
+    margin: "16px 0",
+    flexWrap: "wrap",
+    alignItems: "center"
+  }}>
+      <button type="button" onClick={handleCopy} style={{
+    ...baseButtonStyle,
+    background: "transparent",
+    color: "inherit",
+    border: "1px solid rgba(127,127,127,0.4)"
+  }}>
+        Скопировать промпт
+      </button>
+      <button type="button" onClick={handleBuild} style={{
+    ...baseButtonStyle,
+    background: "#F26207",
+    color: "#FFFFFF",
+    border: "1px solid #F26207"
+  }}>
+        Создать в Replit ↗
+      </button>
+    </div>;
+};
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const pixelGamesPrompt = "Создай мобильное приложение PixelGames: интерфейс ретро-портативной консоли в стиле классического Game Boy — с кремовым пластиковым корпусом, серой рамкой экрана и оливково-зелёным ЖК-экраном с линиями сетки. Добавь крестовину, две круглые кнопки A/B, а также кнопки MENU и START под экраном. Покажи меню с четырьмя играми: Blocks, Snake, Racer и Pinball.";
+
+Создание мобильного приложения в Replit устроено так же, как создание веб-приложения: вы описываете,
+что хотите, а Agent пишет код. В этом руководстве процесс показан на одном примере,
+чтобы вы увидели общий подход, прежде чем применить его к собственной идее.
+
+<Frame caption="Итог: меню PixelGames и игра Blocks, запущенная на телефоне.">
+  <img src="/assets/mirror/pixelgames-home-screen-eeffe5c27dc1.webp" alt="Меню PixelGames со списком игр Blocks, Snake, Racer и Pinball; выбрана игра Blocks" width="420" height="420" data-path="images/pixelgames/mobile/pixelgames-home-screen.webp" />
+</Frame>
+
+<PromptActions prompt={pixelGamesPrompt} campaign="docs-mobile-first-app" />
+
+<div id="before-you-start">
+  ## Перед началом
+</div>
+
+Вам нужен только бесплатный [аккаунт Replit](https://replit.com/).
+
+Цель — пройти весь цикл:
+
+* Создать приложение с помощью [Agent](/ru/features/agent/overview)
+* Протестировать его как мобильное приложение
+* Опубликовать его и поделиться им
+
+Agent — это ИИ-инструмент Replit для создания приложений. Вы описываете, что хотите, а он создаёт приложение, объясняет
+свои действия и исправляет неполадки.
+
+<div id="1-tell-agent-to-build-the-app">
+  ## 1. Попросите Agent создать приложение
+</div>
+
+Откройте Replit и создайте новое приложение. Опишите, что хотите создать, затем выберите **Мобильное приложение**
+в качестве типа приложения.
+
+<AiPrompt>
+  {pixelGamesPrompt}
+</AiPrompt>
+
+<Frame caption="Agent настраивает мобильный проект и интерфейс Shell.">
+  <img src="/assets/mirror/pixelgames-scaffolding-6b34f56cd5f2.png" alt="Промпт на создание PixelGames, введённый на главной странице Replit, с выбранным режимом Mobile" data-path="images/pixelgames/mobile/pixelgames-scaffolding.png" width="877" height="411" data-path="images/pixelgames/mobile/pixelgames-scaffolding.png" />
+</Frame>
+
+<div id="2-confirm-it-works-in-preview">
+  ## 2. Убедитесь, что всё работает в предпросмотре
+</div>
+
+Replit запускает PixelGames в режиме симуляции iOS или Android прямо на панели предпросмотра. Это самый
+быстрый способ проверить изменения.
+
+<Steps>
+  <Step title="Симулятор запускается автоматически">
+    Replit запускает симуляцию, как только PixelGames будет готова — никаких настроек не требуется.
+  </Step>
+
+  <Step title="Переключайте платформы в раскрывающемся списке">
+    Используйте раскрывающийся список **Simulate on...** на панели инструментов предпросмотра (рядом с иконками гаечного ключа и
+    обновления), чтобы переключаться между **iOS**, **Android** и **Web**.
+  </Step>
+</Steps>
+
+<Frame caption="Раскрывающийся список Simulate on... на панели предпросмотра Replit.">
+  <img src="/assets/mirror/replit-simulate-dropdown-130bd3168cfe.png" alt="Панель предпросмотра Replit с открытым раскрывающимся списком Simulate on Web, iOS или Android" data-path="images/pixelgames/mobile/replit-simulate-dropdown.png" width="1920" height="992" data-path="images/pixelgames/mobile/replit-simulate-dropdown.png" />
+</Frame>
+
+<div id="check-that-it-actually-works">
+  ### Убедитесь, что всё действительно работает
+</div>
+
+Протестируйте PixelGames как игрок:
+
+* На экране **MENU** должна быть доступна для выбора игра **Blocks**, а остальные три игры должны быть помечены «СКОРО».
+* Откройте Blocks и сыграйте несколько фигур, используя крестовину и кнопки A/B.
+* Убедитесь, что по ходу игры в HUD обновляются счёт, уровень и количество линий.
+
+Если что-то выглядит неправильно, опишите Agent, что вы увидели — вам не нужно самостоятельно искать ошибку.
+
+<div id="youve-got-pixelgames-running">
+  ## PixelGames уже запущен
+</div>
+
+Всего один prompt — и у вас готова игра, в которую можно играть прямо в Replit.
+
+<div id="troubleshooting">
+  ## Устранение неполадок
+</div>
+
+<AccordionGroup>
+  <Accordion title="Панель предпросмотра остаётся пустой">
+    Первая сборка занимает одну-две минуты, поэтому немного подождите, прежде чем считать, что она зависла.
+    Если после этого панель предпросмотра всё ещё пуста, проверьте Console на наличие ошибок и отправьте их Agent.
+  </Accordion>
+
+  <Accordion title="Изменения не отображаются в предварительном просмотре">
+    Нажмите **R** в Console, чтобы перезагрузить PixelGames, затем воспользуйтесь иконкой обновления на панели инструментов панели предпросмотра,
+    если содержимое всё ещё выглядит неактуальным.
+  </Accordion>
+
+  <Accordion title="Красный экран с ошибкой в предварительном просмотре">
+    Обычно это означает ошибку JavaScript или отсутствие пакета. Прочитайте сообщение — оно часто
+    указывает точный файл и строку. Затем отправьте его Agent и попросите исправить проблему.
+  </Accordion>
+
+  <Accordion title="App работает в веб-версии, но сбоит на iOS или Android (или наоборот)">
+    Некоторые пакеты по-разному работают на разных платформах: пакет, работающий в веб-версии, может не
+    поддерживать нативные платформы или требовать другой настройки. Прежде чем полагаться на него, спросите Agent: «Поддерживает ли этот пакет нативные платформы?»
+  </Accordion>
+
+  <Accordion title="Сборка занимает много времени">
+    Первая сборка всегда выполняется медленнее, поскольку кэш ещё пуст; последующие должны быть
+    быстрее. Если она по-прежнему выполняется медленно, попросите Agent проверить Project на наличие ненужных пакетов.
+  </Accordion>
+
+  <Accordion title="Ошибки «Module not found»">
+    Это означает, что пакет не установлен либо установлен, но кэш устарел. Попросите Agent
+    установить пакет или очистить кэш и ещё раз проверьте, что в названии пакета нет опечатки.
+  </Accordion>
+</AccordionGroup>
+
+<div id="whats-next">
+  ## Что дальше
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Протестируйте на телефоне" icon="mobile" href="/ru/build/mobile-preview-testing">
+    Оцените PixelGames как настоящее мобильное приложение: кнопки под большим пальцем, тактильная отдача, реальный размер
+    экрана.
+  </Card>
+
+  <Card title="Добавьте вход" icon="right-to-bracket" href="/ru/build/mobile-login">
+    Позвольте игрокам входить в систему и сохранять прогресс.
+  </Card>
+
+  <Card title="Храните изображения в мобильном приложении" icon="image" href="/ru/build/mobile-store-images">
+    Сохраняйте фотографии профиля в App Storage.
+  </Card>
+
+  <Card title="Отправляйте push-уведомления" icon="bell" href="/ru/build/mobile-push-notifications">
+    Сообщайте игрокам о выходе новой игры.
+  </Card>
+
+  <Card title="Добавьте платежи" icon="credit-card" href="/ru/build/mobile-payments">
+    Взимайте с игроков плату за контент в PixelGames.
+  </Card>
+</CardGroup>

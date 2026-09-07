@@ -1,0 +1,291 @@
+---
+title: "手动将项目复制到其他 workspace"
+description: "手动将正在运行的应用复制到其他 workspace 或账户：复制代码、设置新应用、以最短停机时间将用户切换到新应用，并了解如何撤销操作"
+sidebarTitle: "手动复制项目"
+icon: "copy"
+---
+
+本指南将介绍如何手动将应用复制到其他 workspace 或账户。你需要复制代码、设置新应用、复制数据，然后将用户切换到新应用。
+
+不会移动或删除任何内容。旧项目会原样保留在原处，两个副本不会保持同步。完成后，你可以选择保留或删除旧项目。
+
+<Note>
+  想使用内置的一键转移功能？请参阅 [将 App 转移到 Teams](/zh/teams/identity-and-access-management/transfer-app-to-teams)。当该选项不可用，或需要跨账户复制时，请使用本指南。
+</Note>
+
+<div id="before-you-start">
+  ## 开始前
+</div>
+
+你需要：
+
+* 同时访问旧项目和新的 workspace 或账户。
+* 预留约一小时不受打扰的时间来完成最终切换。前面的步骤可以分几天进行。
+* 如果你的 App 使用自定义网址，还需要能够访问管理该域名的平台。
+
+有两项内容不会自动复制，而且最耗时：你的**数据库**和**网址**。本指南将介绍如何迁移这两项内容。
+
+<Note>
+  如果你的 workspace 管理员已启用 [Ban source code export](/zh/teams/enterprise-privacy-settings#ban-source-code-export)，你无法将项目下载为 zip 文件。开始前请先与 workspace 管理员沟通——他们可以确认是否允许手动复制，以及如何迁移代码和数据库。
+</Note>
+
+<div id="plan-for-downtime">
+  ## 制定停机计划
+</div>
+
+这就像开一家新店，再关掉旧店。旧店关闭后到新店开业前，会有一小段空档。在这段时间里，没人能使用你的应用。
+
+**应用会下线多久？** 通常为 15 到 60 分钟，具体取决于数据库中的数据量以及网址更新的速度。
+
+**会丢失数据吗？** 只有在复制数据库后，仍有人向旧应用添加数据时才会丢失。为避免这种情况，请在进行最终复制*之前*将旧应用下线。本指南的步骤安排可确保这一点。
+
+**可以撤销吗？** 可以。旧 Project 不会被删除。如果出现问题，只需再次 Publish 旧应用，它就会完全恢复原状。
+
+**应该何时操作？** 请选择使用应用人数较少的时间。如果可以，请提前通知用户。
+
+<div id="step-1-copy-the-code-to-a-new-project">
+  ## 第 1 步：将代码复制到新项目
+</div>
+
+请选择一种方法。在此步骤中，旧 App 会保持在线。两种方法都会复制你的代码。GitHub 始终会保留提交历史，而 zip 文件只有包含 `.git` 文件夹时才会保留历史记录：
+
+|           | 通过 GitHub                            | 通过 zip 文件                                                     |
+| --------- | ------------------------------------ | ------------------------------------------------------------- |
+| **代码文件**  | 仅包含已提交并推送的文件                         | 磁盘上的所有内容，包括未提交的更改                                             |
+| **提交历史**  | 远程仓库中的完整历史记录                         | 如果 zip 文件包含 `.git` 文件夹，则保留完整历史记录；如果为符合导入限制而排除 `.git`，则不保留历史记录 |
+| **依赖文件夹** | 遵循 `.gitignore`                      | 不包含 (`node_modules`、`.venv`、`build` 等) ；导入时会重新安装              |
+| **要求**    | 一个同时连接到两个 Replit Account 的 GitHub 账户 | 无                                                             |
+| **持续同步**  | 两个副本都可以向同一仓库推送并从中拉取                  | 无——仅为一次性快照                                                    |
+| **最适合**   | 需要长期在 Git 中备份的项目                     | 快速创建一次性副本                                                     |
+
+<div id="via-github">
+  ### 通过 GitHub
+</div>
+
+<Steps>
+  <Step title="将旧项目推送到 GitHub">
+    在旧项目中，打开 [Git 窗格](/zh/features/workspace-tools/git-interface)，连接 GitHub 仓库，然后提交并推送。除非你希望公开代码，否则请使用私有仓库。
+  </Step>
+
+  <Step title="授予新账号访问权限">
+    如果新 workspace 属于其他 Replit 账号，其 GitHub 账号需要有权访问该仓库。对于私有仓库，请将该 GitHub 账号添加为协作者，或使用共享的 GitHub 组织。
+  </Step>
+
+  <Step title="在新 workspace 中导入">
+    登录新账号，打开 [replit.com/import](https://replit.com/import)，选择 **GitHub**，连接 GitHub 账号，然后选择仓库。有关故障排除，请参阅[从身份提供方导入](/zh/build/import-from-providers)。
+  </Step>
+
+  <Step title="验证副本">
+    打开新项目，确认文件和提交历史都已导入。导入期间，Replit 会安装依赖项并配置 Run 命令。
+  </Step>
+</Steps>
+
+<Warning>
+  GitHub 只会接收你提交并推送的内容。与 `.gitignore` 匹配的文件和未提交的更改不会被推送。切勿将密钥值或数据库转储提交到仓库。
+</Warning>
+
+<div id="via-zip-file">
+  ### 通过 zip 文件
+</div>
+
+<Steps>
+  <Step title="下载旧项目">
+    在旧项目中，点击文件树顶部的三点菜单，然后选择 **下载为 zip**。
+
+    如果下载成功且文件小于 200 MB，请继续下一步。
+
+    大于 200 MB 的 zip 文件也可能下载成功。但是，[ZIP 导入](/zh/build/import-from-providers#limitations)不接受超过 200 MB 的文件，因此 Replit 无法用它创建新项目。如果下载失败或 zip 文件超过 200 MB，请创建一个更小的文件：
+
+    1. 在旧项目中，打开 **Shell** 工具。
+
+    2. 粘贴以下命令并按 Enter。该命令会创建名为 `project.zip` 的文件，并排除 Replit 可自行重建的文件夹：
+
+       ```bash theme={null}
+       zip -r project.zip . -x ".cache/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+    3. 检查文件大小。粘贴以下命令并按 Enter。它会以 MB 显示大小，例如 `150M` 表示 150 MB：
+
+       ```bash theme={null}
+       du -h project.zip
+       ```
+
+    4. 如果文件超过 200 MB，请排除编辑历史以缩小文件。粘贴以下两行并按 Enter：
+
+       ```bash theme={null}
+       rm project.zip
+       zip -r project.zip . -x ".cache/*" ".local/*" ".git/*" "node_modules/*" ".venv/*" "venv/*" ".pythonlibs/*" "build/*" "target/*" ".next/*" "__pycache__/*"
+       ```
+
+       仅当需要将 zip 文件缩小到 200 MB 以下时，才排除 `.local` 和 `.git`。这些排除项不会从旧项目中删除这两个文件夹。但是，不含 `.git` 的 zip 文件不会包含项目的提交历史。如果需要保留历史记录，请使用 GitHub 方法。
+
+    5. 在文件树中找到 `project.zip`，点击其旁边的三点菜单，然后选择 **下载**。
+
+    `.cache` 文件夹包含 Replit 的内部状态，包括缓存的密钥值。手动创建 zip 文件时，务必将其排除在外。如果项目中还有其他较大的生成文件夹，请将它们添加到排除列表中。
+  </Step>
+
+  <Step title="在新 workspace 中导入">
+    登录新账户，打开 [replit.com/import](https://replit.com/import)，选择 **ZIP**，然后上传文件。
+  </Step>
+
+  <Step title="验证副本">
+    打开新项目，确认文件是否都在。如果 zip 文件包含 `.git` 文件夹，提交历史也会一并导入。如果使用了创建较小压缩包的命令，新项目将没有提交历史。Replit 会在导入时重新安装被排除的依赖项。
+  </Step>
+</Steps>
+
+<div id="step-2-set-up-the-new-app">
+  ## 第 2 步：设置新应用
+</div>
+
+旧应用仍在运行。此步骤中，你将使用数据的*测试副本*让新应用完全正常运行，以便后续快速完成最终切换。
+
+<Steps>
+  <Step title="添加 Secrets">
+    Secret 值 (API 密钥、密码) 绝不会离开旧项目。在两个项目中打开 [Secrets](/zh/core-concepts/project-editor/app-setup/secrets) 工具，手动逐项复制。请包含所有部署密钥。
+  </Step>
+
+  <Step title="重新连接 Connectors 和其他服务">
+    在新项目中通过 **Tools → Connectors** 重新连接各项集成。有关 App Storage、协作者及其他所有内容，请参阅[重新创建未复制的内容](#re-create-what-doesnt-copy-over)。
+  </Step>
+
+  <Step title="发布新应用">
+    [Publish](/zh/features/publishing/overview) 新项目。它将拥有自己的 `replit.app` 网址和独立的空生产数据库。暂时不要连接自定义域名。
+  </Step>
+
+  <Step>
+    按照下方的[复制数据库](#copy-the-database)操作，并将新项目中的 **生产** 数据库作为目标。这会为你提供可用于测试的真实数据。第 3 步将用最新数据替换此副本。
+  </Step>
+
+  <Step>
+    通过新应用的 `replit.app` 地址打开它，并像用户一样使用。继续之前，请修复所有问题。你的用户尚未受到影响。
+  </Step>
+</Steps>
+
+<div id="step-3-switch-your-users-to-the-new-app">
+  ## 第 3 步：将用户切换到新应用
+</div>
+
+这一步会导致服务中断，请一次性完成。
+
+<Steps>
+  <Step title="让旧应用下线">
+    在旧项目中，打开 **Publishing** 工具并选择 **Unpublish**。你的应用现已下线。此后任何人都无法添加新数据，因此接下来创建的副本会包含所有数据。
+  </Step>
+
+  <Step title="最后一次复制数据库">
+    按照下方的[复制数据库](#copy-the-database)操作，将新项目中的 **生产** 数据库作为目标数据库。此副本包含所有最新数据。
+  </Step>
+
+  <Step title="将网址指向新应用">
+    如果你的应用使用自定义域名：在旧项目中，打开 **Publishing → Domains** 并断开该域名。在新项目中，打开 **Publishing → Domains** 并[连接该域名](/zh/features/publishing/custom-domains#connect-a-domain-you-already-own)。如果 Replit 提示你这样做，请在域名提供商处 (例如 GoDaddy 或 Namecheap) 更新记录。
+
+    新网址可能需要几分钟到几小时才能对所有用户生效。在此之前，部分访客可能会看到错误。
+
+    如果你的应用只使用 `replit.app` 网址，请将新网址分享给用户。
+  </Step>
+
+  <Step title="确认新应用已上线">
+    打开网址，确认新应用能正常加载且包含你的数据。你的应用现已恢复上线。
+  </Step>
+</Steps>
+
+<div id="copy-the-database">
+  ## 复制数据库
+</div>
+
+复制代码不会影响数据库。请使用两个项目的 Shell 中提供的 PostgreSQL `pg_dump` 和 `pg_restore` 工具复制数据。步骤 2 和步骤 3 都会用到这里的操作。每次使用的命令相同，只有*目标*不同。
+
+<Warning>
+  运行 `pg_dump` 后写入的数据不会包含在副本中。进行步骤 3 的最终复制前，请先将旧 App 下线。
+</Warning>
+
+<Steps>
+  <Step title="从旧项目导出数据">
+    在旧项目中打开 **Shell** 工具。粘贴以下命令并按 Enter。该命令会在文件树中创建名为 `backup.dump` 的文件：
+
+    ```bash theme={null}
+    pg_dump -Fc "$DATABASE_URL" --no-owner --no-privileges -f backup.dump
+    ```
+
+    这会导出**开发**数据库。你的线上数据通常位于**生产**数据库中。如需导出生产数据库：
+
+    1. 打开 **数据库** 工具，选择生产数据库，然后打开 **设置**。
+    2. 复制连接字符串。
+    3. 在上述命令中，将 `"$DATABASE_URL"` 替换为连接字符串，并保留引号。
+
+    如果找不到连接字符串，请参阅[连接详情](/zh/features/data-and-storage/connection-details)。
+  </Step>
+
+  <Step title="将转储文件移至新项目">
+    在旧项目的文件树中，打开 `backup.dump` 旁边的三点菜单并下载该文件。然后通过文件树中的 **上传文件** 选项将其上传到新项目。
+
+    如果你通过 GitHub 复制了代码，请勿提交转储文件。请单独移动该文件，避免数据进入仓库。
+  </Step>
+
+  <Step title="在新项目中导入数据">
+    在新项目中打开 **Shell** 工具。粘贴以下命令并按 Enter：
+
+    ```bash theme={null}
+    pg_restore --clean --if-exists --single-transaction --no-owner --no-privileges --exit-on-error -d "$DATABASE_URL" backup.dump
+    ```
+
+    按当前写法，该命令会导入到新项目的**开发**数据库。这正是步骤 2 所需的操作。
+
+    对于步骤 3 的最终复制，应改用**生产**数据库。在新项目中，打开 **数据库** 工具，选择生产数据库，打开 **设置**，复制连接字符串，然后用它替换 `"$DATABASE_URL"`。
+
+    此操作会先删除目标数据库中名称匹配的对象，再加载数据。命令完成且没有输出，即表示操作成功。
+  </Step>
+</Steps>
+
+<Note>
+  如果 `pg_restore` 因角色或策略错误而失败，说明你的数据库使用了新项目中尚不存在的自定义 PostgreSQL 角色。请[联系支持团队](https://replit.com/support)获取帮助。
+</Note>
+
+<Note>
+  如果新项目使用[旧版 Neon 开发数据库](/zh/features/data-and-storage/development-and-production#legacy-development-database)，发布流程会提供**使用当前开发数据设置生产数据库**选项。它会复制发布时开发数据库中的所有内容。此选项适合测试，但在最终切换时请使用上述步骤，以确保复制最新数据。
+</Note>
+
+<div id="re-create-what-doesnt-copy-over">
+  ## 重新创建未随之复制的内容
+</div>
+
+项目其余的配置位于文件系统之外。请在新项目中逐项重新创建：
+
+| 项目              | 操作                                                                                                                               |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Secrets**     | 密钥值不会离开旧项目。请在新项目的 [Secrets](/zh/core-concepts/project-editor/app-setup/secrets) 工具中重新添加，包括部署密钥。                                     |
+| **账户 Secrets**  | 在新项目中[关联它们](/zh/core-concepts/project-editor/app-setup/secrets#manage-account-secrets)。如果新项目属于其他账户，请先将它们添加到该账户。                     |
+| **App Storage** | 存储桶不会迁移。在同一账户内，请将[现有存储桶添加](/zh/features/data-and-storage/object-storage#bucket-access-management)到新项目。跨账户时，请下载对象并上传到新存储桶。           |
+| **Connectors**  | 在新项目的 **Tools → Connectors** 中重新连接各项集成。请参阅[集成概览](/zh/features/integrations/overview)。                                               |
+| **部署**          | 副本尚未发布。请按照[步骤 2](#step-2-set-up-the-new-app)，从新 workspace 使用 [Publish](/zh/features/publishing/overview) 将其发布。                      |
+| **自定义域名**       | 从旧部署中移除域名，将其关联到新部署，并更新 DNS 记录。详见[步骤 3](#step-3-switch-your-users-to-the-new-app)。                                                |
+| **协作者**         | 重新邀请协作者，并在新 workspace 中设置[访问权限](/zh/teams/identity-and-access-management/groups-and-permissions)。                                   |
+| **Agent 历史记录**  | Agent 对话和 [checkpoint](/zh/features/version-control/checkpoints-and-rollbacks) 回滚会保留在旧项目中。checkpoint 提交会随 Git 历史一同迁移，但无法从副本回滚到这些提交。 |
+
+<div id="if-something-goes-wrong">
+  ## 如果出现问题
+</div>
+
+旧项目仍然还在。如需恢复：
+
+1. 在旧项目中，打开 **Publishing** 工具，然后选择 **Publish**。
+2. 如果你迁移了自定义域名，也请按相同方式迁回。
+
+你的 App 会重新上线，并保留你将其下线时的数据。不会丢失任何内容。
+
+<div id="clean-up">
+  ## 清理
+</div>
+
+等待一周左右，确认新 App 运行正常。然后：
+
+* 从两个项目和你的设备中删除 `backup.dump`。每个副本都包含完整的数据导出。
+* 你也可以选择删除旧项目。
+
+<div id="related-resources">
+  ## 相关资源
+</div>
+
+* [将 App 转移到 Teams](/zh/teams/identity-and-access-management/transfer-app-to-teams)：用于将项目转移到团队 Workspace 或在不同团队 Workspace 之间转移的内置功能
+* [从身份提供方导入](/zh/build/import-from-providers)：所有支持的导入来源
+* [修复使用共享数据库的已发布 App](/zh/features/data-and-storage/shared-database-migration)：有关 `pg_dump` 和 `pg_restore` 的更多故障排除信息

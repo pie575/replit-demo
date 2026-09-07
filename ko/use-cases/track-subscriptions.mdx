@@ -1,0 +1,153 @@
+---
+title: "구독 추적"
+description: "이메일에서 정기 결제 내역을 찾아 매달 지출하는 금액을 계산합니다."
+sidebarTitle: "구독 추적"
+icon: "receipt"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                기본 제공 connector가 아닙니다. Agent가 API key를 요청합니다.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Gmail에서 구독 및 영수증 이메일을 검색해 정기 결제를 파악하고, Google Sheets에서 월 비용을 계산하세요. Agent가 업체, 금액, 결제 주기를 추출하고, 잊고 있던 무료 체험으로 보이는 항목은 갱신되기 전에 표시해 줍니다.
+
+<div id="best-for">
+  ## 이런 분께 적합합니다
+</div>
+
+* 도구와 서비스에 실제로 나가는 월 지출을 파악해야 하는 창업자와 운영 담당자
+* 잊고 있던 무료 체험이 자동 갱신되기 전에 찾아내야 하는 재무 및 총무 담당자
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "영수증 및 갱신 안내 이메일" },
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "구독 목록 및 월별 비용 관리",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
+
+Gmail과 Google Sheet를 연결하세요(또는 Agent에게 새로 만들어 달라고 요청하세요). 검색할 Inbox 또는
+label이 무엇인지 Agent에게 알려주세요.
+
+<div id="prompt-the-agent">
+  ## 에이전트에 프롬프트 입력하기
+</div>
+
+<AiPrompt>
+  매주 월요일 오전 9시에 실행되는 Routine을 만들어줘. Gmail에서 구독 및 영수증
+  이메일을 검색해서 정기 결제를 찾아내고, 업체, 금액, 결제 주기를 추출한 다음
+  월 비용을 계산하는 Google Sheet를 만들어줘. 깜빡하고 해지하지 않은 무료 체험으로
+  보이는 항목은 따로 표시해줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상 결과
+</div>
+
+Agent가 업체(업체), 금액, 결제 주기, 월 합계로 구성된 표를 만듭니다. 몇 개 행은 원본 이메일과 대조해 확인해 보세요. 첫 실행에서는 제목에 &quot;subscription&quot;이 들어 있지 않은 업체는 누락되니, 해당 라벨을 추가한 뒤 다시 실행하세요. 알고 있는 업체 세 곳을 골라 Gmail 영수증을 열고 금액과 결제 주기를 확인한 다음 월 합계를 신뢰하세요.
+
+<div id="make-it-work-for-you">
+  ## 내 방식대로 활용하기
+</div>
+
+<AiPrompt>
+  구독을 카테고리별(개발 도구, 디자인, AI, 개인)로 분류하고 월 $[amount]을 넘는
+  항목은 강조해 줘.
+</AiPrompt>
+
+<AiPrompt>
+  $[amount]이 넘는 연간 갱신 건은 3일 전에 Slack으로 알림을 보내 줘.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+* **알고 있는 구독이 시트에 빠져 있는 경우:** 어떤 Gmail label이나 검색어를 사용할지 Agent에게 알려주고, 제목에 &quot;subscription&quot;이 들어가지 않는 업체도 포함하도록 하세요. 몇 개 행은 원본 이메일과 대조해 확인해 보세요.
+* **금액이나 결제 주기가 이상해 보이는 경우:** 영수증에는 세금, credits, 또는 다른 통화가 함께 표시되는 경우가 많습니다. 이메일에 적힌 항목별 금액과 billing period를 그대로 사용하고, 추론으로 채운 행은 따로 표시해 달라고 Agent에게 요청하세요.
+* **같은 업체가 두 번 나타나는 경우:** 업체 이름을 기준으로 merge하고 가장 최근 영수증만 남긴 뒤, 월 합계를 다시 계산해 달라고 Agent에게 요청하세요.
+
+<div id="related">
+  ## 관련 항목
+</div>
+
+<CardGroup cols={2}>
+  <Card title="자리를 비운 동안 밀린 내용 따라잡기" href="/ko/use-cases/catch-up-while-away">
+    창업자와 운영 담당자가 휴가 후 복귀할 때 쓰는 동일한 Gmail connector입니다.
+  </Card>
+
+  <Card title="실시간 API dashboard 만들기" href="/ko/use-cases/live-api-dashboard">
+    주간 표 대신 실시간 dashboard를 사용해 보세요.
+  </Card>
+</CardGroup>

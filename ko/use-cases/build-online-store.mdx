@@ -1,0 +1,165 @@
+---
+title: "온라인 스토어 구축하기"
+description: "카탈로그를 Shopify로 가져오고 Replit에서 스토어 페이지를 디자인하세요."
+sidebarTitle: "온라인 스토어 구축하기"
+icon: "store"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                기본 제공 connector가 아닙니다. Agent가 API key를 요청합니다.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+이미 사용 중인 소스에서 products를 Agent에게 전달하세요. Google Sheet(이름, 가격, 설명, 제품 코드, 재고)와 Google Drive에 저장된 사진이면 충분합니다. Agent가 Shopify store를 설정하고 products, 가격, 설명, 이미지를 import한 뒤 checkout과 결제까지 연결해 줍니다.
+스토어프런트의 디자인과 frontend는 Shopify theme가 아니라 Replit에 있습니다. 결제는 Shopify checkout으로 처리되므로 별도의 Stripe connector는 필요 없습니다.
+
+<div id="best-for">
+  ## 이런 분께 적합합니다
+</div>
+
+* 이미 Sheets와 Drive에 정리해 둔 카탈로그로 store를 열고 싶은 창업자
+* Shopify를 커머스 backend로 활용하는 맞춤형 Replit 스토어프런트가 필요한 프로덕트 디자이너
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "제품 목록: 이름, 가격, 설명, 제품 코드, 재고",
+},
+{
+id: "google-drive",
+name: "Google Drive",
+why: "제품 사진 및 브랜드 에셋",
+},
+{
+id: "shopify",
+name: "Shopify",
+why: "스토어 설정, 카탈로그 가져오기, checkout 및 결제 처리",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
+
+제품 하나당 한 행(이름, 가격, 설명, 제품 코드, 재고)으로 정리된 Sheet와, Agent가 각 행과 매칭할 수 있도록 이름을 지정한 사진이 담긴 Drive 폴더를 준비하세요. 그런 다음 Sheets, Drive, Shopify를 연결하세요.
+아직 store가 없다면 Agent가 Chat에서 Shopify를 대신 설정해 줄 수 있습니다. store를 공유하기 전에 test order를 넣어 확인해 보세요.
+
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
+
+<AiPrompt>
+  이 제품 소스 [Google Sheet 및 Drive 폴더]를 사용해서 완전한 Shopify store를
+  구성해 줘. 이름, 가격, 설명, 사진을 포함해 모든 제품을 import해 줘.
+  이 Replit App에서 스토어프런트 frontend(홈, 컬렉션, 제품, 장바구니)를
+  디자인하고 build해 줘. 카탈로그, 장바구니, checkout, 결제에는 Shopify를
+  사용해 줘. 고객이 보는 페이지에는 Shopify theme을 사용하지 마.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상 결과
+</div>
+
+Agent가 카탈로그를 Shopify로 import한 다음, Shopify에서 products를 불러와 고객을 Shopify checkout으로 연결하는 Replit 스토어프런트를 만듭니다. 몇 개의 products를 Sheet와 대조해 가격, 문구, Image가 맞는지 확인하고 test order를 진행해 보세요. Shopify 테스트 결제를 사용해 장바구니 합계가 Sheet와 일치하는지, checkout이 Shopify에서 이루어지는지 확인하세요.
+
+<div id="make-it-work-for-you">
+  ## 내 상황에 맞게 활용하기
+</div>
+
+<AiPrompt>
+  제품 코드 파일명(CODE.jpg)을 기준으로 Drive 사진을 Sheet 행과 매칭해 줘. 사진이
+  없는 행은 건너뛰어.
+</AiPrompt>
+
+<AiPrompt>
+  Sheet의 카테고리 열을 활용해 컬렉션 페이지를 추가하고, Replit 스토어프런트에 검색창을
+  넣어 줘.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+* **사진이 products와 일치하지 않는 경우:** Drive 파일 이름을 제품 코드(`CODE.jpg`) 형식으로 지정하고, 사진이 없는 행은 건너뛰도록 Agent에게 요청하세요.
+* **가격이나 문구가 Sheet와 다른 경우:** product마다 한 행씩(이름, 가격, 설명, 제품 코드, 재고) 작성되어 있는지 확인하고, import 후 몇 개 항목을 골라 점검해 보세요.
+* **checkout이 Shopify가 아니거나 스토어프런트가 theme로 되어 있는 경우:** 고객에게 보이는 페이지는 Replit에 있어야 합니다. 결제는 Shopify checkout을 통해 처리됩니다. store를 공유하기 전에 test order를 한 번 진행해 보세요.
+
+<div id="related">
+  ## 관련 문서
+</div>
+
+<CardGroup cols={2}>
+  <Card title="랜딩 페이지 디자인하기" href="/ko/use-cases/design-landing-page">
+    대기자 명단 페이지부터 만들어야 하는 창업자와 프로덕트 디자이너를 위한 가이드입니다.
+  </Card>
+
+  <Card title="Figma에서 라이브 App으로 전환하기" href="/ko/use-cases/import-figma-design">
+    이미 Figma에 스토어프런트를 만들어 둔 프로덕트 디자이너를 위한 가이드입니다.
+  </Card>
+</CardGroup>

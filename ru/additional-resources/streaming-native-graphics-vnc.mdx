@@ -1,0 +1,69 @@
+---
+title: "Потоковая передача нативной графики через VNC"
+description: "Replit поддерживает виртуальные сетевые вычисления (VNC). VNC — это зрелый протокол виртуального рабочего стола, который позволяет вашему Replit App транслировать нативный рабочий стол в веб-браузер. Этот протокол позволяет нативным приложениям (написанным на Python, Java, C++ и т. д.) открывать окна рабочего стола так же, как на физическом компьютере."
+---
+
+Эта технология потоковой передачи позволяет работать с устаревшими приложениями в браузере с любого устройства! Например, вы можете запустить на мобильном телефоне или планшете игру на Python, разработанную для настольного компьютера, без каких-либо изменений в исходном коде.
+
+<a href="https://replit.com/@demcrepl/Tetris-in-Pygame" target="_blank">Tetris (на базе PyGame)</a>
+
+<img src="/assets/mirror/tetris-ad06b806b2d4.png" alt="изображение Tetris в Replit App" width="2055" height="1057" data-path="images/vnc/tetris.png" />
+
+<div id="how-can-i-use-vnc">
+  ## Как использовать VNC?
+</div>
+
+Любое Replit App — на любом языке — может использовать виртуальный рабочий стол. Чтобы запускать нативные графические программы в Replit, не требуется вносить никаких изменений. Панель VNC появится, когда приложение попытается открыть нативное окно рабочего стола.
+
+<div id="securing-your-replit-app">
+  ## Защита вашего Replit App
+</div>
+
+По умолчанию VNC-подключение не защищено паролем, и доступ к нему возможен только с [https://replit.com](https://replit.com), поскольку для подключения используется та же аутентификация, что и для WebSocket. Если вам нужно получить доступ к Replit App через внешний клиент [noVNC](https://novnc.com), можно установить пароль VNC.
+
+Установите пароль в настройках [Secrets](/ru/core-concepts/project-editor/app-setup/secrets) вашего Replit App. `Secrets` — безопасное место для хранения паролей, защищённое от доступа других пользователей. Установка `VNC_PASSWORD` повысит безопасность удалённых подключений.
+
+<div id="how-can-i-use-fullscreen-vnc">
+  ## Как использовать полноэкранный VNC?
+</div>
+
+Перед выполнением этих шагов необходимо защитить ваше Replit App, как указано выше.
+
+1. Выполните следующую команду на вкладке «Shell»:
+   ```sh theme={null}
+   echo $REPL_ID
+   ```
+
+<Frame>
+  <img src="/assets/mirror/replid-6508492b1e8b.png" alt="изображение с командой echo" width="628" height="174" data-path="images/vnc/replid.png" />
+</Frame>
+
+2. Сформируйте URL-адрес подключения, подставив вместо `REPL_ID` полученное выше значение: `<\REPL_ID\>.id.repl.co`
+3. Откройте [клиент noVNC](https://novnc.com/noVNC/vnc.html) в отдельной вкладке браузера.
+4. Откройте настройки подключения.
+
+<Frame>
+  <img src="/assets/mirror/settings-3e0e0c4fd198.png" alt="открытие настроек подключения" width="126" height="302" data-path="images/vnc/settings.png" />
+</Frame>
+
+5. Разверните поле WebSockets. Введите URL-адрес подключения (`\<REPL_ID\>.id.repl.co`) в поле `host`, а поле `path` оставьте пустым.
+
+<Frame>
+  <img src="/assets/mirror/host-31b5c99194b2.png" alt="хост" width="214" height="230" data-path="images/vnc/host.png" />
+</Frame>
+
+6. Установите для параметра `Scaling Mode` значение `Remote Resizing`:
+
+<Frame>
+  <img src="/assets/mirror/scaling-0ffe9aae34bb.png" alt="масштабирование" width="147" height="74" data-path="images/vnc/scaling.png" />
+</Frame>
+
+7. При запросе учётных данных используйте имя пользователя `runner` и пароль, настроенный выше.
+
+<div id="examples">
+  ## Примеры
+</div>
+
+* <a href="https://replit.com/@demcrepl/Tetris-in-Pygame" target="_blank">PyGame</a>
+* <a href="https://replit.com/@amasad-matplotlib" target="_blank">Python matplotlib</a>
+* <a href="https://replit.com/@sigcse2021/Game-of-Life-demcrepl" target="_blank">Java Processing</a>

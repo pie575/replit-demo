@@ -1,0 +1,167 @@
+---
+title: "通过 MCP 连接"
+description: "通过模型上下文协议 (MCP) 将 Replit Agent 连接到外部工具、数据源和 API；登录已列出的服务器，或添加自定义服务器。"
+sidebarTitle: "通过 MCP 连接"
+icon: "server"
+---
+
+export const McpLinkGenerator = () => {
+  const getLink = () => {
+    if (typeof document === 'undefined') return 'https://replit.com/integrations?mcp=';
+    const displayName = document.getElementById('mcp-display-name')?.value || '我的 MCP 服务器';
+    const baseUrl = document.getElementById('mcp-base-url')?.value || 'https://example.com/mcp';
+    const payload = {
+      displayName,
+      baseUrl
+    };
+    const jsonString = JSON.stringify(payload);
+    const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+    return `https://replit.com/integrations?mcp=${encoded}`;
+  };
+  const updateOutputs = () => {
+    if (typeof document === 'undefined') return;
+    const link = getLink();
+    const badgeUrl = 'https://replit.com/badge?caption=Add%20to%20Replit';
+    const badgeMarkdown = `[![添加到 Replit](${badgeUrl})](${link})`;
+    const linkEl = document.getElementById('mcp-link-output');
+    const badgeMarkdownEl = document.getElementById('mcp-badge-markdown');
+    if (linkEl) linkEl.textContent = link;
+    if (badgeMarkdownEl) badgeMarkdownEl.textContent = badgeMarkdown;
+  };
+  const handleBadgeClick = e => {
+    e.preventDefault();
+    window.open(getLink(), '_blank');
+  };
+  return <div className="space-y-4">
+      <div>
+        <label htmlFor="mcp-display-name" className="block text-sm font-medium mb-1">显示名称</label>
+        <input type="text" id="mcp-display-name" placeholder="我的 MCP 服务器" onInput={updateOutputs} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+      </div>
+      <div>
+        <label htmlFor="mcp-base-url" className="block text-sm font-medium mb-1">基础 URL</label>
+        <input type="text" id="mcp-base-url" placeholder="https://example.com/mcp" onInput={updateOutputs} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">安装链接</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="mcp-link-output">https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6Ik15IE1DUCBTZXJ2ZXIiLCJiYXNlVXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9tY3AifQ==</code>
+        </pre>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">徽章预览</label>
+        <Frame>
+          <a href="#" onClick={handleBadgeClick} style={{
+    cursor: 'pointer'
+  }}>
+            <img src="https://replit.com/badge?caption=Add%20to%20Replit" alt="添加到 Replit 徽章" noZoom />
+          </a>
+        </Frame>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">徽章 Markdown</label>
+        <pre className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm break-all select-all cursor-text">
+          <code id="mcp-badge-markdown">[![Add to Replit](https://replit.com/badge?caption=Add%20to%20Replit)](https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6Ik15IE1DUCBTZXJ2ZXIiLCJiYXNlVXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9tY3AifQ==)</code>
+        </pre>
+      </div>
+    </div>;
+};
+
+Replit Agent 可通过 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) 连接数百种外部工具和数据源——这是一项用于集成 AI 工具的开放标准。登录预设服务器，或添加任何你信任的自定义 MCP 服务器。
+
+<div id="connect-a-pre-listed-mcp-server">
+  ## 连接预置 MCP 服务器
+</div>
+
+Replit 提供精选的 MCP 服务器列表，涵盖 Stripe、Linear、Notion、Sentry 等热门服务。只需点击一下即可登录并完成连接。
+
+<Frame>
+  <img src="/assets/mirror/mcp-servers-pane-8e1f431ca33c.png" alt="Replit Agent 设置窗格中的 MCP Servers，列出了 Stripe、Linear、Notion、Sentry、Atlassian、Miro、PostHog、Amplitude、Mixpanel、Granola 和 Razorpay 等预置 服务器，每个 服务器 均有 Sign in 按钮" width="3452" height="1988" data-path="images/replitai/mcp-servers-pane.png" />
+</Frame>
+
+<Steps>
+  <Step title="打开 Integrations 窗格">
+    前往 [replit.com/integrations](https://replit.com/integrations)，然后滚动至 **MCP Servers for Replit Agent**。
+  </Step>
+
+  <Step title="选择 服务器">
+    找到要连接的服务，例如 Stripe、Linear、Notion、Sentry、Atlassian、Miro、PostHog、Amplitude、Mixpanel、Granola 或 Razorpay。
+  </Step>
+
+  <Step title="登录">
+    点击 服务器 旁的 **Sign in**。系统会引导你完成该服务的 OAuth 流程。连接成功后，服务器 的连接状态会更新，Agent 即可使用其工具。
+  </Step>
+</Steps>
+
+如需查看完整目录，请参阅 [MCP Servers 参考](/zh/features/mcp/overview)。
+
+<div id="add-a-custom-mcp-server">
+  ## 添加自定义 MCP 服务器
+</div>
+
+如果所需的服务器不在预设目录中，可通过 URL 添加。
+
+<Frame>
+  <img src="/assets/mirror/mcp-connect-dialog-5b8f9b0d828e.png" alt="连接 MCP 服务器对话框，显示名称字段、MCP 服务器 URL 字段和可展开的高级设置部分" width="3452" height="1988" data-path="images/replitai/mcp-connect-dialog.png" />
+</Frame>
+
+<Steps>
+  <Step title="打开添加服务器对话框">
+    在 MCP 服务器设置面板中，点击 **+ 添加 MCP 服务器**。
+  </Step>
+
+  <Step title="设置显示名称">
+    输入一个易于识别的名称，Agent 会在聊天记录中用它指代该服务器。
+  </Step>
+
+  <Step title="输入服务器 URL">
+    粘贴 MCP 服务器的 HTTPS 端点。如果服务器需要身份验证，请打开 **高级设置**，添加自定义标头 (例如 `X-API-Key`) 。
+  </Step>
+
+  <Step title="测试并保存">
+    点击 **测试并保存**。Replit 会尝试连接，并引导你完成服务器所需的 OAuth 流程。保存后，该连接会显示在 MCP 服务器下，并标明其状态。
+  </Step>
+</Steps>
+
+<Warning>
+  仅连接你信任的 MCP 服务器。已连接的服务器可向 Agent 提供工具和数据；添加任何不熟悉的端点前，请先核实其来源。
+</Warning>
+
+<div id="use-mcp-tools-in-agent">
+  ## 在 Agent 中使用 MCP 工具
+</div>
+
+连接服务器后，Agent 会自动获取其工具列表，并在你的所有项目中提供这些功能。要使用服务器，只需在 Chat 中提及它：
+
+> 使用 Notion MCP 服务器 查找最新的会议记录。
+
+<Frame>
+  <img src="/assets/mirror/tool-call-7a53f51a11ae.png" alt="Agent 在 Chat 中调用 custom MCP 服务器 的工具" width="571" height="817" data-path="images/replitai/custom-mcp/tool-call.png" />
+</Frame>
+
+Agent 会根据你的请求从服务器中选择合适的工具。如果某个工具需要确认，你会在它运行前看到提示。
+
+<div id="share-an-install-link">
+  ## 分享安装链接
+</div>
+
+安装链接让任何人只需单击一下即可将你的 MCP 服务器 添加到 Replit，适合用于文档、README 或任何你想推广 integration 的地方。
+
+使用下方表单为你的 server 生成安装链接和可点击的徽章：
+
+<McpLinkGenerator />
+
+有关链接格式，请参阅[安装链接参考](/zh/features/mcp/overview#share-your-own-install-link)。
+
+<div id="next-steps">
+  ## 后续步骤
+</div>
+
+<CardGroup cols={2}>
+  <Card title="模型上下文协议" icon="server" href="/zh/learn/model-context-protocol">
+    了解 MCP 是什么、如何运作，以及它为 AI 带来的能力。
+  </Card>
+
+  <Card title="MCP 列表" icon="folder-tree" href="/zh/features/mcp/overview">
+    浏览精选的 MCP 服务器 列表，支持一键安装。
+  </Card>
+</CardGroup>

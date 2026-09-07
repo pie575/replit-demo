@@ -1,0 +1,154 @@
+---
+title: "유료 이벤트 웹사이트 출시하기"
+description: "Notion의 프로그램, 연사, 장소, 유료 티켓 정보를 그대로 웹사이트로 만들어 보세요."
+sidebarTitle: "유료 이벤트 웹사이트 출시하기"
+icon: "calendar-days"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                기본 제공 커넥터가 아닙니다. Agent가 API 키를 요청합니다.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+프로그램, 연사, 장소, 오시는 길, 티켓 결제까지 갖춘 완전한 유료 이벤트 웹사이트를 만들어 보세요. 참가자 정보를 Replit Database에 저장하고, Stripe로 결제를 받고, Resend로 확인 메일을 보내고, 명단을 내보낼 수 있습니다. 링크를 공유하기 전에 테스트 주문을 먼저 진행해 보세요.
+
+<div id="best-for">
+  ## 이런 경우에 적합합니다
+</div>
+
+* 콘퍼런스, 밋업, 출시 행사를 위해 공개 페이지와 유료 티켓이 필요한 이벤트 마케터
+* 별도의 콘텐츠 시스템 없이 앱에서 바로 일정을 수정하고 싶은 커뮤니티 담당자
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "notion",
+name: "Notion",
+why: "발표자, 프로그램, 세션 시간",
+},
+{ id: "resend", name: "Resend", why: "구매 후 확인 이메일" },
+{ id: "stripe", name: "Stripe", why: "유료 티켓 및 결제" },
+]}
+/>
+
+<div id="before-you-start">
+  ## 시작하기 전에
+</div>
+
+행사 이름, 날짜, 장소, 티켓 가격과 연사 정보(이름, 사진, 세션)를 담은 Notion 데이터베이스를 준비하세요. Notion, Resend, Stripe를 연결합니다. Agent가 앱에 결제(checkout) 기능을 구축합니다.
+
+<div id="prompt-the-agent">
+  ## Agent에 프롬프트 입력하기
+</div>
+
+<AiPrompt>
+  이 Notion 페이지 [link]를 바탕으로 유료 이벤트 웹사이트를 완성해 줘: 프로그램,
+  연사, 장소, 오시는 길, 티켓 결제까지 포함해서. Notion에 있는 연사 이름, 사진,
+  직함, 약력, 세션 시간을 사용해 줘. 티켓 한 장당 [price]를 Stripe로 결제받고,
+  참가자는 Replit Database에 저장하고, Resend로 확인 메일을 보내고, 명단을
+  내보낼 수 있게 해 줘.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 예상되는 결과
+</div>
+
+Agent가 공개 사이트를 만들고 결제, 결제, 확인, 참가자 목록을 연결합니다. 링크를 공유하기 전에 테스트 주문을 한 번 진행해 보세요. Stripe 테스트 모드와 테스트 카드를 사용한 뒤, 확인 메일이 도착하는지, 참가자가 목록에 표시되는지, 내보내기 파일에도 포함되는지 확인한 다음 실제 결제로 전환하세요.
+
+<div id="make-it-work-for-you">
+  ## 나에게 맞게 활용하기
+</div>
+
+<AiPrompt>
+  이 Notion 데이터베이스 [link]를 바탕으로 연사 페이지를 추가해 줘. 이름, 사진, 직함,
+  약력, 세션 시간을 사용해. Notion 내용이 바뀌면 페이지도 계속 동기화해 줘.
+</AiPrompt>
+
+<AiPrompt>
+  참가자가 [n]명에 도달하면 티켓 판매를 종료하고 대신 대기자 명단 양식을 보여줘.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+* **확인 이메일이 오지 않는 경우:** Resend가 연결되어 있고 발신 도메인이 인증되었는지 확인하세요. 테스트 주문을 넣어 본 뒤 Resend 대시보드에서 이메일이 발송되었는지 확인하세요.
+* **연사나 시간이 잘못된 경우:** Agent에게 Notion 데이터베이스(이름, 사진, 직함, 약력, 세션 시간)를 알려 주고, Notion이 변경되면 페이지도 동기화되도록 요청하세요.
+* **결제가 이루어지지 않는 경우:** 먼저 Stripe가 연결되어 있고 테스트 모드인지 확인하세요. 링크를 공유하기 전에 테스트 주문을 넣어 보세요.
+
+<div id="related">
+  ## 관련 문서
+</div>
+
+<CardGroup cols={2}>
+  <Card title="랜딩 페이지 디자인하기" href="/ko/use-cases/design-landing-page">
+    대기 명단 또는 출시 페이지에도 동일한 Notion 브리프를 사용합니다.
+  </Card>
+
+  <Card title="소셜 아이콘 및 배너 만들기" href="/ko/use-cases/create-social-kit">
+    프로필과 커버 에셋까지 필요한 이벤트 마케터를 위한 가이드입니다.
+  </Card>
+</CardGroup>

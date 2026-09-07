@@ -1,0 +1,105 @@
+---
+title: "Добавьте вход"
+description: "Позвольте игрокам входить в PixelGames с помощью Clerk."
+sidebarTitle: "Добавьте вход"
+icon: "right-to-bracket"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const loginPrompt = "Добавь в PixelGames вход через Clerk. Играть по-прежнему сможет любой без учётной записи, а вход нужен только игрокам, которые хотят её завести.";
+export const appleSignInPrompt = "Добавь в PixelGames вход с Apple, но показывай его только на iOS. В версии для Android оставь только вход по электронной почте и через Google.";
+
+Добавьте вход в PixelGames уже сейчас, даже если пока нечего сохранять. Когда у игрока появится учётная запись, позже вы сможете привязать к ней что угодно: рекорды, разблокированные игры или всё, что создадите дальше.
+
+Используйте [Clerk Auth](/ru/features/auth-and-identity/clerk-auth) — встроенную интеграцию Replit для входа. Agent автоматически настроит её и создаст для PixelGames фирменный экран входа.
+
+<AiPrompt>
+  {loginPrompt}
+</AiPrompt>
+
+<Frame caption="Экран входа Clerk для PixelGames: электронная почта или Google.">
+  <img src="/assets/mirror/mobile-signin-2b3700144e02.png" alt="Модальное окно входа PixelGames с вариантами «Продолжить с электронной почтой» и «Продолжить с Google»" data-path="images/pixelgames/mobile/mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/mobile-signin.png" />
+</Frame>
+
+<div id="add-sign-in-with-apple">
+  ## Добавьте вход с Apple
+</div>
+
+Правила проверки Apple App Store требуют предлагать **вход с Apple** как равноценный вариант, если
+доступен другой вход через социальную сеть, например Google, но только на iOS. Для Android такого
+требования нет.
+
+<AiPrompt>
+  {appleSignInPrompt}
+</AiPrompt>
+
+<Frame caption="Вход с Apple добавлен наряду с электронной почтой и Google — только для iOS.">
+  <img src="/assets/mirror/apple-mobile-signin-2eee321f670f.png" alt="Модальное окно входа PixelGames: кнопка «Продолжить с Apple» добавлена над кнопкой «Продолжить с Google»" data-path="images/pixelgames/mobile/apple-mobile-signin.png" width="1516" height="1018" data-path="images/pixelgames/mobile/apple-mobile-signin.png" />
+</Frame>
+
+<div id="enable-the-providers">
+  ## Включите провайдеров
+</div>
+
+Добавить провайдера в код недостаточно — его также нужно включить в настройках
+аутентификации приложения. Откройте **Users &amp; Auth → Configure → SSO providers → Production** и убедитесь,
+что **Google** и **Apple** имеют статус Enabled.
+
+<Frame caption="Google и Apple включены в разделе SSO providers среды Production.">
+  <img src="/assets/mirror/sso-provider-0547c43ad601.png" alt="Панель Replit Users and Auth с разделом SSO providers, в котором включены Google и Apple" data-path="images/pixelgames/mobile/sso-provider.png" width="1266" height="502" data-path="images/pixelgames/mobile/sso-provider.png" />
+</Frame>
+
+<Note>
+  У **Development** и **Production** отдельные списки провайдеров. Включение одного не включает
+  другой, поэтому перед публикацией проверьте Production.
+</Note>
+
+<div id="test-it">
+  ## Протестируйте
+</div>
+
+Одной учётной записи недостаточно — нужны две, чтобы убедиться, что PixelGames различает игроков.
+
+1. Сыграйте раунд без входа в систему — PixelGames всё равно должен работать.
+2. Войдите в свою учётную запись.
+3. Выйдите из системы, затем войдите в другую учётную запись и убедитесь, что вы в отдельном сеансе,
+   а не в сеансе первой учётной записи.
+4. Снова войдите в первую учётную запись и убедитесь, что вернулись именно в неё.
+5. На iOS убедитесь, что **Continue with Apple** отображается выше Google. На Android убедитесь, что этот вариант
+   вообще не отображается.
+
+<div id="whats-next">
+  ## Что дальше
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Хранение изображений в мобильном приложении" icon="image" href="/ru/build/mobile-store-images">
+    Сохраняйте фотографии профиля после входа игроков в приложение.
+  </Card>
+
+  <Card title="Добавление нативных функций устройства" icon="camera" href="/ru/build/mobile-camera">
+    Добавьте PixelGames новые возможности.
+  </Card>
+</CardGroup>
+
+<div id="related">
+  ## По теме
+</div>
+
+* [Хранение изображений в мобильном приложении](/ru/build/mobile-store-images)
+* [Добавление покупок в приложении](/ru/build/mobile-payments)
+* [Настройка способов входа](/ru/features/auth-and-identity/sign-in-providers)

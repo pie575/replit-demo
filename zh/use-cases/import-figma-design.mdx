@@ -1,0 +1,157 @@
+---
+title: "将 Figma 设计转为已上线的 App"
+description: "将 Figma frame 转换为可发布的 Replit App，保留原有布局、字体和颜色。"
+sidebarTitle: "将 Figma 设计转为已上线的 App"
+icon: "pen-ruler"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                并非原生连接器。Agent 会要求你提供 API 密钥。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+你已在 Figma 中完成界面设计。Agent 会将其构建为可编辑、
+可预览、可发布的实时 Replit App，包含布局、字体、颜色和间距。最终得到的是可用的产品，
+而非截图。如果文件包含多个流程，请让 Agent 处理指定的 frame。
+
+<div id="best-for">
+  ## 适用对象
+</div>
+
+* 希望基于已有 frame 创建可运行的 Replit App 的产品设计师。
+* 拥有 Figma 文件，希望无需从零开始重建即可将其上线的创始人。
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "figma",
+name: "Figma",
+why: "可用于实现的 frame、组件、字体和颜色",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 开始前
+</div>
+
+准备一个包含已命名 frame (主页、产品、checkout 等) 的 Figma 文件，并连接 Figma。
+将文件共享给 Agent，或粘贴文件链接和你关注的 frame 链接。说明
+这是营销网站、App，还是单个落地页。
+
+<div id="prompt-the-agent">
+  ## 向 Agent 发出提示
+</div>
+
+<AiPrompt>
+  根据此 Figma 文件 [链接]，将以下 frame 构建为可运行的 Replit App：[frame
+  名称或链接]。匹配布局、字体、颜色、间距和断点
+  (桌面端和移动端) 。
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 预期效果
+</div>
+
+Agent 会读取所选 frame，并构建与之匹配、可从 Replit 发布的页面。抽查间距、
+字体和颜色是否与 Figma 一致。请自行检查交互元素 (导航、表单、悬停效果) 。它们
+通常还需要再调整一次。在桌面端和手机宽度下进行预览。点击导航和表单，
+然后在发布前将截图与 Figma 对比。
+
+<div id="make-it-work-for-you">
+  ## 按你的需求实现
+</div>
+
+<AiPrompt>
+  先只实现移动端 frame。匹配 Figma 的自动布局和
+  间距。待我确认移动端后，再实现桌面端。
+</AiPrompt>
+
+<AiPrompt>
+  按钮、输入框和卡片共用一个组件。如果 Figma 中有变量，
+  请使用其中的颜色和字体样式。
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+* **Agent 无法读取文件：**连接 Figma，分享文件，并粘贴 frame 链接，而不只是文件 URL。如果文件包含多个流程，请为各个 frame 命名 (主页、产品、checkout) 。
+* **悬停效果、导航或表单看起来尚未完善：**通常会先完成布局和颜色。请再优化一轮交互细节，并参照 Figma 抽查间距。
+
+<div id="related">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计落地页" href="/zh/use-cases/design-landing-page">
+    适合需要先根据 Notion 简介创建 frame 的产品设计师。
+  </Card>
+
+  <Card title="构建在线商店" href="/zh/use-cases/build-online-store">
+    适合下一步需要搭建 Shopify 店面的创始人和产品设计师。
+  </Card>
+</CardGroup>

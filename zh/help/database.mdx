@@ -1,0 +1,70 @@
+---
+title: "数据库"
+description: "解答常见数据库问题：修复被禁用的端点、恢复表、迁移到生产环境及解决连接错误。"
+sidebarTitle: "数据库"
+icon: "database"
+---
+
+以下内容解答有关生产数据库的常见问题。完整参考请参阅[生产数据库](/zh/features/data-and-storage/development-and-production)和[SQL 数据库](/zh/features/data-and-storage/sql-database)。
+
+<AccordionGroup>
+  <Accordion title="我的数据库端点被禁用了——如何修复“endpoint has been disabled”错误？">
+    此错误表示你的数据库计算端点已暂停。要恢复运行：
+
+    1. 打开**数据库**面板，并在下拉菜单中选择**开发环境**。
+    2. 如果出现**取消暂停数据库**按钮，请点击该按钮。
+    3. 将下拉菜单切换到**生产环境**；如果再次出现**取消暂停数据库**按钮，请再次点击。
+
+    如果未出现该按钮，可能是冲突的 `DATABASE_URL` Secret 导致该按钮被隐藏。打开 **Secrets** 面板，将所有 `DATABASE_URL` 条目与**数据库**面板中的连接字符串进行比较，并更新或移除冲突的 Secret，使两者一致。
+
+    常见原因包括未支付的账单 (请及时支付以避免再次发生) ，或发布期间暂时暂停 (按上述步骤取消暂停即可解决) 。请参阅[生产数据库](/zh/features/data-and-storage/development-and-production)。
+  </Accordion>
+
+  <Accordion title="状态页面显示生产数据库故障——我需要提交工单吗？">
+    不需要。如果 [status.replit.com](https://status.replit.com) 已列出该故障，团队正在处理，提交工单不会加快修复进度。打开当前事件并订阅更新，以便随时了解处理进展。
+
+    如果你的数据库问题*未*列在状态页面上，请[联系 Replit 支持团队](https://replit.com/support)。
+  </Accordion>
+
+  <Accordion title="如何恢复已删除或已丢弃的数据库表？">
+    Replit 支持对生产数据库进行时间点恢复。恢复时间窗口取决于你的套餐：[Core](/zh/billing/plans/replit-core) 为 7 天，[Pro](/zh/billing/plans/replit-pro) 为 28 天。
+
+    要恢复数据，请打开**数据库**面板，进入相应数据库，打开其恢复设置，选择所需时间戳并确认。如果已超出恢复时间窗口，请[联系 Replit 支持团队](https://replit.com/support)。请参阅[生产数据库](/zh/features/data-and-storage/development-and-production)。
+  </Accordion>
+
+  <Accordion title="我的数据库被冻结了，而且看不到取消暂停按钮">
+    冲突的数据库 URL 通常会导致**取消暂停**按钮被隐藏。打开 **Secrets** 面板，找到所有 `DATABASE_URL` 条目，并将其与**数据库**面板中的连接字符串进行比较。如果两者不同，说明该 Secret 覆盖了正确的 URL——移除该 Secret，刷新页面后再次查看**数据库**面板。
+
+    如果移除冲突的 Secret 后仍未出现该按钮，请提供项目 URL 并[联系 Replit 支持团队](https://replit.com/support)。
+  </Accordion>
+
+  <Accordion title="我的应用抛出“connection pool exhausted”错误——这是什么意思？">
+    你的应用同时打开的数据库连接数超过了连接池允许的上限。常见原因包括：
+
+    * 每次请求后未关闭连接
+    * 流量激增
+    * 慢查询长时间占用连接
+
+    大多数框架都应使用单个共享连接池，而不是每个请求都新建一个连接。
+
+    如需快速解决，请打开新的 Agent chat，描述该错误，并让 Agent 检查你的应用如何管理数据库连接。
+  </Accordion>
+
+  <Accordion title="如何从开发数据库迁移到生产环境？">
+    Replit 会将开发数据库和生产数据库分开，避免测试更改影响线上数据。要针对生产环境运行迁移，请将迁移命令添加到 deployment 的构建或预部署步骤中，使其在每次部署时运行。例如，Drizzle 可使用 `drizzle-kit migrate`。你也可以在生产环境的 Shell 中手动运行迁移。
+
+    请参阅[发布时创建生产数据库](/zh/features/data-and-storage/development-and-production)。
+  </Accordion>
+
+  <Accordion title="尽管账单状态正常，我的数据库仍显示“endpoint disabled”">
+    有时即使账单状态正常，也可能发生这种情况。请尝试手动取消暂停：打开**数据库**面板，选择**开发环境**，如果出现**取消暂停数据库**按钮，请点击该按钮；然后对**生产环境**重复操作。
+
+    如果未出现该按钮，或问题反复发生，请提供项目 URL 并[联系 Replit 支持团队](https://replit.com/support)——这可能需要手动取消暂停。请参阅[生产数据库](/zh/features/data-and-storage/development-and-production)。
+  </Accordion>
+</AccordionGroup>
+
+<div id="still-need-help">
+  ## 还需要帮助？
+</div>
+
+如果这里没有解答您的数据库问题，请[联系 Replit 支持团队](https://replit.com/support)。

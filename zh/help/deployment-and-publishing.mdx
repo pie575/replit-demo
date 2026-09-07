@@ -1,0 +1,106 @@
+---
+title: "部署与发布"
+description: "常见发布问题解答：调试发布失败、查看日志、修复运行时错误、重新部署以及更改区域。"
+sidebarTitle: "部署与发布"
+icon: "rocket"
+---
+
+以下解答涵盖发布与部署相关问题。分步排查方法请参阅[部署问题排查](/zh/build/troubleshooting)；部署类型与监控请参阅[自动扩缩容部署](/zh/features/publishing/deployment-types#autoscale)和[监控部署](/zh/features/publishing/monitoring-a-deployment)。
+
+<AccordionGroup>
+  <Accordion title="发布时卡在“创建 Autoscale 服务”步骤失败，如何调试？">
+    只要查看部署日志，大多数 Autoscale 发布失败都能解决：
+
+    1. 打开 **Publishing**，找到失败的部署。
+    2. 点击其旁边的三点菜单，打开日志。
+    3. 复制日志输出，新建一个 Agent chat，粘贴进去，然后询问问题出在哪里以及如何修复。
+
+    如果你明明已经设置了 Run 命令，却仍然看到 `No run command configured` 错误，请打开部署设置，断开该 Run 命令，重新添加，然后保存并重新发布。参见[部署故障排除](/zh/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="我的应用成功发布后出现“内部服务器错误”，这是怎么回事？">
+    如果发布成功，但线上应用返回 500 错误，说明问题出在你的应用代码，而不是 Replit 的基础设施：
+
+    1. 打开 **Publishing**，查看 logs，复制完整的错误文本。
+    2. 新建一个 Agent chat，粘贴 logs，询问错误的原因。
+    3. 应用修复方案并重新发布。
+
+    如果 Agent 找不到问题所在，打开 **Publishing → History**，找到最近一个可正常运行的版本并重新部署。参见[部署故障排查](/zh/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="我的部署在构建或迁移过程中卡住了，该怎么办？">
+    1. 使用 `Cmd+K` (Mac) 或 `Ctrl+K` (Windows) 打开命令面板，搜索 **Restart compute** 并选择该选项。
+    2. 打开 **Publishing**，选择 **Publish** 以触发一次新的部署。
+    3. 如果再次失败，请从三点菜单中打开失败部署的日志，复制构建日志，并粘贴到新的 Agent chat 中进行诊断。
+
+    如果部署始终卡住，请附上完整的构建日志[联系 Replit 支持团队](https://replit.com/support)。请参阅[部署问题排查](/zh/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="我的 App 已上线，但运行缓慢或频繁超时——该检查什么？">
+    1. 查看部署 logs，检查是否有反复出现的超时或内存不足消息。
+    2. 检查部署资源是否触及 CPU 或内存上限——参见[监控部署](/zh/features/publishing/monitoring-a-deployment)。
+    3. 新建一个 Agent chat，粘贴最近的 logs，让 Agent 找出性能瓶颈。
+
+    常见原因包括：数据库查询缺少索引、阻塞式同步操作以及内存泄漏。使用[自动扩缩容部署](/zh/features/publishing/deployment-types#autoscale)时，缩容至零后的第一个请求可能需要几秒钟才能响应——这属于正常的冷启动。
+  </Accordion>
+
+  <Accordion title="我的部署历史记录显示构建失败——如何找出问题所在？">
+    打开 **Publishing → History**，选择失败的 deployment，查看构建 logs。找到第一行标记为 `ERROR` 或 `FAILED` 的记录——它通常就是根本原因，其后的内容多为连锁反应。将这部分内容复制到新的 Agent chat 中进行诊断。大多数构建失败都源于缺少依赖项、Run 命令不正确或数据库 migration 失败。请参阅[监控 deployment](/zh/features/publishing/monitoring-a-deployment)。
+  </Accordion>
+
+  <Accordion title="为什么我的 App 在编辑器预览中运行正常，但发布后却无法运行？">
+    这几乎总是环境之间的配置差异导致的。请检查：
+
+    * 开发环境 [Secrets](/zh/core-concepts/project-editor/app-setup/secrets) 面板中的每个键是否也在部署 Secrets 中设置了——两者是彼此独立的环境。
+    * 你的 `DATABASE_URL` 是否指向生产数据库，而不是开发数据库。
+    * 是否存在硬编码的 `localhost` 或 `127.0.0.1` 引用；请改用相对路径或基于环境的 URL。
+
+    然后查看部署日志，排查生产环境特有的错误。参见[部署故障排除](/zh/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="我的 Autoscale Deployment 一直重启——SIGTERM 或退出代码 1 是什么意思？">
+    [自动扩缩容部署](/zh/features/publishing/deployment-types#autoscale)本身就会定期重启。日志中出现 `SIGTERM`，说明进程是被正常终止的，属于正常现象；而 `Exit code 1` 则表示进程自行崩溃，请查看它前面几行日志，定位真正的错误。
+
+    如果重启频繁到影响用户，请排查是否存在未处理的 Promise 拒绝、内存不足错误，或因缺失环境变量导致启动失败等问题。
+  </Accordion>
+
+  <Accordion title="我更新了环境变量，但已发布的应用没有使用这些更新——为什么？">
+    Replit 会将开发环境与生产环境的 Secrets 分开存储，修改其中一处不会同步到另一处。[开发环境 Secrets](/zh/core-concepts/project-editor/app-setup/secrets) 面板仅在编辑器中可用；已发布的应用读取的是部署 Secrets (deployment secrets) 。
+
+    若要更新线上应用中的变量，请先在部署 Secrets 中设置该变量，然后打开 **Publishing**，选择 **Publish** 重新发布上线。新值会在新的部署启动后生效。请参阅[部署故障排查](/zh/build/troubleshooting)。
+  </Accordion>
+
+  <Accordion title="如何在不修改代码的情况下重新部署？">
+    打开 **Publishing**，选择 **Publish**。即使代码没有任何改动，Replit 也会构建并发布当前代码——在更新密钥后、数据库解除暂停后，或想让某个依赖更新生效时，这一操作很有用。
+
+    如果你的 App 无响应，而完整重新部署又显得动作太大，可以用 `Cmd+K` (Mac) 或 `Ctrl+K` (Windows) 打开命令面板，搜索 **Restart compute** 并选择该命令。
+  </Accordion>
+
+  <Accordion title="应用发布后，可以更改部署区域吗？">
+    不能。应用发布后，无法直接更改发布地理位置。若要迁移应用，请对其进行 Remix，并将 Remix 后的副本发布到新区域。请参阅[地理位置](/zh/features/publishing/project-geography)。
+
+    数据库区域同样无法直接更改。Remix 后的应用可能会分配到不同的 `.replit.app` 子域名，因此如果你需要稳定的 URL，请先绑定[自定义域名](/zh/features/publishing/custom-domains)，并重新添加所有部署 Secrets。
+  </Accordion>
+
+  <Accordion title="为什么 PCI 或安全扫描会将我已发布 App 中的 GAESA Cookie 标记为风险？">
+    Google 的服务基础设施会向已发布的 Replit 应用添加 `GAESA` (Google App Engine 会话亲和性) Cookie，用于将请求路由到正确的实例。该 Cookie 的值是一个不透明的路由标识符，不包含任何敏感信息或应用数据。
+
+    某些安全扫描器会标记 `GAESA`，因为它未设置 `Secure` 或 `HttpOnly` 属性。这个 Cookie 并非由你的应用创建，你也无法为已发布的应用更改或禁用它。
+
+    如果 PCI 合规检查或安全扫描报告了这个 Cookie，请向扫描服务商提出申诉，说明这是误报。请提供 Cookie 名称，并说明它由 Google 的基础设施设置，用于请求路由。你已发布的应用无法读取、更改或禁用它，且该 Cookie 不携带任何敏感数据。
+
+    你所构建应用的合规性由你自行负责——请参阅[责任共担模型](/zh/features/security/shared-responsibility-model)。如果扫描服务商需要更多细节，请[联系 Replit 支持团队](https://replit.com/support)。
+  </Accordion>
+
+  <Accordion title="如何将我的 App 下线或取消发布？">
+    打开 **Publishing**，选择关闭部署的选项，然后确认。你的应用将下线，并停止产生部署费用。project 文件、代码和数据库不会被删除，只是 live deployment 停止运行。与该部署关联的自定义域名连接会被移除，因此重新发布后需要重新添加。
+
+    如果你担心成本，请注意[自动扩缩容部署](/zh/features/publishing/deployment-types#autoscale)在没有流量时会缩容至零，因此你可能根本不需要关闭它。
+  </Accordion>
+</AccordionGroup>
+
+<div id="still-need-help">
+  ## 仍需帮助？
+</div>
+
+如果这里没有解答你关于部署的问题，请[联系 Replit 支持团队](https://replit.com/support)。

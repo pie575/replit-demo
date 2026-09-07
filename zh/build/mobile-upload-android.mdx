@@ -1,0 +1,103 @@
+---
+title: "将您的 App 上传到 Play Console"
+description: "构建生产版本，然后手动上传到 Google Play Console。"
+sidebarTitle: "上传您的 App"
+icon: "cloud-arrow-up"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const androidReleasePrompt = "为 Google Play 构建 PixelGames 的正式发布版本。";
+
+上传后，你的 App 才会进入 Play Console。在此之前，Google 无法看到任何内容；
+在此之后，只有完成上传，才能进行内部测试或提交审核。
+
+你需要先拥有一个 [Play Console 账户](/zh/build/mobile-google-account)。
+
+<div id="what-gets-uploaded">
+  ## 上传的内容
+</div>
+
+**构建** 是 App 的可安装正式副本，类似你从
+Google Play 获取的应用文件，只是尚未发布。Expo Go 会在共享预览
+App 中运行你的代码；构建 则是独立运行的 App，因此推送通知和
+App 内购买等功能只能在其中使用。
+
+Android 构建 是 `.aab` 文件 (Android App Bundle) ，这是 Google Play 要求的格式。
+
+<div id="build-it">
+  ## 构建应用
+</div>
+
+<AiPrompt>
+  {androidReleasePrompt}
+</AiPrompt>
+
+Agent 会在 Expo 的服务器上执行生产构建，构建完成后会提供下载链接，
+通常需要 10 到 15 分钟。你也可以在 Expo 仪表板的
+**Builds** 中找到它。
+
+<div id="upload-it">
+  ## 上传
+</div>
+
+<Steps>
+  <Step title="下载 .aab 文件">
+    打开 Agent 提供的构建链接，然后下载 `.aab` 文件。
+
+    <Frame caption="Agent 提供的已完成 .aab 构建的下载链接。">
+      <img src="/assets/mirror/download-aab-file-37eb1c14cbd2.png" alt="Agent chat 中包含已完成 .aab 文件下载链接的消息" data-path="images/pixelgames/mobile/download-aab-file.png" width="449" height="206" data-path="images/pixelgames/mobile/download-aab-file.png" />
+    </Frame>
+  </Step>
+
+  <Step title="在 Play Console 中创建应用">
+    如果尚未创建应用，请在 Play Console 中选择 **创建应用**，然后填写名称、
+    默认语言，以及应用类型是应用还是游戏。
+  </Step>
+
+  <Step title="创建版本">
+    选择一个发布轨道；开始时请选择 **内部测试**，然后选择 **创建新版本**。
+  </Step>
+
+  <Step title="上传 .aab 文件">
+    将文件拖放到版本中，Play Console 会处理该文件。处理完成后，
+    即可将构建分配给测试人员或推广到正式发布。
+  </Step>
+</Steps>
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+* **Play Console 拒绝上传：**每次上传时，版本代码必须递增。
+  请 Agent 提高版本代码并重新构建。
+* **构建卡在编译阶段：**构建任务会排队，通常需要 10 到 15 分钟。请先在 Expo 仪表板的 **Builds** 中查看，
+  再判断是否出现故障。
+* **首次上传时出现“App signing”提示：**请让 Google 管理签名密钥；这是默认设置，意味着 Google 可以为您重新签名后续上传的版本。
+
+<div id="whats-next">
+  ## 下一步
+</div>
+
+<CardGroup cols={2}>
+  <Card title="通过 Internal Testing 进行测试" icon="flask" href="/zh/build/mobile-internal-testing">
+    先将已上传的构建版本交给真实测试人员测试。
+  </Card>
+
+  <Card title="提交至 Play Store" icon="paper-plane" href="/zh/build/mobile-publish-android">
+    完成应用商店页面信息并提交审核。
+  </Card>
+</CardGroup>

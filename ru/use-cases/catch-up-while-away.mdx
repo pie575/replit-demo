@@ -1,0 +1,166 @@
+---
+title: "Наверстать пропущенное за время отсутствия"
+description: "Превратите Slack, почту и календарь в сводку для возвращения к работе."
+sidebarTitle: "Наверстать пропущенное за время отсутствия"
+icon: "suitcase"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent попросит указать ваш API key.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+После перерыва проанализируй Slack, Gmail и Calendar за этот период и составь в Notion
+сводку для возвращения к работе: что произошло, где нужно принять решение, кому ответить
+в первую очередь и что предстоит на этой неделе. Agent не должен вываливать все сообщения подряд — только то,
+что действительно требует твоего участия.
+
+<div id="best-for">
+  ## Кому подойдёт
+</div>
+
+* Основателям и руководителям, которым нужна сводка после отпуска или конференции, чтобы не перечитывать всё подряд.
+* Всем, кто передаёт дела и хочет подготовить сводку, по которой коллега сразу сможет действовать.
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "slack",
+name: "Slack",
+why: "Активность в каналах и личных сообщениях за время вашего отсутствия",
+},
+{ id: "gmail", name: "Gmail", why: "Ветки писем, требующие ответа" },
+{
+id: "google-calendar",
+name: "Google Calendar",
+why: "Пропущенные и предстоящие встречи",
+},
+{ id: "notion", name: "Notion", why: "Сохранить сводку" },
+]}
+/>
+
+<div id="before-you-start">
+  ## Прежде чем начать
+</div>
+
+Укажите Agent даты своего отсутствия, а также каналы Slack и календари, которые важны. Подключите
+Gmail, Slack, Calendar и Notion.
+
+<div id="prompt-the-agent">
+  ## Отправьте prompt агенту
+</div>
+
+<AiPrompt>
+  Меня не было [даты]. Проанализируй Slack, Gmail и Calendar за этот период
+  и составь в Notion сводку для возвращения к работе: что произошло, где нужно
+  принять решение, на что мне ответить в первую очередь и что предстоит на этой неделе.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## Чего ожидать
+</div>
+
+Agent готовит короткую сводку: решения, ожидающие вас, ветки, требующие ответа, встречи, по
+которым нужно наверстать упущенное. Он не должен вываливать все сообщения подряд — только
+то, что действительно требует вашего участия. Прежде чем действовать по сводке, проверьте
+диапазон дат и каналы, которые он использовал. Откройте из сводки две ветки в Slack или
+Gmail и убедитесь, что они и правда требуют вашего внимания. Если Agent подготовил черновики
+ответов, сначала отправьте один из них самому себе.
+
+<div id="make-it-work-for-you">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Включайте в сводку только решения и запросы, адресованные мне. Игнорируйте
+  каналы, где публикуются только объявления.
+</AiPrompt>
+
+<AiPrompt>
+  Подготовьте черновики ответов на 5 писем и веток в Slack, требующих моего наибольшего внимания. Сохраните мой стиль.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## Устранение неполадок
+</div>
+
+* **В сводку попадает каждое сообщение:** укажите важные каналы Slack и календари и попросите Agent включать только решения и запросы, адресованные вам. Игнорируйте каналы, содержащие только объявления.
+* **В сводке не учтены дни вашего отсутствия:** укажите точные даты и часовой пояс, а также убедитесь, что Gmail, Slack и Calendar подключены к той же учётной записи, которой вы пользовались во время отсутствия.
+* **Черновики звучат не в вашем стиле:** вставьте несколько своих реальных ответов и попросите Agent воспроизвести этот стиль, прежде чем он напишет что-либо, что вы можете отправить.
+
+<div id="related">
+  ## Похожие материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Отслеживание подписок" href="/ru/use-cases/track-subscriptions">
+    Тот же connector Gmail — для основателей и операционных команд.
+  </Card>
+
+  <Card title="Мониторинг упоминаний бренда" href="/ru/use-cases/monitor-brand-mentions">
+    Та же связка Slack и Notion, но для публичных упоминаний.
+  </Card>
+</CardGroup>

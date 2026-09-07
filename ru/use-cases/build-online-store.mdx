@@ -1,0 +1,173 @@
+---
+title: "Создание интернет-магазина"
+description: "Импортируйте каталог в Shopify и оформите витрину магазина в Replit."
+sidebarTitle: "Создание интернет-магазина"
+icon: "store"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent попросит указать ваш API-ключ.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Передайте Agent данные о товарах из уже имеющихся источников: Google Sheet (название, цена,
+описание, код товара, остаток) и фотографии из Google Drive. Agent настроит магазин Shopify,
+импортирует товары, цены, описания и изображения, а также подключит checkout и платежи.
+Дизайн витрины и фронтенд находятся в Replit, а не в теме Shopify. Платежи проходят
+через checkout Shopify, поэтому отдельный connector Stripe не требуется.
+
+<div id="best-for">
+  ## Идеально подходит для
+</div>
+
+* Основателей, которым нужен интернет-магазин на основе каталога, который они уже ведут в Sheets и Drive.
+* Продуктовых дизайнеров, которым нужна кастомная витрина Replit с Shopify в качестве бэкенда электронной коммерции.
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "Список товаров: названия, цены, описания, коды товаров, наличие",
+},
+{
+id: "google-drive",
+name: "Google Drive",
+why: "Фотографии товаров и ассеты бренда",
+},
+{
+id: "shopify",
+name: "Shopify",
+why: "Настройка магазина, импорт каталога, checkout и платежи",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## Перед началом работы
+</div>
+
+Подготовьте таблицу Sheet, где каждому товару соответствует отдельная строка (название, цена, описание, код товара, остаток), и папку Drive
+с фотографиями, названия которых позволят Agent сопоставить их со строками. Подключите Sheets, Drive и Shopify.
+Если у вас ещё нет магазина, Agent может создать его в Shopify через Chat. Оформите тестовый заказ,
+прежде чем предоставлять доступ к магазину.
+
+<div id="prompt-the-agent">
+  ## Сформулируйте запрос для Agent
+</div>
+
+<AiPrompt>
+  На основе этих данных о товарах [Google Таблица и папка на Google Drive] настрой
+  полноценный магазин Shopify: импортируй все товары с названиями, ценами, описаниями и фотографиями.
+  Спроектируй и создай витрину в этом приложении Replit (главная страница, коллекция,
+  товар, корзина). Используй Shopify для каталога, корзины, checkout и платежей. Не
+  используй тему Shopify для страниц, которые видят покупатели.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## Чего ожидать
+</div>
+
+Agent импортирует каталог в Shopify, затем создаёт витрину на Replit, которая получает товары
+из Shopify и направляет покупателей на страницу checkout Shopify. Выборочно сравните несколько товаров с
+таблицей (цену, описание, изображение) и оформите тестовый заказ. Используйте тестовые платежи Shopify, убедитесь, что
+сумма в корзине соответствует данным в таблице, и проверьте, что checkout происходит в Shopify.
+
+<div id="make-it-work-for-you">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Сопоставьте фотографии из Drive со строками в Sheet по имени файла с кодом товара (CODE.jpg). Пропускайте
+  строки без фотографий.
+</AiPrompt>
+
+<AiPrompt>
+  Добавьте страницы коллекций на основе столбца категорий в Sheet и строку поиска на
+  витрину Replit.
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## Устранение неполадок
+</div>
+
+* **Фотографии не соответствуют товарам:** называйте файлы на Drive по коду товара (`CODE.jpg`) и попросите Agent пропускать строки без фотографии.
+* **Цены или описания не соответствуют данным в таблице:** убедитесь, что для каждого товара есть одна строка (название, цена, описание, код товара, остаток), и выборочно проверьте несколько позиций после импорта.
+* **Оформление заказа происходит не через Shopify или витрина представляет собой тему:** страницы для покупателей должны быть размещены в Replit. Платёж проходит через checkout Shopify. Оформите тестовый заказ, прежде чем делиться магазином.
+
+<div id="related">
+  ## По теме
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Создать лендинг" href="/ru/use-cases/design-landing-page">
+    Для основателей и продуктовых дизайнеров, которым в первую очередь нужна страница для сбора заявок в список ожидания.
+  </Card>
+
+  <Card title="Превратить дизайн в Figma в готовое App" href="/ru/use-cases/import-figma-design">
+    Для продуктовых дизайнеров, у которых уже есть витрина в Figma.
+  </Card>
+</CardGroup>

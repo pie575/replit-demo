@@ -1,0 +1,158 @@
+---
+title: "Отслеживание подписок"
+description: "Находите регулярные платежи в почте и подсчитывайте, во сколько они обходятся каждый месяц."
+sidebarTitle: "Отслеживание подписок"
+icon: "receipt"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                Это не нативный connector. Agent запросит ваш ключ API.
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+Сканируйте Gmail на предмет писем о подписках и чеков, выявляйте регулярные платежи и рассчитывайте
+ежемесячные расходы в Google Sheets. Agent определяет поставщика, сумму и периодичность, а также отмечает
+всё, что похоже на забытую пробную подписку, до её продления.
+
+<div id="best-for">
+  ## Кому подойдёт
+</div>
+
+* Основателям и руководителям операционных подразделений, которым нужна реальная картина ежемесячных расходов на инструменты и сервисы.
+* Финансистам и офис-менеджерам, которым важно вовремя находить забытые пробные подписки до их автопродления.
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{ id: "gmail", name: "Gmail", why: "Чеки и письма о продлении подписок" },
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "Актуальный список подписок и ежемесячных расходов",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## Перед началом работы
+</div>
+
+Подключите Gmail и Google Таблицу (или попросите Agent создать её). Укажите Agent, в каком почтовом ящике или по какой
+метке выполнять поиск.
+
+<div id="prompt-the-agent">
+  ## Отправьте prompt агенту
+</div>
+
+<AiPrompt>
+  Создай Routine, который запускается каждый понедельник в 9:00. Просмотри
+  Gmail и найди письма о подписках и чеки. Определи регулярные платежи,
+  извлеки поставщика, сумму и периодичность и составь Google Sheet с расчётом
+  ежемесячных расходов. Отметь всё, что похоже на забытую пробную подписку.
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## Чего ожидать
+</div>
+
+Agent создаст таблицу с поставщиками, суммами, периодичностью списаний и итоговой суммой за месяц. Выборочно сверьте
+несколько строк с исходными письмами. При первом запуске будут пропущены поставщики, у которых в теме нет слова
+«subscription»; добавьте соответствующие метки и запустите снова. Выберите трёх знакомых вам поставщиков,
+откройте чеки в Gmail и подтвердите сумму и периодичность, прежде чем доверять итоговой сумме за месяц.
+
+<div id="make-it-work-for-you">
+  ## Настройте под себя
+</div>
+
+<AiPrompt>
+  Сгруппируй подписки по категориям (инструменты разработки, дизайн, ИИ, личные) и
+  выдели все, что дороже $[сумма] в месяц.
+</AiPrompt>
+
+<AiPrompt>
+  Отправляй напоминание в Slack за 3 дня до любого годового продления дороже $[сумма].
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## Устранение неполадок
+</div>
+
+* **В таблице не хватает подписок, о которых вы знаете:** укажите Agent, какую метку Gmail или поисковый запрос использовать, и перечислите поставщиков, у которых в теме письма нет слова «subscription». Выборочно сверьте несколько строк с исходными письмами.
+* **Суммы или периодичность выглядят неверно:** в чеках часто указаны налог, credits или другая валюта. Попросите Agent брать сумму позиции и расчётный период прямо из письма, а строки, значения в которых он определил сам, помечать.
+* **Один и тот же поставщик встречается дважды:** попросите Agent объединить строки по названию поставщика, оставить последний чек и пересчитать итоговую сумму за месяц.
+
+<div id="related">
+  ## Похожие материалы
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Наверстать после отсутствия" href="/ru/use-cases/catch-up-while-away">
+    Тот же connector Gmail — для основателей и операционных команд, вернувшихся после перерыва.
+  </Card>
+
+  <Card title="Создание live-дашборда на основе API" href="/ru/use-cases/live-api-dashboard">
+    Дашборд в реальном времени вместо еженедельной таблицы.
+  </Card>
+</CardGroup>

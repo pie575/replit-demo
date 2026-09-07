@@ -1,0 +1,117 @@
+---
+title: "데이터베이스 추가하기"
+description: "새로고침, 재시작, 게시 후에도 Velocity의 차량, 예약 가능 여부, 예약 정보가 그대로 유지되도록 만드세요."
+sidebarTitle: "데이터베이스 추가하기"
+icon: "database"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+이 과정을 마치면 Velocity의 모든 차량, 예약 가능 시간대, 예약이 내일도 그대로 남아 있게 됩니다.
+
+<Frame>
+  <img src="/assets/mirror/persisted-bookings-384fb48e8a6d.png" alt="새로고침 후의 Velocity 화면. 로그인한 고객의 내 부킹 목록에 저장된 예약 두 건이 표시되고, 차량 목록 페이지의 차량 순서도 동일하게 유지되어 새로고침 전과 달라지지 않은 모습" width="1280" height="720" data-path="images/velocity/add-database/persisted-bookings.png" />
+</Frame>
+
+[Add login](/ko/build/add-login)에서 Velocity에 로그인 기능을 추가했습니다. 하지만 차량 목록의 차량과 고객이 등록한 예약은 페이지를 새로고침하면 여전히 사라집니다. 브라우저 안에만 존재하기 때문입니다. 데이터베이스를 추가해 모든 데이터가 유지되도록 만들어 보세요.
+
+<div id="tell-agent-to-save-the-data">
+  ## Agent에게 데이터를 저장하도록 지시하기
+</div>
+
+Velocity에서는 Replit의 관리형 Postgres 데이터베이스인 Neon을 사용하세요. Neon은 동시 부킹을 깔끔하게 처리하고 실제 고객 트래픽에 맞춰 확장되며, Agent가 Development와 Production 환경을 분리해 자동으로 프로비저닝합니다. Neon 대시보드에 따로 가입할 필요도, 키를 붙여넣을 필요도 없습니다.
+
+<AiPrompt>
+  Velocity의 데이터를 데이터베이스에 저장해서 차량, 예약 가능 여부, 예약 내역이 새로고침해도 사라지지 않게 해줘.<br />
+  Neon(Postgres)을 사용해.<br />
+  저장할 항목: 각 차량(제조사, 모델, 연식, 일일 요금, 사진, 위치), 각 차량의 예약 가능 캘린더, 각 예약(픽업 날짜, 반납 날짜, 차량, 고객).<br />
+  모든 예약을 로그인한 고객에게 연결해서 각자 자신의 예약만 볼 수 있게 해줘.<br />
+  같은 차량이 겹치는 날짜에 부킹되지 않도록 막아줘.<br />
+  변경 후 무엇을 테스트해야 하는지 알려줘.
+</AiPrompt>
+
+Agent는 Neon 데이터베이스를 프로비저닝하고, 차량 목록과 예약 내역을 메모리 데이터에서 데이터베이스로 옮긴 뒤, 같은 람보르기니가 중복 부킹되지 않도록 겹침 검사를 추가합니다.
+
+<Frame>
+  <img src="/assets/mirror/agent-db-connected-e266fa2f9db8.png" alt="Neon 마이그레이션 이후의 Agent chat 화면. 겹침 방지, 로그아웃 상태 차단, 사용자별 부킹 범위 지정, 잘못된 날짜 거부, 잘못된 차량 거부 등의 검증 체크리스트와 방금 생성된 Checkpoint 표시가 보이고, 그 옆에는 저장된 차량 목록이 렌더링된 Velocity Preview가 있습니다" width="1280" height="720" data-path="images/velocity/add-database/agent-db-connected.png" />
+</Frame>
+
+<div id="test-that-everything-sticks">
+  ## 데이터가 유지되는지 테스트하기
+</div>
+
+1. Preview에서 Velocity에 로그인한 뒤 다음 주 토요일로 차량을 예약합니다.
+2. 페이지를 새로 고칩니다. &quot;내 부킹&quot;에 예약이 그대로 남아 있어야 합니다.
+3. Agent chat에서 앱을 재시작합니다. 차량 목록과 예약이 모두 그대로 남아 있어야 합니다.
+4. 다른 계정으로 같은 토요일에 같은 차량을 예약해 봅니다. Velocity는 해당 차량을 이용할 수 없다고 안내하고 다른 날짜나 차량을 제안해야 합니다.
+5. 로그아웃한 뒤 다시 로그인합니다. 예약이 그대로 남아 있어야 합니다.
+
+어느 단계에서든 예약이 사라진다면, 나타난 증상을 그대로 Agent에 붙여넣으세요:
+
+<AiPrompt>
+  Velocity에서 차량을 예약했는데, 새로 고침하면 예약이 사라집니다.<br />
+  예약이 데이터베이스에 저장되고 있는지, 아니면 페이지에만 저장되고 있는지 확인해 주세요.<br />
+  가장 작은 문제만 수정하고, 확인하는 방법을 알려주세요.
+</AiPrompt>
+
+데이터베이스에 무엇이 들어 있는지 확인할 수 있는 간단한 관리자 화면을 Agent에 요청할 수도 있습니다:
+
+<AiPrompt>
+  Velocity에서 데이터베이스에 있는 모든 차량과 모든 예약을 차량별로 묶어 보여 주는 간단한 관리자 페이지를 만들어 주세요.<br />
+  project 소유자인 저에게만 표시되도록 해 주세요.
+</AiPrompt>
+
+<div id="publish-and-confirm-on-the-public-url">
+  ## public URL에서 게시하고 확인하기
+</div>
+
+Agent가 구성한 Neon 덕분에 Velocity는 별도의 Development 환경과 Production 환경을 기본으로 갖추게 됩니다. Agent chat이나 Publishing 타일에서 Velocity를 다시 게시한 다음, 새 tab에서 public URL을 열어 보세요. Replit이 Production Neon 자격 증명을 게시된 deployment에 자동으로 연결해 줍니다. public URL에서 예약을 하나 만들고 새로고침한 뒤에도 그대로 남아 있는지 확인해 보세요.
+
+이제 Velocity는 모든 차량, 예약 가능한 모든 날짜, 그리고 모든 예약을 기억합니다. 다시 새로고침해도 부킹이 단 하나도 사라지지 않습니다.
+
+<div id="improve-it-next">
+  ## 다음 단계로 개선하기
+</div>
+
+<CardGroup cols={2}>
+  <Card title="결제 추가하기" icon="credit-card" href="/ko/build/add-payments">
+    고객이 차량을 예약할 때 환불 가능한 예약금을 받으세요.
+  </Card>
+
+  <Card title="integration 추가하기" icon="plug" href="/ko/build/add-integrations">
+    예약이 생길 때마다 고객의 캘린더로 전송하세요.
+  </Card>
+
+  <Card title="데이터로 dashboard 만들기" icon="chart-simple" href="/ko/build/dashboard">
+    저장된 예약 정보를 이용률 차트로 만들어 보세요.
+  </Card>
+</CardGroup>
+
+<div id="need-further-help">
+  ## 추가 도움이 필요하신가요?
+</div>
+
+* **Preview에서는 예약이 저장되지만 public URL에서는 저장되지 않는 경우:** Production Neon 자격 증명이 게시된 deployment에 제대로 연결되어 있는지 확인해 달라고 Agent에게 요청하세요.
+* **데이터를 확인하기 어려운 경우:** 데이터베이스의 모든 항목을 보여주는 간단한 관리자 화면을 추가해 달라고 Agent에게 요청하세요.
+* **차량 목록에 초기 데이터를 채우고 싶은 경우:** 실제 차량 데이터를 데이터베이스에 불러오는 일회성 스크립트를 추가해 달라고 Agent에게 요청하세요.
+* **빠른 프로토타입용으로 설정이 필요 없는 데이터베이스를 원하는 경우:** 대신 [Replit Database](/ko/features/data-and-storage/sql-database)를 사용하세요. 모든 Repl에 기본 내장되어 있어 별도의 provisioning이 필요 없습니다.
+
+<div id="related">
+  ## 관련 문서
+</div>
+
+* [Production 데이터베이스](/ko/features/data-and-storage/development-and-production)
+* [Replit Database](/ko/features/data-and-storage/sql-database)

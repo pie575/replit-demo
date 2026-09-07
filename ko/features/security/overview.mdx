@@ -1,0 +1,74 @@
+---
+title: "보안"
+description: "Replit에서 게시할 때 보안이 중요한 이유, Security 도구의 위치, project 또는 workspace 검토 시 사용할 페이지를 알아보세요."
+sidebarTitle: "보안"
+icon: "shield-halved"
+---
+
+Replit에서 게시하면 project에 실제 트래픽이 유입될 수 있습니다. Replit 보안 도구를 사용하면 취약점을 찾아내고, 승인한 issues를 Agent로 수정하며, audit에 대비해 증적을 남길 수 있습니다.
+
+<div id="why-security-matters">
+  ## 보안이 중요한 이유
+</div>
+
+* 게시된 project는 공개 경로와 API를 포함해 인터넷 어디서나 접근할 수 있습니다.
+* 요즘 project는 수많은 package에 의존하며, 게시한 뒤에도 새로운 CVE가 발견될 수 있습니다.
+* AI가 생성한 코드에도 security review가 필요합니다. 특히 authentication, database 쿼리, secret, 데이터 처리와 관련된 부분이 그렇습니다.
+* 컴플라이언스 프로그램에서는 dependency 목록, 취약점 추적, remediation에 대한 증적을 요구하는 경우가 많습니다.
+
+<div id="where-to-start">
+  ## 어디서부터 시작할까요
+</div>
+
+* packages를 설치하시나요? [Package Firewall](/ko/features/security/package-firewall)이 설치 시점에 악성 dependencies를 차단하며, 기본으로 켜져 있습니다.
+* 단일 project에서 작업하시나요? [Project Security Center](/ko/features/security/project-security-center)를 사용하세요.
+* workspace 전반을 audit하시나요? [Workspace Security Center](/ko/features/security/workspace-security-center)를 사용하세요.
+* 개발 리소스를 어디에서 실행할지 정하시나요? [Workspace geography](/ko/features/collaboration/workspace-geography)를 읽어보세요. 게시된 Project의 실행 위치를 정하려면 [Project geography](/ko/features/publishing/project-geography)를 읽어보세요.
+* 용어 정의가 필요하신가요? [보안 개념](/ko/features/security/concepts)을 읽어보세요.
+
+Replit의 보안 도구는 앱 수명 주기의 여러 지점을 각각 보호하면서 서로 맞물려 작동합니다.
+
+* **설치 시점**: [Package Firewall](/ko/features/security/package-firewall)이 악성 및 compromised packages를 download되기 전에 차단합니다.
+* **설치 이후**: [자동 dependency 스캔](/ko/features/security/project-security-center#automatic-dependency-scans)이 새로 공개된 CVE를 탐지하고, Auto-Protect가 이에 대한 Agent 패치를 준비할 수 있습니다.
+* **게시 전**: [Security Agent](/ko/features/security/agent-security-scans)가 코드, dependency, 개인정보 취약점을 찾아 codebase를 audit합니다.
+
+대부분의 스캔 작업은 동일한 loop를 따릅니다. 스캔하고, findings를 review하고, Agent로 수정하고, republish하고, 필요할 때 증적을 내보냅니다.
+
+<div id="where-security-lives-in-the-product">
+  ## 제품 내 보안 기능 위치
+</div>
+
+<div id="in-a-project">
+  ### project에서
+</div>
+
+project의 **Tools** pane에서 **Security Center**를 선택하면 project 수준의 findings를 검토하고, Agent security scan을 실행하고, 게시 전에 dependency 취약점을 점검할 수 있습니다.
+
+소스 코드를 검토하려면 [Agent security scan](/ko/features/security/agent-security-scans)을 사용하세요. 실행 중인 앱을 외부에서도 테스트해야 한다면 [Level 3 black-box pen test](/ko/features/security/black-box-pen-tests)를 사용하세요.
+
+<Frame>
+  <img src="/assets/mirror/review-security-button-9331149c28f7.png" alt="Security pane을 여는 project의 Publish flow 내 Review security 버튼" width="1440" height="900" data-path="images/project-security-center/review-security-button.png" />
+</Frame>
+
+<div id="in-your-workspace">
+  ### workspace에서
+</div>
+
+홈 사이드바에서 **Security**를 선택하면 여러 project의 취약점을 검토하고, exposure를 기준으로 findings의 우선순위를 정하며, workspace 수준의 스캔 기록을 확인할 수 있습니다.
+
+<Frame>
+  <img src="/assets/mirror/security-overview-b37f090f236c.png" alt="총 스캔 수, 총 취약점 수, severity별로 그룹화된 CVE를 보여주는 Workspace Security Center 시작 화면" width="3438" height="1984" data-path="images/workspace-security-center/security-overview.png" />
+</Frame>
+
+<div id="in-publishing-and-settings">
+  ### Publishing 및 설정에서
+</div>
+
+* **Publish** &gt; **Advanced**에서 **Block publishing of critical vulnerabilities**를 사용하면 심각(critical) 등급 findings가 있는 앱의 배포를 차단할 수 있습니다.
+* **Settings** &gt; **Account** &gt; **Advanced**에서 Agent가 준비한 dependency remediation에 적용할 Auto-Protect severity 임계값을 설정하세요.
+
+<div id="further-reading">
+  ## 참고 자료
+</div>
+
+* [How Replit Secures AI-Generated Code](https://blog.replit.com/securing-ai-generated-code)

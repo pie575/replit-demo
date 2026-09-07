@@ -1,0 +1,166 @@
+---
+title: "Frames"
+description: "frame 종류, frame별 액션 바, 그리고 Canvas의 Build 및 Focus 동작을 알아봅니다."
+sidebarTitle: "Frames"
+icon: "square-dashed"
+---
+
+Canvas의 모든 타일은 **frame**입니다. frame은 선택하고, 드래그하고, 작업을 적용하는 대상입니다. 이 페이지에서는 frame의 종류, 선택 시 나타나는 frame별 액션 바, 그리고 거기에서 실행할 수 있는 기능인 Build와 Focus를 다룹니다.
+
+<Frame>
+  <img src="/assets/mirror/canvas-overview-d32e8d2ab073.png" alt="board에 세 개의 frame이 배치된 Canvas: Website(Scroll Hero), APEX X1 Design System, APEX X1 슈퍼카의 Design mockup, 하단에는 플로팅 툴바(Chat, Draw, Edit, Generate)가 표시됨" width="2000" height="1255" data-path="images/replitai/canvas-overview.png" />
+</Frame>
+
+<div id="frame-kinds">
+  ## frame 종류
+</div>
+
+주요 종류는 **Artifacts**(라이브 앱 기반 화면)와 **Designs**(mockup) 두 가지입니다. frame 왼쪽 상단 헤더에 어떤 종류인지 표시됩니다.
+
+| 종류           | 헤더 레이블                    | 기반                | live app처럼 조작 가능? | 실제 앱으로 변환 가능?                                      |
+| ------------ | ------------------------- | ----------------- | ----------------- | -------------------------------------------------- |
+| artifact     | **Website**, **Slides** 등 | 실행 중인 artifact    | 예                 | 이미 앱입니다.                                           |
+| 모바일 artifact | **Mobile app**            | 실행 중인 artifact    | 예(시뮬레이터에서)        | 이미 앱입니다.                                           |
+| Design       | **Design**                | 정적 / 인터랙티브 mockup | 인터랙티브 frame만 가능   | 예 — frame별 **Build…** 메뉴에서 가능. [Build](#build) 참조. |
+| Image        | **Image**                 | 생성된 PNG / JPG     | 아니요               | 아니요 — 참고용으로 사용하세요.                                 |
+| 비디오          | **Video**                 | 생성된 비디오           | 아니요               | 아니요.                                               |
+| 벡터 그래픽       | **Graphic**               | 생성된 SVG           | 아니요               | 아니요 — 실제 앱에 삽입하세요.                                 |
+
+<Note>
+  Design frame이 정적 이미지로 동작할지 인터랙티브 프로토타입으로 동작할지는 **Interactive frames** 기능에 따라 달라집니다. 이 기능을 켜면 Design frame이 실제 페이지처럼 클릭과 양식 입력에 반응하고, 켜지 않으면 클릭해 이동할 수는 없지만 수정을 반복할 수 있는 snapshot으로 표시됩니다.
+</Note>
+
+<div id="preview-on-different-devices">
+  ## 다양한 기기에서 미리 보기
+</div>
+
+디자인이 화면 크기별로 어떻게 보이는지 확인해 보세요. Agent에게 모바일, 태블릿, 데스크톱 버전을 보여 달라고 요청하면(예: &quot;이 페이지의 모바일 버전을 보여 줘&quot;) 해당 크기의 frame을 렌더링합니다.
+
+* **모바일**: 390 × 844
+* **태블릿**: 768 × 1024
+* **데스크톱**: 1280 × 720
+
+<div id="per-frame-action-bar">
+  ## 프레임별 액션 바
+</div>
+
+프레임을 선택하면 액션 바가 나타납니다. 사용할 수 있는 작업은 프레임 종류에 따라 다릅니다.
+
+<div id="artifact-and-design-frames">
+  ### Artifact 및 Design frames
+</div>
+
+Artifact(Website, Slides 등)와 Design frame에서는 액션 바가 frame 상단에 가로로 표시됩니다.
+
+<Frame caption="Design frame의 액션 바: Build…, Focus 및 추가 옵션.">
+  <img src="/assets/mirror/canvas-frame-action-bar-86f90fdd1375.png" alt="APEX X1 Design frame이 선택된 Canvas. 상단에 종류 레이블과 Build, Focus, 추가 옵션 액션이 있는 per-frame action bar가 표시되고, 해당 frame이 chat prompt box에 chip으로 첨부된 모습" width="2000" height="1290" data-path="images/replitai/canvas-frame-action-bar.png" />
+</Frame>
+
+액션 묶음은 너비가 좁으면 icon으로 축소되고, frame이 넓어지면 레이블이 함께 표시됩니다. 왼쪽에서 오른쪽 순서로 전체 목록은 다음과 같습니다.
+
+| 액션       | 기능                                                                                                                                                                   |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export   | frame을 PNG로 download합니다. [frame을 PNG로 export하기](/ko/design/canvas#export-a-frame-as-png)를 참고하세요.                                                                        |
+| Build…   | project 내 모든 Artifact가 나열된 메뉴를 엽니다. 하나를 선택하면 해당 Artifact에 design이 적용되고, **Build this design**을 선택하면 새 Artifact가 생성됩니다. Design frame에만 해당됩니다. [Build](#build)를 참고하세요. |
+| Focus    | focus mode로 전환해 frame을 기본 화면으로 확장합니다.                                                                                                                                |
+| More (…) | 추가 frame 액션입니다. 복사, 복제, 순서 변경, export는 board의 [마우스 오른쪽 버튼 메뉴](/ko/design/canvas#right-click-menu)에서도 사용할 수 있습니다.                                                        |
+
+앱 frame(Website, Slides, Mobile app)에는 Focus와 추가 옵션이 표시되며, Design frame에는 그 앞에 Build…가 추가됩니다. 선택한 frame에서 새로운 direction으로 뻗어 나가려면 해당 frame의 [suggestions](/ko/design/explore-suggestions)를 활용하세요.
+
+frame을 선택하면 다음 Agent chat 메시지에 snapshot으로도 첨부됩니다. [Canvas에 있는 요소](/ko/design/canvas#what-lives-on-the-canvas)를 참고하세요.
+
+<Note>
+  액션 바는 **읽기 전용 모드**를 따릅니다. 백그라운드 task 컨텍스트에서 Canvas가 잠기면 반복 작업 액션은 숨겨지고 Focus만 남습니다.
+</Note>
+
+<div id="media-frames">
+  ### 미디어 frame
+</div>
+
+Image, Video, Vector graphic frame은 frame 위쪽에 작은 플로팅 액션 바를 표시합니다. 세 종류 모두 다음 항목을 공통으로 제공합니다:
+
+* **Replace media**: 새 파일을 업로드해 frame의 미디어를 교체합니다. Canvas에서의 위치와 크기는 그대로 유지됩니다.
+* **Download**: 미디어 파일을 컴퓨터에 저장합니다.
+* **Alt text**: 접근성을 위해, 그리고 해당 frame이 참조될 때 Agent가 더 많은 context를 얻을 수 있도록 대체 텍스트를 추가합니다.
+
+<Frame caption="비디오 frame의 액션 바: Replace media, Download, Alt text.">
+  <img src="/assets/mirror/canvas-frame-video-actions-905585560e90.png" alt="Canvas에서 선택된 파란색 슈퍼카 비디오 frame과 그 위에 표시된 플로팅 액션 바로, Replace media, Download('Download original' 툴팁 표시), Alt text 컨트롤이 보입니다." width="2000" height="1252" data-path="images/replitai/canvas-frame-video-actions.png" />
+</Frame>
+
+Image frame에는 다음 두 가지 컨트롤이 추가됩니다:
+
+* **Crop**: Canvas에서 바로 이미지를 잘라냅니다.
+* **Generate video**: 이미지를 바탕으로 비디오 클립을 생성합니다.
+
+<Frame caption="이미지 frame의 액션 바에는 Crop과 Generate video가 추가됩니다.">
+  <img src="/assets/mirror/canvas-frame-image-actions-aae1378db7e3.png" alt="Canvas에서 선택된 노란색 슈퍼카 이미지 frame과 그 위에 표시된 플로팅 액션 바로, Replace media, Crop, Download, Alt text, Generate video 컨트롤이 보입니다." width="1600" height="1002" data-path="images/replitai/canvas-frame-image-actions.png" />
+</Frame>
+
+<div id="explore-new-directions">
+  ## 새로운 direction 탐색하기
+</div>
+
+frame을 선택하면 그 옆에 [suggestions](/ko/design/explore-suggestions)가 나타납니다. 지금 보고 있는 화면을 바탕으로 한 원클릭 direction으로, 다른 layout, 새로운 분위기, 또는 디자인이 암시하는 페이지 등을 제안합니다. 각 제안은 원본 옆에 새로운 frame으로 생성되므로 원본은 그대로 유지되고 나란히 비교해 볼 수 있습니다.
+
+<Frame>
+  <img src="/assets/mirror/ambient-iq-0989ea31bce7.png" alt="APEX X1 슈퍼카 hero가 표시된 선택된 Website frame과, 그 옆에서 다른 접근 방식 탐색, 다른 layout 시도, 다른 분위기 탐색, 알아서 추천해 줘 같은 suggestion chip을 제공하는 추천 다음 단계 패널" width="2000" height="1254" data-path="images/design/replit-design/ambient-iq.png" />
+</Frame>
+
+<div id="build">
+  ## Build
+</div>
+
+선택한 Design frame의 **Build…** 메뉴는 디자인을 실제로 실행되는 앱으로 만들어 줍니다. 또한 이 메뉴에서 기존 Artifact에 디자인을 적용할 수도 있습니다.
+
+<Frame>
+  <img src="/assets/mirror/canvas-build-menu-f06b8b8b455f.png" alt="선택된 Design frame(APEX X1 Exact Replica)에서 열린 Build 메뉴. 'Build or apply your designs' 헤더 아래에 새 artifact를 생성하는 'Build this design'과, 프로젝트의 APEX X1 Design System 및 Scroll Hero website가 나열된 'Apply to an existing creation'이 표시되어 있음" width="2000" height="1153" data-path="images/replitai/canvas-build-menu.png" />
+</Frame>
+
+<div id="build-this-design">
+  ### Build this design
+</div>
+
+메뉴에서 **Build this design**을 선택하면 선택한 Design frame을 기반으로 새 Artifact가 생성됩니다. 새 Artifact는 project의 artifact 목록에 추가되고, 실제로 실행되는 앱이 됩니다. Build는 Core 또는 Pro 플랜에서 사용할 수 있습니다.
+
+<div id="apply-to-an-existing-artifact">
+  ### 기존 artifact에 적용하기
+</div>
+
+Build… 메뉴에는 project 내 모든 artifact가 나열됩니다. 그중 하나를 선택하면 선택한 Design의 변경 사항이 해당 artifact에 적용됩니다. Agent가 디자인에 맞춰 artifact의 코드를 다시 작성하며, design frame은 참고용으로 Canvas에 그대로 남아 있습니다.
+
+<div id="focus-mode">
+  ## Focus mode
+</div>
+
+Focus mode를 사용하면 Design을 벗어나지 않고도 선택한 frame을 전체 크기로 작업할 수 있습니다.
+
+<Steps>
+  <Step title="frame에서 Focus 선택하기">
+    frame을 선택한 다음, 해당 액션 바에서 **Focus**를 선택합니다.
+
+    <Frame caption="선택한 frame의 액션 바에 있는 Focus 동작.">
+      <img src="/assets/mirror/focus-before-0c9ced9218d9.png" alt="Canvas에서 선택된 Design frame과 frame 액션 바에 강조 표시된 Focus 동작." width="2000" height="1254" data-path="images/design/replit-design/focus-before.png" />
+    </Frame>
+  </Step>
+
+  <Step title="전체 크기로 작업하기">
+    frame이 화면을 가득 채우므로 board의 다른 요소 없이 frame만 확대해 작업할 수 있습니다.
+
+    <Frame caption="Focus mode">
+      <img src="/assets/mirror/focus-mode-24da418577ae.png" alt="Design frame이 화면을 가득 채우고 board 상단에 Exit focus 버튼이 표시된 Focus mode." width="2000" height="1254" data-path="images/design/replit-design/focus-mode.png" />
+    </Frame>
+  </Step>
+
+  <Step title="canvas로 돌아가기">
+    board 상단의 **Exit focus**를 선택하면 canvas로 돌아갑니다.
+  </Step>
+</Steps>
+
+<div id="related-pages">
+  ## 관련 페이지
+</div>
+
+* [Canvas](/ko/design/canvas) — 개요와 구성 요소.
+* [Toolbar](/ko/design/toolbar) — 플로팅 툴바로, Generate를 통해 새 frame을 만듭니다.
+* [Elements](/ko/design/elements) — frame 안에 들어가는 개별 요소.
+* [Visual Editor](/ko/design/visual-editor) — Focus한 frame 안에서의 요소 단위 편집.

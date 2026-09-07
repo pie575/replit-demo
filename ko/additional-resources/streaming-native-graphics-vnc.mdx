@@ -1,0 +1,69 @@
+---
+title: "VNC로 네이티브 그래픽 스트리밍하기"
+description: "Replit은 가상 네트워크 컴퓨팅(VNC) 기능을 제공합니다. VNC는 Replit App의 네이티브 데스크톱 화면을 웹 브라우저로 스트리밍할 수 있게 해주는 검증된 가상 데스크톱 프로토콜입니다. 이 프로토콜을 사용하면 네이티브 애플리케이션(Python, Java, C++ 등으로 개발된)이 실제 컴퓨터에서와 똑같이 데스크톱 창을 열 수 있습니다."
+---
+
+이 스트리밍 기술을 사용하면 어떤 기기에서든 브라우저에서 레거시 애플리케이션을 사용할 수 있습니다! 예를 들어 데스크톱용으로 만들어진 Python 기반 게임을 원본 코드를 전혀 수정하지 않고도 휴대폰이나 태블릿에서 바로 실행할 수 있습니다.
+
+<a href="https://replit.com/@demcrepl/Tetris-in-Pygame" target="_blank">테트리스(PyGame 기반)</a>
+
+<img src="/assets/mirror/tetris-ad06b806b2d4.png" alt="Replit App에서 실행 중인 테트리스 이미지" width="2055" height="1057" data-path="images/vnc/tetris.png" />
+
+<div id="how-can-i-use-vnc">
+  ## VNC는 어떻게 사용하나요?
+</div>
+
+언어에 상관없이 모든 Replit App에서 가상 데스크톱을 사용할 수 있습니다. Replit에서 네이티브 그래픽 프로그램을 실행하기 위해 별도로 변경할 사항은 없습니다. 애플리케이션이 네이티브 데스크톱 창을 열려고 하면 VNC pane이 나타납니다.
+
+<div id="securing-your-replit-app">
+  ## Replit App 보안 설정
+</div>
+
+기본적으로 VNC 연결에는 비밀번호가 설정되어 있지 않으며, WebSocket과 동일한 인증 방식을 사용하기 때문에 [https://replit.com](https://replit.com)에서만 접근할 수 있습니다. 외부 [noVNC](https://novnc.com) 클라이언트로 Replit App에 접근해야 한다면 VNC 비밀번호를 설정할 수 있습니다.
+
+Replit App의 [secrets](/ko/core-concepts/project-editor/app-setup/secrets) 설정에서 비밀번호를 지정하세요. `Secrets`는 다른 사용자가 비밀번호에 접근할 걱정 없이 안전하게 비밀번호를 보관할 수 있는 공간입니다. `VNC_PASSWORD`를 설정하면 원격 연결 시 보안이 한층 강화됩니다.
+
+<div id="how-can-i-use-fullscreen-vnc">
+  ## 전체 화면 VNC는 어떻게 사용하나요?
+</div>
+
+이 단계를 진행하려면 먼저 위의 안내에 따라 Replit App 보안 설정을 완료해야 합니다.
+
+1. &quot;Shell&quot; 탭에서 다음 명령을 실행하세요:
+   ```sh theme={null}
+   echo $REPL_ID
+   ```
+
+<Frame>
+  <img src="/assets/mirror/replid-6508492b1e8b.png" alt="echo 명령을 보여주는 이미지" width="628" height="174" data-path="images/vnc/replid.png" />
+</Frame>
+
+2. 위 출력값으로 `REPL_ID`를 바꿔 연결 URL을 만드세요: `<\REPL_ID\>.id.repl.co`
+3. 별도의 브라우저 탭에서 [noVNC 클라이언트](https://novnc.com/noVNC/vnc.html)를 여세요.
+4. 연결 설정을 여세요.
+
+<Frame>
+  <img src="/assets/mirror/settings-3e0e0c4fd198.png" alt="연결 설정 열기" width="126" height="302" data-path="images/vnc/settings.png" />
+</Frame>
+
+5. WebSockets 필드를 펼치세요. `host` 필드에 연결 URL(`\<REPL_ID\>.id.repl.co`)을 입력하고, `path` 필드는 비워 두세요.
+
+<Frame>
+  <img src="/assets/mirror/host-31b5c99194b2.png" alt="host" width="214" height="230" data-path="images/vnc/host.png" />
+</Frame>
+
+6. `Scaling Mode`를 `Remote Resizing`으로 변경하세요:
+
+<Frame>
+  <img src="/assets/mirror/scaling-0ffe9aae34bb.png" alt="scaling" width="147" height="74" data-path="images/vnc/scaling.png" />
+</Frame>
+
+7. 자격 증명을 입력하라는 메시지가 나타나면 사용자 이름 `runner`와 위에서 설정한 비밀번호를 사용하세요.
+
+<div id="examples">
+  ## 예시
+</div>
+
+* <a href="https://replit.com/@demcrepl/Tetris-in-Pygame" target="_blank">PyGame</a>
+* <a href="https://replit.com/@amasad-matplotlib" target="_blank">Python matplotlib</a>
+* <a href="https://replit.com/@sigcse2021/Game-of-Life-demcrepl" target="_blank">Java Processing</a>

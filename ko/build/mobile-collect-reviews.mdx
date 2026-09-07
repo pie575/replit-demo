@@ -1,0 +1,73 @@
+---
+title: "리뷰와 평점 수집하기"
+description: "각 스토어의 기본 리뷰 요청 프롬프트를 활용해 만족한 플레이어가 PixelGames에 평점을 남기도록 유도하세요."
+sidebarTitle: "리뷰 수집"
+icon: "star"
+---
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+export const reviewPrompt = "플레이어가 Blocks에서 새로운 최고 점수를 기록한 직후 native review prompt를 사용해 PixelGames를 평가하도록 요청하세요.";
+
+평점이 많을수록 앱 순위가 올라가고 새로운 User의 신뢰를 얻는 데 도움이 됩니다. 두 store 모두 이를 위한 네이티브 prompt를 제공합니다. 앱 안에서 바로 평점을 요청하는 팝업입니다.
+
+<div id="ask-for-a-review-at-the-right-moment">
+  ## 적절한 순간에 리뷰 요청하기
+</div>
+
+승리, 최고 점수 경신, 레벨 업 직후에 리뷰를 요청하세요. 얼마나 자주 요청하느냐보다 언제 요청하느냐가 더 중요합니다.
+
+<AiPrompt>
+  {reviewPrompt}
+</AiPrompt>
+
+<Frame caption="최고 점수를 경신한 뒤 나타난 PixelGames의 게임 오버 화면. 평점을 요청하기에 가장 좋은 순간입니다.">
+  <img src="/assets/mirror/rate-app-dd66c937eaf7.webp" alt="최고 점수 경신을 보여주는 PixelGames 게임 오버 화면" data-path="images/pixelgames/mobile/rate-app.webp" width="1516" height="852" data-path="images/pixelgames/mobile/rate-app.webp" />
+</Frame>
+
+iOS의 StoreKit과 Android의 Google Play In-App Review API는 코드에서 아무리 자주 요청하더라도 실제로 표시되는 횟수를 제한합니다.
+
+<Note>
+  별 5개를 줘야만 게임을 잠금 해제해 주는 식으로 평점을 대가로 보상을 주거나 평점을 강요하지 마세요. Apple과 Google 모두 보상을 조건으로 한 리뷰를 금지하고 있으며, 이를 어기면 PixelGames가 심사에서 거부되거나 스토어에서 삭제될 수 있습니다.
+</Note>
+
+<div id="troubleshooting">
+  ## 문제 해결
+</div>
+
+* **평가 요청이 전혀 표시되지 않음:** 가끔 발생할 수 있는 현상입니다. 두 플랫폼 모두 코드에서 API를
+  몇 번 호출하든 관계없이 시스템이 이를 표시하는 빈도를 제한합니다.
+* **테스트 중에 매번 평가 요청이 표시됨:** TestFlight나 Internal Testing 빌드에서는 정상입니다.
+  연간 rate limit은 실제 production 설치에만 적용됩니다.
+* **사용자가 너무 자주 요청받는다고 불평함:** 앱을 실행할 때마다 표시되는 커스텀 팝업이 아니라 네이티브
+  API를 호출하고 있는지 확인하세요. 커스텀 팝업은 내장된 rate limiting을 우회합니다.
+
+<div id="whats-next">
+  ## 다음 단계
+</div>
+
+<CardGroup cols={2}>
+  <Card title="결제 추가" icon="credit-card" href="/ko/build/mobile-payments">
+    PixelGames에서 플레이어에게 콘텐츠 이용료를 청구해 보세요.
+  </Card>
+</CardGroup>
+
+<div id="related">
+  ## 관련 문서
+</div>
+
+* [App Store에 제출하기](/ko/build/mobile-publish-ios)
+* [Google Play에 제출하기](/ko/build/mobile-publish-android)

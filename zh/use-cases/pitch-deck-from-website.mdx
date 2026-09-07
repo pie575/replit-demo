@@ -1,0 +1,162 @@
+---
+title: "制作投资者路演演示文稿"
+description: "基于您的网站、Drive 和财务 Sheet，生成一份包含 10–12 张幻灯片的投资者路演演示文稿。"
+sidebarTitle: "制作投资者路演演示文稿"
+icon: "presentation-screen"
+---
+
+export const Connectors = ({items}) => <div style={{
+  margin: "8px 0 20px"
+}}>
+    <style>{`
+      .connectors-list, .connectors-list * { margin-top: 0 !important; margin-bottom: 0 !important; }
+      .connectors-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding: 4px 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+      }
+      .connectors-row img {
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        margin: 2px 0 0 !important;
+        display: block !important;
+      }
+    `}</style>
+    <div className="connectors-list">
+      {items.map((item, i) => <div key={item.id} className="connectors-row" style={{
+  borderTop: i === 0 ? "none" : "1px solid rgba(130,130,130,0.22)"
+}}>
+          <img src={`/images/connectors/${item.id}.svg`} alt="" width={20} height={20} />
+          <div style={{
+  minWidth: 0
+}}>
+            <div>
+              <strong>{item.name}</strong>
+              {item.why ? <span style={{
+  opacity: 0.72
+}}> · {item.why}</span> : null}
+            </div>
+            {item.auth === "api-key" ? <div style={{
+  fontSize: "11.5px",
+  lineHeight: 1.35,
+  color: "#F26207",
+  marginTop: "2px"
+}}>
+                这不是原生 connector。Agent 会要求您提供 API key。
+              </div> : null}
+          </div>
+        </div>)}
+    </div>
+  </div>;
+
+export const AiPrompt = ({children}) => {
+  return <CodeBlock className="relative block max-w-full overflow-x-hidden font-sans !whitespace-pre-wrap !break-words" style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+      <div className="pr-7" style={{
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  }}>
+        {children}
+      </div>
+    </CodeBlock>;
+};
+
+基于你的网站、Google Drive 中的品牌文件以及 Google Sheets 中的财务数据，在 Replit Slides 中生成一份
+面向投资者的路演演示文稿 (10–12 张幻灯片) ，涵盖问题、产品、市场、业务进展、
+团队和融资需求。Agent 从网站提取叙事和佐证材料，从 Drive 获取品牌素材，并从 Sheet 获取数据
+(收入、现金消耗、资金续航期、单位经济效益、预测) 。
+
+<div id="best-for">
+  ## 适用对象
+</div>
+
+* 需要根据现有网站和财务表格制作投资者路演材料的创始人。
+* 正在进行融资，且已在 Google Sheets 中维护指标的运营负责人。
+
+<div id="connectors">
+  ## Connectors
+</div>
+
+<Connectors
+  items={[
+{
+id: "google-drive",
+name: "Google Drive",
+why: "徽标、配色和可选的参考演示文稿",
+},
+{
+id: "google-sheets",
+name: "Google Sheets",
+why: "财务数据：收入、资金消耗、资金续航期、预测",
+},
+]}
+/>
+
+<div id="before-you-start">
+  ## 开始前
+</div>
+
+准备好线上网站、Drive 中的品牌文件，以及包含已标注行或标签页 (收入、
+资金消耗、资金续航期、预测) 的 Sheet。连接 Drive 和 Sheets。告知 Agent 融资轮次 (pre-seed、seed、
+Series A) 及融资金额。
+
+<div id="prompt-the-agent">
+  ## 向 Agent 提示
+</div>
+
+<AiPrompt>
+  根据此网站 [URL]、Google Drive 中的品牌文件，以及这份包含财务数据的 Google Sheet
+  [链接]，在 Replit Slides 中生成一份包含 10–12 张幻灯片的投资者路演演示文稿。涵盖问题、解决方案、产品、市场、业务进展、商业模式、
+  财务状况、团队和融资需求。仅使用 Sheet 中出现的数字。标注所有需要注明来源的内容。
+</AiPrompt>
+
+<div id="what-to-expect">
+  ## 使用预期
+</div>
+
+Agent 会将网站内容整理成幻灯片大纲，加入 Sheet 中的业务进展和财务数据，
+并在 Replit Slides 中制作演示文稿。发送给投资者之前，请逐一对照 Sheet 核查所有数据。请在 Preview 中逐页浏览演示文稿，将财务幻灯片与
+Sheet 标签页核对，并确认每项表述都能在网站或 Sheet 中找到来源。
+
+<div id="make-it-work-for-you">
+  ## 按你的需求调整
+</div>
+
+<AiPrompt>
+  从 Sheet 中添加一张财务幻灯片，包含过去 12 个月的收入和资金消耗，
+  以及未来 18 个月的预测。请在幻灯片上标注来源标签页。
+</AiPrompt>
+
+<AiPrompt>
+  将此演示文稿修改为与 [参考演示文稿] 一致。保留布局、
+  排版、颜色和章节结构。保留 Sheet 中已批准的数据，并标记任何不匹配的内容。
+</AiPrompt>
+
+<div id="troubleshooting">
+  ## 故障排除
+</div>
+
+* **数据与表格不一致：**带标签的行或工作表标签页很重要。请为收入、资金消耗、资金续航期和预测数据的标签页命名，并告诉 Agent 仅使用其中的数字。对任何需要来源的数据进行标注。
+* **品牌效果不对：**连接 Drive，并指定徽标和颜色。如果你有参考演示文稿，请让 Agent 在不更改已批准数据的前提下，匹配布局和字体样式。
+
+<div id="related">
+  ## 相关内容
+</div>
+
+<CardGroup cols={2}>
+  <Card title="设计落地页" href="/zh/use-cases/design-landing-page">
+    使用相同的 Google Drive 品牌文件，适合还需要候补名单页面的创始人。
+  </Card>
+
+  <Card title="创建社交媒体图标和横幅" href="/zh/use-cases/create-social-kit">
+    为所有平台使用相同的 Google Drive 品牌文件。
+  </Card>
+</CardGroup>
